@@ -1,0 +1,163 @@
+<apex:component >
+<style>
+body {background-color: #C0C0C0;}
+</style>
+<apex:includeScript value="{!URLFOR($Resource.progressBarResources, 'progressBarResources/scripts/jquery-2.0.2.min.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.progressBarResources, 'progressBarResources/scripts/jquery-ui.min.js')}"  />
+
+
+
+<script type="text/javascript">
+    
+    $(document).ready(function () {
+var accordionItems = new Array();
+	init();
+	/*
+	$('#typeID').hide();
+	$('#sortBy').hide();
+
+	$("#countryID").change(function(){availableTypes();});
+	$("#typeID").change(function(){results();});
+	$("#sortBy").change(function(){results();});
+
+	function availableTypes(){
+		var countryID = $('#countryID').val();
+		$.ajax({
+			url:"ajax/availableTypes.php",
+			type:"post",
+			dataType: "html",
+			data:{countryID:countryID, userlevel:<?php echo $userLevel ?>},
+			beforeSend:function(){
+				$('#results').html('<div class="loading"><img src="images/site/loading.gif" alt="Loading..." />Getting types</div>');
+			},
+			success:function(data){
+				$('#typeID').html(data);
+			},
+			complete:function(){
+				$('#typeID').show();
+				$('#sortBy').show();
+				$('#results').html("");
+				$('#typeID').focus();
+			}
+		});
+	*/	
+	}
+	/*
+	function results(){
+		var countryID = $('#countryID').val();
+		var typeID = $('#typeID').val();
+		var sort = $('#sortBy').val();
+		
+		if(typeID !="000"){
+			$.ajax({
+				url:"ajax/listByType.php",
+				type:"post",
+				dataType: "html",
+				data:{countryID:countryID,typeID:typeID,sortBy:sort},
+				beforeSend:function(){
+					$('#results').html('<div class="loading"><img src="images/site/loading.gif" alt="Loading..." /></div>');
+				},
+				success:function(data){
+					$('#results').html(data);
+				}
+			});
+		}else{
+			$('#results').html("");
+		}
+	}
+	
+	$('#keywords').on('keyup', function() {
+		keyword();
+	});
+	$('#keywords').on('paste', function() {
+		keyword();
+	});
+	
+	$('#keywordFilter input:checkbox').click(function(e){
+		keyword();
+	});
+	$("#limit").on('change',function(){
+		keyword();
+	});
+
+
+function keyword(){
+		var kw = $("#keywords").val();
+		var chkName = $('#chkName').prop('checked');
+		var chkRegion = $('#chkRegion').prop('checked');
+		var chkDistrict = $('#chkDistrict').prop('checked');
+		var chkTown = $('#chkTown').prop('checked');
+		var chkPCode = $('#chkPCode').prop('checked');
+		var limit=$('#limit').val();
+		var len = kw.length;
+		if(len > 2){    
+		$.ajax({
+			 type: "POST", 
+			 url: "ajax/search_keyword.php",
+			 data:{kw:kw,fName:chkName,fRegion:chkRegion,fDistrict:chkDistrict,fTown:chkTown,fPCode:chkPCode, limit:limit, userlevel:<?php echo $userLevel ?>},
+			 dataType: 'html',
+			 beforeSend:function(){
+					$('#results').html('<div><img src="images/site/loading.gif" alt="searching..." /></div>');
+				},
+			 success: function(data){        
+				$("#results").html(data); 
+				//$('#results').highlight(kw);				
+			}
+		  });    
+		}else{
+			$("#results").html("Enter 3 or more letters to search");
+		}
+}
+
+
+    */
+
+    function init() {
+
+      // Grab the accordion items from the page
+      var divs = document.getElementsByTagName( 'div' );
+      for ( var i = 0; i < divs.length; i++ ) {
+        if ( divs[i].className == 'homeVisitDetailBox' ) accordionItems.push( divs[i] );
+      }
+      alert(accordionItems);
+      // Assign onclick events to the accordion item headings
+      for ( var i = 0; i < accordionItems.length; i++ ) {
+        var h3 = getFirstChildWithClassName( accordionItems[i], 'titleBox' );
+        h3.onclick = toggleItem;
+      }
+	
+      // Hide all accordion item bodies except the first
+      for ( var i = 0; i < accordionItems.length; i++ ) {
+        accordionItems[i].className = 'homeVisitDetailBox hide';
+        $(accordionItems[i]).find('div').slideUp();
+      }
+		
+	}
+
+    function toggleItem() {
+      var itemClass = this.parentNode.className;
+
+      // Hide all items
+      for ( var i = 0; i < accordionItems.length; i++ ) {
+        accordionItems[i].className = 'homeVisitDetailBox hide';
+        $(accordionItems[i]).find('div').slideUp();
+      }
+
+      // Show this item if it was previously hidden
+      if ( itemClass == 'homeVisitDetailBox hide' ) {
+        this.parentNode.className = 'homeVisitDetailBox';
+        $(this).parent().find('div').slideDown();
+      }
+    }
+
+    function getFirstChildWithTagName( element, tagName ) {
+      for ( var i = 0; i < element.childNodes.length; i++ ) {
+        if ( element.childNodes[i].nodeName == tagName ) return element.childNodes[i];
+      }
+    }
+
+});
+    
+</script>
+
+</apex:component>

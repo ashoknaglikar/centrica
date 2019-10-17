@@ -1,0 +1,35 @@
+<apex:page controller="MyNotesController" action="{!init}">
+     <apex:includeScript value="/support/console/25.0/integration.js"/>
+    <style> 
+        html body.sfdcBody {
+            background-color: #FFFFCC;
+        }
+    </style>
+    
+    <textarea id="notesInput" cols="50" rows="10" style="width:500px; height:250px;background-color:#FFFFCC; border:0px; margin:0px;"
+        onkeyup="saveNotes();"                
+    >
+        {!Notes}
+    </textarea> 
+   
+    <apex:form >
+        <apex:actionFunction action="{!setNotes}" name="setNotesJS" reRender="">
+            <apex:param name="note" assignTo="{!Notes}" value=""/>
+        </apex:actionFunction>  
+    </apex:form>
+    
+    <script>
+        var notesTextArea = document.getElementById('notesInput');        
+        function saveNotes() {
+            setNotesJS(notesTextArea.value);
+        }
+        
+        var listener = function (result) {
+            sforce.console.setCustomConsoleComponentWindowVisible(true);
+            document.getElementById('notesInput').innerHTML += '\nMessage Received: ' + result.message;
+        };
+
+        // add a listener for the 'SampleEvent' event type
+        sforce.console.addEventListener('updateMyNotes', listener);
+    </script>
+</apex:page>

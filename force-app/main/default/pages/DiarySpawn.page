@@ -1,0 +1,50 @@
+<apex:page standardController="Job__c" extensions="bg_Diary_Spawn_Extension">
+        <apex:includeScript value="/soap/ajax/29.0/connection.js"/>
+        <apex:includeScript value="/support/console/29.0/integration.js"/>
+        <script>
+            var openSubtabTimer = null;
+       
+           function openDiarySubtab() {
+           
+               // Use the results primary tab id and open a new subtab 
+               var openSubtab = function(result) {
+                    var jobUrl = '/apex/DiaryDisplay?area={!District}&week={!WeekBegining}&stopNull=true';
+                    //alert(jobUrl);
+                    sforce.console.openSubtab(result.id,jobUrl,false,'Job Diary');           
+                    clearTimeout(openSubtabTimer);
+                };
+                // Get the enclosing primary tab id. The openSubtab method is set as the callback
+                sforce.console.getEnclosingPrimaryTabId(openSubtab);
+           }       
+          
+           var previousOnload = window.onload;        
+           window.onload = function() { 
+                if (previousOnload) { 
+                    previousOnload();
+                }                
+               openSubtabTimer = setTimeout('openDiarySubtab()', '500'); 
+           }
+            
+            function testGetSubtabIds(result) {
+                //Get the subtabs of the primary tab 'scc-pt-0'
+               //This value is for example purposes only
+                 var primaryTabId = result;
+                  sforce.console.getSubtabIds(primaryTabId , showTabId);
+            }
+            
+            var showTabId = function showTabId(result) {
+                //Display the subtab IDs
+                //alert('Subtab IDs: ' + result.ids);
+            
+                //Get the urls of all of those sub tabs
+                //pull back the related ids
+                //check if the ids appear in the urls
+                //spawn the tabs that don't already exist
+            };
+            
+            sforce.console.getFocusedPrimaryTabId(function(result) {
+                testGetSubtabIds(result.Id);
+            });
+            
+        </script>
+</apex:page>

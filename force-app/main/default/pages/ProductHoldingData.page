@@ -1,0 +1,49 @@
+<apex:page standardController="Account" extensions="ProductHoldingDataController">
+    <apex:form >
+    	<!-- Display error message if user is not enabled -->
+    	<apex:pagemessage severity="info" detail="Not enabled for Product Holding." strength="2" rendered="{!!ProductHoldingEnabled}" />
+    	
+    	<!-- Display error message if user is enabled but error occurred -->
+    	<apex:pagemessage severity="info" detail="No Product Holding Information data present in system." strength="2" rendered="{!IsError && ProductHoldingEnabled}" />
+    	
+    	<!-- Display information if user is enabled and information retrieved sucessfully -->
+        <apex:pageblock rendered="{! (!IsError) && ProductHoldingEnabled}">
+             <c:ProductHoldingInfo ProductHolding="{!productHolding}" ProductHoldingAccounts="{!ProductHoldingAccounts}"/>
+             <apex:pageblocksection columns="3" collapsible="false" title="Product Holding Information (Optional)">    
+                    <apex:outputfield value="{!ProductHolding.LengthOfTimeProductHeld__c}" />
+                    <apex:outputfield value="{!ProductHolding.GasAnnualSpend__c}" />
+                    <apex:outputfield value="{!ProductHolding.ElectricityAnnualSpend__c}" />
+<!--                    <apex:outputfield value="{!ProductHolding.GasMonthlySpend__c}" />-->
+<!--                    <apex:outputfield value="{!ProductHolding.ElectricityMonthlySpend__c}" />-->
+                    
+                    <apex:outputfield value="{!ProductHolding.MakeOfBoiler__c}" />
+                    <apex:outputfield value="{!ProductHolding.ModelOfBoiler__c}" />
+<!--                    <apex:outputfield value="{!ProductHolding.DateOfInstallation__c}" />-->
+                    
+<!--                    <apex:outputfield value="{!ProductHolding.DateOfLastCertification__c}" />-->
+                    <apex:outputfield value="{!ProductHolding.BoilerBreakdownHistory__c}" />
+                    <apex:outputfield value="{!ProductHolding.CustomerTypeOrMarketingCode__c}" />
+                    
+<!--                    <apex:outputfield value="{!ProductHolding.IsExistingPropertiesHaveCentralHeating__c}" />-->
+<!--                    <apex:outputfield value="{!ProductHolding.IsPetOwner__c}" />-->
+<!--                    <apex:outputfield value="{!ProductHolding.IsParent__c}" />-->
+<!--                    -->
+<!--                    <apex:outputfield value="{!ProductHolding.IsPartTimeOrNightWorker__c}" />-->
+                    <apex:outputfield value="{!ProductHolding.BestTimeToCall__c}" />
+<!--                    <apex:outputfield value="{!ProductHolding.DateOfPreviousQuotes__c}" />-->
+<!--                    -->
+<!--                    <apex:outputfield value="{!ProductHolding.QuoteDetails__c}" />-->
+<!--                    <apex:outputfield value="{!ProductHolding.IsCustomerHasCavityWallInsulation__c}" />-->
+                    <apex:outputfield value="{!ProductHolding.IsCustomerHasLoftInsulation__c}" />
+                    
+<!--                    <apex:outputfield value="{!ProductHolding.ExistingFinanceProducts__c}" />-->
+<!--                    <apex:outputfield value="{!ProductHolding.NumberOfExistingProperties__c}" />-->
+                    
+                    <apex:outputfield value="{!ProductHolding.NumberOfPreviousQuotes__c}" />
+                
+               </apex:pageblocksection>
+        </apex:pageblock>
+        
+        
+    </apex:form> 
+</apex:page>

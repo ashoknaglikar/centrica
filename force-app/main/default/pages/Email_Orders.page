@@ -1,0 +1,29 @@
+<apex:page StandardController="order__c" recordSetVar="order__c" tabStyle="order__c" extensions="clsOrderEmail" action="{!sendMail}">
+    <apex:sectionHeader title="Purchase Order" Subtitle="Email Order Details"/> 
+    <apex:form > 
+        <apex:pageBlock title="Purchase Order">
+            <apex:pageblock rendered="{!(ISNULL(orderLst))}">
+                <apex:outputLabel value="No records to selected"></apex:outputLabel>
+            </apex:pageblock>
+            <apex:pageblock rendered="{!NOT(ISNULL(orderLst))}">
+                <apex:pageblockTable value="{!orderLst}" var="order" >
+                    <apex:column headerValue="SAP number">
+                        <a href="/{!order.sOrderId}" ><apex:outputLabel value="{!order.sSapNumber}" /></a>
+                    </apex:column>
+                    <apex:column headerValue="Supplier Name">
+                        <apex:outputLabel value="{!order.sSupplierName}" />  
+                    </apex:column>  
+                    <apex:column headerValue="Supplier Email Address">
+                        <apex:outputLabel value="{!order.sEmailAddress}" />  
+                    </apex:column>     
+                    <apex:column headerValue="Status">
+                        <apex:outputLabel value="{!order.sMessage}" />  
+                    </apex:column>                      
+                </apex:pageblockTable>
+            </apex:pageblock>
+            <apex:pageBlockButtons rendered="true">
+                <apex:commandButton value="Done" action="{!CancelGoBack}" />
+            </apex:pageBlockButtons>
+        </apex:pageBlock>  
+    </apex:form>
+</apex:page>

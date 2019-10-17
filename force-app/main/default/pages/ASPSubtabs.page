@@ -1,0 +1,67 @@
+<apex:page showHeader="false" sidebar="false" extensions="bg_Javascript_Remote_Methods" standardController="ASP__c">
+   <apex:includeScript value="/soap/ajax/29.0/connection.js"/>
+   <apex:includeScript value="/support/console/29.0/integration.js"/>
+   <script type="text/javascript"> 
+      function testOpenSubtab() {
+            //First find the ID of the primary tab to put the new subtab in
+            sforce.console.getEnclosingPrimaryTabId(openSubtab);
+        }
+        
+        var openSubtab = function openSubtab(result) {
+            //Now that we have the primary tab ID, we can open a new subtab in it
+            var primaryTabId = result.id;
+            sforce.console.openSubtab(primaryTabId , '/{!ASP__c.Quote__c}', false, 
+            'Quote', null, openSuccess, 'salesforceSubtab');
+
+            bg_Javascript_Remote_Methods.getOpportunity('{!ASP__c.Id}', function(result, event){
+                if(event.status) {
+                    sforce.console.openSubtab(primaryTabId , '/'+result, false, 
+                    'CHI Lead', null, openSuccess, 'salesforceSubtab2');
+                }
+            });
+
+            bg_Javascript_Remote_Methods.getJobs('{!ASP__c.Quote__c}', function(result, event){
+                if(event.status) {
+                    for (var i = 0; i < result.length; i++) {
+                        sforce.console.openSubtab(primaryTabId , '/'+result[i].Id, false, 
+                        result[i].Name, null, openSuccess, 'salesforceSubtabJob'+i);
+                    }
+                }
+            });
+            
+            bg_Javascript_Remote_Methods.getPaymentCollections('{!ASP__c.Quote__c}', function(result, event){
+                if(event.status) {
+                    for (var i = 0; i < result.length; i++) {
+                        sforce.console.openSubtab(primaryTabId , '/'+result[i].Id, false, 
+                        result[i].Name, null, openSuccess, 'salesforceSubtabPayment'+i);
+                    }
+                }
+            });
+
+            
+        };
+        
+        var openSuccess = function openSuccess(result) {
+            //Report whether we succeeded in opening the subtab
+            if (result.success == true) {
+                //alert('subtab successfully opened');
+            } else {
+                //alert('subtab cannot be opened');
+            }
+        };   
+        testOpenSubtab();
+					
+			var getEnclosingPrimaryTabId = function getEnclosingPrimaryTabId() {
+				sforce.console.getEnclosingPrimaryTabId(getTabLink);
+			}
+			var getTabLink = function getTabLink(result) {
+				sforce.console.getTabLink(sforce.console.TabLink.PARENT_AND_CHILDREN, result.id, showTabLink);
+			}
+			var showTabLink = function showTabLink(result) {
+				var link = result.tabLink;
+				console.log(link);
+				//alert(link);
+			};
+			getEnclosingPrimaryTabId();
+        </script>
+</apex:page>

@@ -1,0 +1,31 @@
+<apex:page standardController="cscfga__Product_Basket__c"  tabStyle="Appointment__c">
+    <style type="text/css">
+        .numberCol {
+            text-align: right
+        }
+        .main {
+            padding-top: 8px;
+        }
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+    <apex:form >
+        <apex:pageBlock title="Product Basket Edit">
+        
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton value="Save" action="{!save}" />
+                <apex:commandButton value="Cancel" action="{!cancel}" />
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection title="Information">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Name" for="name" />
+                    <apex:inputField id="name" value="{!cscfga__Product_Basket__c.name}" />
+                </apex:pageBlockSectionItem>
+                <apex:inputfield value="{!cscfga__Product_Basket__c.Appointment__c}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+    </apex:form>
+</apex:page>

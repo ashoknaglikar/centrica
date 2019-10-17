@@ -1,0 +1,167 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" controller="NPSSurveyEntryFormController">
+<apex:form style="padding:0px;margin:0px;">
+<style>
+    body{position:absolute;padding:0px;margin:0px;}
+</style>
+<!-- Display Load errors sections -->
+<center>
+<apex:pageblock rendered="{!IsLoadError}">
+    
+    <apex:outputPanel rendered="{!DisplayNoDataError}">
+    <apex:image url="{!$Resource.ErrorImage}" width="50" height="50" />
+    <h1>Sorry !!</h1>
+    <p>No data present. Please retry or contact Administrator.</p>
+    </apex:outputPanel>
+    
+    <apex:outputPanel rendered="{!DisplayLinkAccessError}">
+    <apex:image url="{!$Resource.ErrorImage}" width="50" height="50" />
+    <h1>Sorry !!</h1>
+    <p>You have already taken the survey.</p>
+    </apex:outputPanel>
+
+    <apex:outputPanel rendered="{!DisplayNPSExistsError}">
+    <apex:image url="{!$Resource.ErrorImage}" width="50" height="50" />
+    <h1>Sorry !!</h1> 
+    <p>NPS already exists.</p>
+    </apex:outputPanel>
+    
+    <apex:outputPanel rendered="{!DisplayNoNPSExistsError}">
+    <apex:image url="{!$Resource.ErrorImage}" width="50" height="50" />
+    <h1>Sorry !!</h1>
+    <p>No NPS data exists.</p>
+    </apex:outputPanel>
+    
+</apex:pageblock>
+</center>
+<!-- Display survey form -->
+<apex:outputPanel layout="none" style="padding:0 0 0 0;margin:0 0 0 0;" rendered="{! !SurveyPosted && !IsLoadError }"> <!--&& !DisplayNoDataError && !DisplayLinkAccessError}">  -->
+<script>
+    var curHit = -1;
+    function setHit(num)
+    {
+        curHit = parseInt(num);
+        if(isNaN(curHit)) curHit = 0;
+        //alert('curHit = ' + curHit);
+        document.getElementById('{!$Component.txtHit}').value = curHit;
+    }
+</script>
+
+<style>
+    body
+    {
+        font-family:verdana;
+    }
+
+</style>
+
+
+<div style="width:875px;padding:0px 0px 0px 0px;margin:0px 0px 0px 0px;background-image:url('{!URLFOR($Resource.NPS_Images,'/npsbck.JPG')}');background-repeat:no-repeat;">
+    <div style="margin-left: 50px">
+        <table width="100%">
+            <tr>
+                <td style="margin-top:5px;color:#E6A312;font-size:46px;font-weight:bold;" width="100%">
+                    Your comments card
+                </td>
+                <td width="25%" align="right">
+                    <apex:image rendered="{!IsEnglish}" url="{!URLFOR($Resource.NPS_Images, '/BritishGaslogoblue.JPG')}" style="padding-top:10px;margin-right:8px;"/>
+                    <apex:image rendered="{!!IsEnglish}" url="{!URLFOR($Resource.NPS_Images, '/ScottishGasonWhite.jpg')}" style="padding-top:10px;margin-right:8px;"/>
+                </td>
+            </tr>
+        </table>
+        <div style="margin-top:5px;color:#FFFFFF;font-size:12px;width: 93%;">
+        
+         <b>Dear {!PrimaryContactDetails}</b>,<br/><br/>
+
+           <apex:outputText escape="false" value="{!PageBody}"></apex:outputText>
+            ,<br/><br/>
+           Yours faithfully,<br/><br/>
+
+            <b><apex:outputText escape="false" value="{!PageSignature}"></apex:outputText></b><br/>            
+            Managing Director, Central Heating Installations
+        </div>                
+        <table style="font-size: 12px; font-weight: bold; color: rgb(18, 57, 130); margin-top: 70px; width: 93%;">
+            <tr>
+                <td rowspan="3" width="40%" style="padding-left:5px;">
+                
+				<apex:outputText escape="false" value="{!PageComment}"></apex:outputText>                
+                </td>                
+                <td rowspan="3" width="5%">&nbsp;</td>
+                <td  width="55%" colspan="11"  align="center">Definitely would not recommend <font weight="bold">?</font> Definitely would recommend</td>                   
+            </tr>
+            <tr>
+                <td align="center">
+                    0<br/>
+                    <input type="radio" onClick="setHit(0);" name="CHIT" value="0"/>
+                    <apex:inputText value="{!Hit}" style="display:none;position:absolute;" id="txtHit"/>
+                </td>
+                <td align="center">1<br/>
+                    <input type="radio" onClick="setHit(1);" name="CHIT" value="1"/>
+                </td>
+                <td align="center">2<br/>
+                    <input type="radio" onClick="setHit(2);" name="CHIT" value="2"/>
+                </td>
+                <td align="center">3<br/>
+                    <input type="radio" onClick="setHit(3);" name="CHIT" value="3"/>
+                </td>
+                <td align="center">4<br/>
+                    <input type="radio" onClick="setHit(4);" name="CHIT" value="4"/>
+                </td>
+                <td align="center">5<br/>
+                    <input type="radio" onClick="setHit(5);" name="CHIT" value="5"/>
+                </td>
+                <td align="center">6<br/>
+                    <input type="radio" onClick="setHit(6);" name="CHIT" value="6"/>
+                </td>
+                <td align="center">7<br/>
+                    <input type="radio" onClick="setHit(7);" name="CHIT" value="7"/>
+                </td>
+                <td align="center">8<br/>
+                    <input type="radio" onClick="setHit(8);" name="CHIT" value="8"/>
+                </td>
+                <td align="center">9<br/>
+                    <input type="radio" onClick="setHit(9);" name="CHIT" value="9"/>
+                </td>
+                <td align="center">10<br/>
+                    <input type="radio" onClick="setHit(10);" name="CHIT" value="10"/>
+                </td>
+                
+            </tr>
+        </table>
+        <br/>
+        <div style="margin-left:5px;margin-top:2px;margin-right:15px;margin-top:8px;margin-right:15px;padding-left:2px;">
+        <br></br> 
+            <div style="font-size:12px;font-weight:bold;color:#123982;">Please give reasons for the score you gave</div>
+            &nbsp;&nbsp;           
+            <apex:inputTextarea value="{!Comments}" style="padding-left:5px;border:1px solid #AAAAAA" rows="4" cols="80"></apex:inputTextarea>
+            <apex:commandButton value="Submit" action="{!PostSurvey}" onClick="return checkScale();"/>
+        </div>
+        <br/><br/>
+        
+    </div>
+</div>
+
+<script>
+    function checkScale()
+    {
+        if(curHit < 0)
+        {
+            alert('Please select a value on scale.');
+            return false;
+        }
+        return true;
+    }
+    
+    if({!IsErrComments})
+    {
+        alert('{!ErrComments}');
+    }
+</script>
+
+</apex:outputPanel>
+
+<apex:outputPanel layout="none" rendered="{!SurveyPosted}">
+Survey posted successfully.
+</apex:outputPanel>
+
+</apex:form>
+</apex:page>

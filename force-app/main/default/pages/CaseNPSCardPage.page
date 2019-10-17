@@ -1,0 +1,286 @@
+<apex:page Controller="CaseNPSCardController" showHeader="false" sidebar="false" >
+<html>
+<head>
+    
+<script>
+    var curHit = -1;
+    function setHit1(num)
+    {
+        //alert(num);
+        curHit = parseInt(num);
+        //alert(curHit);
+        if(isNaN(curHit)) curHit = 0;
+        //alert(curHit);
+       assignfirst(curHit);
+        
+    }
+    function setHit2(num)
+    {
+        curHit = parseInt(num);
+        if(isNaN(curHit)) curHit = 0;
+        //document.getElementById('{!$Component.txtHit2}').value = curHit;
+        assignSec(curHit);
+    }
+    function setHit3(num)
+    {
+        curHit = parseInt(num);
+        if(isNaN(curHit)) curHit = 0;
+        //document.getElementById('{!$Component.txtHit3}').value = curHit;
+        assignThird(curHit);
+    }
+    function setHit4(num)
+    {
+        curHit = parseInt(num);
+        if(isNaN(curHit)) curHit = 0;
+        //document.getElementById('{!$Component.txtHit4}').value = curHit;
+        assignForth(curHit);
+    }    
+</script>    
+    
+<style type="text/css">
+
+.page{
+    width:100%; 
+    background:white;
+    }
+.content{
+    width:980px;
+    margin-left:auto;
+    margin-right:auto;
+    font-family:Arial;
+    background: white;}
+    
+.liner{
+    width:900px;
+    margin-left:auto; 
+    margin-right:auto;
+    color:grey;
+    background: white;
+    }
+    
+.topLogo{
+    width:100%;
+    background: blue;
+    margin-left:auto; 
+    margin-right:auto;
+    }    
+ .question_wrapper{width:900px; margin-left:auto; margin-right:auto}   
+    .question{
+    background: url("{!$Resource.mid_box}") no-repeat; 
+    height:128px;
+    padding-top:4px;
+    }    
+.tbl{display:table}
+.tr{display:table-row;text-align:center;}
+.td{display:table-cell;}
+.question p{width:90%;margin-left:auto;margin-right:auto;font-size:15px;}
+.tickboxes{width:90%;margin-left:auto;margin-right:auto;}    
+
+input.mybutton{
+ text-decoration:none; 
+ text-align:center; 
+ padding:11px 47px; 
+ border:solid 1px #004F72; 
+ -webkit-border-radius:50px;
+ -moz-border-radius:50px; 
+ border-radius: 50px; 
+ font:15px Arial, Helvetica, sans-serif; 
+ font-weight:bold; 
+ color:#E5FFFF; 
+ background-color:#d3eaf2; 
+ background-image: -moz-linear-gradient(top, #d3eaf2 0%, #0babe0 100%); 
+ background-image: -webkit-linear-gradient(top, #d3eaf2 0%, #0babe0 100%); 
+ background-image: -o-linear-gradient(top, #d3eaf2 0%, #0babe0 100%); 
+ background-image: -ms-linear-gradient(top, #d3eaf2 0% ,#0babe0 100%); 
+ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0babe0', endColorstr='#0babe0',GradientType=0 ); 
+ background-image: linear-gradient(top, #d3eaf2 0% ,#0babe0 100%);   
+ -webkit-box-shadow:1px 2px 0px #bababa, inset 0px 0px -6px #ffffff; 
+ -moz-box-shadow: 1px 2px 0px #bababa,  inset 0px 0px -6px #ffffff;  
+ box-shadow:1px 2px 0px #bababa, inset 0px 0px -6px #ffffff;  
+ }
+
+.bottomImage{
+    position:absolute;
+    top:100%;
+    right:80px;
+}
+    
+</style> 
+</head>
+<body>
+<apex:form id="form">
+<apex:actionFunction name="assignfirst" action="{!assignfirst}" rerender=""> 
+    <apex:param name="question1" value="" />
+</apex:actionfunction>  
+    <apex:actionFunction name="assignSec" action="{!assignSec}" rerender=""> 
+    <apex:param name="question2" value="" />
+</apex:actionfunction> 
+    <apex:actionFunction name="assignThird" action="{!assignThird}" rerender=""> 
+    <apex:param name="question3" value="" />
+</apex:actionfunction> 
+    <apex:actionFunction name="assignForth" action="{!assignForth}" rerender=""> 
+    <apex:param name="question4" value="" />
+</apex:actionfunction> 
+
+<div class="page" id ="page">
+<div class="content" id = "content"> 
+<div class="liner" id = "liner">   
+
+<div class="topLogo">
+<apex:image url="{!$Resource.Logo_GiveUsFeedBack}" alt="Feed Back" height="467" width="900"/>    
+</div>
+
+<apex:pageMessages /> 
+
+<apex:outputPanel rendered="{!showQuestionSection}" id="pan1">
+
+<div id="question">
+<div class="question_wrapper" id="wrap">
+               
+<apex:outputPanel rendered="{!showQ1}" style="{!q1color}" id="pan2" >
+<div class="question" id="question_1">               
+                       
+    <p><b>1. On a scale of 0-10 based on the way we managed your complaint how likely is it that you would recommend 
+            {!$CurrentPage.parameters.tn} to a friend or relative for a new boiler installation?</b></p>     
+    <p style="font-size:15px;text-align: center">Definitely would not recommend &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;&gt; Satisified</p>
+        <div class="tbl tickboxes" id="chk1">
+            <div class='tr' id="chk1tr">               
+                <div class='td'><input name="q1" onClick="setHit1(0);" type="radio" value="0" /><label>0</label></div>                
+                <div class='td'><input name="q1" onClick="setHit1(1);" type="radio" value="1" /><label>1</label></div>
+                <div class='td'><input name="q1" onClick="setHit1(2);" type="radio" value="2" /><label>2</label></div>
+                <div class='td'><input name="q1" onClick="setHit1(3);" type="radio" value="3" /><label>3</label></div>
+                <div class='td'><input name="q1" onClick="setHit1(4);" type="radio" value="4" /><label>4</label></div>
+                <div class='td'><input name="q1" onClick="setHit1(5);" type="radio" value="5" /><label>5</label></div>
+                <div class='td'><input name="q1" onClick="setHit1(6);" type="radio" value="6" /><label>6</label></div>
+                <div class='td'><input name="q1" onClick="setHit1(7);" type="radio" value="7" /><label>7</label></div>
+                <div class='td'><input name="q1" onClick="setHit1(8);" type="radio" value="8" /><label>8</label></div>
+                <div class='td'><input name="q1" onClick="setHit1(9);" type="radio" value="9" /><label>9</label></div>
+                <div class='td'><input name="q1" onClick="setHit1(10);" type="radio" value="10" /><label>10</label></div>
+            </div>  <!-- tr -->
+         </div>     <!-- tbl tickboxes -->
+            
+        <!-- <apex:selectRadio value="{!question1}" ><apex:selectOptions value="{!QuestionItem}" /></apex:selectRadio> -->
+</div>    <!-- question -->      
+</apex:outputPanel>
+<br/>    
+    
+<apex:outputPanel rendered="{!showQ2}" style="{!q2color}">    
+<div class="question" id="question_1">      
+        <p><b>2. On a scale of 0-10 how satisfied are you with the way we handled your complaint?</b></p>  
+        <p style="font-size:15px;text-align: center">Definitely would not recommend &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;&gt; Satisified</p>    
+        <div class="tbl tickboxes">
+            <div class='tr'>               
+                <div class='td'><input name="q2" onClick="setHit2(0);"  type="radio" value="0" /><label>0</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(1);" type="radio" value="1" /><label>1</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(2);" type="radio" value="2" /><label>2</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(3);" type="radio" value="3" /><label>3</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(4);" type="radio" value="4" /><label>4</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(5);" type="radio" value="5" /><label>5</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(6);" type="radio" value="6" /><label>6</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(7);" type="radio" value="7" /><label>7</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(8);" type="radio" value="8" /><label>8</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(9);" type="radio" value="9" /><label>9</label></div>
+                <div class='td'><input name="q2" onClick="setHit2(10);" type="radio" value="10" /><label>10</label></div>
+            </div>  <!-- tr -->
+         </div>     <!-- tbl tickboxes -->    
+              
+</div>    <!-- question --> 
+</apex:outputPanel>
+
+<br/>    
+  
+<apex:outputPanel rendered="{!showQ3}" style="{!q3color}">    
+<div class="question" id="question_1">       
+    <p><b>3. On a scale of 0-10 how satisfied are you with the time it took to resolve your complaint?</b></p>
+    <p style="font-size:15px;text-align: center">Definitely would not recommend &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;&gt; Satisified</p>    
+        <div class="tbl tickboxes">
+            <div class='tr'>
+                
+                <div class='td'><input name="q3" onClick="setHit3(0);" type="radio" value="0" /><label>0</label></div>                
+                <div class='td'><input name="q3" onClick="setHit3(1);" type="radio" value="1" /><label>1</label></div>
+                <div class='td'><input name="q3" onClick="setHit3(2);" type="radio" value="2" /><label>2</label></div>
+                <div class='td'><input name="q3" onClick="setHit3(3);" type="radio" value="3" /><label>3</label></div>
+                <div class='td'><input name="q3" onClick="setHit3(4);" type="radio" value="4" /><label>4</label></div>
+                <div class='td'><input name="q3" onClick="setHit3(5);" type="radio" value="5" /><label>5</label></div>
+                <div class='td'><input name="q3" onClick="setHit3(6);" type="radio" value="6" /><label>6</label></div>
+                <div class='td'><input name="q3" onClick="setHit3(7);" type="radio" value="7" /><label>7</label></div>
+                <div class='td'><input name="q3" onClick="setHit3(8);" type="radio" value="8" /><label>8</label></div>
+                <div class='td'><input name="q3" onClick="setHit3(9);" type="radio" value="9" /><label>9</label></div>
+                <div class='td'><input name="q3" onClick="setHit3(10);" type="radio" value="10" /><label>10</label></div>
+            </div>  <!-- tr -->
+         </div>     <!-- tbl tickboxes -->      
+</div>    <!-- question -->     
+</apex:outputPanel>
+
+<br/>
+ 
+<apex:outputPanel rendered="{!showQ4}" style="{!q4color}">     
+<div class="question" id="question_1">         
+    <p><b>4. On a scale of 0-10 how satisfied are you that we have resolved all the issues you raised with us?</b></p> 
+    <p style="font-size:15px;text-align: center">Definitely would not recommend &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&ndash;&gt; Satisified</p>    
+        <div class="tbl tickboxes">
+            <div class='tr'>
+               
+                <div class='td'><input name="q4" onClick="setHit4(0);" type="radio" value="0" /><label>0</label></div>                
+                <div class='td'><input name="q4" onClick="setHit4(1);" type="radio" value="1" /><label>1</label></div>
+                <div class='td'><input name="q4" onClick="setHit4(2);" type="radio" value="2" /><label>2</label></div>
+                <div class='td'><input name="q4" onClick="setHit4(3);" type="radio" value="3" /><label>3</label></div>
+                <div class='td'><input name="q4" onClick="setHit4(4);" type="radio" value="4" /><label>4</label></div>
+                <div class='td'><input name="q4" onClick="setHit4(5);" type="radio" value="5" /><label>5</label></div>
+                <div class='td'><input name="q4" onClick="setHit4(6);" type="radio" value="6" /><label>6</label></div>
+                <div class='td'><input name="q4" onClick="setHit4(7);" type="radio" value="7" /><label>7</label></div>
+                <div class='td'><input name="q4" onClick="setHit4(8);" type="radio" value="8" /><label>8</label></div>
+                <div class='td'><input name="q4" onClick="setHit4(9);" type="radio" value="9" /><label>9</label></div>
+                <div class='td'><input name="q4" onClick="setHit4(10);" type="radio" value="10" /><label>10</label></div>
+            </div> <!-- tr -->
+         </div>    <!-- tbl tickboxes -->     
+</div>    <!-- question -->     
+</apex:outputPanel>
+    
+</div>    <!-- question wrapper -->
+</div>    <!-- questions --> 
+    
+<apex:outputPanel rendered="true">
+        <p>We may contact you about your feedback to gain a greater understanding of our service.</p>
+        <p>Please tick here if you do not want to be contacted by us regarding the complaints feedback.<apex:inputCheckbox value="{!question5}"/></p>
+</apex:outputPanel>  
+
+</apex:outputPanel> <!-- End of QuestionsSection -->
+
+<apex:outputPanel rendered="{!showThanks}">
+    <p>Thank you for taking the time to respond to this email.</p>
+</apex:outputPanel> 
+
+<tbl>
+<tr>
+    <td>
+        <apex:outputPanel rendered="{!showQuestionSection}">
+            <apex:commandButton value="SUBMIT" action="{!save}" styleClass="mybutton"/>
+        </apex:outputPanel>
+    </td>
+    <td>
+        <apex:outputpanel rendered="{!$CurrentPage.parameters.tn != 'Scottish Gas'}">
+            <apex:image value="{!$Label.Logo_BG_header}" alt="Company Logo" height="90" width="187" style="float:right;"/>
+        </apex:outputpanel>
+        
+         <apex:outputpanel rendered="{!$CurrentPage.parameters.tn = 'Scottish Gas'}">
+            <apex:image value="{!$Label.Logo_SG_header}" alt="Company Logo" height="90" width="187" style="float:right"/>
+        </apex:outputpanel>       
+        
+    </td>
+   
+    </tr>
+</tbl> 
+
+<div id="version">
+Version 1
+</div>
+
+</div> <!-- LINER -->    
+</div> <!-- CONTENT -->    
+</div> <!-- PAGE -->   
+
+</apex:form>    
+</body>
+</html>
+</apex:page>

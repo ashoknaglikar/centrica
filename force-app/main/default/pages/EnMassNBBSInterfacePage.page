@@ -1,0 +1,49 @@
+<apex:page standardController="Opportunity" recordSetVar="opportunities" tabStyle="Opportunity" extensions="EnMassNBBSInterface">
+<script>
+var isClicked = false;
+function check(obj) {   
+    var v=document.getElementsByName('j_id0:j_id3:j_id4:j_id17:ConfirmButton');
+
+    if(v[0].className == 'btnDisabled' || v[1].className == 'btnDisabled') {
+        alert('Button can only be pressed once.');
+        return false;
+    } else {
+        //isClicked = true;        
+        v[0].className = 'btnDisabled';
+        v[1].className = 'btnDisabled';
+        return true;
+    }
+
+}
+</script>    
+    <apex:sectionHeader title="CHI Leads" Subtitle="Installation Billing Details"/> 
+    <!--<apex:actionStatus startText="Please wait..." id="pleaseWait"/>-->
+    <apex:form >
+        <apex:pageBlock title="Billing Details Status">
+            <apex:pageblockTable value="{!enMassNBBSInterfaceUpdateStatusList}" var="billingStatus" rendered="{!Not(blConfirmed)}">
+                <apex:column headerValue="CHI Lead Name">
+                    <apex:commandLink action="/{!billingStatus.objOpportunity.Id}" value="{!billingStatus.objOpportunity.Name}"/>
+                </apex:column>
+                <apex:column headerValue="Payment Reference">
+                    <apex:outputField value="{!billingStatus.objOpportunity.Payment_Reference_Number__c}" /> 
+                </apex:column>    
+            </apex:pageblockTable>
+            <apex:pageblockTable value="{!enMassNBBSInterfaceUpdateStatusList}" var="billingStatus" rendered="{!blConfirmed}">
+                <apex:column headerValue="CHI Lead Name">
+                    <apex:commandLink action="/{!billingStatus.objOpportunity.Id}" value="{!billingStatus.objOpportunity.Name}"/>
+                </apex:column>
+                <apex:column headerValue="Payment Reference">
+                    <apex:outputField value="{!billingStatus.objOpportunity.Payment_Reference_Number__c}" /> 
+                </apex:column>    
+                <apex:column headerValue="Status">
+                    <apex:outputLabel value="{!billingStatus.strErrorStatus}" /> 
+                </apex:column>    
+            </apex:pageblockTable>
+            <apex:pageBlockButtons rendered="true">
+                <apex:commandButton id="ConfirmButton" value="Confirm"  action="{!ConfirmSubmit}" onclick="return check(this);" rendered="{!Not(blConfirmed)}" /> <!-- status="pleaseWait"-->
+                <apex:commandButton value="Cancel" action="/006/o" rendered="{!Not(blConfirmed)}"/>
+                <apex:commandButton value="Done" action="/006/o" rendered="{!blConfirmed}"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>  
+    </apex:form>
+</apex:page>

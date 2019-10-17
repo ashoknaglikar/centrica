@@ -1,0 +1,33 @@
+<apex:component > 
+  <apex:attribute name="payment" type="BGS_Payment__c" required="true" description="This attribute is used to set Payment object"/>
+  <apex:attribute name="paymentMessage" type="Boolean" required="true" description="This attribute is used to set visibility of alert message: Payment created successfully." />
+  <apex:pageBlockSection title="Payment" collapsible="false" columns="6">
+        <apex:pageblocksectionitem ><b>Date And Time</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Payment Value</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Payment Type</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Payment Method</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>BG Ref. Number</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Payee Ref. Number</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><apex:inputField value="{!payment.Payment_Date__c}"/></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem >
+        <apex:inputField id="txtAmount" value="{!payment.Amount__c}"/>
+        	
+        </apex:pageblocksectionitem>
+        
+        <apex:pageblocksectionitem ><apex:inputField value="{!payment.Payment_Type__c}"/></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><apex:inputField value="{!payment.Payment_Method__c}"/></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><apex:inputField value="{!payment.BGS_Payment_Reference_Num__c}"/></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><apex:inputField value="{!payment.EPDQ_Authorisation__c}"/></apex:pageblocksectionitem> 
+  </apex:pageBlockSection>  
+  	<script>
+	if({!paymentMessage})
+	{
+	    alert('Payment created successfully.');  	             
+	}
+	window.onload = function(){
+	try{DatePicker.datePicker.hide();}catch(e){}
+	}
+	//document.getElementById('j_id0:j_id1:j_id29:ViewPayment:j_id429:j_id430:j_id443:j_id444').style.display='none';
+	
+	</script>
+</apex:component>

@@ -1,0 +1,222 @@
+<apex:page controller="PreElectricWork"  > 
+  <script>
+    function confirmDel()
+            {
+                if(confirm('Clicking OK button will Delete Records.'))
+                {
+                    togglleDiv('');
+                    return true;
+                    
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            function togglleDiv(show)
+            {
+                document.getElementById('darkLayer').style.display = show; 
+                document.getElementById('LoadingDiv').style.display = show;      
+            }  
+  
+  </script> 
+   
+   
+<div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+        </div>
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;"></div>
+
+  <apex:form id="formId" >
+    <apex:pageMessages />   
+    
+   
+        
+        <apex:pageblock title="Select Date Range" id="selectdata">
+            <apex:pageBlock id="Second">
+                <apex:pageBlockSection title="Search Job by WMIS Ref Number:" columns="4">
+                     <apex:inputText value="{!WMISNumber}"/>
+                     <apex:commandButton value="Search by WMIS" action="{!onClickSearch}" reRender="formId" status="Refreshing"/>
+                     <apex:actionStatus id="Refreshing" startText="Refreshing..."> </apex:actionStatus>
+                 </apex:pageBlockSection> 
+                 
+                <apex:pageblocksection title="Select Duration" id="thesection">
+                    <apex:pageblocksectionItem id="thesection1">
+                        <apex:outputLabel value="Start Date:" for="startDate" ></apex:outputLabel>
+                        <apex:inputfield value="{!jb.Customer_Journey_First_Update__c}" id="startDate"/>                        
+                    </apex:pageblocksectionItem>
+                    
+                    <apex:pageblocksectionItem id="thesection2">
+                        <apex:outputLabel value="End Date:" for="endDate"></apex:outputLabel>
+                        <apex:inputfield value="{!jb.BGNE_Install_Date__c}" id="endDate"/>  
+                    </apex:pageblocksectionItem>
+         
+                    <apex:pageblocksectionItem >
+                         <b>District:</b> 
+                        <apex:selectList style="font-size:7pt;" value="{!AreaName}" multiselect="false" size="1" id="areaDropDown">
+                            <apex:selectOptions value="{!AreaItems}"/>
+                        </apex:selectList>
+                    </apex:pageblocksectionItem>
+                     
+                    <apex:pageblocksectionItem >
+                         <b>Region:</b> 
+                        <apex:selectList style="font-size:7pt;" value="{!RegionName}" multiselect="false" size="1" id="areaDropDown1">
+                            <apex:selectOptions value="{!RegionItems}"/>
+                        </apex:selectList>
+                     </apex:pageblocksectionItem>
+        
+       
+                    
+                  <!-- <apex:pageBlockSectionItem id="thesection3">
+                        <apex:outputLabel value="Installer Name:" for="installer"></apex:outputLabel>
+                        <apex:inputfield value="{!app.Assigned_To__c}" id="installer"/>
+                    </apex:pageBlockSectionItem> -->
+                        
+             </apex:pageblocksection> 
+              <apex:pageBlockSection title="Criteria" columns="2" collapsible="true">
+                <apex:pageBlockSectionItem >
+                    <b>Status:</b> 
+                       <apex:selectList style="font-size:7pt;" value="{!statusvar}" multiselect="false" size="1" id="areaDropDown1">
+                           <apex:selectOptions value="{!allStatusSelected}"/>
+                       </apex:selectList>
+               </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+              
+                <apex:pageBlockSection title="{!tableName}" columns="1" id="showplannedjobs1" rendered="{!showplanned}">
+                                    
+                    <apex:pageBlocktable style="width:100%" value="{!wrapList}" var="planned">
+                    
+                       <apex:Column >
+                        <apex:facet name="header">Job Number</apex:facet>
+                         <apex:outputField value="{!planned.je.Job__c}"/>
+                        </apex:Column>
+                        
+                        <apex:Column >
+                        <apex:facet name="header">Address</apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.Address__c}"/>
+                        </apex:Column>
+                        
+                         <!---<apex:Column >
+                           <apex:facet name="header">           
+                                <apex:commandLink action="{!ViewData}" value="Created Date{!IF(sortExpression=='Job__r.CreatedDate',IF(sortDirection='ASC','▼','▲'),'')}">
+                                    <apex:param value="Job__r.CreatedDate" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                </apex:commandLink>
+                           </apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.CreatedDate}"/>
+                        </apex:Column>-->
+                        
+                        <apex:Column >
+                            <apex:facet name="header">           
+                                <apex:commandLink action="{!ViewData}" value="Installation Date{!IF(sortExpression=='Job__r.Installation_Date__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                    <apex:param value="Job__r.Installation_Date__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                </apex:commandLink>
+                           </apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.Installation_Date__c}"/>
+                        </apex:Column>
+                        
+                        <apex:Column >
+                            <apex:facet name="header">           
+                                <apex:commandLink action="{!ViewData}" value="Status{!IF(sortExpression=='Job__r.Status__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                    <apex:param value="Job__r.Status__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                </apex:commandLink>
+                           </apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.Status__c}"/>
+                        </apex:Column>
+                        
+                        <apex:Column >
+                            <apex:facet name="header">Sub Status</apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.Sub_Status__c}"/>
+                        </apex:Column> 
+                        
+                         <apex:Column >
+                            <apex:facet name="header">           
+                                <apex:commandLink action="{!ViewData}" value="Pre-Elec Date{!IF(sortExpression=='Start_Date__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                    <apex:param value="Start_Date__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                </apex:commandLink>
+                           </apex:facet>
+                            <apex:outputField value="{!planned.je.Start_Date__c}"/>
+                        </apex:Column>
+                        
+                        
+                        <apex:Column >
+                            <apex:facet name="header">           
+                                <apex:commandLink action="{!ViewData}" value="Pre-Elect Status{!IF(sortExpression=='Job__r.Pre_Installed_Status__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                    <apex:param value="Job__r.Pre_Installed_Status__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                </apex:commandLink>
+                            </apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.Pre_Installed_Status__c}"/>
+                        </apex:Column> 
+                        
+                        <apex:Column >
+                     
+                            <apex:facet name="header">Pre-Elec Sub-Status</apex:facet>
+                            <apex:outputField value="{!planned.pe.Sub_Status__c}"/>
+                        </apex:Column> 
+                        
+                         <apex:Column >
+                            <apex:facet name="header">Job Element</apex:facet>
+                            <apex:outputField value="{!planned.je.Job_Element_Number__c}"/>
+                        </apex:Column>
+                        
+                        <apex:Column >
+                            
+                             <apex:facet name="header">           
+                                <apex:commandLink action="{!ViewData}" value="Pre Install Type{!IF(sortExpression=='Job__r.Pre_Install_Type__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                    <apex:param value="Job__r.Pre_Install_Type__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                </apex:commandLink>
+                            </apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.Pre_Install_Type__c}"/>
+                        </apex:Column>
+                        
+                         <apex:Column >
+                            <apex:facet name="header">District</apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.District__c}"/>
+                        </apex:Column> 
+                        
+                         <apex:Column >
+                            <apex:facet name="header">Resource</apex:facet>
+                            <apex:outputField value="{!planned.je.Employee_Itn__c}"/>
+                        </apex:Column>
+                        
+                        <apex:Column >
+                            <apex:facet name="header">Customer category</apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.CHI_Lead__r.Latest_customer_category_indicator__c}"/>
+                        </apex:Column>
+                        
+                        <apex:Column >
+                            <apex:facet name="header">           
+                                <apex:commandLink action="{!ViewData}" value="Next Action{!IF(sortExpression=='Job__r.Next_Action_Date_From_Pre_Electric_Recor__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                    <apex:param value="Job__r.Next_Action_Date_From_Pre_Electric_Recor__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                </apex:commandLink>
+                            </apex:facet>
+                            <apex:outputField value="{!planned.je.Job__r.Next_Action_Date_From_Pre_Electric_Recor__c }"/>
+                        </apex:Column>
+                        
+                        
+                                                                                         
+                    </apex:pageBlocktable>
+                </apex:pageBlockSection>  
+                <apex:pageBlockButtons location="Top">
+                    <apex:commandButton value="Show Planned Jobs" action="{!showplannedjobs}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" reRender="formId"/>
+                    <apex:commandButton value="Show UnPlanned Jobs" action="{!showunplannedjobs}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" reRender="formId"/>               
+                </apex:pageBlockButtons> 
+                
+                           
+            </apex:pageBlock>
+        </apex:pageblock>
+ </apex:form>
+</apex:page>

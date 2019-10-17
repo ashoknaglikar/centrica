@@ -1,0 +1,230 @@
+<apex:page standardController="Employee_NOVO_Log__c" extensions="NovoSmartController" id="pge" sidebar="false" showHeader="true" > <!--action="{!generatepdf}"-->
+  
+   <script> 
+        var cntrlEmpID, cntrlEmpName;
+        function setEmpData(empName, empID)
+        {
+            try
+            {
+                document.getElementById(cntrlEmpID).value = empName;
+                document.getElementById(cntrlEmpName).value = empID.replace('&#39;','\'');
+            }
+            catch(e){}
+        }
+        function check(obj) {
+          if(confirm("Have you finished adding all your tasks. You can't add any new tasks once you have cliked this button ok. Click Cancel to go back and finish adding Tasks"))
+          {
+          SaveAction();
+          return true;
+          }
+          else{
+          return false;
+          }
+        }
+        
+        function openAttachment(NovActId){
+          var myWindow = window.open('/002?parent_id='+NovActId+'&id='+NovActId,'mywindow','height=600,width=900');
+          myWindow.blur();
+        }
+        
+           
+        function viewPdf(sId){
+         var myWindow1 = window.open('/apex/novosmartpdf?signsuccess=2&vPdf=1&headerId='+sId);
+        }
+        
+        function confirmDelete()
+        {
+            if(confirm("Are you sure you want to delete this NOVO record."))
+            {
+                return true;
+            }else
+            {
+                return false;
+            }
+        }
+        
+   </script> 
+  <apex:form id="frm">
+      <apex:OutputPanel id="panel">
+         <apex:pageMessages />
+        <apex:outputPanel id="panel1"> 
+        <apex:pageBlock >
+        <div align="Center">
+            <h1>EMPLOYEE NOVO Goal</h1>
+        </div>
+        </apex:pageBlock>
+     
+                    
+        <apex:pageBlock id="headerBlock" title="NOVO Log Details" >   
+            <apex:pageBlockSection columns="2" showHeader="True" collapsible="false">
+                <apex:inputField value="{!header.Employee__c}" />
+                <apex:OutputField value="{!header.Status__c}"/>
+                
+            </apex:pageblocksection>
+            <apex:pageBlockSection columns="2" showHeader="True" collapsible="false" title="Details">
+                <apex:inputField value="{!header.Related_Strategic_Priority__c}"/>
+                <apex:inputField value="{!header.Reason__c}"/>
+                <apex:inputField value="{!header.Job_CHI_Lead_Number__c}"/>
+                <apex:inputField value="{!header.Goal_Target_Date__c}"/>
+                              
+            </apex:pageblocksection>
+            <apex:pageBlockSection columns="1" showHeader="True" collapsible="false" title="Notes">
+                <apex:inputField value="{!header.Goal_Novo__c}" style="width:400px;height:60px;" required="true"/>
+                <apex:inputField value="{!header.Where_Are_U_Now__c}" style="width:400px;height:60px;" required="true"/>
+                <apex:inputField value="{!header.How_will_you_measure_prog__c}" style="width:400px;height:60px;" required="true"/>
+               
+            </apex:pageblocksection>
+            <apex:pageBlockSection columns="1" showHeader="True" collapsible="false" title="Outcome">
+                <apex:inputField value="{!header.Note_on_Outcome__c}" style="width:400px;height:60px;"/>
+                
+            </apex:pageblocksection>
+             <!-- <apex:pageBlockSection columns="1" showHeader="True" collapsible="false" title="Action Records">
+              <apex:pageblocksectionItem >
+                    <apex:outputLabel value="Enter the number of Action Records you want to create:" for="co"/>
+                    <apex:inputText value="{!val}" id="co" required="true"/>
+                    <apex:inputField value="{!header.Number_of_Actions__c}"/>
+                </apex:pageblocksectionItem>              </apex:pageblocksection> -->
+
+            
+            <apex:pageblockbuttons location="bottom" > <!--rendered="{!NovoActivity}" -->
+                <apex:commandbutton value="Add Action" action="{!NovoAction}"   />
+                <apex:commandbutton value="Cancel" action="{!goBack}" immediate="true" rendered="{!!NovoAct}"/>
+                
+            </apex:pageblockbuttons>
+         </apex:pageblock>
+         
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="Panel2" >
+            <apex:actionFunction action="{!saveAction}" name="SaveAction" />
+            <apex:pagebLock title="NOVO Activities" id="actBlock" rendered="{!NovoAct}">
+                 <apex:variable value="{!0}" var="rowNumber" />
+                <apex:pageblockTable value="{!theQuestions}" var="a" id="actTable">
+                  <apex:column >
+                    <apex:facet name="header">
+                    <apex:outputPanel >
+                        <apex:outputText value="Action"/>
+                        <apex:image value="/s.gif" styleClass="helpOrb" title="{!$ObjectType.NOVO_Activities__c.Fields.Action_activity__c.inlineHelpText}"/>
+                        </apex:outputPanel>
+                    </apex:facet>
+                     <apex:inputField value="{!a.nov.Action_activity__c}" style="width:200px;height:50px;"/>
+                  </apex:column>
+                  <apex:column >
+                  <apex:facet name="header">
+                  <apex:outputPanel >
+                  <apex:outputlabel value="Owner" for="txtEmpID"/>
+                        <apex:image value="/s.gif" styleClass="helpOrb" title="{!$ObjectType.NOVO_Activities__c.Fields.Owner__c.inlineHelpText}"/>
+                  </apex:outputPanel>
+                  </apex:facet>
+                  <apex:inputField value="{!a.nov.Owner__c}" rendered="{!if(a.nov.Owner__c!=null, true, false)}"/>
+                  <apex:outputpanel rendered="{!if(a.nov.Owner__c==null, true, false)}">
+                  <apex:inputText id="txtEmpName"   onchange="javascript: setEmpData('',this.value);" />
+                    <a href="#" onclick="javascript:window.open('/apex/employeesearch','_new','width=700,height=500,menubar=no,directories=no,status=yes,location=no,toolbar=no,scrollbars=yes');" title="Referral Employee Lookup (New Window)">
+                    <img src="/s.gif" alt="Owner Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Referral Employee Lookup (New Window)"/>
+                    </a>
+                 <apex:inputText value="{!a.nov.Owner__c}" id="txtEmpID" style="display:none;" required="true" />
+                 </apex:outputpanel>
+                 <script>
+                    cntrlEmpName = '{!$Component.txtEmpName}';
+                    cntrlEmpID = '{!$Component.txtEmpID}'; 
+                 </script>
+               
+                 </apex:column>
+                 <apex:column >
+                    <apex:facet name="header">
+                    <apex:outputPanel >
+                        <apex:outputText value="Action Completion Date"/>
+                        <apex:image value="/s.gif" styleClass="helpOrb" title="{!$ObjectType.NOVO_Activities__c.Fields.Action_Completion_Date__c.inlineHelpText}"/>
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:inputField value="{!a.nov.Action_Completion_Date__c}"/>
+                  </apex:column>
+                  <apex:column headerValue="Status" >
+                   <!--  <apex:facet title="header">Status</apex:facet>-->
+                     <apex:inputField value="{!a.nov.Status__c}"/>
+                  </apex:column>
+                  <!--<apex:column >
+                     <apex:facet name="header">FileName</apex:facet>
+                     <apex:inputText value="{!a.fileName}"/>
+                  </apex:column>-->
+                  <!--<apex:column >
+                     <apex:facet name="header">Description</apex:facet>
+                     <apex:inputTextarea value="{!a.attachment.description}" id="description"/>
+                  </apex:column> -->
+                  <apex:column >
+                     <apex:facet name="header">Upload New Attachements</apex:facet>
+                   <!--  <apex:inputFile value="{!a.attachment.body}" filename="{!a.attachment.name}" id="file" disabled="{!attachFile}" />
+                 -->
+                  <apex:commandLink value="Upload"  action="{!upload}"  >
+                      <apex:param value="{!a.nov.id}" assignTo="{!attachementParent}" name="attachementParent"/>
+                  </apex:commandLink>&nbsp;&nbsp;&nbsp;
+                   <apex:commandLink value="[{!a.attSize}]" style="color:red;font:bold;" onclick="openAttachment('{!a.nov.id}');"  reRender="Panel2" rendered="{!a.Nov.Id!=null}" />
+                  </apex:column>
+                   <apex:column >
+                     <apex:facet name="header">Remove</apex:facet>
+                    <apex:commandLink value="Remove"  action="{!RemoveAction}" reRender="Panel2 " style="color:red" immediate="true">
+                      <apex:param name="p1" value="{!rowNumber}" assignTo="{!numberOfRowToRemove}"/>
+                     </apex:commandLink>
+                     <apex:variable var="rowNumber" value="{!rowNumber + 1}" />
+                  </apex:column>
+                </apex:pageblockTable>
+                 <apex:pageblockbuttons location="bottom" >
+                    <apex:commandbutton value="Save & Send PDF"  action="{!sendpdfAction}" rerender="emailpanel"/>
+                       <apex:commandbutton value="Save & Exit" action="{!goBack}"   />
+                       
+                      
+                       <apex:commandbutton value="Delete" action="{!deleteNovo}" onclick="if(!confirmDelete()) return;" rerender="frm"/>
+                </apex:pageblockbuttons> 
+             
+            </apex:pagebLock>
+        
+        </apex:outputPanel> 
+       
+      </apex:OutputPanel>
+    
+
+      <apex:outputpanel id="emailpanel" >
+      <apex:pageblock title="Email Details" rendered="{!signSucessRender}">
+          <apex:pageMessages />
+             
+
+         <apex:pageBlockTable value="{!emailWrapList}" var="c" rendered="{!signSucessRender}" >
+        <apex:column >
+        <apex:inputCheckbox value="{!c.checked}"/>
+        </apex:column>
+        
+        <apex:column headerValue="Name">
+            <apex:inputfield value="{!c.emailHead.Owner__c}" id="user" />
+        </apex:column>
+        <apex:column headerValue="email">
+         <apex:inputText value="{!c.emailWrap}" id="co" />
+         </apex:column>
+         
+        </apex:pageBlockTable>
+        <!--
+          <apex:pageblocksectionItem >
+              <apex:outputLabel value="Pick the user " for="user" />
+              <apex:inputfield value="{!emailHeader.Owner__c}" id="user" />
+          </apex:pageblocksectionItem>     
+          <apex:pageblocksectionItem >
+                    <apex:outputLabel value="Enter the Email Address" for="co" />
+                    <apex:inputText value="{!email}" id="co" />
+          </apex:pageblocksectionItem>
+              
+       -->
+        <apex:pageblockbuttons location="bottom" >
+                <apex:commandbutton value="Send Email" action="{!ProcessSelected}" />
+                <apex:commandbutton value="View PDF" onclick="viewPdf('{!header.id}');return false;" reRender="frm1" />
+            
+        </apex:pageblockbuttons>
+        </apex:pageblock>
+      </apex:outputpanel>
+  </apex:form>
+  
+  
+    
+     
+    
+  
+  
+</apex:page>

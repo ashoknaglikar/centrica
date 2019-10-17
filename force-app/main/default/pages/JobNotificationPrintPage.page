@@ -1,0 +1,323 @@
+<apex:page controller="JobNotificationMail" renderAs="html" showHeader="false" sidebar="false" title="Job Diary">
+   
+   <Html>
+        <Head>
+            <Title>{!str_InstallerName}</Title>
+            <Style Type="Text/Css">
+                Table.Sample {
+                    
+                }
+                Table.Sample Td {
+                    Color: Black;
+                }
+                Table.Sample Tr.D0 Td {
+                    Background-color: #fcf6cf;
+                }
+    
+                Table.Sample Tr.D1 Th {
+                    Background-color: #fcf6cf;
+                    
+                }
+            </Style>
+            <script>
+                function printWindows() {
+                    document.getElementById('printButton').style.display = 'none'; 
+                    document.getElementById('backButton').style.display = 'none'; 
+                    window.print();
+                    document.getElementById('printButton').style.display = ''; 
+                    document.getElementById('backButton').style.display = ''; 
+                }
+                function backWindow() {
+                    var browserName=navigator.appName; 
+                    if (browserName=="Netscape")
+                    { 
+                        window.location="/apex/JobNotificationMail";
+                    }else { 
+                        if (browserName=="Microsoft Internet Explorer")
+                        {
+                            window.location="/apex/JobNotificationMail";
+                        } else {
+                            window.location="/apex/JobNotificationMail";
+                        }
+                    }
+                }
+            </script>
+        </Head>
+    
+        <Body>
+    
+            <Table Class="Sample" Width="100%" Border="0">
+                <Caption><B><U>{!str_InstallerName}<br/>{!str_jobPipelineTimeline}</U></B></Caption>
+                <apex:repeat value="{!lst_JobDiaryDetails}" var="v_job">
+                    <Tr Class="D0">
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" >{!v_job.str_JobTitle}</Font></B></Td>
+                    </Tr>
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                    <TR>
+                        <Td><apex:outputLabel value="Installer Name" rendered="{!IF((contains($Profile.Name, 'CHI Agency Office User') && ISNULL(specificContractor)),True,False)}"/>   </Td>
+                        <Td><apex:outputText value="{!v_job.sInstallerNameOfOfficeUser}" rendered="{!IF(contains($Profile.Name, 'CHI Agency Office User'),True,False)}"/></Td>
+                        <Td><apex:outputText value=" " rendered="{!IF(contains($Profile.Name, 'CHI Agency Office User'),True,False)}"/></Td>
+                        <Td><apex:outputText value=" " rendered="{!IF(contains($Profile.Name, 'CHI Agency Office User'),True,False)}"/> </Td>
+                    </TR>
+                    
+                    <Tr>
+                        <Td Width="15%" ><B><Font Size="2" >Customer Name</Font></B></Td>
+                        <Td><Font Size="2" >{!v_job.obj_job5.Customer_Name__c}</Font></Td>
+                        <Td Width="15%"><B><Font Size="2" >CHI LEAD NUMBER</Font></B></Td>
+                        <Td><Font Size="2" >{!v_job.obj_job5.CHI_Lead_Number_Text__c}</Font></Td>
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" >Installation Address</Font></B></Td>
+                        <Td style="word-wrap=break-word"><apex:outputText value="{!v_job.obj_job5.Address__c}"/><Font Size="2" ></Font></Td>
+ 
+                        <Td Width="15%"><B><Font Size="2" >Job No</Font></B></Td>
+                        <Td><Font Size="2" >{!v_job.obj_job5.Name}</Font></Td>
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" >Installation Date</Font></B></Td>
+                        <Td><Font Size="2" ><apex:outputField value="{!v_job.obj_job5.Installation_Date__c}" /></Font></Td>
+                        <Td Width="15%"><B><Font Size="2" >Home Phone</Font></B></Td>
+                        <Td><Font Size="2" >{!v_job.obj_job5.Home_Phone__c} </Font></Td>
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" >Delivery Date</Font></B></Td>
+                        <Td><Font Size="2" ><apex:outputField value="{!v_job.obj_job5.Delivery_Date__c}" id="DeliveryDate"/></Font></Td>
+                        <Td Width="15%"><B><Font Size="2" >Work Phone</Font></B></Td>
+                        <Td><Font Size="2" ><apex:outputField value="{!v_job.obj_job5.Work_Phone__c}"/></Font></Td>
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" >Job Status</Font></B></Td>
+                        <Td><Font Size="2" ><apex:outputField value="{!v_job.obj_job5.Status__c}"/></Font></Td>
+                        <Td Width="15%"><B><Font Size="2" >Mobile</Font></B></Td>
+                        <Td><Font Size="2" ><apex:outputField value="{!v_job.obj_job5.Best_Phone_Number__c}"/></Font></Td>
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" ><apex:outputText value="Amount Outstanding" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}" /></Font></B></Td>
+                        <Td><Font Size="2" ><apex:outputField value="{!v_job.obj_job5.CHI_Lead__r.Balance_Outstanding__c}" id="InstallationAddress" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}" /></Font></Td>
+                        <Td Width="15%"><B><Font Size="2" ><apex:outputText value="Salesperson" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}" /></Font></B></Td>
+                        <Td><Font Size="2" ><apex:outputField value="{!v_job.obj_job5.CHI_Lead__r.OwnerId}" id="Salesperson" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}" /></Font></Td>
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" ><apex:outputText value="Payment Method" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}"/></Font></B></Td>
+                        <Td><Font Size="2" ><apex:outputField value="{!v_job.obj_job5.CHI_Lead__r.Payment_Method__c}" id="PaymentMethod" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}"/></Font></Td>
+                        <Td Width="15%"><B><Font Size="2" ><apex:outputText value="Planner" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}"/></Font></B></Td>
+                        <Td><Font Size="2" ><apex:outputField value="{!v_job.obj_job5.LastModifiedById}" id="Planner" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}"/></Font></Td>
+                    </Tr>
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                    <Tr Class="D0">
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" >Notes</Font></B></Td>
+                    </Tr>
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" >Job Installation Notes</Font></B></Td>
+                        <Td Height="10" Colspan="3" Align="Left">
+                            <Font Size="2" >
+                                <apex:outputText value="{!v_job.obj_job5.Installer_Notes__c}" id="Inst_notes" />                                
+                            </Font>
+                        </Td>                        
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" >Boiler Installation Notes</Font></B></Td>
+                        <Td Height="10" Colspan="3" Align="Left">
+                            <Font Size="2" >
+<!--                                <apex:outputText value="{!v_job.sBoilerInstallationNotes}" id="Inst_notes_contractor" />-->
+								<apex:outputField value="{!v_job.quoteProduct.installationNotes__c}" id="Inst_notes_contractor" />
+                            </Font>
+                        </Td>                        
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" >Status Notes</Font></B></Td>
+                        <Td Height="10" Colspan="3" Align="Left"><Font Size="2" >{!v_job.obj_job5.Quote_Status_Notes__c}</Font></Td>
+                    </Tr>
+                    <Tr>
+                        <Td Width="15%"><B><Font Size="2" >Delivery Notes</Font></B></Td>
+                        <Td Height="10" Colspan="3" Align="Left"><Font Size="2" >{!v_job.obj_job5.Quote_Delivery_Notes__c}</Font></Td>
+                    </Tr>
+                    
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                   
+                    <!-------------- ORDERS SHOULD NOT BE DISLAYED IN PRINTABLE VIEW ----------------------------
+                    <Tr Class="D0">
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ><apex:outputText value="Orders" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor'),contains($Profile.Name, 'System Administrator')),True,False)}"/></Font></B></Td>
+                    </Tr>
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                    <Tr>                     
+                         <td Colspan="4">
+                         <apex:outputText value="{!orderMessage}" rendered="{!IF(AND( ISNULL(v_job.lst_Order) ,OR(contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor'),contains($Profile.Name, 'System Administrator'))),True,False)}"/>
+                         <apex:dataTable title="Orders" value="{!v_job.lst_Order}" var="order" Width="100%" Border="0" rendered="{!IF(AND((!ISNULL(v_job.lst_Order)) ,OR(contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor'),contains($Profile.Name, 'System Administrator'))),True,False)}">
+                               <apex:Column >
+                                        <apex:facet name="header">Order</apex:facet>
+                                        <apex:outputField value="{!order.name}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">SAP Number</apex:facet>
+                                        <apex:outputField value="{!order.SAP_Number__c}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Status</apex:facet>
+                                        <apex:outputField value="{!order.Status__c}"/>
+                                    </apex:Column>                                    
+                                    <apex:Column >
+                                        <apex:facet name="header">Supplier</apex:facet>
+                                        <apex:outputField value="{!order.Supplier_Name__c}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Order date</apex:facet>
+                                        <apex:outputField value="{!order.CreatedDate}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Order Value</apex:facet>
+                                        <apex:outputField value="{!order.Order_Value_Text__c}"/>
+                                    </apex:Column>                                    
+                         </apex:dataTable>
+                         </td>
+                    </Tr> 
+                    ------------------------------------------------------------->
+                    <Tr Class="D0">
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ><apex:outputText value="Materials" rendered="{!IF(OR(AND(contains($Profile.Name, 'CHI Agency Office User'),ISNULL(specificContractor)),ISNULL(v_job.lst_Material)),False,True)}"/></Font></B></Td>
+                    </Tr>
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                    <Tr>                     
+                         <td Colspan="4">
+                         <apex:dataTable title="Materials" value="{!v_job.lst_Material}" var="JobElements" rendered="{!IF(OR(AND(contains($Profile.Name, 'CHI Agency Office User'),ISNULL(specificContractor)),ISNULL(v_job.lst_Material)),False,True)}" Width="100%" Border="0">
+                               <apex:Column >
+                                    <apex:facet name="header">Material Order No</apex:facet>
+                                    <apex:outputField value="{!JobElements.Merchant_Order_Number__c}" rendered="{!IF(AND(contains(JobElements.Type__c, 'Material'),!ISNULL(JobElements.Order__c),contains(JobElements.Status__c, 'Active'),contains(JobElements.Sub_Status__c, 'Ordered')),True,False)}"/>
+                               </apex:Column>
+                               <apex:Column >
+                                   <apex:facet name="header">Supplier</apex:facet>
+                                   <apex:outputField value="{!JobElements.Current_Supplier__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Material'), True, False)}"/>
+                               </apex:Column>
+                               <apex:Column >
+                                   <apex:facet name="header">Product Name</apex:facet>
+                                   <apex:outputField value="{!JobElements.Code__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Material'), True, False)}"/>
+                               </apex:Column>
+                               <apex:Column >
+                                   <apex:facet name="header">Product Description</apex:facet>
+                                   <apex:outputField value="{!JobElements.Description__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Material'), True, False)}"/>
+                               </apex:Column>
+                               <apex:Column >
+                                   <apex:facet name="header">Quantity</apex:facet>
+                                   <apex:outputField value="{!JobElements.Units__c}"   rendered="{!IF(contains(JobElements.Type__c, 'Material'), True, False)}"/>
+                               </apex:Column>                                    
+                         </apex:dataTable>
+                         </td>
+                    </Tr>                     
+                    
+                    <Tr Class="D0">
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ><apex:outputText value="Labour" rendered="{!IF(OR(AND(contains($Profile.Name, 'CHI Agency Office User'),ISNULL(specificContractor)),ISNULL(v_job.lst_Labour)),False,True)}" /></Font></B></Td>
+                    </Tr>
+                     
+                     <Tr>
+                        <Td Colspan="4">
+                            <apex:dataTable value="{!v_job.lst_Labour}" var="JobElements" rendered="{!IF(OR(AND(contains($Profile.Name, 'CHI Agency Office User'),ISNULL(specificContractor)),ISNULL(v_job.lst_Labour)),False,True)}" Width="100%" Border="0">
+                                    <apex:Column >
+                                        <apex:facet name="header">Supplier Order No </apex:facet>
+                                        <apex:outputField value="{!JobElements.Supplier_Order_Number__c}" rendered="{!IF(AND(contains(JobElements.Type__c, 'Work'),!ISNULL(JobElements.Order__c),contains(JobElements.Status__c, 'Active'),contains(JobElements.Sub_Status__c, 'Ordered')),True,False)}" />
+                                    </apex:Column>
+                                 
+                                    <apex:Column >
+                                        <apex:facet name="header">Supplier</apex:facet>
+                                        <apex:outputField value="{!JobElements.Current_Supplier__c}"  rendered="{!IF(AND(ISNULL(JobElements.New_Supplier__c),contains(JobElements.Type__c, 'Work')), True, False)}"/>
+                                    </apex:Column>
+                             
+                                     <!-- -------TODAYS DEFECT FIX -->
+                                 <!--   <apex:Column rendered="{!IF(AND(ISNULL(JobElements.New_Supplier__c),contains(JobElements.Type__c, 'Work')), True, False)}">
+                                        <apex:facet name="header">Supplier</apex:facet>
+                                        <apex:outputField value="{!JobElements.Current_Supplier__c}"  />
+                                    </apex:Column>
+                                    <apex:Column rendered="{!IF(AND(!ISNULL(JobElements.New_Supplier__c),contains(JobElements.Type__c, 'Work')), True, False)}">
+                                        <apex:facet name="header">Supplier</apex:facet>
+                                        <apex:outputField value="{!JobElements.New_Supplier__c}"/>
+                                    </apex:Column> -->
+                                    <!-- -------TODAYS DEFECT FIX -->
+                                    <apex:Column >
+                                        <apex:facet name="header">Description</apex:facet>
+                                        <apex:outputField value="{!JobElements.Description__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Work'), True, False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Type</apex:facet>
+                                        <apex:outputField value="{!JobElements.Type__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Work'), True, False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Skill</apex:facet>
+                                        <apex:outputField value="{!JobElements.Skill__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Work'), True, False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Hours</apex:facet>
+                                        <apex:outputField value="{!JobElements.UnitsFormula__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Work'), True, False)}"/>
+                                    </apex:Column>
+                                </apex:dataTable>
+                           </Td>
+                      </Tr>
+                    
+                    
+                    
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                    <Tr Class="D0">
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" >Other Installers</Font></B></Td>
+                    </Tr>
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                    <Tr>
+                        <Td Colspan="4">
+                            <Table  Width="100%" Border="0">
+                                <Tr>
+                                    <Td Width="30%"><B><Font Size="2" >User</Font></B></Td>
+                                    <Td Width="30%"><B><Font Size="2" >Skills</Font></B></Td>
+                                    <Td Width="40%"><B><Font Size="2" >Mobile No</Font></B></Td>
+                                </Tr>
+                                <Tr >
+                                    <Td Height="10" Colspan="5" Align="Left"><Font Size="2" ><hr width="100%" color="black"></hr></Font></Td>
+                                </Tr>
+                                <apex:repeat value="{!v_job.obj_job5.User_Jobs__r}" var="UserJob" rendered="{!NOT(ISNULL(v_job.obj_job5.User_Jobs__r))}">
+                                    <Tr>
+                                        <Td Width="30%">
+                                            <Font Size="2" >
+                                                <apex:outputField value="{!UserJob.User__c}" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}"/>
+                                                <apex:outputField value="{!UserJob.User__r.name}" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), True, False)}"/>                                             
+                                            </Font>
+                                        </Td>
+                                        <Td Width="30%"><Font Size="2" ><apex:outputField value="{!UserJob.Sub_Type__c}"/></Font></Td>
+                                        <Td Width="40%"><Font Size="2" ><apex:outputField value="{!UserJob.User__r.MobilePhone}"/></Font></Td>
+                                    </Tr>
+                                </apex:repeat>
+                            </Table>
+                        </Td>
+                    </Tr>
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ><hr width="100%" color="black"></hr></Font></B></Td>
+                    </Tr>
+                    <Tr >
+                        <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ></Font></B></Td>
+                    </Tr>
+                </apex:repeat>
+                <Tr >
+                    <Td Height="10" Colspan="4" Align="Left"><B><Font Size="2" ><CENTER>
+                        <input Type="button" value="Print" onClick="printWindows();" id="printButton"/>
+                        <input Type="button" value="Back" onClick="backWindow();" id="backButton"/>
+                    </CENTER>
+                    </Font></B></Td>
+                </Tr>
+            </Table> 
+        </Body>
+    </Html>
+</apex:page>

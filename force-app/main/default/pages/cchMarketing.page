@@ -1,0 +1,68 @@
+<apex:page standardController="Opportunity" tabStyle="Opportunity" extensions="cchExtension" id="page">
+<apex:form id="form">
+    <apex:actionfunction name="checkCustomerMarketing" rerender="noMessage,section1" action="{!checkCustomerMarketing}"/>
+    <apex:outputpanel id="noMessage">
+      <!--  <apex:pagemessage summary="Is it that you don’t want to hear from us at all?  You can choose to be contacted by any of the following options – mail, mobile, landline, email or text. Do any of these sound ok?" severity="warning" strength="3" 
+                          rendered="{!Opportunity.Customer_Marketing_Consent__c == 'No' }"  /> -->
+    <!--    <apex:pagemessage summary="Sucessfully Updated! Please inform customers that downstream systems will take x hours for these changes to take effect." severity="warning" strength="3" 
+                          rendered="{!showMessage}"  /> -->
+        <apex:pagemessages rendered="{!cchMessage}"  />
+         <!-- <apex:pagemessage summary="Thanks, you can update your preferences or opt out online or email  generalenquiry@britishgas.co.uk at anytime.For more details on how we use your data, please read our privacy policy online" severity="warning" strength="3" 
+                                      rendered="{!(Opportunity.Customer_Marketing_Consent__c == 'Yes' && !cchMessage) }"  /> -->
+                    
+    </apex:outputpanel>
+
+	<apex:pageblock title="Customer Marketing Preferences:" >
+		<apex:pageBlockSection title="Contact Details" collapsible="false">
+		<apex:pageBlockSectionItem >
+			<apex:outputLabel value="Address" for="address"/>
+				
+
+				{!Opportunity.Install_Address_Street__c}<br/>
+				{!Opportunity.Install_Address_City__c}<br/>
+				{!Opportunity.Install_Postcode__c}
+			
+		</apex:pageBlockSectionItem>
+			<apex:outputField value="{!Opportunity.Comms_Email_Field__c}"/>
+			<apex:outputfield value="{!Opportunity.Mobile_Phone__c}"/>
+			<apex:outputfield value="{!Opportunity.Home_Phone__c}"/>
+			<apex:pageBlockSectionItem >
+			<apex:outputlabel value="Edit Contact" for="contName"/>    
+			<apex:outputlink value="/{!contactid}/e?retURL=%2Fapex/cchMarketing?id={!Opportunity.Id}">
+			<apex:outputfield value="{!Opportunity.Customer_Name__c}" id="contName"/>
+			</apex:outputlink>
+			</apex:pageBlockSectionItem>
+		</apex:pageBlockSection>
+
+		<apex:pageBlockSection columns="1" title="Existing Marketing Preferences" collapsible="false" id="section1">
+		    <apex:pageblocksectionitem >
+    			<apex:outputlabel value="We’d like to let you know about personalised offers and relevant products from British Gas and its related brands (Scottish Gas, Local Heroes, Dyno and Hive), is that ok ?" style="font-weight:bold;"/>
+			</apex:pageblocksectionitem>
+			
+            <apex:pageblocksectionitem >
+    			<apex:outputlabel value="I am happy to receive marketing communications 
+    									   and personalised offers via the following methods:" style="font-weight:bold;"  />
+    		</apex:pageblocksectionitem>							   
+    	    <apex:pageblocksectionitem id="marketingPreference">
+    		<apex:dataTable value="{!picklistValues}" var="wrapper">
+                    <apex:column >
+                        <apex:outputtext value="{!wrapper.label}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:inputCheckbox value="{!wrapper.isSelected}" />
+                    </apex:column>
+                </apex:dataTable>     
+            </apex:pageblocksectionitem>
+            <apex:pageblocksectionitem >
+                    <apex:commandButton value="Agree and Accept" action="{!AgreeAndAccept}" rerender="form" style="background:{!acceptBttnClr};text-align:center ;font-size:10pt;font-weight:bold;padding: 12px 15px;border-radius: 12px;width:150px;" />
+                    <apex:commandButton value="Opt-Out" action="{!OptOut}" rerender="form" style="background:{!optOutBttnClr};text-align:center ;font-size:10pt;font-weight:bold;padding: 12px 15px;border-radius: 12px;width:150px;"/>
+                </apex:pageblocksectionitem>
+		</apex:pageBlockSection>
+		<apex:pageBlockButtons >
+			<apex:commandbutton value="Exit" action="{!cancel}"/>
+			<apex:commandbutton value="Update" action="{!updatePreference}" rerender="form"/>
+
+		</apex:pageBlockButtons>
+	</apex:pageblock>	
+</apex:form>
+</apex:page>

@@ -1,0 +1,180 @@
+<apex:page controller="scaffoldViewController" docType="html-5.0" sidebar="false">
+   
+    <script>
+        var isClicked = false;
+        
+        function check(obj) {
+            if(isClicked) {
+                alert('Button can only be pressed once');
+                return false;
+            } else {
+                isClicked = true;
+                obj.className = 'btnDisabled';
+                togglleDiv('');
+                
+            }
+        }   
+        
+        <!-- Open notes page using selected lead id -->
+        function openNotes(oppID){
+            window.open('/apex/AmalgamateNotes?OppId='+oppID);
+            <!--,'','fullscreen=yes'); -->
+        }
+        
+        function isClickedReset(){
+          isClicked = false;
+          togglleDiv('none');
+        }
+
+        function togglleDiv(show){
+            document.getElementById('darkLayer').style.display = show; 
+            document.getElementById('LoadingDiv').style.display = show;      
+        } 
+    </script>
+    
+    
+    
+    <!-- Working prompt in box -->
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:360px; top:320px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Search is under progress...please wait...
+            </div>
+    </div>
+
+    <div id="darkLayer" style ="background-color: white; 
+                                filter:alpha(opacity=50); /* IE */ 
+                                opacity: 0.5; /* Safari, Opera */ 
+                                -moz-opacity:0.50; /* FireFox */ 
+                                z-index: 20; 
+                                height: 100%; 
+                                width: 100%; 
+                                background-repeat:no-repeat; 
+                                background-position:center; 
+                                position:absolute; 
+                                top: 0px; 
+                                left: 0px; 
+                                display:none;">
+    </div>
+    
+    <apex:pageBlock title="Work List">
+
+    <apex:outputPanel id="errorPanel">
+        <apex:PageMessages />
+    </apex:outputPanel>
+    
+    <!-- <h1>{!employeeDetail.supplier__r.name}</h1> -->
+        <apex:pageBlockSection title="Search" collapsible="false">
+            <apex:form >
+                Start Date: <apex:inputField value="{!startDate1.Installation_Date__c}" id="startDate"/>
+                End Date: <apex:inputField value="{!endDate1.Installation_Date__c}" id="endDate"/>
+                <apex:commandButton action="{!search}" value="Search.." id="theButton" rerender="workListSection, errorPanel" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" />
+            </apex:form>
+        </apex:pageBlockSection>
+        
+    </apex:pageBlock> <!-- end of search block -->
+    
+    <!-- List of jobs found in date query -->
+    
+     <apex:form >
+    <apex:outputPanel id="workListSection">
+    <apex:pageBlock title="Job list" id="joblist">
+        <apex:pageBlockTable value="{!orderList}" var="o" rendered="{!jobListSection}" >
+            <apex:column headervalue="Job Name" >
+                <apex:commandLink value="{!o.job__r.name}" action="{!getSelected}" rerender="jobDetailsSection">
+                    <apex:param value="{!o.job__r.id}" assignTo="{!selectedJobID}" name="selectedJobID"/>
+                    <!-- <apex:param value="{!o.job__c}" assignTo="{!selectedJOBObj}" name="selectedJobID"/> -->
+                </apex:commandLink>
+            </apex:column>
+            <apex:column value="{!o.job__r.CHI_Lead_Name__c}" />
+            <apex:column value="{!o.SAP_Number__c}" />
+            <apex:column value="{!o.job__r.Customer_Name__c}" />
+            <apex:column value="{!o.job__r.Installation_Date__c}" />
+            <apex:column value="{!o.job__r.Install_Street__c}" />
+             <apex:column value="{!o.job__r.Install_Postcode__c}" />
+            <apex:column value="{!o.Total_Order_Value__c}" />
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+    </apex:outputPanel>
+    </apex:form>
+    
+    <apex:outputPanel id="jobDetailsSection">
+    <apex:pageBlock title="Job Details" id="jobDetails" rendered="{!showJobDetails}" >
+        <apex:form > <apex:commandButton value="View Notes" onclick="openNotes('{!jobInfo.chi_lead__r.id}');"/></apex:form>
+        
+        <apex:pageBlockSection title="Customer Details" collapsible="false">
+            
+            <apex:outputField value="{!jobInfo.Customer_Name__c}" id="customerName" />
+            
+            <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Customer Category" for="custCat" />
+            <apex:outputField value="{!jobInfo.Latest_customer_category_indicator__c}" id="custCat" />
+            </apex:pageBlockSectionItem>
+            
+            <apex:outputField value="{!jobInfo.Install_Street__c}" />
+            <apex:outputField value="{!jobInfo.Vulnerable_Customer__c}" />
+            
+            
+            <apex:outputField value="{!jobInfo.Installation_County__c}" />
+            <apex:outputField value="{!jobInfo.DHM_Name__c}" />
+            
+            <apex:outputField value="{!jobInfo.Install_Postcode__c}" />
+            <apex:outputField value="{!jobInfo.DHM_Phone__c}" />
+            
+            <apex:outputField value="{!jobInfo.CAM_Name__c}" />
+            
+            <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Office Phone " for="districtPhone" />
+            <apex:outputField value="{!jobInfo.district__r.Customer_Account_Manager_Phone__c}" id="districtPhone"/>
+
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+            <apex:outputLink value="/{!jobInfo.id}" target="_blank">{!jobInfo.Name}</apex:outputLink>
+            </apex:pageBlockSectionItem>
+            
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="SAP Information" id="sapInfo" collapsible="false" columns="1">
+            <apex:pageBlockTable value="{!jobSAPList}" var="sap">
+                <apex:column value="{!sap.SAP_Number__c}" />
+                <apex:column value="{!sap.Order_Value_Text__c}" />
+                <apex:column value="{!sap.Status__c}" />
+                <apex:column value="{!sap.createdDate}" />
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Assigned Resources" id="resources" collapsible="false" columns="1">
+            <apex:pageBlockTable value="{!resourceList}" var="res">
+                <apex:column headerValue="Skill" value="{!res.Sub_Type__c}" />
+                <apex:column value="{!res.Employee_Name__c}" />
+                <apex:column value="{!res.Employee_Phone__c}" />
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Required work" id="work" collapsible="false" columns="1">
+            <apex:pageBlockTable value="{!jobElementList}" var="je">
+                <apex:column value="{!je.name}" />
+                <apex:column value="{!je.Code__c}" />
+                <apex:column value="{!je.Description__c}" />
+                <apex:column value="{!je.Skill__c}" />
+                <apex:column value="{!je.Units__c}" />
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Photographs and Installaton Notes" id="photos" collapsible="false" columns="1">
+            <apex:pageBlockTable value="{!attachmentList}" var="a">
+                
+                <apex:column headerValue="Name">
+                    <apex:outputLink value="/servlet/servlet.FileDownload?file={!a.id}" target="_blank">{!a.Name}</apex:outputLink>
+                </apex:column>
+                <apex:column value="{!a.createdDate}" />
+                <apex:column value="{!a.createdByID}" />
+                
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        
+        
+    </apex:pageBlock>
+    </apex:outputPanel>
+
+</apex:page>

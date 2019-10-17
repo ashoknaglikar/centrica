@@ -1,0 +1,90 @@
+<apex:page standardcontroller="Green_Deal_Measures__c"  extensions="captureMeasures" id="page">
+
+<script type="text/javascript">
+function fecthIntallJS()
+{
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec1.Recommended_m}").value;
+     //alert(txtVal1);
+     fecthIntall(txtVal1);
+    
+}
+
+ function dateReqFuncJs()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec1.Instdate}").value;
+    //alert(txtVal1);
+    incReqFunc(txtVal1);
+ }
+ 
+ function installdateJs()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec2.planappststus}").value;
+    //alert(txtVal1);
+    appstatus(txtVal1);
+ }
+ 
+</script>
+<apex:form id="frm">
+
+    <apex:actionfunction name="fecthIntall" action="{!fecthIntall}" rerender="blk1" immediate="true" >
+         <apex:param name="recMeas" value="" />
+    </apex:actionfunction>
+    
+    <apex:actionfunction name="incReqFunc" action="{!accptddte}" immediate="true" rerender="blk1sec2">
+        <apex:param name="incdate" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="appstatus" action="{!installdate}" immediate="true" rerender="blk1sec1,blk1sec2">
+        <apex:param name="status" value="" />
+</apex:actionfunction>
+
+    <apex:pageblock title="Green Deal Measures" id="blk1">
+        <apex:pageblockbuttons >
+           
+            <apex:commandButton action="{!save}" value="Save (Dont Use this)" alt="Save" id="saveButton" rendered="{!$Profile.Name=='System Administrator'}"/>
+     <apex:commandbutton action="{!SaveRecord}" value="Save"/>
+            <apex:commandbutton action="{!cancel}" value="cancel"/>
+           
+        </apex:pageblockbuttons>
+        <apex:pagemessages />
+        <apex:pageblocksection id="blk1sec1">
+            <apex:pageblocksectionitem />
+            <apex:outputfield value="{!gdm.Green_Deal_Record__c}"/>
+            <apex:inputfield value="{!gdm.Recommended_measure__c}" required="true" onchange="fecthIntallJS()" id="Recommended_m"/>
+            <apex:inputfield value="{!gdm.Customer_Taken_Up_measure__c}" required="true"/>
+           
+            <apex:inputfield value="{!gdm.Installation_date__c}" onchange="dateReqFuncJs()" Id="Instdate"><!-- required="{!!planappstatus}"  -->
+               <!-- <script>document.getElementById('{!$Component.Instdate}').disabled ={!planappstatus}; </script>-->
+              </apex:inputField>
+            <apex:inputfield value="{!gdm.Scaffolding_Required__c}" />
+            <apex:inputfield value="{!gdm.COCRecieved__c}"/>
+            <apex:pageblocksectionitem />
+            <apex:inputfield value="{!gdm.Measure_Gross_Value__c}" required="true"/>
+            <apex:inputfield value="{!gdm.Extra_Gross_Value__c}" required="true"/>
+          
+        </apex:pageblocksection>
+        
+           
+            <apex:pageblocksection id="blk1sec2" rendered="{!solidwall}" >
+            <!-- <apex:inputfield value="{!gdm.C_Contribution__c}" id="ccAmt" /> -->
+            <apex:inputfield value="{!gdm.Accepted_Dates__c}" id="accptdt" required="{!accptddate}"/> 
+            <apex:inputfield value="{!gdm.Planning_Application__c}" id="plan" required="{!accptddate}"/>
+            <apex:inputfield value="{!gdm.C_10x__c}" />
+            <apex:inputfield value="{!gdm.install_spec__c}"/>
+            <apex:inputfield value="{!gdm.insulation_end__c}"/>
+            <apex:inputfield value="{!gdm.Planning_application_status__c}" id="planappststus" onchange="installdateJs()"/>
+            
+            <apex:inputfield value="{!gdm.quote_uploaded__c}"/>
+            <apex:inputfield value="{!gdm.solid_wall_insulation__c}" required="true"/>
+            <apex:inputfield value="{!gdm.solid_wall__c}"/>
+            <apex:inputfield value="{!gdm.EWISUR_has__c}"/>
+            <apex:inputfield value="{!gdm.SWI_Survery__c}"/>
+            </apex:pageblocksection>
+        
+        
+    </apex:pageblock>
+
+</apex:form>
+
+
+</apex:page>

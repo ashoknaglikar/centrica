@@ -1,0 +1,197 @@
+<apex:page controller="job_UnavailabilityCont" showheader="false" sidebar="false">
+<apex:form >
+<script>
+    function togglleDiv(show)
+                {
+                    document.getElementById('darkLayer').style.display = show; 
+                    document.getElementById('LoadingDiv').style.display = show;      
+                }  
+    function generateNewUnavailability(unavailabiltyRecordId)
+    {
+        
+        alert('Click on OK button to start creating unavailability. Please wait till you get confirmation alert after that. It will take few moments.');
+        togglleDiv('');
+    }
+    
+    function checkSelected(){
+        togglleDiv('');
+        var selectedChkbox = true;
+        var inputs = document.getElementsByTagName('input');
+        for (var i = 0; i < inputs.length; i++) {
+          if (inputs[i].type == 'checkbox') {
+            if (inputs[i].checked) {
+              selectedChkbox = false;
+              break;
+            }
+          }
+        }
+        
+        if(selectedChkbox){
+            alert ("Warning: No work elements have been selected. Select at least one work element to return before clicking the Return Work button.");
+            togglleDiv('none');
+            return false;
+        }
+        
+        return true;
+       }       
+    
+                    
+</script>
+<apex:outputPanel id="jspanel"> 
+      <script>  
+      function onControllerReturn(){
+        togglleDiv('none');
+        alert('Sucessfully Generated');
+        window.top.location.reload(true);
+        
+      }
+    </script>
+</apex:outputPanel>
+ 
+  <apex:actionFunction name="doControllerSave"  rerender="jspanel"/>
+    <apex:pageblock id="block1">
+        <apex:pageblockbuttons >
+            <apex:commandButton value="Close" onclick="window.top.close();"/>
+            <apex:commandButton action="{!RemoveUnavilabilities}" value="Remove Unavailabilities" onclick="if(!checkSelected()) return false;" oncomplete="togglleDiv('none');alert('Sucessfully Removed');window.top.location.reload(true);" rendered="{!(showUnav||showUnavStack) && !alreadyused}" />
+            <apex:commandButton action="{!generateUnavailability}" value="Apply New Unavailability" onclick="doControllerSave,generateNewUnavailability();" rendered="{!showApplyBtn && !alreadyused}" oncomplete="onControllerReturn();" />
+        </apex:pageblockbuttons>
+        <apex:pagemessages />
+        <!-- <apex:outputtext value="{!message}" style="font-weight:bold;color:red;text-align:center;" /> -->
+        <apex:pageblocksection title="{!unavailabiltyRecord.Name}" columns="2" collapsible="false">
+            <apex:outputfield value="{!unavailabiltyRecord.Employee__c}" />
+            <apex:outputfield value="{!unavailabiltyRecord.Start_Date_Time__c}" />
+            <apex:outputfield value="{!unavailabiltyRecord.Group__c}" />
+            <apex:outputfield value="{!unavailabiltyRecord.End_Date_Time__c}" />
+            <apex:outputfield value="{!unavailabiltyRecord.Generated_Unavailability__c}" />
+            <apex:outputfield value="{!unavailabiltyRecord.Unavailability_Reason__c}" />
+            <apex:outputfield value="{!unavailabiltyRecord.Unavailability_Notes__c }" />
+            <apex:outputfield value="{!unavailabiltyRecord.Amendment_Reason__c }" />
+        </apex:pageblocksection>
+         <apex:outputPanel rendered="{!showUnav}">
+                <p/>
+                <apex:outputPanel rendered="{!!alreadyused}">
+                <table width='100%'>
+                    <tr bgcolor='#99FFFF'>
+                        <td>
+                            <font face='calibri' size='2'><b>To Remove all Unavailabilities please Select All Unavailabilities and hit on Remove Unavailabilities.</b>
+                            </font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <apex:inputCheckbox value="{!selectAll}" onchange="selectAll()" disabled="{!alreadyused}"/><font face='calibri' color='#880000' size='2'><b> Select All Unavailabilities </b></font>
+                        </td>
+                    </tr>
+                </table>
+                </apex:outputPanel>
+                <p/>
+                
+                <apex:outputPanel id="innerPanel" >
+                    <apex:actionFunction name="selectAll" action="{!selectAll}" rerender="innerPanel" status="myStatus"/>
+                    <apex:actionStatus startText="Processing..." id="myStatus">
+                    </apex:actionStatus>
+        <apex:pageblocksection title="Current Unavailabilities" columns="1" collapsible="false" rendered="{!showUnav}" id="section1">
+            
+            <apex:pageblocktable value="{!unavaila_Records}" var="u">
+                 <apex:column headerValue="Select">
+                      <apex:inputCheckbox selected="{!u.isSelected}" disabled="{!alreadyused}" id="select"/>
+                 </apex:column>   
+                 <apex:column headerValue="Name">
+                     <apex:outputField value="{!u.unava_Entry.Name}"/>
+                 </apex:column>
+                 <apex:column headerValue="Employee Name" rendered="{!unavailabiltyRecord.Group__c !=NULL}">
+                     <apex:outputField value="{!u.unava_Entry.Employee_Name__c}"/>
+                 </apex:column>
+                 <apex:column headerValue="Reason">
+                     <apex:outputField value="{!u.unava_Entry.Sub_Type__c}"/>
+                 </apex:column>
+                 <apex:column headerValue="Start Time">
+                     <apex:outputField value="{!u.unava_Entry.Start__c}"/>
+                 </apex:column> 
+                 <apex:column headerValue="End Time">
+                     <apex:outputField value="{!u.unava_Entry.End__c}"/>
+                 </apex:column>
+                 
+                  <apex:column headerValue="Ammendment Reason/Authoriser">
+                 <apex:selectlist value="{!u.AmmendmentReason}" size="1" id="picklist" required="true">
+                 <apex:selectoptions value="{!u.AuthoriserReasonOptions}"/>
+                 </apex:selectlist>
+                   </apex:column>
+                   
+                 
+                  
+                 
+                 
+                 
+            </apex:pageblocktable>
+            
+        </apex:pageblocksection>
+        
+        <apex:pageblocksection title="Current Stacked Unavailabilities" columns="1" collapsible="false" rendered="{!showUnavStack }" id="section2">
+            
+            <apex:pageblocktable value="{!unavailastack_Records}" var="u">
+                 <apex:column headerValue="Select">
+                      <apex:inputCheckbox selected="{!u.isSelected}" disabled="{!alreadyused}" id="select"/>
+                 </apex:column>   
+                 <apex:column headerValue="Name">
+                     <apex:outputField value="{!u.unava_Entry.Name}"/>
+                 </apex:column>
+                 <apex:column headerValue="Employee Name" rendered="{!unavailabiltyRecord.Group__c !=NULL}">
+                     <apex:outputField value="{!u.unava_Entry.Employee_Name__c}"/>
+                 </apex:column>
+                 <apex:column headerValue="Reason">
+                     <apex:outputField value="{!u.unava_Entry.Sub_Type__c}"/>
+                 </apex:column>
+                 <apex:column headerValue="Start Time">
+                     <apex:outputField value="{!u.unava_Entry.Start__c}"/>
+                 </apex:column> 
+                 <apex:column headerValue="End Time">
+                     <apex:outputField value="{!u.unava_Entry.End__c}"/>
+                 </apex:column>
+            </apex:pageblocktable>
+            
+        </apex:pageblocksection>
+        </apex:outputPanel>
+        </apex:outputPanel>
+        <apex:pageblocksection title="Current Jobs List" columns="1" collapsible="false" rendered="{!showJobs}" id="section3">
+            <apex:pageblocktable value="{!jobDisplaylst}" var="j">
+                <apex:column headerValue="Job Number">
+                    <apex:outputlink value="/{!j.job.Id}">
+                                <apex:outputtext value="{!j.job.Name}"/>
+                    </apex:outputlink>
+                 </apex:column>
+                 <apex:column headerValue="Employee Name" rendered="{!unavailabiltyRecord.Group__c !=NULL}">
+                     <apex:outputText value="{!j.employeeName}"/>
+                 </apex:column>
+                <apex:column headerValue="Installation Date">
+                    <apex:outputtext value="{!j.instDate}"/>
+                </apex:column>
+                <apex:column headerValue="Start Time">
+                    <apex:outputtext value="{!j.startTime}"/>
+                </apex:column>
+                <apex:column headerValue="End Time">
+                    <apex:outputtext value="{!j.endTime}"/>
+                </apex:column>                          
+            </apex:pageblocktable>
+        </apex:pageblocksection>    
+    </apex:pageblock>
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+        </div>
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;"></div>
+</apex:form>
+</apex:page>

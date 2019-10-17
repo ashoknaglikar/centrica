@@ -1,0 +1,285 @@
+<apex:page controller="QuotesPageCont" sidebar="false" readonly="true">
+    
+<script type="text/javascript" src="/soap/ajax/15.0/connection.js"></script>
+<script type="text/javascript" src="/soap/ajax/15.0/apex.js"></script>
+<script type="text/javascript" src="/js/functions.js"></script>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css"/>
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+
+<script>
+     var isClicked = false;
+     function check(obj) {
+          if(isClicked) {
+                return false;
+            } else {
+                isClicked = true;
+                obj.className = 'btnDisabled';
+                togglleDiv('');
+                
+            }
+        }
+    
+     function isClickedReset(){
+              isClicked = false;
+              togglleDiv('none');
+        }
+        
+        function togglleDiv(show){
+            document.getElementById('darkLayer').style.display = show; 
+            document.getElementById('LoadingDiv').style.display = show;      
+        } 
+</script>
+    <apex:form id="myform">
+        <apex:pageMessages id="pgmsg"/>
+        <apex:pageblock title="Filter criteria : " rendered="{!!isPrevious}">
+            
+             <apex:pageBlockSection columns="1">
+                        <apex:pageBlockSection title="Filter Date Criteria" columns="2"  collapsible="true">
+                            <apex:pageBlockSectionItem >
+                                        <apex:outputLabel value="From Date : " />
+                                        <apex:outputpanel layout="block" styleClass="requiredInput">
+                                        <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                                        <apex:inputField value="{!bm.installationDate__c}" /></apex:outputpanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                        <apex:outputLabel value="To Date : " />
+                                        <apex:outputpanel layout="block" styleClass="requiredInput">
+                                        <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                                        <apex:inputField value="{!bm.closeDate__c}" /></apex:outputpanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+            </apex:pageBlockSection>
+            
+             <apex:pageBlockSection >
+                        <apex:pageBlockSection title="Product Interest Criteria (Included) " columns="1" collapsible="true" >
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel ><b>Product Interest : </b></apex:outputLabel>
+                                <c:MultiselectPicklist leftLabel="Available values"
+                                    leftOptions="{!ProductInterestOptions}"
+                                    rightLabel="Selected Values"
+                                    rightOptions="{!allProductIntSelected}"
+                                    size="5"
+                                    width="200px"/>
+                           </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection title="District Criteria (Included)" columns="1" collapsible="true" >
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel ><b>District : </b></apex:outputLabel>
+                                <c:MultiselectPicklist leftLabel="Available values"
+                                    leftOptions="{!AreaItems}"
+                                    rightLabel="Selected Values"
+                                    rightOptions="{!allDistrictsSelected}"
+                                    size="5"
+                                    width="200px"/>
+                           </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+            </apex:pageBlockSection>
+            
+           
+            
+            <apex:pageBlockSection >
+                       <apex:pageBlockSection title="Region Criteria (Included)" columns="1" collapsible="true" >
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel ><b>Region : </b></apex:outputLabel>
+                                <c:MultiselectPicklist leftLabel="Available values"
+                                    leftOptions="{!RegionItems}"
+                                    rightLabel="Selected Values"
+                                    rightOptions="{!allRegionsSelected}"
+                                    size="5"
+                                    width="200px"/>
+                           </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection> 
+                        <apex:pageBlockSection title="Allowance Key Criteria (Excluded)" columns="1" collapsible="true" >
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel ><b>Allowance Key : </b></apex:outputLabel>
+                                <c:MultiselectPicklist leftLabel="Available values"
+                                    leftOptions="{!AllowanceKeyOptions}"
+                                    rightLabel="Selected Values"
+                                    rightOptions="{!allAllowanceKeySelected}"
+                                    size="5"
+                                    width="200px"/>
+                           </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+            </apex:pageBlockSection>
+                
+            <apex:pageBlockSection >
+                         <apex:pageBlockSection title="Core Bundle Criteria (Excluded)" columns="1" collapsible="true" >
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel ><b>Core Bundle : </b></apex:outputLabel>
+                                <c:MultiselectPicklist leftLabel="Available values"
+                                    leftOptions="{!CoreBundleOptions}"
+                                    rightLabel="Selected Values"
+                                    rightOptions="{!allCoreBundleSelected}"
+                                    size="5"
+                                    width="200px"/>
+                           </apex:pageBlockSectionItem>
+                         </apex:pageBlockSection>
+                         <apex:pageBlockSection title="Current Product Holdings & Part Number Criteria (Included)" columns="1" collapsible="true" >
+                            <apex:outputText ></apex:outputText>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="Current Product Holdings "></apex:outputLabel>
+                                <apex:inputText value="{!currentProductHoldings}"/>
+                           </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="Part Number "></apex:outputLabel>
+                                <apex:inputText value="{!partNumber}"/>
+                           </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockButtons >
+                <!--<apex:commandButton value="Back" action="{!backQuotes}" />-->
+                <apex:commandButton value="Get Leads" action="{!queryLeads}" reRender="myform,pgmsg" status="status1" />
+                <apex:actionstatus id="status1" onstart="check(true);" onstop="isClickedReset()"></apex:actionstatus>
+                 <apex:commandButton value="Previous Voucher Files Sent" action="{!previousVFSent}" rerender="myform" immediate="true"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+        
+      
+        <apex:pageBlock title="Voucher Section " id="pgblk2" rendered="{!(isShowVoucherBlock && !isPrevious)}">
+            
+                   <apex:pageBlockSection columns="1">
+                            <apex:pageBlockSection title="Select Vocher Code ">
+                                <apex:pageBlockSectionItem >
+                                        <apex:outputLabel value="Offer "/>
+                                        <apex:outputpanel layout="block" styleClass="requiredInput">
+                                        <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                                        <apex:inputField value="{!voucherFile.Offer__c}"/></apex:outputPanel>
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                   </apex:pageBlockSection>
+                
+                   <apex:pageBlockSection >
+                        <apex:pageBlockSection title="Channel">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Salesforce "/>
+                                    <apex:inputCheckbox value="{!isSalesforce}" label="Salesforce"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                     <apex:outputLabel value="Contact Engine "/>
+                                    <apex:inputCheckbox value="{!isContactEngine}" label="Contact Engine"/>
+                                </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection title="Contact Method ">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Text "/>
+                                    <apex:inputCheckbox value="{!isText}" label="Text"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                     <apex:outputLabel value="Email "/>
+                                    <apex:inputCheckbox value="{!isEmail}" label="Email"/>
+                                </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </apex:pageBlockSection>
+             
+                    <apex:pageBlock title="CHI Leads " rendered="{!count>0}">
+                              <apex:outputText rendered="{!IF(count>0,false,true)}">No Leads to display</apex:outputText>
+                              <apex:pageBlockTable style="width:100%" value="{!opplist}" var="opp" rows="{!setRecords}" first="{!(pageNumber-1)*setRecords}" rendered="{!count>0}"> 
+                                 <apex:column value="{!opp.CHI_Lead_Id__c}"  />
+                                 <apex:column headerValue="CHI Lead ID"> <a href="/{!opp.id}" target="_blank">{!opp.name}</a></apex:column>            
+                                 <apex:column value="{!opp.Customer_Name__c}"  />
+                                 <apex:column value="{!opp.account.Address__c}"  />
+                              </apex:pageBlockTable> 
+                              
+                               
+                             <apex:outputPanel style="position:relative;float:right" rendered="{!count>0}">
+                                 <apex:outputText >Total Records: {!count}</apex:outputText>
+                             </apex:outputPanel>
+                             
+                              <apex:outputPanel rendered="{!count>0}">
+                              <center>                        
+                                <apex:commandButton value="|< First" action="{!firstPage}" reRender="pgblk2" disabled="{!pageNumber<=1}"  />
+                                <apex:commandButton value="< Previous" action="{!previousPage}" reRender="pgblk2" disabled="{!pageNumber<=1}"/>
+                                <b>Page {!pageNumber} of {!pageUpInt}</b>&nbsp;
+                                <apex:commandButton value=" Next > " action="{!nextPage}" reRender="pgblk2" disabled="{!pageNumber == pageUpInt}"  />             
+                                <apex:commandButton value="Last >|" action="{!lastPage}" reRender="pgblk2" disabled="{!pageNumber == pageUpInt}"   />
+                             </center>
+                             </apex:outputPanel>
+        
+            
+                            <apex:pageBlockButtons rendered="{!count>0}">
+                                 <apex:commandButton value="Apply Voucher Code" action="{!applyVoucher}"/>
+                                 <apex:commandButton value="Download as CSV" action="/apex/LeadsDownloadPage" onclick="" id="download"/>
+                                 <!--<apex:commandButton value="Download as CSV" action="{!downloadCSV}"/>-->
+                            </apex:pageBlockButtons>
+                   </apex:pageBlock>
+                   
+                  <!-- <apex:pageBlockButtons location="top">
+                                <apex:commandButton value="Previous Voucher Files Sent" action="{!previousVFSent}" rerender="myform" immediate="true"/>
+                   </apex:pageBlockButtons>-->
+        </apex:pageBlock>
+       
+         
+        
+        
+        
+        <apex:pageBlock rendered="{!isPrevious}" id="voucherpgblk">
+            
+            <apex:pageblock title="Filter criteria : ">
+              <apex:pageBlockSection columns="4"  collapsible="false">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="From Date : " />
+                        <apex:outputpanel layout="block" styleClass="requiredInput">
+                        <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                        <apex:inputField value="{!bm.installationDate__c}" /></apex:outputpanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="To Date : " />
+                        <apex:outputpanel layout="block" styleClass="requiredInput">
+                        <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                        <apex:inputField value="{!bm.closeDate__c}" /></apex:outputpanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Voucher Code: " />
+                        <apex:outputpanel layout="block" styleClass="requiredInput">
+                        <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                        <apex:inputField value="{!voucherFile.Offer__c}" /></apex:outputpanel>
+                    </apex:pageBlockSectionItem>
+                    
+                </apex:pageBlockSection>
+               <apex:pageBlockButtons location="bottom">
+                      <apex:commandButton value="Get Voucher Files" action="{!queryVoucherFiles}" status="status1" rerender="voucherpgblk,pgmsg"/>
+                      <apex:commandButton value="Back" action="{!back}" rerender="myform" immediate="true"/>
+               </apex:pageBlockButtons>
+           </apex:pageBlock>
+        
+           <apex:pageblock title="Voucher Files Sent :" rendered="{!voucherFileList.size>0}">
+               <apex:outputText rendered="{!IF(voucherFileList.size>0,false,true)}">No Details to display. </apex:outputText>
+               <apex:pageBlockTable value="{!voucherFileList}" var="voucherFile" rendered="{!voucherFileList.size>0}">
+                   <apex:column value="{!voucherFile.name}"/>
+                   <apex:column value="{!voucherFile.createddate}"/>
+                   <apex:column value="{!voucherFile.From_Date__c}"/>
+                   <apex:column value="{!voucherFile.To_Date__c}"/>
+                   <apex:column value="{!voucherFile.VoucherCode__c}"/>
+                   <apex:column value="{!voucherFile.Voucher_Name__c}"/>
+                   <apex:column value="{!voucherFile.Voucher_File_Link__c}"/>
+               </apex:pageBlockTable>
+           </apex:pageBlock>
+        </apex:pageBlock>
+        
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:360px; top:320px;display:none;">
+                <div style="margin-left:5px; margin-top:5px;">
+                <img src="/img/loading.gif" /> Working in Progress..please wait...
+                </div>
+    </div>
+    
+    <div id="darkLayer" style ="background-color: white; 
+                                filter:alpha(opacity=50); /* IE */ 
+                                opacity: 0.5; /* Safari, Opera */ 
+                                -moz-opacity:0.50; /* FireFox */ 
+                                z-index: 20; 
+                                height: 100%; 
+                                width: 100%; 
+                                background-repeat:no-repeat; 
+                                background-position:center; 
+                                position:absolute; 
+                                top: 0px; 
+                                left: 0px; 
+                                display:none;">
+    </div>
+        
+          
+        </apex:form>    
+</apex:page>

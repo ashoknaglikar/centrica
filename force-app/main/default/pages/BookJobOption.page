@@ -1,0 +1,342 @@
+<apex:page controller="BookJobOptionController" action="{!populateResults}" tabStyle="Job__c" id="pageform">
+
+<script type="text/javascript" src="/soap/ajax/15.0/connection.js"></script>
+<script type="text/javascript" src="/soap/ajax/15.0/apex.js"></script>
+<script type="text/javascript" src="/js/functions.js"></script>
+<script>
+ 
+var isClicked = false;
+function check(obj) {
+  if(isClicked) {
+        alert('Button can only be pressed once');
+        return false;
+    } else {
+        isClicked = true;
+        obj.className = 'btnDisabled';
+        togglleDiv('');
+        
+    }
+}
+
+function isClickedReset(){
+      isClicked = false;
+      togglleDiv('none');
+}
+
+function togglleDiv(show){
+    document.getElementById('darkLayer').style.display = show; 
+    document.getElementById('LoadingDiv').style.display = show;      
+}  
+
+
+</script>
+
+ «&nbsp;<apex:outputLink rendered="{!!DummyFlag}" value="JobSearchResults?jobId={!jobId}" id="jobLink">Back to Search Results</apex:outputLink>
+ <br/>
+ <br/>
+<apex:pageMessages id="errormsg" />
+<apex:outputText rendered="{!error}" value="Encountered an error: {!errorMsg}" />
+<apex:form id="bookingForm">
+<style>
+ body .bPageBlock .pbBody .red .pbSubheader h3{
+                color: #F0F7FF;
+          }
+ body .bPageBlock .pbBody .red{
+                font-size: 17px;
+          }
+
+</style>
+
+<apex:pageBlock id="bookInfo" title="Confirm Booking " mode="detail">
+<apex:outputPanel styleClass="red" layout="block">
+<apex:pageBlockSection title="OverBook Hours: {!TotOBHors}" columns="1" collapsible="false" rendered="{!isoverBook}" id="aja">
+<apex:outputText escape="false" value="{!Msg1}" style="color:red;font-size:12px;font-weight: bold;font-family: Times New Roman;"/>  
+
+<!--<apex:outputPanel rendered="{!isoverBook}" id="aja"> 
+
+                    <font face='Georgia' color = 'blue' size ='3'>
+                        <b><center>
+                           OVERBOOK HOURS: {!TotOBHours}<br/>
+                           <apex:outputText escape="false" value="{!Msg1}" style="color:red;font-size:12px;font-weight: bold;font-family: Times New Roman;"/>  
+
+                        </center></b>
+                    
+                     </font>
+                
+</apex:outputPanel>-->
+</apex:pageBlockSection>
+</apex:outputPanel>
+<!-- code added for failed install on day -->
+<apex:pageblocksection title="Failed Install Details" id="failedInstall" columns="2" collapsible="false" rendered="{!showFailedInstallDetails}">
+<apex:repeat value="{!fields}" var="f">
+<apex:inputField value="{!failedInstall[f.fieldPath]}" required="{!OR(f.required, f.dbrequired)}"/>
+</apex:repeat>
+</apex:pageblocksection>
+<!--
+<apex:pageBlockSection title="Over Ride Smart Meter Validation" columns="1" rendered="{!overRideSMVal}" collapsible="false">
+    <apex:outputlabel value="I understand Smart Meter Validations, but I would still like to proceed with these bookings without changing the Smart Meter Installation Date." for="smSwitch" style="font-weight:bold;color:blue">
+    &nbsp;&nbsp;<apex:inputcheckbox value="{!smValSwitch}" id="smSwitch"/>
+    </apex:outputlabel>
+</apex:pageBlockSection>
+-->
+
+<apex:pageBlockSection title="I will book: " columns="1" collapsible="false" >
+<apex:pageBlockTable value="{!Wresults}" var="result" >
+<apex:column value="{!result.EmpName}" headerValue="Employee Name" style="{!if(result.result.Skill__c=='Travel Time','color:blue;font-weight: bold;','color:black;')}"/>
+<apex:column value="{!result.result.Skill__c}" headerValue="To do" style="{!if(result.result.Skill__c=='Travel Time','color:blue;font-weight: bold;','color:black;')}"/>
+<apex:column value="{!result.result.Hours__c}" headerValue="For" style="{!if(result.result.Skill__c=='Travel Time','color:blue;font-weight: bold;','color:black;')}"/>
+<apex:column value="{!result.DEName}" headerValue="In Diary Entry" style="{!if(result.result.Skill__c=='Travel Time','color:blue;font-weight: bold; ','color:black;')}" />
+<apex:column value="{!result.DEhours}" headerValue="(with hours)" style="{!if(result.result.Skill__c=='Travel Time','color:blue;font-weight: bold;','color:black;')}"/>
+<apex:column value="{!result.result.Start_Date_Time__c}" headerValue="Employee starts at..." style="{!if(result.result.Skill__c=='Travel Time','color:blue;font-weight: bold;','color:black;')}"/>
+<apex:column value="{!result.result.End_Date_Time__c}" headerValue="...and finishes at" style="{!if(result.result.Skill__c=='Travel Time','color:blue;font-weight: bold;','color:black;')}"/>
+</apex:pageBlockTable>
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Delivery Information: " columns="2" collapsible="false" rendered="{!!DummyFlag}" id="deliveryInputDetails">
+
+<apex:inputField value="{!job.Delivery_Date__c}" required="true" id="deliveryDate"/>
+ <apex:outputpanel style="display:none"> 
+<apex:inputField value="{!job.PTS_Rollout__c}" id="rollout"/>
+<script>document.getElementById('{!$Component.rollout}').disabled = true; </script>
+</apex:outputpanel>
+<apex:inputField value="{!job.Delivery_Slot__c}" required="true"/>
+
+<apex:outputpanel rendered="{!withinStandard}" style="margin-left:120px;">
+<apex:outputlabel for="sl" value="Service Level :" style="font-weight:bold;"/>
+<apex:outputText id="sl" value="{!serviceLevel}"/>
+</apex:outputpanel>
+<apex:outputpanel rendered="{!withinStandard}" style="margin-left:120px;">
+<apex:outputlabel for="slr" value="Service Level Reason :" style="font-weight:bold;"/>
+<apex:outputText id="slr" value="{!serviceLevelReason}"/>
+</apex:outputpanel>
+<apex:outputpanel rendered="{!!withinStandard}" style="margin-left:120px;">
+<apex:outputlabel for="sl1" value="Service Level :" style="font-weight:bold;"/>
+<apex:selectList value="{!serviceLevel}" id="sl1" size="1" >
+
+<apex:selectOptions value="{!SL}"/>
+<apex:actionSupport event="onchange" action="{!fetchSLR}" status="wait" reRender="SLRPanel"/>
+</apex:selectList>
+<apex:actionStatus id="wait" startText="wait..." style="color:red;"/>
+</apex:outputpanel>
+<apex:inputField value="{!job.Delivery_Notes__c}" required="false"/>
+
+<apex:outputpanel rendered="{!!withinStandard}" style="margin-left:60px;" id="SLRPanel" >
+<apex:outputlabel for="slr1" value="Service Level Reason :" style="font-weight:bold;"/>
+<apex:selectList value="{!serviceLevelReason}" id="slr1" size="1" >
+<apex:selectOptions value="{!SLR}"/>
+</apex:selectList>
+</apex:outputpanel>
+<!--//CR - 1379 change by ASHOK G-->
+<apex:InputField value="{!JPH.Direction2__c}" id="ashok1" rendered="{!reason}" />
+<script>document.getElementById('{!$Component.ashok1}').disabled = {!reason}; </script>
+<!--//Change end-->
+<apex:inputField value="{!JPH.Re_Plan_Reason__c}" rendered="{!reason}" required="true"/>
+<apex:inputField value="{!job.DPA_Done__c}" />
+<apex:inputField value="{!JPH.Re_Plan_Sub_Reason__c}" rendered="{!reason}" required="true"/>
+<apex:inputField value="{!job.Bring_Forward_Job__c}"/>
+<div>
+<apex:InputField value="{!job.Refused_Earlier_Date__c}"/>
+</div>
+<!-- Sqeeze JOB CHANGE ADDED BY ASHOK G-->
+<apex:pageblocksectionitem >
+    <apex:outputLabel value="Squeeze Job?" for="SJob" />
+    <apex:actionregion >
+    <apex:InputField Value="{!job.Squeeze_Job__c}">
+    <apex:actionSupport event="onchange" action="{!CalcOverBookedHours}" reRender="bookInfo"/>
+    </apex:inputField>
+    </apex:actionregion>
+</apex:pageblocksectionitem>
+
+
+<!--<apex:inputField value="{!job.Who_in_Field_Engaged__c}" />-->
+<!--<apex:inputField value="{!job.Engineer_Working_NWD__c}" required="true"/>
+<apex:inputField value="{!job.Engineer_Working_NWD_Hours1__c}"/>
+
+<apex:inputField value="{!job.Engineer_Working_NWD_Hours2__c}"/>-->
+
+
+<script>
+    var jsPopPTSWindow;
+    var jsCheckInterval;
+     function openNewPTSWindow()
+     {
+        var deliveryDateDT = document.getElementById('{!$Component.deliveryDate}');
+        //deliveryDateDT = deliveryDateDT(//,'-');
+        jsPopPTSWindow = window.open('/apex/PTSForm?id={!jobID}&dt=' + deliveryDateDT.value,"_blank","controls=no,height=705,width=1020,scrollbars=1");
+        jsPopPTSWindow.focus();
+        jsCheckInterval = setInterval(checkNewPTSWindowClosed, 300);
+        return false;
+     }
+     
+     function checkNewPTSWindowClosed()
+     {
+        if(jsPopPTSWindow != null && jsPopPTSWindow.closed)
+        {
+            window.location = window.location;
+            clearInterval(jsCheckInterval);
+        }
+     }
+     
+     function openPTSScrren()
+     {
+        jsPopPTSWindow = window.open('/apex/CancelSlotInPTS?jobId={!jobID}&slot=B');
+     }
+     
+</script>
+ 
+</apex:pageBlockSection> 
+<!--{!ShowSPDetails}
+{!job.Exception_Required__c}-->
+<apex:pageblockSection title="SP Details" columns="1" collapsible="false" rendered="{!ShowSPDetails}" >
+    <apex:outputField value="{!job.Exception_Required__c}"/>
+    
+    <!--<apex:inputField value="{!job.Reason__c}" required="{!if(job.Exception_Required__c!=null,true,false)}" />-->
+    
+    <apex:inputField value="{!job.Exception_reason__c}" required="true"  />
+    <apex:inputField value="{!job.Engineer_Spoken_To__c}" required="true"/>
+</apex:pageblockSection>
+    
+<apex:pageBlockSection title="Confirm Over Booking" columns="1" collapsible="false" rendered="{!overBook}">
+    <apex:inputCheckbox label="I Agree to Over Book this Job:" value="{!inputOverbook}"/>
+</apex:pageBlockSection> 
+<apex:pageBlockSection title="Green Deal Assesment Info" columns="2" collapsible="false" rendered="{!(!DummyFlag && gdJob)}">
+<apex:inputField value="{!job.GDA_Date__c}" />
+<apex:inputField value="{!job.GDMIDASRefNumber__c}" />
+</apex:pageBlockSection> 
+<!--
+<apex:pageBlockSection title="Smart Meter Information: " columns="2" collapsible="false" rendered="{!(!DummyFlag && smFlag)}" id="smsection">
+
+<apex:outputField value="{!job.CHI_Lead__r.SMStatus__c}"  id="smStatus"/>
+<apex:inputField value="{!job.Smart_Meter_Required_Flag__c}"  id="smInstallDate"/>
+<apex:inputField value="{!job.Smart_meter_installation_date__c}" />
+<apex:inputField value="{!job.SMInstalltionTime__c}" />
+<apex:inputCheckbox value="{!job.not_booked__c}" />
+</apex:pageBlockSection> 
+-->
+<!--- Added the section to display the user to select Platform for Parallel Run Functionality -->
+<apex:pageBlockSection title="Job Planning Platform selection: " rendered="{!(parallelRunEnabled && platformCheck && !DummyFlag)}" columns="1" collapsible="false">
+
+<apex:inputField value="{!job.CHI_Lead__r.Platform__c}" />
+</apex:pageBlockSection>
+<!--- Added the section to display the user the platform already selected in CHI Lead for Platform for Parallel Run Functionality -->
+<apex:pageBlockSection title="Job Planning Platform: " rendered="{!(parallelRunEnabled && !platformCheck && !DummyFlag)}" columns="1" collapsible="false">
+<apex:outputfield value="{!job.CHI_Lead__r.Platform__c}"/>
+</apex:pageBlockSection>
+
+<!-- <apex:pageBlockSection title="Testing: ">
+<apex:repeat value="{!strings}" var="string">
+<apex:outputText value="{!string}"/><br/>
+</apex:repeat>
+</apex:pageBlockSection> -->
+
+<br/>
+<apex:commandButton title="Click to Book" value="Make these bookings" action="{!bookOption}" rendered="{!(!buttonClicked && !DummyFlag)}" 
+                    rerender="{!rerenderblocks}" onclick="check(this);" oncomplete="isClickedReset()"/>
+                    
+<apex:commandButton title="Book delivery slot" value="Book delivery slot" rendered="{!(!buttonClicked && !DummyFlag)}" onclick="return openNewPTSWindow();" />
+                    <!-- onclick="return openNewPTSWindow();" -->
+                    
+                    
+                    
+                    
+<apex:commandButton title="Get Resources" value="Click to go Back" action="{!goback}" rendered="{!DummyFlag}" />                    
+ 
+                
+</apex:pageBlock>
+      
+<div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:360px; top:320px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Job booking is under progress...please wait...
+            </div>
+</div>
+
+<div id="darkLayer" style ="background-color: white; 
+                            filter:alpha(opacity=50); /* IE */ 
+                            opacity: 0.5; /* Safari, Opera */ 
+                            -moz-opacity:0.50; /* FireFox */ 
+                            z-index: 20; 
+                            height: 100%; 
+                            width: 100%; 
+                            background-repeat:no-repeat; 
+                            background-position:center; 
+                            position:absolute; 
+                            top: 0px; 
+                            left: 0px; 
+                            display:none;">
+</div>
+                                    
+                                    
+</apex:form>
+
+<!--<apex:outputPanel id="bookingResultsPanel">
+<apex:pageBlock id="bookingResults" title="Booking results" mode="detail" rendered="{!buttonClicked}">
+
+  <apex:pageBlockSection id="bookingStatus" title="Booking status: " columns="1" rendered="{!buttonClicked}"  collapsible="false">
+<apex:outputText value="{!bookingStatus}" rendered="{!buttonClicked}"/>
+</apex:pageBlockSection>
+<br/>
+<apex:pageBlockTable value="{!booked}" var="b" rendered="{!bookedRetrieved}">
+<apex:column value="{!b.Week__r.Employee__r.Name}" headerValue="Employee"/>
+<apex:column value="{!b.Sub_Type__c}" headerValue="Skill"/>
+<apex:column value="{!b.Hours__c}" headerValue="For"/>
+<apex:column value="{!b.Start__c}" headerValue="From"/>
+<apex:column value="{!b.End__c}" headerValue="To"/>
+<apex:column headerValue="Diary Entry">
+<apex:outputLink value="{!URLFOR($Action.Diary_Entry__c.View,b.ID)}">{!b.Name}
+</apex:outputLink>
+</apex:column>
+</apex:pageBlockTable>
+
+</apex:pageBlock>
+</apex:outputPanel>-->
+<apex:pageblock >
+    <apex:pageblocksection title="Road Map for Primary Engineer" collapsible="true" columns="1">
+    <script src="http://maps.googleapis.com/maps/api/js?v=3&client=gme-britishgasnewheating&sensor=false">  
+    </script>  
+      
+    <script type="text/javascript">  
+        var map;
+        var directionsDisplay;
+        var directionsService = new google.maps.DirectionsService();
+        
+        function initialize() {
+          directionsDisplay = new google.maps.DirectionsRenderer();
+          var latlng = new google.maps.LatLng(-34.397, 150.644);
+          var mapOptions = {
+            zoom: 8,
+            center: latlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+          }
+          map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+          directionsDisplay.setMap(map);
+          codeAddress();
+          
+        }
+        
+        function codeAddress() {
+           var start = "{!customerAdd}";
+          var end = "{!instAdd}";
+          var request = {
+              origin:start,
+              destination:end,
+              travelMode: google.maps.DirectionsTravelMode.DRIVING
+          };
+          directionsService.route(request, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+              directionsDisplay.setDirections(response);
+            }
+          });
+        
+        }
+        
+
+    </script>  
+      
+      
+    <div id="map-canvas" style="width:100%;height:300px"></div>  
+    <script>  
+        initialize() ;  
+    </script>  
+    </apex:pageblocksection>
+</apex:pageblock>
+</apex:page>

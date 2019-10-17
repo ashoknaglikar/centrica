@@ -1,0 +1,357 @@
+<apex:component >
+    <apex:attribute name="projectId" description="Project ID from the page" type="String" required="true"/>
+    <script>
+    var COLLAPSE   = 'Collapse';
+    var EXPAND     = 'Expand';
+    var COLLAPSEALL = 'Collapse All';
+    var EXPANDALL = 'Expand All';    
+    var DESCENDING = 'Sort Descending';
+    var ASCENDING  = 'Sort Ascending';
+    var $from;
+    var cancelDrag = false;
+    
+    $(document).ready(function() {
+        initializeCollapsibleState();    
+        initializeSortable();
+        bindActions();
+        placeEmptySectionMessage();
+        calcEstimate($('ul[type="backlog"]'));
+        calcEstimate($('ul[type="release"]'));
+        $('.estimateCollection').each(function()
+        {
+          calcParentEstimate($(this));
+        });
+        
+          $(".Completed").hide();
+          $(".completed").toggleClass("deactivate");
+
+    });
+    
+    $(document).keyup(function(ev) {
+      if(ev.keyCode == 27 && $from) {
+        cancelDrag = true;
+        $from.sortable('cancel');
+      }
+    });    
+    
+    function detectSectionsWithoutChildren() {
+      var sections = [];
+      
+      $('ul.sortable').each(function(idx, ele) {
+        if($(ele).find('li').length === 0) {
+          sections.push(ele);
+        }
+      });
+      
+      return sections;
+    }
+    
+    function placeEmptySectionMessage() {
+      var sections = detectSectionsWithoutChildren();
+      $(sections).html(
+        '<div class="sort-disabled no-result">No Work Products Found</div>');
+    }
+    
+    function rankProducts($target) {
+      var isAscending = isDisplayedAscending($target);
+      var numToRank   = $target.find('li').length;
+      var actualIndex;
+      
+      $target.find('li').each(function(index, value) {
+        actualIndex = isAscending? index : numToRank - index - 1;
+        var $that = $(this);
+        $that.attr('rank', actualIndex);
+        $that.find('>:first-child')
+             .html(actualIndex + ':&nbsp;' + $that.attr('name'));
+      });
+      calcEstimate($target);
+      var $collection = $target.parent().parent();
+      if($collection.hasClass('estimateCollection')) {
+        calcParentEstimate($collection);
+      }
+    }
+    
+    function bindActions() {
+      $('.as-link').unbind().click(gotoHref);
+      $('.right.link.show-hide.unselectable').click(expandAndCollapse);
+      $('span.sort').click(flipRankOrder);
+      $('.filter-heading').click(filterElements);
+      $('.filter-global').click(filterGlobal);
+    }
+            
+    
+    // Called on page render, reads the localStorage and restores collapsible menu state.
+    function initializeCollapsibleState() {
+       $('.right.link.show-hide.unselectable').each(function(index){
+           var isCollapsed = '';
+           var divContainer = $(this).parent().parent();
+         
+         //Check if current element is the product backlog, if so - restore appropriate file.
+         if ($(this).parent().parent().attr('class') == ('half wp-container'))  {
+              isCollapsed = localStorage.getItem('{!projectId}' + 'left' + divContainer.index());
+          } else {
+              isCollapsed = localStorage.getItem('{!projectId}' + divContainer.index());
+          }
+          
+           //Restore corresponding labels and toggle elements accordingly.
+           if (isCollapsed === 'collapsed') {
+               if ($(this).text() === COLLAPSE) {
+                    $(this).text(EXPAND);
+                } if ($(this).text() === COLLAPSEALL) {
+                    $(this).text(EXPANDALL);
+                }
+                divContainer.find('ul').css("display","none");
+           } else if (isCollapsed === 'expanded') { 
+                 if ($(this).text() === EXPAND) {
+                    $(this).text(COLLAPSE);
+                } if ($(this).text() === EXPANDALL) {
+                    $(this).text(COLLAPSEALL);
+                }   
+                divContainer.find('ul').css("display","block");
+           } 
+       });
+    }
+    
+    function gotoHref() {
+      window.open($(this).attr('href'), '_blank');
+    }
+    
+    function showLoadingPopup() {
+      $('div#overlay, div#loading').show();
+    }
+    
+    function hideLoadingPopup() {
+      $('div#overlay, div#loading').hide();
+    }
+        
+    function initializeSortable() {
+            $( ".sortable" ).sortable({
+                connectWith: ".sortable",
+                dropOnEmpty: true,
+                cancel: ".sort-disabled",
+        
+        over: function(event, ui) {
+          $(this).parent().addClass('droppable');
+        },
+        
+        out: function(event, ui) {
+          $(this).parent().removeClass('droppable');
+        },
+        
+        start: function(event, ui) {
+          $from = $(ui.item.context).parent();
+          $dragged = $(ui.item.context);
+        },
+        
+        stop: function(event, ui) {
+          if(cancelDrag) {
+            cancelDrag = false
+            return false;
+          }
+          console.log('THIS: ' + $(this).attr('id'));
+          var $to          = $(ui.item.context).parent();
+          var toGrouping   = getGrouping($to);
+          var fromGrouping = getGrouping($from);
+          
+          $('div.no-result').remove();
+          document.getElementById("loading").innerHTML = 'Updating...';
+          showLoadingPopup();
+          console.log('To Release: ' + toGrouping.release+ 'To Iteration: '+toGrouping.iteration+' To ReocrdType:  '+toGrouping.recordType);
+          console.log('From Release ' + fromGrouping.release+ 'From Iteration: '+ fromGrouping.iteration+' From RecordType: '+fromGrouping.recordType);
+          ViewBacklog.updateWorkProductRank($to.sortable('toArray'), 
+                                              toGrouping.release,
+                                              toGrouping.iteration,
+                                            isDisplayedAscending($to),
+                                            $from.sortable('toArray'),
+                                            fromGrouping.release,
+                                            fromGrouping.iteration,
+                                            isDisplayedAscending($from),
+                                            toGrouping.recordType,
+                                            fromGrouping.recordType,
+                                            function(result, event) {
+            
+            if(result != 'success')
+            {
+              document.getElementById("loading").innerHTML = '<span class="error">Error: ' + result + '</span><button onclick="hideLoadingPopup()">close</button>';
+              placeEmptySectionMessage();
+              $from.sortable('cancel');
+            }
+            else
+            {
+              if(!wasError(event)) { 
+                rankProducts($to);
+                rankProducts($from);
+                placeEmptySectionMessage();
+                hideLoadingPopup();
+                $from = null;
+              }
+            }  
+          });
+                }
+            }).disableSelection(); 
+        }
+    
+    function getGrouping($target) {      
+            var newListType = $target.attr('type');
+            //alert(newListType);
+            var iterationId = '';
+            var releaseId   = '';
+            var recordTypeId = ''; 
+      if (newListType === "release") {
+        releaseId = $target.attr('id');
+      } else if (newListType === "iteration") {
+            iterationId = $target.attr('id');
+      }else if(newListType === "backlog")
+      {
+          recordTypeId = $target.attr('id');
+      }
+      
+      return { iteration : iterationId, release : releaseId, recordType : recordTypeId  };
+    }
+    
+    function isDisplayedAscending($target) {
+      return $target.parent().find('span.sort').text() === DESCENDING;      
+    }
+    
+        function wasError(event) {
+            if(event.type === 'exception') {
+                console.log('An error occured');
+                console.log(event.message);
+                console.log(event.where);
+                alert('The following error has occured: ' + event.message);
+                return true;
+            }
+      
+      return false;
+        }
+    
+   function expandAndCollapse() {  
+         var className = $(this).parent().parent().attr('class');
+         var index = $(this).parent().parent().index(); 
+         var parent = $(this).parent().parent();  
+         var $this = $(this);
+         
+         // Toggle the element and store the state in localStorage.        
+         if ($this.text() === EXPAND) { 
+             $this.parent().parent().parent().find('ul').css('display','block');
+             if (parent.attr('class') == 'half wp-container') {
+                 localStorage.setItem('{!projectId}' + 'left' + index, 'expanded');
+             } else {
+                 localStorage.setItem('{!projectId}' + index, 'expanded');
+             }
+
+         } else if ($this.text() === COLLAPSE){
+             $this.parent().parent().parent().find('ul').css('display','none');
+             if (parent.attr('class') == 'half wp-container') {
+                 localStorage.setItem('{!projectId}' +  'left' + index, 'collapsed');
+             } else {
+                 localStorage.setItem('{!projectId}' + index, 'collapsed');
+             }
+             
+         } else if ($this.text() === EXPANDALL) {
+             $this.parent().parent().find('ul').css('display','block'); 
+             $('.right.link.show-hide.unselectable').each(function(index1) {
+                 if ($(this).parent().parent().attr('class') != 'half wp-container')  { 
+                     localStorage.setItem('{!projectId}' + $(this).parent().parent().index(), 'expanded');
+                 }  
+
+             });  
+         
+         } else if ($this.text() === COLLAPSEALL){
+             $this.parent().parent().find('ul').css('display','none'); 
+             $('.right.link.show-hide.unselectable').each(function(index2) {
+                  if ($(this).parent().parent().attr('class') != 'half wp-container')  { 
+                     localStorage.setItem('{!projectId}' + $(this).parent().parent().index(), 'collapsed');                  
+                  }           
+             });                    
+         }
+         
+         // Toggle the label.
+         if ($this.text() ===  COLLAPSEALL) {
+             $this.parent().parent().find('.right.link.show-hide.unselectable').text(EXPAND);
+             ($this.text(EXPANDALL));
+         } else if ($this.text() === EXPANDALL) {    
+             $this.parent().parent().find('.right.link.show-hide.unselectable').text(COLLAPSE);
+             ($this.text(COLLAPSEALL));             
+         } else if ($this.text() === COLLAPSE) {
+             ($this.text(EXPAND));             
+         } else if ($this.text() === EXPAND) {
+             ($this.text(COLLAPSE));         
+         }
+         
+        
+   }
+    
+    function flipRankOrder() {
+      var $this = $(this);
+      $this.text($this.text() === DESCENDING ? ASCENDING : DESCENDING);
+      var $ul = $this.parent().parent().parent().find('ul');
+      $ul.html($ul.find('li').get().reverse());
+      $('.as-link').unbind().click(gotoHref);
+    }
+
+    function calcEstimate($target) {
+      var estimate = 0;
+      $target.find('li[estimate!=""]').each(function() {
+        estimate += parseInt($(this).attr('estimate'));
+      });
+      $target.parent().find('.planEstimate').html('Plan Estimate: ' + estimate);
+    }
+
+    function calcParentEstimate($target) {
+      var estimate = 0;
+      $target.find('li[estimate!=""]').each(function() {
+        estimate += parseInt($(this).attr('estimate'));
+      });
+      $target.find('.planEstimate[type="parentSummary"]').html('Backlog Estimate: ' + estimate);
+    }
+
+    function filterElements() {
+        
+      var $this = $(this);
+      var op;
+      $this.toggleClass("deactivate");
+      var $ul = $this.parent().parent().parent().find('ul');
+      $this.parent().find("span.stopButton").hasClass("deactivate") ? op=false : op=true;
+      $this.parent().find('span.filter').not('span.stopButton').each(function(){
+        var $myGreatGrandParent = $(this).parent().parent().parent();
+        if(op)
+        {
+        $(this).hasClass("deactivate") ?
+          $myGreatGrandParent.find('li.' + $(this).attr('title')).hide() :
+          $myGreatGrandParent.find('li.' + $(this).attr('title')).show();
+        }
+        else
+        {
+          $(this).hasClass("deactivate") ?
+            $myGreatGrandParent.find('li.' + $(this).attr('title')).hide() :
+            $myGreatGrandParent.find('li.' + $(this).attr('title')).not("li.Blocked").show();
+            $myGreatGrandParent.find('li.Blocked').hide();
+        }
+      });
+    }
+
+    function filterGlobal() {
+      var $this = $(this);
+      var op;
+      $this.toggleClass("deactivate");
+      $this.hasClass("deactivate") ? op=false : op=true;
+      $("div.rightside span.filter").each(function(){
+      if($(this).attr('title')==$this.attr('title'))
+        {
+          if(op)
+          {
+            $('div.rightside span.deactivate[title='+$(this).attr("title")+']').not('.filter-global').trigger('click');
+          }
+          if(!op)
+          {
+            $('div.rightside span[title='+$(this).attr("title")+']:not(.filter-global):not(.deactivate)').trigger('click');
+          }
+          
+        }
+
+      });
+
+    }
+    </script>
+</apex:component>

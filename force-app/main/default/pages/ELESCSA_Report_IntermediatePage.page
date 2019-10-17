@@ -1,0 +1,22 @@
+<apex:page controller="ELESCSA_Report_Controller" cache="true" title="Generate ELECSA Report" >
+	<apex:form title="Generate ElLECSA Report">
+		<div><h1>Generate ELECSA Report</h1></div>
+		<apex:pageblock title="Select date range">
+			<apex:pageBlockSection title="Date Range: " columns="2" collapsible="false">  
+				<apex:inputField value="{!dateObj.Start_Date__c}" required="true"/>
+				<apex:inputField value="{!dateObj.End_Date__c}" required="true"/>
+ 			</apex:pageBlockSection>
+ 			<apex:PageBlockButtons location="bottom">                
+				<apex:commandbutton value="Generate" action="{!CreateReport}"></apex:commandbutton>
+			</apex:PageBlockButtons>
+ 
+		</apex:pageblock>
+ <!-- 
+<apex:pageblock rendered="{!!IsGenerate}" >
+<apex:PageBlockButtons location="bottom">                
+<apex:commandbutton value="Generate" action="{!CreateReport}"></apex:commandbutton>
+</apex:PageBlockButtons>
+</apex:pageblock>
+ -->
+	</apex:form>
+</apex:page>

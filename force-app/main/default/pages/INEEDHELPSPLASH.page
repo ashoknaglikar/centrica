@@ -1,0 +1,13 @@
+<apex:page standardController="Support_Query__c">
+<html>
+<head>
+</head>
+<body>
+<h2>Message!</h2>
+<p>
+If you have an issue with Salesforce or HEAT/Big Machines or you require 
+assistance with escalating an issue already raised with 123 please complete the I need help form
+</p>
+</body>
+</html>
+</apex:page>

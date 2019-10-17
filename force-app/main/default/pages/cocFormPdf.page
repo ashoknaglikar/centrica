@@ -1,0 +1,287 @@
+<apex:page sidebar="false" showHeader="false" renderas="pdf" controller="cocController" >
+
+<style>
+    @page {
+        size: letter;
+       }
+ </style> 
+
+<html>
+           
+<body>
+
+<div style="font-family:Agency FB;font-size:20px;font-weight:bold;color:black;letter-spacing:2px;">
+    Claim Of Conformity:Central Heating Systems
+</div>
+<div style="height:15px;"/>
+<div style="font-family:Agency FB;font-size:15px; font-weight:bold; letter-spacing:100px;">
+    Customer reference number: 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:outputField value="{!jcd.CHI_Lead_Number__c}"/>
+    <!--<div style="font-family:Agency FB;font-size:15px; font-weight:bold; letter-spacing:100px;">
+    Green Deal Home Improvement Fund Registration Number: Q5EBYP 
+    </div>-->
+</div>
+<div style="height:5px;"/>
+<div style="font-family:Agency FB;font-size:15px; font-weight:bold; color:#8FD8FF;letter-spacing:2px;">
+    For completeion by installer
+ 
+</div>
+<div style = "font-family:Calibri; font-size:15px;letter-spacing:1px;">
+Please tick as appropriate or provide information
+</div>
+
+<div style ="width:40%; margin:2px; position:absolute; top:0px; right:-140px; " >
+    <apex:image url="/servlet/servlet.FileDownload?file=01520000000i0Ur" style="height:40%;width:50%" rendered="{!bglogo}"/>
+    <apex:image url="/servlet/servlet.FileDownload?file=01520000000i0V1" style="height:40%;width:50%" rendered="{!!bglogo}"/>
+</div>
+<div style ="width:55%;margin:2px; border:1px solid gray; background-color:#8FD8FF;  border-radius:10px 10px;">
+
+
+<p style="margin-left:5px; margin:2px;font-family:Calibri;font-size:12px;font-weight:bold; ">Condensing Boiler</p>
+<p style="margin-left:5px;margin:2px;font-family:Calibri;font-size:12px;font-weight:bold;">Natural gas fired and liquified petroleum gas fired:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+<apex:outputfield value="{!jcd.Gas_Fired__c}" /></p>
+
+
+</div>
+
+<!-- <div style ="height:5px;" />
+
+<div style ="width:55%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify;">
+
+<p style="margin-left:5px;margin:2px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Micro Combined heat and power (Micro-CHP)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<apex:outputfield value="{!jcd.micro_CHP__c}" /></p>
+</div>-->
+
+<div style ="height:5px;" />
+
+<div style =" width:55%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%;">Heating and hot water controls:</p>
+<p style="margin-left:5px; margin:2px; font-family:Calibri;font-size:12px;font-weight:bold;">TRV's
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;
+<apex:outputfield value="{!jcd.TRV_s__c}" /></p>
+
+<p style="margin-left:5px; margin:2px; font-family:Calibri;font-size:12px;font-weight:bold;">Programmers
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Programmers__c}" /></p>
+
+<p style="margin-left:5px; margin:2px; font-family:Calibri;font-size:12px;font-weight:bold;">Room Thermostats
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Room_thermostats__c}" /></p>
+
+<p style="margin-left:5px; margin:2px; font-family:Calibri;font-size:12px;font-weight:bold;">Timer and Temperature Control Devices
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.TT_C_D__c}" /></p>
+
+<p style="margin-left:5px; margin:2px; font-family:Calibri;font-size:12px;font-weight:bold;">Cylinder Thermostat
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Cylinder_Thermostat__c}" /></p>
+
+</div>
+<div style ="height:5px;" />
+<div style ="width:40%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify; top:103px; right:10px;  position:absolute;">
+<div>
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%;">Heating system insulation:</p>
+<p style="margin-left:5px; margin:2px; font-family:Calibri;font-size:12px;font-weight:bold;">Ducting
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Ducting_COC__c}" /></p>
+
+<p style="margin-left:5px; margin:2px; font-family:Calibri;font-size:12px;font-weight:bold;">Pipes
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Pipes__c}" /></p>
+
+<p style="margin-left:5px; margin:2px; font-family:Calibri;font-size:12px;font-weight:bold;">Cylinders
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<apex:outputfield value="{!jcd.Cylinder__c}" /></p>
+</div>
+</div>
+
+<!-- <div style ="height:5px;" />
+<div style =" width:40%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify; top:200px; right:10px; position:absolute;">
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Solar Thermal
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<apex:outputfield value="{!jcd.Solar_thermal__c}" /></p>
+</div> -->
+
+<div style ="width:40%; margin:2px; border:1px solid gray; position:absolute; top:212px; right:10px; background-color:#8FD8FF; height:88px;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold; ">Notes:
+<br/>
+<apex:outputfield value="{!jcd.Notes_Coc__c}" /></p>
+</div>
+
+<br/>
+<div>
+<p style="margin-left:5px; margin:2px; font-family:Calibri;font-size:12px;font-weight:bold; height:34px;">
+British Gas have satisfactorily installed a central heating system using an installation process complying with
+PAS 2030:2014, including Annexes C2, C4 and C6, at the following domestic address:
+</p>
+</div>
+
+<div style ="height:5px;" />
+<div style="width:99%;margin:2px; border:1px solid gray; background-color:#8FD8FF; height:20%;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Customer Address (location Of installation):
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputtext value="{!installStreet}" /></p>
+</div>
+<div style ="height:5px;" />
+<div style ="width:55%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Line 2:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Job_Number__r.Install_City__c}" /></p>
+</div>
+<div style ="height:5px;" />
+<!--<div style ="width:55%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Date of Handover:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Date_of_handover_Ins__c}" /></p>
+
+</div>-->
+
+<div style ="height:5px;" />
+<div style ="width:55%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Installers Name:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Installers_Name1_Coc__c}" /></p>
+
+</div>
+<div style ="height:5px;" />
+
+<div style ="width:40%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify; position:absolute; top:452px; right:15px;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Installers Name:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Installer_s_name2_COC__c}"/></p>
+
+</div>
+
+<div style ="width:40%;margin:2px;border:1px solid gray;position:absolute;top:410px; right:15px;background-color:#8FD8FF;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Post Code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Job_Number__r.Install_Postcode__c}" /></p>
+</div>
+
+<!--<div style ="width:40%; margin:2px; border:1px solid gray; position:absolute; top:450px; right:15px; background-color:#8FD8FF; height:25%;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:110px">Installers Signature:</p>
+ 
+</div>
+
+<div style = "top:470px; right:15px; position:absolute; ">
+
+<apex:image url="https://c.{$label.Salesforce_Server}.content.force.com/servlet/servlet.FileDownload?file={!signList[1]}" rendered="true"/>
+</div>-->
+<div>
+
+<p style="font-family:Agency FB;font-size:15px; font-weight:bold; color:#8FD8FF;letter-spacing:2px;">For completion by the customer</p>
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%;"> By signing, you also confirm you are satisfied with the installation: </p>
+
+</div>
+<div style ="height:5px;" />
+<div style ="width:55%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Date of Handover:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Date_of_handover_Cus__c}" /></p>
+
+</div>
+<div style ="height:5px;" />
+<div style ="width:55%;margin:2px; border:1px solid gray;line-height:150%; background-color:#8FD8FF;text-align:justify;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:25px;">Customers Name:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Customer_s_name_COC__c}" /></p>
+
+</div>
+<div style ="height:5px;" />
+<div style = "width:55%; margin:2px;border:1px solid gray; background-color:#8FD8FF; height:100px;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:40px;">Customers Signature:</p>
+  
+</div>
+
+<div style = "top:650px; left:50px;  position:absolute;">
+
+  <apex:image url="https://c.{$label.Salesforce_Server}.content.force.com/servlet/servlet.FileDownload?file={!signList[0]}"  rendered="true" style="top:830px; left:15px; "/>
+</div>
+
+<div style ="height:5px;" />
+
+<div style ="width:55%; margin:2px; border:1px solid gray;  background-color:#8FD8FF; height:25%;">
+
+<p style="margin-left:5px;margin:1px;font-family:Calibri;font-size:12px;font-weight:bold;line-height:120%; height:110px">Installers Signature:</p>
+ 
+</div>
+
+<div style = "top:760px;left:50px; position:absolute; ">
+
+<apex:image url="https://c.{$label.Salesforce_Server}.content.force.com/servlet/servlet.FileDownload?file={!signList[1]}" rendered="true"/>
+</div>
+
+
+<div style ="width:40%; margin:2px; position:absolute; top:550px; right:-50px; " >
+
+    <apex:image url="https://{$label.Salesforce_Server}.salesforce.com/resource/1425047716000/GreenDealLogo" style="height:260px;width:160px" rendered="true"/>
+    
+
+</div>
+
+<div style = "font-family:Calibri;font-size:10px;">
+<apex:outputtext value="Alternatively, if you would like further independent advice on any of the information in this form, or anything else related to Green Deal,
+visit the Energy Saving Trust website (www.energysavingtrust.org.uk) or call them on: 0300 123 1234 (local rates apply) in England,
+Wales or Northern Ireland. 0800 512 012 in Scotland."/>
+<div style ="height:5px;" />
+<apex:outputtext value="*Phone lines are open 8am–8pm Monday to Friday and 8am–4pm on Saturday. Closed on Bank Holidays."/>
+<br/>
+<apex:outputtext value="Calls may be monitored and/or recorded for quality assurance and compliance purposes."/>
+<div style ="height:5px;" />
+<apex:outputtext value="British Gas is the trading name of British Gas New Heating Limited which is authorised and regulated by the Financial Conduct Authority for it consumer credit activities.
+Registered in England & Wales (Registered No. 06723244). Registered Office: Millstream, Maidenhead Road, Windsor, Berkshire SL4 5GD."/>
+</div>
+
+
+</body>
+</html>
+
+
+
+
+</apex:page>

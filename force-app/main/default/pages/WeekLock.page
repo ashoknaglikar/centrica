@@ -1,0 +1,37 @@
+<apex:page standardController="Week__c"  showHeader="false" sidebar="false" extensions="WeekLockChange" id="page" standardstylesheets="false" action="{!lockandUnlock}">
+
+   
+ <script type='text/Javascript'>
+        
+ </script>
+
+<apex:form id="frm" > 
+
+<apex:outputPanel >
+                <hr/>
+                    <font face='calibri' color = '#787878' size ='3'>
+                        <p>
+                        <b><center>
+                            {!Msg} was performed successfully. click on close to Refresh
+                        </center></b>
+                        </p>
+                    </font>
+                <hr/>
+                <p/>
+                <hr/>
+                <center><input type='button' value='Close' onClick='Javascript:closeAndRefresh();'/></center>
+                <hr/>
+ </apex:outputPanel>
+ 
+ 
+</apex:form>
+<script type='text/Javascript'>
+        function closeAndRefresh(){
+            
+            window.close();
+            if (window.opener && !window.opener.closed) {
+                window.opener.location.reload();
+            } 
+        }
+</script>
+</apex:page>

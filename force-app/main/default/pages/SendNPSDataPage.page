@@ -1,0 +1,8 @@
+<apex:page standardController="NPS__c" extensions="sendNPSDataController" action="{!sendNPSData}">
+<apex:pageMessages />
+<apex:form >
+<div align="center">
+    <apex:commandButton value="Back" action="{!back}"/>
+</div>
+</apex:form>
+</apex:page>

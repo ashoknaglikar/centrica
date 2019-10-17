@@ -1,0 +1,8 @@
+<!--
+Type Name: NPSIntermidiatePage
+Author: Aruna
+Created Date: 23/04/2010
+Reason: An intermidiate page for calling action method to populate Account and CHI Lead for NPS.Change History:
+-->
+<apex:page standardController="NPS__c" extensions="NpsController" action="{!npsCHILeadAccountMethod}">
+</apex:page>

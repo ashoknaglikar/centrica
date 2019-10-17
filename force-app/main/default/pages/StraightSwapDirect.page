@@ -1,0 +1,122 @@
+<apex:page standardController="CombiSwapQuestion__c" extensions="StraightSwapDirect" id="page">
+   <script>
+     function checkItems(){
+       chek();
+     }
+      function popUp(){
+             //alert('Your name has been Saved'+'{!ssobj.Opportunity__c}')
+             
+             var a = document.getElementById("page:frm:blk1:sect10:aaaaa:GF1");
+             var b = document.getElementById("page:frm:blk1:sect10:bbbbb:GF2");
+             var c = document.getElementById("page:frm:blk1:sect10:ccccc:GF3");
+             var d = document.getElementById("page:frm:blk1:sect10:ddddd:GF4");
+             var e = document.getElementById("page:frm:blk1:sect10:eeeee:GF5");
+             var f = document.getElementById("page:frm:blk1:sect10:fffff:GF6");
+             var g = document.getElementById("page:frm:blk1:sect10:ggggg:GF7");
+             var h = document.getElementById("page:frm:blk1:sect10:hhhhh:GF8");
+             
+             if(a.value == 'Yes' && b.value == 'Yes' && c.value == 'Yes' && d.value == 'Wall' && e.value == 'Yes' && f.value == 'No' && g.value == 'Wall' && h.value == 'No'){
+                var oppid = '{!ssObj.Opportunity__c}';
+                window.open('/apex/SSDirectBookAppointment?oppId='+oppid+'&new=true',+"_blank","controls=no,height=250,width=650,scrollbars=0,top=200,left=400");
+                
+             }
+         }
+    
+   </script>
+   
+   <style>
+     select
+        {
+                  //color:#f00;
+                  //height:18px;
+                  //font-size:12px;
+                  float: left;
+                  position: relative;
+                  left: 10%;
+                  font-weight:bolder;
+        }
+
+   </style>
+
+    <apex:form id="frm">
+        <apex:actionFunction action="{!check}"  name="chek" rerender="frm"/>
+        <apex:outputPanel id="pg">
+        <apex:pageblock id="blk1">
+            <apex:outputPanel id="errmsg">
+            <apex:pagemessages />
+            </apex:outputPanel>
+            <apex:pageblockbuttons rendered="{!!pid}">
+                <apex:commandButton value="Save & Exit" action="{!saveExit}" rerender="frm" rendered="{!saveExitBtn}"/>
+                <apex:commandbutton value="Cancel" action="{!exitBtn}"/>
+            </apex:pageblockbuttons>
+             
+            <apex:pageBlocksection columns="1" id="sect10">
+               
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="aaaaa">
+                        <apex:outputLabel value="Is the boiler on the ground floor of your home?" for="GF1" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!ssObj.SSD1__c}" id="GF1" onchange="checkItems();"/>
+                    </apex:pageblocksectionitem>
+                    <!--<apex:pageblocksectionItem></apex:pageblocksectionItem>-->
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="bbbbb">
+                        <apex:outputLabel value="Do you want a like for like combi replacement?" for="GF2" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!ssObj.SSD2__c}" id="GF2" onchange="checkItems();"/>
+                    </apex:pageblocksectionItem>
+                    <!--<apex:pageblocksectionItem></apex:pageblocksectionItem>-->
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="ccccc">
+                        <apex:outputLabel value="Will the new boiler be in the exact same location?" for="GF3" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!ssObj.SSD3__c}" id="GF3" onchange="checkItems();"/>
+                    </apex:pageblocksectionitem>
+                    <!--<apex:pageblocksectionItem></apex:pageblocksectionItem>-->
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="ddddd">
+                        <apex:outputLabel value="Is your boiler fixed to the floor or mounted on the wall?" for="GF4" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!ssObj.SSD4__c}" id="GF4" onchange="checkItems();"/> 
+                    </apex:pageblocksectionitem>
+                    <!--<apex:pageblocksectionItem></apex:pageblocksectionItem>-->
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="eeeee">
+                        <apex:outputLabel value="Is there a sink or washing machine within 3 mtrs of the boiler?" for="GF5" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!ssObj.SSD5__c}" id="GF5" onchange="checkItems();"/> 
+                    </apex:pageblocksectionitem>
+                    <!--<apex:pageblocksectionItem></apex:pageblocksectionItem>-->
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="fffff">
+                        <apex:outputLabel value="Are you looking to buy or replace any radiators?" for="GF6" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!ssObj.SSD6__c}" id="GF6" onchange="checkItems();"/> 
+                    </apex:pageblocksectionitem>
+                    <!--<apex:pageblocksectionItem></apex:pageblocksectionItem>-->
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="ggggg">
+                        <apex:outputLabel value="Does the flue on your boiler go up through the roof or out through the wall?" for="GF7" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!ssObj.SSD7__c}" id="GF7" onchange="checkItems();"/> 
+                    </apex:pageblocksectionitem>
+                    <!--<apex:pageblocksectionItem></apex:pageblocksectionItem>-->
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="hhhhh" >
+                        <apex:outputLabel value="Does your home have any asbestos that you are aware of ?" for="GF8" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!ssObj.SSD8__c}" id="GF8" onchange="checkItems();"/> 
+                    </apex:pageblocksectionitem>
+                    <!-- <apex:inputfield value="{!opp.Product_Interest__c}" id="GF9" style="float:right;font-weight:bolder;" rendered="{!pid}"/>  -->
+                    
+            </apex:pageblocksection> 
+           
+        </apex:pageblock>
+        </apex:outputpanel>
+        <apex:pageblock id="blk2" rendered="{!pid}">
+            <apex:pageblocksection columns="1">
+                
+           
+            <apex:outputPanel >
+                <font face='calibri' color = '#787878' size ='3'>
+                    <p>
+                    <b><center>
+                        Based on the information you’ve provided we’re able to provide you with a quote over the phone. Would you like me to book a telephone appointment for you ? .
+                       </center></b>
+                    </p>
+                </font>
+            </apex:outputPanel>
+            </apex:pageblocksection>
+            <apex:pageblockButtons location="bottom" >
+                  <apex:commandButton value="Yes" action="{!confirm}" />
+                  <apex:commandbutton value="No" action="{!exitBtn}"/>
+            </apex:pageblockButtons>
+        </apex:pageblock>
+        
+   </apex:form>
+       
+</apex:page>

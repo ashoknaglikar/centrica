@@ -1,0 +1,15 @@
+<apex:page >
+
+
+<apex:form >  
+  
+  <apex:outputlink value="https://www.britishgas.co.uk/products-and-services/boilers-and-central-heating/cover/" target="_blank" style="text-decoration: none;color:#3063A5;">Home Care</apex:outputlink><br/>
+  <apex:outputlink value="http://www.britishgas.co.uk/products-and-services/hive-active-heating.html" target="_blank" style="text-decoration: none;color:#3063A5;">Hive</apex:outputlink><br/>
+  <apex:outputlink value="https://www.britishgas.co.uk/energy-saving-products/home-insulation" target="_blank" style="text-decoration: none;color:#3063A5;">Insulation</apex:outputlink><br/>
+  <apex:outputlink value="http://www.britishgas.co.uk/products-and-services/boilers-and-central-heating/new-boilers.html" target="_blank" style="text-decoration: none;color:#3063A5;">Reasons to choose BG for a new boiler</apex:outputlink><br/>
+  <apex:outputlink value="http://www.britishgas.co.uk/products-and-services/boilers-and-central-heating/new-boilers/central-heating-and-boilers-explained.html" target="_blank" style="text-decoration: none;color:#3063A5;">Types of boilers</apex:outputlink><br/>
+  <apex:outputlink value="http://www.britishgas.co.uk/products-and-services/boilers-and-central-heating/new-boilers/boiler-and-heating-range.html" target="_blank" style="text-decoration: none;color:#3063A5;">Our boiler range</apex:outputlink><br/>
+  <apex:outputlink value="http://www.britishgas.co.uk/products-and-services/boilers-and-central-heating/new-boilers/boiler-costs-and-ways-to-pay-pilot.html" target="_blank" style="text-decoration: none;color:#3063A5;">Our payment options</apex:outputlink><br/>
+  
+</apex:form>
+</apex:page>

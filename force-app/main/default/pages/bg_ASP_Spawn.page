@@ -1,0 +1,62 @@
+<apex:page standardController="ASP__c" extensions="bg_Javascript_Remote_Methods">
+<apex:includeScript value="/soap/ajax/29.0/connection.js"/>
+	<apex:includeScript value="/support/console/29.0/integration.js"/>
+    <script type="text/javascript"> 
+		function testOpenSubtab() {
+            //First find the ID of the primary tab to put the new subtab in
+            sforce.console.getEnclosingPrimaryTabId(openSubtab);
+        }
+		
+		var openSubtab = function openSubtab(result) {
+            //Now that we have the primary tab ID, we can open a new subtab in it
+            var primaryTabId = result.id;
+			
+            bg_Javascript_Remote_Methods.getASPReferenceData('{!ASP__c.Id}', function(result, event){
+                if(event.status) {
+					//ASP Spawns
+	   				console.log(result);
+					console.log(result.ASP.Name);
+					if(result.ASP.Id != undefined) {
+                    	sforce.console.openSubtab(primaryTabId , '/'+result.ASP.Id, false, result.ASP.Name, null, openSuccess, /*result.ASP.Id*/ 'test');
+	   				}
+					console.log(result.Job.Name);
+					if(result.Job.Id != undefined) {
+						sforce.console.openSubtab(primaryTabId , '/'+result.Job.Id, false, result.Job.Name, null, openSuccess, result.Job.Id);
+					}
+	   				for(i=0;i<result.JobPayment.length;i++) {
+						sforce.console.openSubtab(primaryTabId , '/'+result.JobPayment[i].Id, false, result.JobPayment[i].Name, null, openSuccess, result.JobPayment[i].Id);
+					}
+					console.log(result.CHILead.Name);
+					if(result.CHILead.Id != undefined) {
+	   					sforce.console.openSubtab(primaryTabId , '/'+result.CHILead.Id, false, result.CHILead.Name, null, openSuccess, result.CHILead.Id);
+					}
+					//sforce.console.focusSubtabByNameAndPrimaryTabId('test', primaryTabId);
+				}
+            }); 
+        };		
+		
+		var openSuccess = function openSuccess(result) {
+            //Report whether we succeeded in opening the subtab
+			sforce.console.getEnclosingTabId(function(result) {
+					if(result.id != undefined) {
+						sforce.console.focusSubtabById(result.id);
+					}
+			});
+            if (result.success == true) {
+                console.log('subtab successfully opened');
+            } else {
+                console.log('subtab cannot be opened');
+            }
+        };
+					
+		var previousOnload = window.onload;
+       window.onload = function() { 
+            if (previousOnload) { 
+                previousOnload();
+            } 
+			if (sforce.console.isInConsole()) {
+           		openSubtabTimer = setTimeout('testOpenSubtab()', '3000');
+			}
+       }
+	</script>
+</apex:page>

@@ -1,0 +1,424 @@
+<style type="text/css">
+            body {
+              margin: 0;
+              padding: 0;
+              background: transparent;
+              font: 10px 'Arial',sans-serif;
+            }
+                .wrap {
+                  overflow: hidden;
+                  margin: 2px;
+                  height: 100%;
+                  width: 100%;
+                  position: relative;
+                }
+                .wrapCommon {
+                  border-radius: 2px 2px 2px 2px;   
+                  background: rgba(237, 237, 237, 0.74);//rgb(221, 221, 223);
+                  margin-top: 20px;
+                  margin-left: auto;
+                  margin-right: auto;
+                  -webkit-transition: background-color 2s ease-out;
+                  -moz-transition: background-color 2s ease-out;
+                  -o-transition: background-color 2s ease-out;
+                  transition: background-color 2s ease-out;
+                } 
+                .wrapCommon:hover {
+                  background-color: #D1C7C7;//rgb(173,216,230);
+                  -webkit-box-shadow: 0px 1px 2px 0px #000000;;
+                  -moz-box-shadow: 0px 1px 2px 0px #000000;;
+                  box-shadow: 0px 1px 2px 0px #000000;; 
+                } 
+                    .BGLogoBox {
+                      width: 20%;
+                      height: 5%;
+                      //min-width:200px;
+                      //min-height:30px;
+                      left : .5%;  
+                      position: absolute;
+                      background: transparent;
+                    }
+                        .progressBarGreetingBox {
+                          width: 100%;
+                          height: 100%;
+                          font: 20px 'Arial'; 
+                          color: rgb(38, 184, 218); 
+                          position: absolute;
+                          background: transparent;
+                        }
+                        .progressBarDateBox {
+                          font: 10px 'Arial'; 
+                        }
+                        hc {
+                          //width: 10%;
+                          height: 20%;
+                          left:50%;
+                          //position: absolute;
+                          background: transparent;  
+                          font-family: Arial,sans-serif;
+                          color: rgb(38, 184, 218);//#129adb;
+                          font-size: 2em;
+                          letter-spacing: -1px;
+                        }         
+                    .progressBarBox {
+                      width: 58%;
+                      height: 10%;
+                      //min-width:500px;
+                      //min-height:60px;
+                      left: 21%;
+                      position: absolute;
+                      background: transparent;
+                    }
+                    .knowledgeBox {
+                      width: 19%;
+                      height: 8%;
+                      left:80.1%;
+                      position: absolute;
+                    }
+                        .knowledgeBox table{ width: 105%; height: 65%;}
+                        .knowledgeBox table tr td { vertical-align: middle; text-align: left; color: white;font: 14px 'Arial'; } 
+                        .customBut {
+                          font-family: 'Arial',sans-serif;;
+                          color: white;
+                          background-color : rgb(165, 167, 169);
+                          background-image : none; 
+                        }
+                                    
+                    .custDetailsBox {
+                      width: 20%;
+                      height: 30%;
+                      left: .5%;
+                      top:5.1%;
+                      position: absolute;
+                    }
+                        .custDetailsContentBox {
+                          /* Firefox */
+                          height: -moz-calc(90% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(90% - 25px);
+                          /* Opera */
+                          height: -o-calc(90% - 25px);
+                          /* Standard */
+                          height: calc(90% - 25px);
+                          //white-space: nowrap;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          position: absolute;
+                        }            
+                  
+                            .custDetailsContentBox table{ width: 100%; height: 100%; font: 12px 'Arial';table-layout: fixed;}
+                            .custDetailsContentBox table tr td { vertical-align: top; text-align: left; } 
+                        
+                        .custDetailsBoxFooterBar {
+                          width: 100%;
+                          height: 10%;
+                          //left: 70%;
+                          top: 88%;
+                          position: absolute;
+                          //background: yellow;
+                        }
+                            .custDetailsBoxFooterBar table{ width: 105%; height: 65%;table-layout: fixed}
+                            .custDetailsBoxFooterBar table tr td { vertical-align: top; text-align: left; }
+                    .custNotesBox {
+                      width: 78.4%;
+                      height: 14%;
+                      top: 82%;
+                      left:20.6%;
+                      position: absolute;
+                    }
+                        .custNotesContentBox {
+                          //left : .5%;  
+                          width: 100%;
+                          height: 100%;
+                          /* Firefox */
+                          height: -moz-calc(100% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(100% - 25px);
+                          /* Opera */
+                          height: -o-calc(100% - 25px);
+                          /* Standard */
+                          height: calc(100% - 25px);
+                          font: 12px 'Arial'; 
+                          position: absolute;
+                          overflow: auto;
+                          white-space: nowrap;
+                          overflow: hidden;         
+                          text-overflow: ellipsis;
+                          vertical-align: middle; text-align: left; font: 12px 'Arial';
+                          //overflow-x:scroll ; overflow-y: scroll;
+                        }  
+                
+                        .oneThirdVertical1 {
+                          padding-left: 1%;
+                          width: 100%;
+                          height: 33%;
+                          //top:20%;
+                          //left: 0;
+                          position: absolute;
+                          //background: green;
+                          display: table-cell;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          vertical-align: middle;
+                        }
+                        .oneThirdVertical2 {
+                          padding-left: 1%;
+                          width: 100%;
+                          height: 33%;
+                          top:33%;
+                          //left: 0;
+                          position: absolute;
+                          background-color: #D1C7C7;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          //background: yellow;
+                        }
+                        .oneThirdVertical3 {
+                          padding-left: 1%;
+                          width: 100%;
+                          height: 33%;
+                          top:66%;
+                          //left: 0;
+                          position: absolute;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          //background: blue;
+                        }
+                    .numbersBox {
+                      left : .5%;  
+                      width: 20%;
+                      height: 20%;
+                      top:55.3%;
+                      position: absolute;
+                    }
+                        .numbersContentBox {
+                          width: 100%;
+                          /* Firefox */
+                          height: -moz-calc(100% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(100% - 25px);
+                          /* Opera */
+                          height: -o-calc(100% - 25px);
+                          /* Standard */
+                          height: calc(100% - 25px);
+                  
+                          position: absolute;
+                        } 
+                            .numbersContentBox table{ width: 100%; height: 100%; }                   
+                            .numbersContentBox table tr td { vertical-align: middle; text-align: left; font: 12px 'Arial'; } 
+                            .even-row {
+                               //background-color: #fcefa1;
+                            }
+                            .odd-row {
+                               background-color: #D1C7C7;
+                            }
+                    
+                            .boxed {
+                              //border: 1px solid green ;
+                              text-align: center;
+                              font: 18px 'Arial';
+                              background-color: #EDC10E;//#75DE4B;
+                            }       
+                    .quoteAcceptedBox {
+                      width: 18.8%;
+                      height: 25%;
+                      top:25.2%;
+                      left:80.2%;
+                      position: absolute;
+                    }
+                
+                        .quoteAcceptedContentBox {
+                          left : .5%;  
+                          width: 100%;
+                          /* Firefox */
+                          height: -moz-calc(100% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(100% - 25px);
+                          /* Opera */
+                          height: -o-calc(100% - 25px);
+                          /* Standard */
+                          height: calc(100% - 25px);
+                          //height: 80%;
+                          //top:40.2%;
+                          //left:77%;
+                          position: absolute;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          font: 12px 'Arial';
+                        }             
+                    .leadJobBox {
+                      width: 59.4%;
+                      height: 71.6%;
+                      top:10.1%;
+                      left:20.6%;
+                      position: absolute;
+                    }
+                    .homeVisitDetailBox {
+                      width: 19%;
+                      height: 17%;
+                      top:8.1%;
+                      left:80.1%;
+                      position: absolute;
+                    }
+                        .homeVisitDetailContentBox {
+                          left : .5%;  
+                          width: 100%;
+                          /* Firefox */
+                          height: -moz-calc(100% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(100% - 25px);
+                          /* Opera */
+                          height: -o-calc(100% - 25px);
+                          /* Standard */
+                          height: calc(100% - 25px);
+                          //height: 80%;
+                          //top:40.2%;
+                          //left:77%;
+                          position: absolute;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          font: 12px 'Arial';
+                        }
+                        .homeVisitDetailContentBox table{ width: 100%; height: 100%; white-space: nowrap; text-overflow: ellipsis; table-layout: fixed; }                   
+                        .homeVisitDetailContentBox table tr td { vertical-align: middle; text-align: left; font: 12px 'Arial'; } 
+                
+                    .openCasesBox {
+                      width: 60%;
+                      height: 15%;
+                      left: 20.1%;
+                      top:85.1%;
+                      position: absolute;
+                    }
+           .recentItemsBox {
+              left : .5%;  
+              width: 20%;
+              height: 20.8%;
+              top:75.4%;
+              left : .5%;  
+              position: absolute;
+            }
+                .recentItemsContentBox {
+                  left : .5%;  
+                  width: 100%;
+                  height: 100%;  
+                  /* Firefox */
+                  height: -moz-calc(100% - 25px);
+                  /* WebKit */
+                  height: -webkit-calc(100% - 25px);
+                  /* Opera */
+                  height: -o-calc(100% - 25px);
+                  /* Standard */
+                  height: calc(100% - 25px);
+                  //height: 80%;
+                  //top:40.2%;
+                  //left:77%;
+                  position: absolute;
+                  //overflow-x: scroll;
+                  //overflow-y: scroll;
+                }
+                    .recentItemsContentBox table{ width: 100%; height: 100%; white-space: nowrap; text-overflow: ellipsis; table-layout: fixed; }                   
+                    .recentItemsContentBox table tr td { vertical-align: middle; text-align: left; font: 12px 'Arial'; } 
+                    .even-row {
+                       //background-color: #fcefa1;
+                    }
+                    .odd-row {
+                       background-color: #D1C7C7;
+                    }
+                               
+                    .installationBox {
+                      width: 18.8%;
+                      height: 31.5%;
+                      top:50.3%;
+                      left:80.2%;
+                      position: absolute;
+                    }
+                        .installationContentBox {
+                          left : .5%;  
+                          width: 100%;
+                          /* Firefox */
+                          height: -moz-calc(100% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(100% - 25px);
+                          /* Opera */
+                          height: -o-calc(100% - 25px);
+                          /* Standard */
+                          height: calc(100% - 25px);
+                          //height: 80%;
+                          //top:40.2%;
+                          //left:77%;
+                          position: absolute;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          //background-color: blue;
+                          font: 12px 'Arial';
+                        }
+                
+                    .contactsBox {
+                      left : .5%;  
+                      width: 20%;
+                      height: 20%;
+                      top:35.2%;
+                      //left:77%;
+                      position: absolute;
+                    }
+                        .contactsContentBox {
+                          left : .5%;  
+                          width: 100%;
+                          /* Firefox */
+                          height: -moz-calc(100% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(100% - 25px);
+                          /* Opera */
+                          height: -o-calc(100% - 25px);
+                          /* Standard */
+                          height: calc(100% - 25px);
+                          //height: 80%;
+                          //top:40.2%;
+                          //left:77%;
+                          position: absolute;
+                          white-space: nowrap;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                        }
+                            .contactsContentBox table{ width: 100%; height: 100%; table-layout: fixed; }                   
+                            .contactsContentBox table tr:first-child td { font-weight: bold; }
+                            .contactsContentBox table tr td { height:33%; vertical-align: middle; text-align: left; font: 12px 'Arial'; } 
+                            .even-row {
+                               //background-color: #fcefa1;
+                            }
+                            .odd-row {
+                               height:33%; 
+                               background-color: #D1C7C7;
+                            }
+                    
+                    
+                        .titleBox {
+                          padding-left: 5px;   
+                          width: 100%;
+                          height: 25px;//20%;
+                          background:  rgb(38, 184, 218);//rgb(20, 144, 232);
+                          color: white;
+                          //font: 12px 'Arial',sans-serif;
+                          //display: inline-block;
+                          //vertical-align: middle;
+                          //line-height: 2;
+                        }
+                            .titleBox table{ width: 100%; height: 100%;table-layout: fixed}
+                            .titleBox table tr td { vertical-align: middle; text-align: left; color: white;font: 14px 'Arial'; }                    
+                
+                .hoverLink {
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+           .expandTopRight {
+              position:absolute;
+              top:0;
+              right:0; 
+              z-index: 99;
+              font: 16px 'Arial';
+              cursor: pointer; 
+              background: rgb(38, 184, 218);
+              display: none; 
+            }
+                          
+</style>

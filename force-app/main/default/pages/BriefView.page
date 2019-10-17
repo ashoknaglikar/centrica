@@ -1,0 +1,105 @@
+<apex:page standardController="Mandatory_Briefings__c" extensions="BriefViewController"  tabStyle="Mandatory_Briefings__c">
+    <apex:form id="formId">
+        <apex:PageMessages />
+        <apex:outputPanel rendered="{!isBriefEnabled}">
+            <script>
+                alert('You can not access brief record prior to the issued date');
+                window.location  = "/home/home.jsp";
+                
+                
+            </script>
+        </apex:outputPanel>
+        
+        <!-- <apex:inputHidden value="{!documentStatus}" id="docReadStatus"/>  -->
+        <apex:sectionHeader title="Briefing" subtitle="{!Mandatory_Briefings__c.Name}"/>
+        <apex:outputPanel rendered="{!isEdit}">
+            <apex:PageBlock rendered="{!NOT(isBriefEnabled)}" title="Briefing Detail">
+                <apex:outputText value="Please contact to line manager." style="color:blue;font-family:arial;font-weight:bold" rendered="{!isNotUnderstood}" /> <br/>
+                <apex:PageBlockSection columns="2" rendered="{!isEdit}" >
+                    <apex:outputField value="{!brief.Briefing_Name__c}"/>
+                    <apex:outputField value="{!brief.Status__c}"/>
+                    <apex:outputField value="{!brief.Over_All_Status_Text__c}"/>
+                    <apex:outputField value="{!brief.Sub_Status__c}"/>
+                    <apex:outputField value="{!brief.Actual_End_Date_Time__c}"/>
+                    <apex:outputField value="{!brief.Status_Indicator__c}"/>
+                    <apex:outputField value="{!brief.District__c}"/>
+                    <apex:outputField value="{!brief.Region__c}"/>
+                     <apex:outputField value="{!brief.Not_Understood_Date_time__c}"/>
+                </apex:PageBlockSection>
+                <apex:PageBlockSection title="Content" columns="2" rendered="{!isEdit}" >
+                    <apex:outputField value="{!Mandatory_Briefings__c.Content__c}"/>
+                    <apex:outputField value="{!brief.I_have_read_understood_content__c}" label="I have read the content"/>
+                </apex:PageBlockSection>
+                <apex:PageBlockSection title="Briefing Documents" columns="1" id="attachsection" rendered="{!IF(docHelperList.size > 0 ,true,false)}" >
+                    <apex:pageBlockTable value="{!docHelperList}" var="doc">
+                        <apex:column headerValue="Action">
+                            <apex:outputLink onclick="chi_markAttachmentRead('{!doc.briefDocument.Name}');" value="/servlet/servlet.FileDownload?file={!doc.briefDocument.Id}" target="_blank">View</apex:outputLink>
+                        </apex:column>
+                        <apex:column headerValue="Viewed">
+                            <apex:inputCheckbox value="{!doc.documentViewed}" disabled="true"/>
+                        </apex:column>
+                        <apex:column headerValue="Type">
+                            <apex:outputLabel value="Attachment"/>
+                        </apex:column>
+                        <!-- <apex:column headerValue="Title">
+                            <apex:outputLink onclick="chi_markAttachmentRead();" value="/{!doc.Id}" target="_blank">{!doc.Name}</apex:outputLink>
+                        </apex:column> -->
+                        <apex:column value="{!doc.briefDocument.Name}" headervalue="Title"/>
+                    </apex:pageBlockTable>
+                </apex:PageBlockSection>
+                 <apex:pageBlockButtons rendered="{!isEdit}" location="top">
+                    <apex:commandButton action="{!editDetails}" value="Edit"/>
+                 </apex:pageBlockButtons>
+            </apex:PageBlock>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!NOT(isEdit)}">   
+            <apex:PageBlock rendered="{!NOT(isBriefEnabled)}" title="Briefing Detail" id="briefEdit">     
+                <apex:PageBlockSection columns="2" >
+                    <apex:outputField value="{!brief.Briefing_Name__c}"/>
+                    <apex:inputField value="{!brief.Status__c}" onchange="completionReasonValidation();"/>
+                    <apex:outputField value="{!brief.Over_All_Status_Text__c}"/>
+                    <apex:inputField value="{!brief.Sub_Status__c}" onchange="completionReasonValidation();"/>
+                   <apex:outputText />
+                    <apex:inputText value="{!completionReason}" disabled="{!isCompletionReasonEnabled}" label="Completion Reason"/>
+                    <apex:outputField value="{!brief.Actual_End_Date_Time__c}"/>
+                    <apex:outputField value="{!brief.Status_Indicator__c}"/>
+                    <apex:outputField value="{!brief.District__c}"/>
+                    <apex:outputField value="{!brief.Region__c}"/>
+                    </apex:PageBlockSection>
+                <apex:PageBlockSection title="Content" columns="2" rendered="{!NOT(isEdit)}" >
+                    <apex:outputField value="{!Mandatory_Briefings__c.Content__c}"/>
+                    <apex:inputField value="{!brief.I_have_read_understood_content__c}" label="I have read the content"/>
+                </apex:PageBlockSection>
+                <apex:PageBlockSection title="Briefing Documents" columns="1" rendered="{!IF(docHelperList.size > 0 ,true,false)}" >
+                    <apex:pageBlockTable value="{!docHelperList}" var="doc">
+                        <apex:column headerValue="Action">
+                            <apex:outputLink onclick="chi_markAttachmentRead('{!doc.briefDocument.Name}');" value="/servlet/servlet.FileDownload?file={!doc.briefDocument.Id}" target="_blank">View</apex:outputLink>
+                        </apex:column>
+                        <apex:column headerValue="Viewed">
+                            <apex:inputCheckbox value="{!doc.documentViewed}" disabled="true"/>
+                        </apex:column>
+                        <apex:column headerValue="Type">
+                            <apex:outputLabel value="Attachment"/>
+                        </apex:column>
+                        <!-- <apex:column headerValue="Title">
+                            <apex:outputLink onclick="chi_markAttachmentRead();" value="/{!doc.Id}" target="_blank">{!doc.Name}</apex:outputLink>
+                        </apex:column> -->
+                        <apex:column value="{!doc.briefDocument.Name}" headervalue="Title"/>
+                    </apex:pageBlockTable>
+                </apex:PageBlockSection>
+                 <apex:pageBlockButtons rendered="{!NOT(isEdit)}" location="top">
+                    <apex:commandButton action="{!saveDetails}" value="Save" />
+                    <apex:commandButton action="{!cancelDetails}" value="Cancel"/>
+                 </apex:pageBlockButtons>
+            </apex:PageBlock>
+        </apex:outputPanel>
+        
+        <apex:actionFunction action="{!isDocumentViewed}" name="chi_markAttachmentRead" reRender="formId" >
+           <apex:param name="docName" value="" assignTo="{!selectedDocument}"/>
+        </apex:actionFunction>
+        
+        
+        <apex:actionFunction action="{!enableisCompletionReasonEnabled}" name="completionReasonValidation" reRender="briefEdit"/>
+        
+    </apex:form>
+</apex:page>

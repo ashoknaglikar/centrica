@@ -1,0 +1,105 @@
+<apex:page standardController="Appointment__c" extensions="CS_DifferenceReviewController" readOnly="true">
+    <script type="text/javascript" src="{!URLFOR($Resource.jquery_1_8_3)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.cs_min)}"></script>  
+    <script type="text/javascript" src="{!URLFOR($Resource.cs_online)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.underscorejs_1_5_2)}"></script>
+
+    <script>
+        jQuery(function() {
+            jQuery("#submit-button-span span").on('click', function() {
+                var status = jQuery("#status-sl").val(),
+                    dateFrom = jQuery("#date-from-span input").val(),
+                    dateTo = jQuery("#date-to-span input").val();
+                    
+                if(!_.isEmpty(dateFrom) && !_.isEmpty(dateTo)) {
+                    getFilteredPcList(dateFrom, dateTo, status); 
+                } else {
+                    alert('Please enter start and ending dates.');
+                }
+            });
+            
+            require(['src/cs-full'], function() {
+               launchConfigurator(CS, {}, {});
+               CS.indicator.stop();
+            });
+        });
+    </script>
+    <!--
+    ################################################
+    # Dummy input date field to enable hand-rolled
+    # date pickers to be built dynamically. Adding
+    # this control forces SF to build the DatePicker
+    # table at the end of the page containing the
+    # content for the datepicker div.
+    ################################################
+    -->
+    <div style="display:none">
+        <apex:form >
+            <apex:inputfield id="dummy"  value="{!dateRange.cscfga__Start__c}" />
+        </apex:form>
+    </div>
+    
+    <apex:stylesheet value="{!URLFOR($Resource.cscfga__Indicator,'css/indicator.css')}"></apex:stylesheet>
+    <div id="indicatorContainer" style="top: 0;bottom: 0;right: 0;left: 0;position: absolute; display:none;">Loading...</div>
+    
+    <apex:actionStatus id="splashStatus" onstart="CS.indicator.start();" onstop="CS.indicator.stop(); "/>
+    
+    <apex:form >
+
+        <apex:actionFunction action="{!getPcFilteredList}" name="getFilteredPcList" rerender="results-block" status="splashStatus">
+            <apex:param name="firstParam" assignTo="{!dateFromString}" value="" />
+            <apex:param name="secondParam" assignTo="{!dateToString}" value="" />
+            <apex:param name="thirdParam" assignTo="{!status}" value="" />
+        </apex:actionFunction>
+
+        <apex:pageBlock >
+            
+            <span id="date-from-span">Date from: <apex:inputText styleClass="cssbody" size="10" id="date-from" value="{!firstOfMonth}" onfocus="DatePicker.pickDate(false, this, false);" /></span>   
+            <span id="date-to-span">Date to: <apex:inputText styleClass="cssbody" size="10" id="date-to" value="{!lastOfMonth}" onfocus="DatePicker.pickDate(false, this, false);" /></span>
+            
+            <span>Status: </span> 
+            <select id="status-sl">
+                <option>-- None --</option>
+                <option>Quote Finalised - Accepted</option>
+                <option>Quote Finalised - Not Accepted</option>
+            </select>
+            
+            <span id="submit-button-span">
+                <apex:outputPanel styleClass="btn" id="submit-button"> 
+                    Submit
+                </apex:outputPanel>
+            </span>
+            
+        </apex:pageBlock>
+    </apex:form>     
+    
+    <apex:pageBlock id="results-block">
+        <div style="clear: both;font-weight: bold;font-size: 14px;">
+            <apex:outputPanel layout="block" style="display:inline-block; width: 400px;">Product Basket Name - Id - Created Date</apex:outputPanel>
+            <div style="display:inline-block; width: 500px;">
+                Parts Model 
+            </div>
+            <div style="display:inline-block; width: 500px;">
+                Product Configuration
+            </div>
+        </div>
+        
+        <apex:repeat var="row" value="{!errorModelList}">
+            <div style="clear: both; border-top: 1px solid black;">
+                <apex:outputPanel layout="block" style="display:inline-block; width: 400px; vertical-align: top;">{!row.ProductBasketName} - {!row.ProductBasketId} - {!row.ProductBasketCreatedDate}</apex:outputPanel>
+                <div style="display:inline-block; width: 500px;">
+                    <apex:repeat var="pm" value="{!row.PartModels}">
+                        <apex:outputPanel layout="block" style=";"><span style="display:inline-block;overflow: hidden;text-overflow: ellipsis;-o-text-overflow: ellipsis;white-space: nowrap;width: 340px;">{!pm.Name}</span><span style="float:right;padding-right: 7px;">{!pm.Id}</span></apex:outputPanel>
+                    </apex:repeat>    
+                </div>
+                <div style="display:inline-block; width: 500px;">
+                    <apex:repeat var="at" value="{!row.AttrModels}">
+                        <apex:outputPanel layout="block" style=";"><span style="display:inline-block;overflow: hidden;text-overflow: ellipsis;-o-text-overflow: ellipsis;white-space: nowrap;width: 340px;">{!at.Name}</span><span style="float:right;padding-right: 7px;">{!at.Id}</span></apex:outputPanel>
+                    </apex:repeat>    
+                </div>
+            </div>
+        </apex:repeat>
+        
+    </apex:pageBlock>
+    
+</apex:page>

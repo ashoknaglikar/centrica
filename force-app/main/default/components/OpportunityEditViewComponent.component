@@ -1,0 +1,744 @@
+<apex:component controller="OpportunityEditViewComponentController" allowdml="true">        
+    <apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" required="true"/>
+    <apex:attribute name="callModeVal" description="This attrribute is used to determine the call type." type="Integer"/>
+    <apex:attribute name="ListOpportunity" description="This attrribute passes the opportunity list to the controller." type="Opportunity[]" assignTo="{!Opportunities}"/>
+    <apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+    <apex:attribute name="CallModeobj" description="This attrribute passes the CallMode." type="CallMode"/>
+    <apex:attribute name="WrapUp" description="This attrribute is used to determine the Opp screen." type="Boolean"/>
+    <apex:attribute name="leadCommentsNew" description="This attrribute is used to carry the new lead comments" type="String" assignTo="{!LeadCommentsEdit}"/>
+    <apex:attribute name="renderPriorityInstallDetails" description="This attrribute is used to determine rendering of priority install section." type="Boolean"/>
+    <apex:attribute name="gas1" description="This attrribute is used to capture Gas Council No 1st part." type="string"/>
+    <apex:attribute name="gas2" description="This attrribute is used to capture Gas Council No 2nd part" type="string"/>
+    <apex:attribute name="gas3" description="This attrribute is used to capture Gas Council No 3rd part" type="string"/>
+    <script>
+        var cntrlEmpID, cntrlEmpName;
+        function setEmpData(empName, empID)
+        {
+            try
+            {
+                document.getElementById(cntrlEmpID).value = empName;
+                document.getElementById(cntrlEmpName).value = empID.replace('&#39;','\'');
+            }
+            catch(e){}
+        }
+      
+      
+       window.onload = function applyPickListValues(){
+                          checkCustomerCategoryQuestions();
+                       }  
+
+       function checkCustomerCategoryQuestions(){
+        
+                var customers_boiler_working_element = document.getElementById("1").getElementsByTagName("select")[0];
+                var customer_have_hot_water_element = document.getElementById("2").getElementsByTagName("select")[0];
+                var customer_have_heat_element = document.getElementById("3").getElementsByTagName("select")[0];
+                var vulnerable_reason_element = document.getElementById("4").getElementsByTagName("select")[0];
+                var vulnerable_reason_dependent_element = document.getElementById("5").getElementsByTagName("select")[0];
+                var customercategoryindicator = document.getElementById("customercategoryindicator").getElementsByTagName("img")[0];
+                var customercategoryindexinputvalue = document.getElementById("customercategoryindexvalue").getElementsByTagName("input")[0];;
+                customercategoryindexinputvalue.disabled="disabled";
+                
+                 if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "Yes"){
+                       
+                        customer_have_heat_element.value="Not applicable";
+                        customer_have_heat_element.disabled="disabled";
+                        vulnerable_reason_element.value="Not applicable";
+                        vulnerable_reason_element.disabled="disabled";
+                        vulnerable_reason_dependent_element.value="";
+                        vulnerable_reason_dependent_element.disabled="disabled";
+                        
+                  }else if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "No"){
+                  
+                        customer_have_heat_element.value="Not applicable";
+                        customer_have_heat_element.disabled="disabled";
+                        
+                        if(vulnerable_reason_element.disabled){
+                        
+                                vulnerable_reason_element.disabled="";
+                                vulnerable_reason_element.value="";
+                                
+                         }
+                         
+                        if(vulnerable_reason_dependent_element.disabled){
+                        
+                               vulnerable_reason_dependent_element.disabled="";
+                               vulnerable_reason_dependent_element.value="";
+                               
+                         }
+                          
+                  }else{
+                  
+                        if(customer_have_heat_element.disabled){
+                        
+                           customer_have_heat_element.disabled="";
+                           customer_have_heat_element.value="";
+                           
+                        }
+                        
+                        if(vulnerable_reason_element.disabled){
+                        
+                           vulnerable_reason_element.disabled="";
+                           vulnerable_reason_element.value="";
+                           
+                        }
+                        
+                        if(vulnerable_reason_dependent_element.disabled){
+                        
+                            vulnerable_reason_dependent_element.disabled="";
+                            vulnerable_reason_dependent_element.value="";
+                            
+                        }
+                        
+                  }
+                  
+                 if(vulnerable_reason_element.value != "Yes"){
+                 
+                        vulnerable_reason_dependent_element.disabled="disabled";
+                        vulnerable_reason_dependent_element.value="";
+                        
+                 }  
+                 
+                 if(vulnerable_reason_dependent_element.disabled && vulnerable_reason_element.value == "Yes"){
+                 
+                        vulnerable_reason_dependent_element.disabled="";
+                        vulnerable_reason_dependent_element.value="";
+                        
+                 }   
+                 
+              if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Operational}');
+              }else if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "No" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "No" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Vulnerable}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Vulnerable}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else{
+                       setIndicatorImage('{!$Resource.Undefined}');
+              }
+         
+     }
+
+     function setIndicatorImage(imageSource){
+
+           var customercategoryindicator = document.getElementById("customercategoryindicator").getElementsByTagName("img")[0];
+           var customercategoryindexinputvalue = document.getElementById("customercategoryindexvalue").getElementsByTagName("input")[0];
+           
+           customercategoryindicator.src = imageSource;
+           
+           
+           if(imageSource.indexOf('Vulnerable') != -1){
+             customercategoryindexinputvalue.value = 1;
+           }else if(imageSource.indexOf('Emergency_Non_Op') != -1){
+             customercategoryindexinputvalue.value = 2;
+           }else if(imageSource.indexOf('Non_Op') != -1){
+             customercategoryindexinputvalue.value = 3;
+           }else if(imageSource.indexOf('Operational') != -1){
+             customercategoryindexinputvalue.value = 4;
+           }else if(imageSource.indexOf('Undefined') != -1){
+             customercategoryindexinputvalue.value = 99;
+           }
+           
+     }
+     
+         
+    </script>
+ 
+    <!-- MGM Change Starts -->
+    <apex:pageBlockSection title="MGM Details" collapsible="false" rendered="{!IF(AND(NOT(WrapUp),OR(displayModeVal==DisplayModeobj.VIEW,displayModeVal==DisplayModeobj.APPOINTSUCCESS)),true,false)}" columns="1">
+        <apex:pageBlockTable var="opp" value="{!ListOpportunity}">
+            <apex:column >
+                <apex:outputLabel value="MGM Source CHI Lead" style="font-weight:bold" rendered="{!opp.isMGM__c=='Yes'}"/>&nbsp;&nbsp;
+                <apex:inputField value="{!opp.MGM_Source_Opp__c}" rendered="{!opp.isMGM__c=='Yes'}"/>
+            </apex:column>
+            <apex:column >
+                 <apex:outputLabel value="MGM Referral Employee" style="font-weight:bold" rendered="{!opp.isMGM__c=='Yes'}"/>&nbsp;&nbsp;
+                <apex:inputField value="{!opp.MGM_Ref_Emp__c}" rendered="{!opp.isMGM__c=='Yes'}"/>
+            </apex:column>
+            <apex:column >
+                 <apex:outputLabel value="MGM Details Not Required" style="font-weight:bold" rendered="{!opp.isMGM__c=='No'}"/>
+            </apex:column>
+        </apex:pageBlockTable>
+   </apex:pageBlockSection>
+   <!-- MGM Change Ends --> 
+    
+    <!-- 2nd MGM Starts - Added for member get member for Will Gilbert 10/06/2015 -->
+    <apex:pageBlockSection title="MGM Information" collapsible="false" rendered="{!IF(AND(NOT(WrapUp),OR(displayModeVal==DisplayModeobj.VIEW,displayModeVal==DisplayModeobj.APPOINTSUCCESS)),false,true)}" columns="1">
+        <apex:pageBlockTable var="opp" value="{!ListOpportunity}">
+            <apex:column >
+                <apex:outputLabel value="MGM Source CHI Lead" style="font-weight:bold" rendered="true"/>&nbsp;&nbsp;
+                <apex:inputField value="{!opp.MGM_Source_Opp__c}" rendered="true"/>
+            </apex:column>        
+        </apex:pageBlockTable>
+   </apex:pageBlockSection>
+   <!-- 2nd MGM Change Ends -->    
+   
+    <!-- To display the Opportunity edit mode-->
+    <apex:pageBlockSection title="Opportunity" rendered="{!IF(displayModeVal==DisplayModeobj.EDIT,true,false)}" collapsible="false" columns="1">
+        <apex:pageblocksectionitem >
+        
+        <apex:pageBlockTable var="opp" value="{!ListOpportunity}">
+            <apex:column headerValue="Campaign" rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST),true,false)}">
+                <apex:inputField value="{!opp.CampaignId}"/>
+                <table width="100%">
+                    <tr/><tr/><tr/><tr/><tr/>
+                    <tr>
+                        <!--  <td align ="left">
+                            <b>Ecogen Propositioned</b>
+                        </td>
+                        <td>
+                            <b>Interested In Ecogen</b>
+                        </td>-->
+                        <td>
+                            <b>Interested In Green Deal Cash Back</b>
+                        </td>
+                    </tr>
+                 </table>
+                 <table width="100%">
+                    <tr>
+                        <!-- <td align ="left">
+                            <apex:inputField value="{!opp.Ecogen_Propostioned__c}"/>
+                        </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                        <td>
+                            <apex:inputField value="{!opp.Customer_Interested_In_Ecogen__c}"/>
+                        </td>-->
+                        <td>
+                            <apex:inputField value="{!opp.GDCashBack__c}"/>
+                        </td>
+                    </tr>
+                 </table>          
+            </apex:column>
+            <apex:column headerValue="Product Interest">
+                <apex:inputField value="{!opp.Product_Interest__c}"/>
+                  <apex:outputpanel rendered="{!IF((callModeVal != CallModeobj.CUSTOMERCALLNEWCUST),true,false)}">
+                    <table width="100%">
+                    <tr/><tr/><tr/><tr/><tr/>
+                    <tr>
+                        <!--  <td align ="left">
+                            <b>Ecogen Propositioned</b>
+                        </td>
+                        <td>
+                            <b>Interested In Ecogen</b>
+                        </td>-->
+                        <td>
+                            <b>Interested In Green Deal Cash Back</b>
+                        </td>
+                    </tr>
+                 </table>
+                 <table width="100%">
+                    <tr>
+                        <!-- <td align ="left">
+                            <apex:inputField value="{!opp.Ecogen_Propostioned__c}"/>
+                        </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                        <td>
+                            <apex:inputField value="{!opp.Customer_Interested_In_Ecogen__c}"/>
+                        </td>-->
+                        <td>
+                            <apex:inputField value="{!opp.GDCashBack__c}"/>
+                        </td>
+                    </tr>
+                 </table>
+               </apex:outputpanel>
+            </apex:column>
+            
+          
+            <!-- New question for missing product holidngs CR -->
+            <apex:column >
+                
+                
+                <apex:outputpanel rendered="{!if($CurrentPage.parameters.ucrn == null,true,false)}"> 
+               <table width = '100%'>
+                
+                <tr>
+                    <td>
+                         <b>Missing product holiding reason </b>
+                    </td>
+                </tr>     
+                <tr>
+                    <td>
+                
+               
+                 <apex:inputField required="true" value="{!opp.Missing_product_holdings_reason__c}" />     
+                
+                   </td>
+                </tr>
+            </table>
+            </apex:outputpanel>
+            
+            <apex:outputpanel rendered="{!if(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST),true,false)}"> 
+               <table style="width:150px">
+                
+             <tr>
+                
+                <td>
+                <b>GAS</b>
+                </td>
+                
+                <td >
+                <b>Council</b>
+                </td>
+                
+                <td>
+                <b>Number</b>
+                </td>
+               
+                </tr> 
+                </table>
+                
+             <table style="width:150px">
+             <tr>
+                     <td>
+                     <apex:inputText value="{!gas1}" maxlength="2"  size="1"/> 
+                     </td>
+                     <td>-
+                     </td>
+                     <td>
+                     <apex:inputText value="{!gas2}" maxlength="3"  size="3"/> 
+                     </td>
+                     <td>-
+                     </td>
+                     <td>
+                     <apex:inputText value="{!gas3}" maxlength="2"  size="1"/>
+                     </td>
+                 </tr>
+            </table>
+            </apex:outputpanel>
+            </apex:column>
+            
+            <!-- Commented for Priority Installation CR on 06/07/2012 -->
+<!--            <apex:column headerValue="Emergency Install">-->
+<!--                <apex:inputField value="{!opp.Non_Op__c}"/>-->
+<!--            </apex:column>-->
+            <!-- Commented for Priority Installation CR on 06/07/2012 -->
+            
+            <!-- Commented for Priority Installation CR on 06/07/2012 -->
+<!--            <apex:column headerValue="Contact Centre Fast Track">-->
+<!--                <apex:inputField value="{!opp.Contact_Centre_Fast_Track__c}"/>-->
+<!--            </apex:column>-->
+            <!-- Commented for Priority Installation CR on 06/07/2012 -->
+            <apex:column headerValue="HomeCare">
+                <apex:inputField value="{!opp.Homecare__c}"/>
+            </apex:column>
+           
+            <!-- <apex:column headerValue="">
+            <apex:facet name="header">
+                <table width="100%">
+                    <tr align="center">
+                        <td colspan="3"  width="100%">Sales Appointment Reqd</td>
+                    </tr>
+                    <tr align="center">
+                        <td width="30%">Day</td>
+                       
+                    <td width="40%">Date</td>
+                      
+                        <td width="30%">Time</td>
+                    </tr>
+                </table>
+            </apex:facet>
+                  <table width="100%"> 
+                    <tr>
+                         <td width="30%">
+                            <apex:inputField value="{!opp.Preferred_appointment_day__c}" style="width:100px"/>
+                        </td>
+                   
+                        <td width="40%">
+                            <apex:inputField value="{!opp.Preferred_Visit_Date_Time__c}" StyleClass="dateInput dateOnlyInput" />
+                        </td>
+                        
+                         <td width="30%">
+                            <apex:inputField value="{!opp.Preferred_appointment_time__c}"/>
+                        </td>
+                     </tr>
+                </table>
+            </apex:column> -->
+            
+            <apex:column headerValue="With Customer" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+                <table>
+                    <tr><td>
+                    <apex:inputField value="{!opp.WithCustomer__c}" required="true" id="withCustomer"/>
+                    </td></tr>
+                    <apex:outputpanel id="withCust" >
+                    <tr><td>
+                    Reasons
+                    </td></tr>
+                    <tr><td>
+                    <apex:inputField value="{!opp.WithCustReasons__c}" required="{!if(opp.WithCustomer__c == 'No', true,false)}"/>
+                    </td></tr>
+                    </apex:outputpanel>
+                </table>
+            </apex:column>
+            <apex:column headerValue="Referral Employee" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+                
+                <table border="0" cellspacing="0" cellpadding="0"><tr>
+                <td><apex:inputText id="txtEmpName" onchange="javascript: setEmpData('',this.value);" /></td>
+                <td>                
+                <a href="#" onclick="javascript:window.open('/apex/employeesearch','_new','width=700,height=500,menubar=no,directories=no,status=yes,location=no,toolbar=no,scrollbars=yes');" title="Referral Employee Lookup (New Window)">
+                <img src="/s.gif" alt="Referral Employee Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Referral Employee Lookup (New Window)"/>
+                </a>
+                </td></tr></table>
+                
+                
+                <apex:inputText value="{!Referral_Employee}" id="txtEmpID" style="display:none;" />
+                <script>
+                    cntrlEmpName = '{!$Component.txtEmpName}';
+                    cntrlEmpID = '{!$Component.txtEmpID}'; 
+                </script>
+                
+            </apex:column>
+        </apex:pageBlockTable>
+        </apex:pageblocksectionitem>
+        <apex:outputpanel rendered="{!IF(OR(callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+            <h1>Fusion Details </h1>
+        </apex:outputpanel>
+        <apex:pageblocksectionitem rendered="{!IF(OR(callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+            <apex:pageBlockTable var="opp" value="{!ListOpportunity}">
+                <apex:column headerValue="Fusion Media Code">
+                <apex:inputField value="{!opp.CampaignId}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Fusion Store">
+                <apex:inputField value="{!opp.Fusion_Store__c}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Fusion UCRN ">
+                <apex:inputField value="{!opp.Fusion_UCRN__c}"/>
+                </apex:column>
+                <apex:column width="400px" />
+            </apex:pageBlockTable>
+        </apex:pageblocksectionitem>
+        
+    </apex:pageBlockSection>
+    <!-- To dispaly the Opportunty view mode-->
+    <apex:pageBlockSection title="Opportunity" rendered="{!IF(displayModeVal==DisplayModeobj.VIEW,true,false)}" collapsible="false" columns="1">
+        <apex:pageblocksectionitem >
+            <apex:pageBlockTable var="opp" value="{!ListOpportunity}">
+                <apex:column headerValue="Lead Num">
+                    <apex:outputField value="{!opp.CHI_Lead_Id__c}"/>
+                    <table>
+                    <tr>
+                        <td>
+                            <b>Interested</b> In<br/><b>Green Deal Cash Back</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <apex:outputfield value="{!opp.GDCashBack__c}"/>
+                        </td>
+                    </tr>
+                </table>
+                </apex:column>
+                <apex:column headerValue="Lead Name">
+                    <apex:outputField value="{!opp.Name}"/>
+                </apex:column>
+                <apex:column headerValue="Campaign" rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST),true,false)}">
+                    <apex:outputField value="{!opp.CampaignId}"/>
+                </apex:column>
+                <apex:column headerValue="Product Interest">
+                    <apex:outputField value="{!opp.Product_Interest__c}"/>
+                </apex:column>
+                <!-- Commented for Priority Installation CR on 06/07/2012 -->
+<!--                <apex:column headerValue="Non Op">-->
+<!--                    <apex:outputField value="{!opp.Non_Op__c}"/>-->
+<!--                </apex:column>-->
+                <!-- Commented for Priority Installation CR on 06/07/2012 -->
+                <apex:column headerValue="HomeCare">
+                    <apex:outputField value="{!opp.Homecare__c}"/>
+                </apex:column>  
+                <!-- <apex:column headerValue="">
+                <apex:facet name="header">
+                    <table width="100%">
+                        <tr align="center">
+                            <td colspan="3"  width="100%">Sales Appointment Reqd</td>
+                        </tr>
+                        <tr align="center">
+                            <td width="30%">Day</td>
+                            
+                          <td width="40%">Date</td>
+                            
+                            <td width="30%">Time</td>
+                        </tr>
+                    </table>
+                </apex:facet>
+    
+    
+                    < <table width="100%"> 
+                         <tr> 
+                             <td>
+                                <apex:outputField value="{!opp.Preferred_appointment_day__c}"/>
+                            </td> 
+                          
+                           <td>
+                               <apex:outputText value="{0,date,d/M/yyyy}">
+                                    <apex:param value="{!opp.Preferred_Visit_Date_Time__c}" />
+                               </apex:outputText>
+                                  <apex:outputField value="{!opp.Preferred_Visit_Date_Time__c}" style="width:50%"/>   
+                           </td>  
+                            
+                             <td>
+                                <apex:outputField value="{!opp.Preferred_appointment_time__c}"/>
+                            </td> 
+                        </tr>
+                    </table>
+                </apex:column> -->
+                <!-- <apex:column headerValue="Sales Appointment Date And Time">
+                    <apex:outputField value="{!opp.Sales_Appointment_Date_an_Time__c}"/>
+                </apex:column> -->
+                <apex:column headerValue="With Customer" rendered="{!IF(WrapUp,true,false)}">
+                    <apex:outputField value="{!opp.WithCustomer__c}"/>
+                </apex:column>
+                <apex:column headerValue="Referral Employee" rendered="{!IF(WrapUp,true,false)}">
+                    <apex:outputField value="{!opp.Referral_Employee__c}"/>
+                </apex:column>
+                <apex:column headerValue="Emp Type" rendered="{!IF(WrapUp,true,false)}">
+                    <apex:outputField value="{!opp.Referral_Employee__r.Group__c}"/>
+                   
+                </apex:column>
+                <apex:column headerValue="With Customer" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+                     <apex:outputField value="{!opp.WithCustomer__c}"/>                
+                </apex:column>
+                <apex:column headerValue="Referral Employee" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+                    <apex:outputField value="{!opp.Referral_Employee__c}"/>
+                </apex:column> 
+                <br/>
+                
+            </apex:pageBlockTable>
+        </apex:pageblocksectionitem>
+        <apex:outputpanel >
+                <h1> Fusion Details </h1>
+        </apex:outputpanel>
+        <apex:pageblocksectionitem >
+            <apex:pageBlockTable var="opp" value="{!ListOpportunity}">
+                <apex:column headerValue="Fusion Media Code" rendered="{!IF(OR(callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+                    <apex:outputField value="{!opp.CampaignId}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Fusion Store">
+                    <apex:outputField value="{!opp.Fusion_Store__c}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Fusion UCRN">
+                    <apex:outputField value="{!opp.Fusion_UCRN__c}"/>
+                </apex:column>
+                    <apex:column width="400px" />
+                </apex:pageBlockTable>
+         </apex:pageblocksectionitem>
+    </apex:pageBlockSection>
+    
+        <!-- To display the Opportunty APPOINTSUCCESS mode-->
+    <apex:pageBlockSection title="Opportunity" rendered="{!IF(displayModeVal==DisplayModeobj.APPOINTSUCCESS,true,false)}" collapsible="false" columns="1">
+        <apex:pageblocksectionitem >
+        <apex:pageBlockTable var="opp" value="{!ListOpportunity}">
+            <apex:column headerValue="Lead Num">
+                <apex:outputField value="{!opp.CHI_Lead_Id__c}"/>
+                <table>
+                    <tr>
+                        <td>
+                            <b>Interested In</b><br/><b>Green Deal Cash Back</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <apex:outputfield value="{!opp.GDCashBack__c}"/>
+                        </td>
+                    </tr>
+                </table>
+            </apex:column> 
+            <apex:column headerValue="Lead Name">
+                <apex:outputField value="{!opp.Name}"/>
+                
+            </apex:column>
+            <apex:column headerValue="Campaign" rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST),true,false)}">
+                <apex:outputField value="{!opp.CampaignId}"/>
+            </apex:column>
+            <apex:column headerValue="Product Interest">
+                <apex:outputField value="{!opp.Product_Interest__c}"/>
+            </apex:column>
+            <apex:column headerValue="Non Op"> 
+                <apex:outputField value="{!opp.Non_Op__c}"/>
+            </apex:column>
+            <apex:column headerValue="HomeCare">
+                <apex:outputField value="{!opp.Homecare__c}"/>
+            </apex:column>  
+            <!-- <apex:column headerValue="">
+            <apex:facet name="header">
+                <table width="100%">
+                    <tr align="center">
+                        <td colspan="3"  width="100%">Sales Appointment Reqd</td>
+                    </tr>
+                    <tr align="center">
+                        <td width="30%">Day</td> 
+                     
+                      <td width="40%">Date</td>
+                        
+                         <td width="30%">Time</td>
+                     </tr>
+                </table>
+            </apex:facet>
+
+
+                 <table width="100%">
+                     <tr>
+                         <td>
+                            <apex:outputField value="{!opp.Preferred_appointment_day__c}"/>
+                        </td> 
+                        
+                        <td>
+                           <apex:outputText value="{0,date,d/M/yyyy}">
+                               <apex:param value="{!opp.Preferred_Visit_Date_Time__c}" />
+                            </apex:outputText>
+                               <apex:outputField value="{!opp.Preferred_Visit_Date_Time__c}" style="width:50%"/>    
+                       </td>
+                  
+                        <td>
+                            <apex:outputField value="{!opp.Preferred_appointment_time__c}"/>
+                        </td> 
+                    </tr>
+                </table>
+            </apex:column> -->
+            
+            <!-- <apex:column headerValue="Sales Appointment Date And Time">
+                <apex:outputField value="{!opp.Sales_Appointment_Date_an_Time__c}"/>
+            </apex:column> -->
+            <apex:column headerValue="With Customer" rendered="{!IF(WrapUp,true,false)}">
+                <apex:outputField value="{!opp.WithCustomer__c}"/>
+            </apex:column>
+            <apex:column headerValue="Referral Employee" rendered="{!IF(WrapUp,true,false)}">
+                <apex:outputField value="{!opp.Referral_Employee__c}"/>
+            </apex:column>
+            <apex:column headerValue="Emp Type" rendered="{!IF(WrapUp,true,false)}">
+                <apex:outputField value="{!opp.Referral_Employee__r.Group__c}"/>
+            </apex:column>
+            <apex:column headerValue="With Customer" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+                <apex:outputField value="{!opp.WithCustomer__c}"/>
+            </apex:column>
+            <apex:column headerValue="Referral Employee" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+                <apex:outputField value="{!opp.Referral_Employee__c}"/>
+            </apex:column>  
+        </apex:pageBlockTable>
+        </apex:pageblocksectionitem>
+        <apex:outputpanel >
+                <h1> Fusion Details </h1>
+        </apex:outputpanel>
+         <apex:pageblocksectionitem >
+            <apex:pageBlockTable var="opp" value="{!ListOpportunity}">
+                <apex:column headerValue="Fusion Media Code" rendered="{!IF(OR(callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">
+                    <apex:outputField value="{!opp.CampaignId}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Fusion Store">
+                    <apex:outputField value="{!opp.Fusion_Store__c}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Fusion UCRN">
+                    <apex:outputField value="{!opp.Fusion_UCRN__c}"/>
+                </apex:column>
+                    <apex:column width="400px" />
+                </apex:pageBlockTable>
+         </apex:pageblocksectionitem>
+        <apex:outputText value="Lead Comments" style="font-weight:bold"/>        
+        <apex:repeat value="{!LeadCommentsOppArray}" var="commentLine"> 
+            <apex:outputText value="{!commentLine}" /><br/>
+        </apex:repeat>
+        
+        <!-- <apex:outputText value="{!LeadCommentsOppArray}" rendered="{!IF(displayModeVal==DisplayModeobj.APPOINTSUCCESS,true,false)}"/> -->   
+    </apex:pageBlockSection>   
+        
+    <!-- Priority Install Change Starts -->
+    <apex:pageBlockSection title="Priority install details" rendered="{!renderPriorityInstallDetails}">
+        <apex:repeat var="opp" value="{!ListOpportunity}">
+          <table cellspacing="15px" border="0">
+            <tr>
+               <td>
+                <div id="1" style="width:400px">
+                    <apex:outputLabel value="Is the customer’s main source of heating working?" style="font-weight:bold"/>&nbsp;&nbsp;
+                    <apex:inputField value="{!opp.Is_the_customers_boiler_working__c}" onChange="checkCustomerCategoryQuestions();"/>
+                </div>
+               </td>
+               <td>
+                 <div id="2" style="width:400px">
+                     <apex:outputLabel value="Does the customer have hot water?" style="font-weight:bold"/>&nbsp;&nbsp;
+                     <apex:inputField value="{!opp.Does_the_customer_have_hot_water__c}" onChange="checkCustomerCategoryQuestions();"/>
+                 </div>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                 <div id="3" style="width:400px">
+                     <apex:outputLabel value="Customer have any other form of HEAT?" style="font-weight:bold"/>&nbsp;&nbsp;
+                     <apex:inputField value="{!opp.Customer_have_any_other_form_of_HEAT__c}" onChange="checkCustomerCategoryQuestions();"/>
+                 </div>
+              </td>
+              <td>
+                 <div id="4" style="width:400px">
+                     <apex:outputLabel value="Is the occupier of the property vulnerable?" style="font-weight:bold"/>&nbsp;&nbsp;
+                     <apex:inputField value="{!opp.Is_the_customer_vulnerable__c}" onChange="checkCustomerCategoryQuestions();"/>
+                 </div>
+             </td>
+            </tr>
+            <tr>
+             <td>
+                 <div id="5" style="width:400px">
+                     <apex:outputLabel value="Vulnerable reason" style="font-weight:bold"/>&nbsp;&nbsp;
+                     <apex:inputField value="{!opp.Vulnerable_reason__c}"/>
+                 </div>
+             </td>
+             <td></td>
+            </tr>
+            <tr>
+            <td>
+                <div id="customercategoryindicator" style="width:400px">
+                    <apex:outputLabel value="Latest customer category indicator" style="font-weight:bold"/>&nbsp;&nbsp;
+                    <img width="90" height="25"></img>
+                </div>
+            </td>
+            <td>
+                <div id="customercategoryindexvalue" style="width:400px">
+                    <apex:outputLabel value="Latest customer category" style="font-weight:bold"/>&nbsp;&nbsp;
+                    <apex:inputField value="{!opp.Latest_customer_category__c}"/>
+                </div>
+            </td>
+           </tr>
+          </table>
+        </apex:repeat>
+   </apex:pageBlockSection>
+   
+   <apex:pageBlockSection title="Futher Details" rendered="{!IF(displayModeVal==DisplayModeobj.EDIT,true,false)}" >
+        <apex:repeat var="opp" value="{!ListOpportunity}">
+            <table cellspacing="15px" border="0">
+            <tr>
+               <td>
+                <div id="1" style="width:400px">
+                    <apex:outputLabel value="Nectar Number" style="font-weight:bold"/>&nbsp;&nbsp;
+                    <apex:inputField value="{!opp.Nectar_Number__c}" />
+                </div>
+               </td>
+            </tr>
+           </table>     
+        </apex:repeat>
+    </apex:pageBlockSection>
+    
+   <!-- Priority Install Change Ends -->  
+   
+</apex:component>

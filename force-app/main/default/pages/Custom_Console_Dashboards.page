@@ -1,0 +1,16 @@
+<apex:page controller="ConsoleDBLookup" sidebar="false" showHeader="false" id="thepage">
+    <apex:pageBlock >
+        <apex:form >
+            <apex:selectList value="{!currentDBId}" multiselect="false" size="1" rendered="{!currentDBId == null}">            
+                <apex:actionSupport event="onchange" action="{!setSelectedId}" />    
+                <apex:selectOptions value="{!Dashboards}" />
+            </apex:selectList>
+        </apex:form> 
+        <apex:form >
+            <apex:commandLink action="{!edit}" rendered="{!currentDBId <> null}">Change Dashboard</apex:commandLink>
+        </apex:form>                     
+        <apex:outputPanel id="dashboardframe" style="overflow:scroll;">
+            <apex:iframe src="/{!currentDBId}?isdtp=vw" rendered="{!currentDBId != null}" scrolling="true" />
+        </apex:outputPanel>
+    </apex:pageBlock>
+</apex:page>

@@ -1,0 +1,78 @@
+<apex:component >
+<apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" required="true"/>
+<apex:attribute name="contactList" description="This attrribute passes the Opportunity object to the AccountEditViewComponent type: Edit or View." type="Contact[]" />
+<apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+
+<apex:pageblock >
+
+<apex:pageblocksection title="Contact Details" rendered="{!if(displayModeVal==DisplayModeobj.VIEW, true, false)}"  columns="1">
+
+<apex:pageblocktable value="{!contactList}"  var="contactObject" >
+<apex:column value="{!contactObject.Primary_Contact__c}" />
+<apex:column value="{!contactObject.Salutation}" />
+<apex:column value="{!contactObject.FirstName}" />
+<apex:column value="{!contactObject.Lastname}" /> 
+<apex:column value="{!contactObject.MobilePhone}" /> 
+<apex:column value="{!contactObject.Phone}" /> 
+<apex:column value="{!contactObject.Email__c}" /> 
+
+</apex:pageblocktable>
+
+
+</apex:pageblocksection>
+
+
+	<apex:pageblocksection title="Contact Details" rendered="{!if(displayModeVal==DisplayModeobj.EDIT, true, false)}" collapsible="false" columns="1">
+	
+			<apex:pageblocktable value="{!contactList}" var="contactObject">
+			
+				<apex:column headervalue="Primary">
+				<apex:inputfield value="{!contactObject.Primary_Contact__c}" />
+				</apex:column>
+				
+				<apex:column headervalue="Salutation">
+				<apex:inputfield value="{!contactObject.Salutation}" />
+				</apex:column>
+				
+				<apex:column headervalue="First Name">
+				<apex:inputfield value="{!contactObject.FirstName}" />
+				</apex:column>
+				
+				<apex:column headervalue="Last Name">
+				<apex:inputfield value="{!contactObject.Lastname}" required="false"/> 
+				</apex:column>
+				
+				<apex:column headervalue="Contact Type">
+				<apex:inputfield value="{!contactObject.Contact_Type__c}" /> 
+				</apex:column>
+				
+				<apex:column headervalue="Mobile">
+				<apex:inputfield value="{!contactObject.MobilePhone}"/> 
+				</apex:column>
+				
+				<apex:column headervalue="Work Phone">
+				<apex:inputfield value="{!contactObject.OtherPhone}" /> 
+				</apex:column>
+				
+				<apex:column headervalue="Email">
+				<apex:inputfield value="{!contactObject.Email__c}" /> 
+				</apex:column>
+			</apex:pageblocktable>
+	</apex:pageblocksection>
+
+	<apex:pageblocksection title="Billing Address:" rendered="{!if(displayModeVal==DisplayModeobj.EDIT, true, false)}" columns="1" collapsible="false">
+	
+		<c:AddressLookup AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+		StreetLabel="Street" StreetField="{!contactList[0].MailingStreet}" 
+		CityLabel="City" CityField="{!contactList[0].MailingCity}" StateLabel="State" 
+		StateField="{!contactList[0].MailingState}" PostalCodeLabel="Postcode" 
+		PostalCodeField="{!contactList[0].MailingPostalcode}" CountryLabel="Country" 
+		CountryField="{!contactList[0].MailingCountry}"   />
+	</apex:pageblocksection> 
+
+
+
+</apex:pageblock>
+ 
+
+</apex:component>

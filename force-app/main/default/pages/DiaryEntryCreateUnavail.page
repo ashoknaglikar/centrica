@@ -1,0 +1,66 @@
+<apex:page standardController="Diary_Entry__c" extensions="DiaryEntryCreateUnavail" >
+<apex:form >
+<div>
+<img src="/img/s.gif" class="pageTitleIcon"/>
+<h1 class="pageType" style="font-size:100%">Diary Entry</h1>
+<br/>
+<h4 class="pageDescription" style="font-size:150%">{!diaryEntry.Name}</h4>
+</div>
+<br/>
+   <apex:pageblock title="Diary Entry Detail"> 
+     <apex:pageblocksection columns="2" >
+                  <apex:pageblocksectionItem >
+                     <apex:outputLabel value="Employee Name" />
+                     <apex:outputfield value="{!diaryEntry.Employee_Name__c}"  />
+                  </apex:pageblocksectionItem>   
+                  <apex:pageblocksectionItem >
+                     <apex:outputLabel value="Start" />
+                     <apex:outputfield value="{!diaryEntry.Start__c}"  />
+                  </apex:pageblocksectionItem> 
+                 <apex:pageblocksectionItem >
+                     <apex:outputLabel value="Week" />
+                     <apex:outputfield value="{!diaryEntry.Week__c}"  />
+                  </apex:pageblocksectionItem> 
+                   <apex:pageblocksectionItem >
+                     <apex:outputLabel value="End" />
+                     <apex:outputfield value="{!diaryEntry.End__c}"  />
+                  </apex:pageblocksectionItem>   
+                  <apex:pageblocksectionItem >
+                     <apex:outputLabel value="Record Type" />
+                     <apex:outputfield value="{!diaryEntry.Record_Type__c}"  />
+                  </apex:pageblocksectionItem> 
+                   <apex:pageblocksectionItem >
+                     <apex:outputLabel value="Hours" />
+                     <apex:outputfield value="{!diaryEntry.Hours__c}"  />
+                  </apex:pageblocksectionItem>   
+                  <apex:pageblocksectionItem >
+                     <apex:outputLabel value="Sub Type" />
+                     <apex:outputfield value="{!diaryEntry.Sub_Type__c}"  />
+                  </apex:pageblocksectionItem> 
+                   <apex:pageblocksectionItem >
+                     <apex:outputLabel value="Extra Hours">
+                     <apex:image value="/s.gif" styleClass="helpOrb" title="{!$ObjectType.Diary_Entry__c.Fields.Extra_Hours__c.inlineHelpText}"/>
+                     </apex:outputLabel>
+                     <apex:outputfield value="{!diaryEntry.Extra_Hours__c}"  />
+                  </apex:pageblocksectionItem> 
+                   <apex:pageblocksectionItem >
+                     <apex:outputLabel value="16 Hr Gap Count" />
+                     <apex:outputfield value="{!diaryEntry.Gap_Count1__c}"  />
+                  </apex:pageblocksectionItem>   
+                  <apex:pageblocksectionItem >
+                     <apex:outputLabel value="Overbooked Hours" />
+                     <apex:outputfield value="{!diaryEntry.Overbooked_Hours__c}"  />
+                  </apex:pageblocksectionItem>
+                  <apex:pageblocksectionItem >
+                     <apex:outputLabel value="Length" />
+                     <apex:outputfield value="{!diaryEntry.Length__c}"  />
+                  </apex:pageblocksectionItem>
+      </apex:pageblocksection>
+   <apex:pageblockbuttons location="both" >
+                        <apex:commandbutton value="Create Unavailability" action="{!CreateUnavailability}" />
+                        <apex:commandbutton value="Diary View" action="{!DiaryView}" rendered="{!area != 'null'}"/>
+                        
+                </apex:pageblockbuttons>
+   </apex:pageblock>
+</apex:form>
+</apex:page>

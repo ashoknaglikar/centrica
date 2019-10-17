@@ -1,0 +1,222 @@
+<apex:page controller="GenerateQuotePDFController" renderAs="PDF" showHeader="false">
+<html>  
+<head>
+<style type="text/css" media="print,screen"> 
+                @page{
+                      size: 8.32in 11.69in;
+                      margin-top:0px;
+                      margin-right:0px;
+                      margin-left:0px;
+                      margin-bottom:0px;
+                } 
+                body{  
+                      font-family:Arial,Helvetica;
+                      font-size:8.75pt;
+                }  
+</style>
+</head>
+<body>
+<apex:variable var="isFirstPage" value="true" />
+<!-------------------------------------------- PDF Pages one to N-1 Starts ------------------------------------------------->
+<apex:repeat value="{!lstListPackGroups}" var="listPackGroups">
+<div style="page-break-after:always;margin-top:0px;"> 
+<!-------------------------------------------- PDF Pages one to N-1 Header Starts ------------------------------------------>
+     <img src="{!$Resource.British_Gas_Quote_PDF_Header_1}" style="border-style:none;opacity:0;height:100%;width:100%;"/>
+<!-------------------------------------------- PDF Pages one to N-1 Header Ends ------------------------------------------>
+<!-------------------------------------------- PDF Pages one to N-1 Customer information table starts ---------------------->
+        <table border='0' width="100%" style="margin-left:45.5px;" cellpadding="2px">
+            <tr rowspan ='6'>
+                <td width="160px">
+                   <b>Installation Address</b><br/>
+                    {!oppObj.customer_name__c}<br/>
+                    {!oppObj.Account.BillingStreet},{!oppObj.Account.BillingCity}<br/>
+                    {!oppObj.Account.BillingPostalCode}<br/>
+                    Tel &nbsp;:&nbsp; {!conObj.HomePhone}<br/>
+                    Mob &nbsp;:&nbsp; {!conObj.MobilePhone}
+                </td>
+                <td width="160px">
+                    <b>Billing Address</b><br/>
+                    {!oppObj.customer_name__c}<br/>
+                    {!conObj.Mailingstreet},{!conObj.MailingCity}<br/>
+                    {!conObj.MailingPostalCode}<br/>
+                    Tel &nbsp;:&nbsp; {!conObj.HomePhone}<br/>
+                    Mob &nbsp;:&nbsp; {!conObj.MobilePhone}
+                </td>
+                <td width="160px">
+                    Quote Ref:&nbsp;{!oppObj.CHI_Lead_Id__c}<br/>
+                    Quote Date:&nbsp;{!quoteDate}<br/>
+                    <b>Heating Sales</b><br/>
+                    <b>Adviser details</b><br/>
+                    Name : &nbsp;{!sgcAgent.First_Name__c} {!sgcAgent.Last_Name__c}<br/>
+                    Contact Number: &nbsp;{!sgcAgent.Phone_No__c}
+                </td>
+                <td width="190px">
+                    Total Price Payable:&nbsp;{!frozenBMGrossText}<br/>
+                    Deposit:&nbsp;{!sumOfDepositsText}<br/>
+                    Deposit reference:&nbsp;{!oppObj.Payment_Reference_Number__c}<br/>
+                    Paid by: &nbsp;{!oppObj.Quote_Payment_Method__c}<br/>
+                    Balance: &nbsp;{!balanceText}<br/>
+                    Balance payment method: &nbsp;{!quoteObj.POC_Payment_Method__c}
+            </td>
+            </tr>   
+          </table>
+<!-------------------------------------------- PDF PDF Pages one to N-1 Customer information table ends ---------------------->
+<br/>          
+<!-------------------------- PDF PDF Pages one to N-1 Customer pricing information table starts------------------>
+          <table width="70%" style="margin-left:45.5px;">
+              <colgroup>
+                  <col span="1"/>
+              </colgroup>
+           <tr>
+                <td>
+                    <div style="font-size:8.2pt;">
+                    <apex:outputpanel rendered="{!isFirstPage}">
+                    <table border="0" cellspacing="0" width="74.5%">
+                          <tr><td bgcolor='#8FD8FF' style="font-size:10pt;"><b>Customer Needs</b></td></tr>
+                          <tr><td bgcolor='#8FD8FF' style="font-size:9pt;">During the call today, you expressed the following needs and requirements :</td></tr>
+                          <tr><td bgcolor='#D4EFFF' style="font-size:9pt;">Enter customer needs</td></tr>
+                     </table>
+                     <br/> 
+                     <table border="0" cellspacing="0" width="74.5%">
+                          <tr><td bgcolor='#8FD8FF' style="font-size:10pt;"><b>Quotation Details</b> : CombiSwap Phone Quote - The price quoted is only available over the phone.</td></tr>
+                     </table>
+                     </apex:outputpanel>
+                     <apex:variable var="isFirstPage" value="false" />
+                    <apex:repeat value="{!listPackGroups}" var="packGroupsInstance">
+                    <br/>
+                    <table width="74.5%" border='0' cellspacing="0">
+                         <colgroup>
+                            <col span="2" style="background-color: #D4EFFF;border:0px;" />
+                            <col span="1" style="background-color: #8FD8FF;border:0px;"/>
+                          </colgroup>
+                             <tr>
+                             <td width='330px'>
+                             <apex:outputText rendered="{!packGroupsInstance.displayUpperContinuation}">&nbsp;
+                                <u><b>Continued from last page ....<br/><br/></b></u>
+                            </apex:outputText><b>{!packGroupsInstance.quotePDFCategory} : </b></td>
+                            <td width='70px'></td>
+                                 <td width='100px'></td>
+                             </tr>
+                        <apex:repeat value="{!packGroupsInstance.quotePacksList}" var="qp">
+                            <tr>
+                                <td width='330px'>{!qp.Product__r.Long_description__c}</td>
+                                <td width='70px' align='center'>&nbsp;<apex:outputpanel rendered="{!isitemized}">(x {!qp.Text_Quantity__c})</apex:outputpanel></td>
+                                <td width='100px' align='right'>&nbsp;<apex:outputpanel rendered="{!isitemized}">£<apex:outPutText >{!qp.Gross_Total_Number__c}</apex:outPutText></apex:outputpanel></td>
+                            </tr>
+                        </apex:repeat>
+                            <tr><td></td><td></td><td></td></tr>
+                             <tr>
+                                 <td width='330px'>&nbsp;
+                                 <apex:outputText rendered="{!packGroupsInstance.displayBottomContinuation}">
+                                   <u><b>Continued on next page ....</b></u>
+                                 </apex:outputText>
+                                 </td>
+                                 <td width='70px'>&nbsp;</td>
+                                 <td width='100px' align='right'>&nbsp;<apex:outputText rendered="{!packGroupsInstance.displayTotal}"><b>£<apex:outPutText >{!packGroupsInstance.packGroupTotalPriceText}</apex:outPutText></b></apex:outputText></td>
+                             </tr>
+                      </table>
+                      </apex:repeat> 
+                      </div>
+               </td>
+         </tr>
+      </table>
+   <img src="{!$Resource.British_Gas_Quote_PDF_Sider_1}" 
+        style="border-style:none;opacity:0;height:465px;width:275px;
+               top:310px;left:480px;position:fixed;"/>
+<!-------------------------- Pages one to N-1 Customer pricing information table ends------------------>
+<br/><br/>
+<!-------------------------------------------- Pages one to N-1 Footer Starts ------------------------------------------>
+   <img src="{!$Resource.British_Gas_Quote_PDF_Footer_1}" 
+        style="border-style:none;opacity:0;
+               height:100%;width:98%;
+               top:790px;left:30px;position:fixed;"/>
+<!-------------------------------------------- Pages one to N-1 Footer ends ------------------------------------------>
+ </div>
+</apex:repeat>
+<!-------------------------------------------- Pages one to N-1 ends ------------------------------------------------->
+
+<!-------------------------------------------- PDF Page N Starts ------------------------------------------------->
+
+<div> 
+<!-------------------------------------------- PDF Page N Header Starts ------------------------------------------>
+    <img src="{!$Resource.British_Gas_Quote_PDF_Header_2}" style="border-style:none;opacity:0;height:100%;width:100%;"/>
+<!-------------------------------------------- PDF Page 2 Header Ends ------------------------------------------>
+
+<!-------------------------------------------- PDF Page N Customer information table starts ---------------------->
+    <table border='0' width="100%" style="margin-left:45.5px;" cellpadding="2px">
+        <tr rowspan ='6'>
+            <td width="160px">
+               <b>Installation Address</b><br/>
+                {!oppObj.customer_name__c}<br/>
+                {!oppObj.Account.BillingStreet},{!oppObj.Account.BillingCity}<br/>
+                {!oppObj.Account.BillingPostalCode}<br/>
+                Tel &nbsp;:&nbsp; {!conObj.HomePhone}<br/>
+                Mob &nbsp;:&nbsp; {!conObj.MobilePhone}
+            </td>
+            <td width="160px">
+                <b>Billing Address</b><br/>
+                {!oppObj.customer_name__c}<br/>
+                {!conObj.Mailingstreet},{!conObj.MailingCity}<br/>
+                {!conObj.MailingPostalCode}<br/>
+                Tel &nbsp;:&nbsp; {!conObj.HomePhone}<br/>
+                Mob &nbsp;:&nbsp; {!conObj.MobilePhone}
+            </td>
+            <td width="160px">
+                Quote Ref:&nbsp;{!oppObj.CHI_Lead_Id__c}<br/>
+                Quote Date:&nbsp;{!quoteDate}<br/>
+                <b>Heating Sales</b><br/>
+                <b>Adviser details</b><br/>
+                Name : &nbsp;{!sgcAgent.First_Name__c} {!sgcAgent.Last_Name__c}<br/>
+                Contact Number: &nbsp;{!sgcAgent.Phone_No__c}
+            </td>
+            <td width="190px">
+                Total Price Payable:&nbsp;{!frozenBMGrossText}<br/>
+                Deposit:&nbsp;{!sumOfDepositsText}<br/>
+                Deposit reference:&nbsp;{!oppObj.Payment_Reference_Number__c}<br/>
+                Paid by: &nbsp;{!oppObj.Quote_Payment_Method__c}<br/>
+                Balance: &nbsp;{!balanceText}<br/>
+                Balance payment method: &nbsp;{!quoteObj.POC_Payment_Method__c}
+            </td>
+        </tr>   
+      </table>
+<!-------------------------------------------- PDF Page N Customer information table ends ---------------------->
+<br/><br/>      
+<!-------------------------- PDF Page N Customer pricing information table starts------------------>
+        <table border="0" cellspacing="0" width="70%" style="margin-left:45.5px;">
+          <colgroup>
+            <col span="1"/>
+          </colgroup>
+          <tr>
+            <td>
+                <div style="font-size : 8.2pt;">
+                <table border="0" cellspacing="0" width="74.5%">
+                      <colgroup>
+                        <col span="1" style="background-color: #D4EFFF;border:0px;" />
+                        <col span="1" style="background-color: #8FD8FF;border:0px;"/>
+                      </colgroup>
+                      <tr>
+                          <td width='400px'><b>TOTAL GROSS PRICE (inc. VAT) : </b></td>
+                          <td width='100px' align='right'><b>£{!totalGrossPriceText}</b></td>
+                      </tr>
+                </table>
+                <br/>
+                <table border="0" cellspacing="0" width="74.5%">
+                      <colgroup>
+                        <col span="1" style="background-color: #D4EFFF;border:0px;" />
+                        <col span="1" style="background-color: #8FD8FF;border:0px;"/>
+                      </colgroup>
+                      <tr>
+                          <td width='400px'><b>NET CONTRACT PRICE (inc. VAT) : </b></td>
+                          <td width='100px' align='right'><b>£{!netContractPriceText}</b></td>
+                      </tr> 
+                   </table>
+                 </div>
+            </td> 
+         </tr>
+      </table>
+<!-------------------------- PDF Page N Customer pricing information table ends------------------>
+ </div>
+<!-------------------------------------------- PDF Page N ends ------------------------------------------------->
+</body>
+</html>
+</apex:page>

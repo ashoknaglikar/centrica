@@ -1,0 +1,3 @@
+<apex:page controller="QuotesPageCont"  cache="true" sidebar="false" action="{!downloadCSV}" readOnly="true" contenttype="text/csv#{!filename}.csv ">
+    <apex:outputText value="{!finalStringCSV}" escape="false"/>
+</apex:page>

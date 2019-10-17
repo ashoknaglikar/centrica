@@ -1,0 +1,140 @@
+<apex:component access="global">
+    <apex:attribute name="domId" type="String" required="false" description="ID" access="global"/>
+    <apex:attribute name="ref" type="String" required="false" description="Reference" access="global"/>
+    <apex:attribute name="mini" type="Boolean" required="false" default="true" description="Use mini controls on mobile platforms" access="global"/>
+    <apex:attribute name="type" type="String" required="false" description="Attribute Type" access="global"/>
+    <apex:attribute name="flavour" type="String" required="false" default="standard" description="standard or mobile" access="global"/>
+    <apex:attribute name="definition" type="cscfga__Attribute_Definition__c" required="false" description="The Attribute's Definition" access="global"/>
+
+    <apex:variable var="rendered" value="false" />
+
+    <apex:outputPanel layout="none" rendered="{!type == 'Calculation'}">
+        <apex:variable var="rendered" value="true" />
+        <span id="{!domId}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" data-role="none" data-mini="{!mini}"></span>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" rendered="{!type == 'Checkbox'}">
+        <apex:variable var="rendered" value="true" />
+        <input type="checkbox" id="{!domId}_%idx%" name="%ctx%{!ref}_%idx%" data-role="none" data-cs-binding="%ctx%{!ref}_%idx%" value="" />
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" rendered="{!type == 'Date'}">
+        <apex:variable var="rendered" value="true" />
+        <apex:outputPanel layout="none" rendered="{!flavour == 'mobile'}">
+            <input type="date" id="{!domId}_%idx%" name="%ctx%{!ref}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" value="" data-role="none" data-mini="{!mini}" />
+        </apex:outputPanel>
+        <apex:outputPanel layout="none" rendered="{!flavour == 'standard'}">
+            <span class="dateInput dateOnlyInput">
+                <input id="{!domId}_%idx%" name="%ctx%{!ref}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" value="" data-role="none" data-mini="{!mini}"
+                    onfocus="DatePicker.pickDate(true, '{!domId}_%idx%', false );" size="12" />
+                <span class="dateFormat">
+                    [&nbsp;<a href="" class="todayPicker" onclick="return (function(){ DatePicker.insertDate(CS.todayFormatted, '{!domId}_%idx%', true); return false; })();">___</a>&nbsp;]
+                </span>
+            </span>
+        </apex:outputPanel>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" rendered="{!type == 'Lookup' && definition.cscfga__Select_List_Lookup__c == false && definition.cscfga__Enable_Multiple_Selection__c == false}">
+        <apex:variable var="rendered" value="true" />
+        <span class="lookupInput">
+            <input type="text" id="{!domId}_%idx%" name="%ctx%{!ref}_%idx%" readonly="readonly" data-cs-binding="%ctx%{!ref}_%idx%" data-role="none" data-mini="{!mini}" value="" size="20" />
+        <apex:outputPanel layout="none" rendered="{!flavour == 'mobile'}">
+            <a href="#" data-cs-action="clearLookup" data-cs-ref="%ctx%{!ref}_%idx%" data-cs-control="%ctx%{!ref}_%idx%" data-cs-type="Clear" class="deleteIcon" title="Clear lookup field" data-role="none"><span class="icon-cancel-circle"></span></a>
+            <a href="#" data-cs-action="lookup" data-cs-params='{"ref": "%ctx%{!ref}_%idx%"}' data-cs-control="%ctx%{!ref}_%idx%" data-cs-type="Add" data-role="none"><span class="icon-plus-circle"></span></a>
+        </apex:outputPanel>
+        <apex:outputPanel layout="none" rendered="{!flavour == 'standard'}">
+            <div data-cs-action="clearLookup" data-cs-ref="%ctx%{!ref}_%idx%" data-cs-control="%ctx%{!ref}_%idx%" data-cs-type="Clear" class="deleteIcon" title="Clear lookup field"></div>
+            <a href="#" data-cs-action="lookup" data-cs-params='{"ref": "%ctx%{!ref}_%idx%"}' data-cs-button="Lookup" data-cs-control="%ctx%{!ref}_%idx%" data-cs-type="Add" style="text-decoration: none; float: left;">
+                <img src="/s.gif" alt="Lookup" class="lookupIcon"
+                    onblur="this.className = 'lookupIcon';"
+                    onfocus="this.className = 'lookupIconOn';"
+                    onmouseout="this.className = 'lookupIcon';"
+                    onmouseover="this.className = 'lookupIconOn';"
+                    title="Lookup" />
+            </a>
+        </apex:outputPanel>
+        </span>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" style="width : 100;" rendered="{!type == 'Lookup' && definition.cscfga__Select_List_Lookup__c == true}">
+        <apex:variable var="rendered" value="true" />
+        <span class="lookupInput">
+            <input type="text"
+                    id="{!domId}_%idx%"
+                    name="%ctx%{!ref}_%idx%"
+                    data-cs-binding="%ctx%{!ref}_%idx%"
+                    data-cs-select-list-lookup="true"
+                    data-role="none"
+                    data-mini="{!mini}"
+                    value=""
+                    size="20"
+            />
+        </span>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" rendered="{!type == 'Related Product'}">
+        <apex:variable var="rendered" value="true" />
+        <input type="text" readonly="readonly" data-cs-action="addOrEditRelatedProduct" data-cs-ref="%ctx%{!ref}_%idx%" id="{!domId}_%idx%" name="%ctx%{!ref}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" value="" data-role="none" data-mini="{!mini}" />
+        &nbsp;
+        <apex:outputPanel layout="none" rendered="{!flavour == 'standard'}">
+            <span data-cs-control="%ctx%{!ref}_%idx%" data-cs-type="Add">
+                <a href="#" data-cs-action="addRelatedProduct" data-cs-ref="%ctx%{!ref}_%idx%">Add</a>
+            </span>
+            <span data-cs-control="%ctx%{!ref}_%idx%" data-cs-type="EditDel">
+                <a href="#" data-cs-action="editRelatedProduct" data-cs-ref="%ctx%{!ref}_%idx%">Edit</a>
+                <a href="#" data-cs-action="removeRelatedProduct" data-cs-ref="%ctx%{!ref}_%idx%">Del</a>
+            </span>
+        </apex:outputPanel>
+        <apex:outputPanel layout="none" rendered="{!flavour == 'mobile'}">
+            <span data-cs-control="%ctx%{!ref}_%idx%" data-cs-type="EditDel">
+                <a href="#" data-cs-action="removeRelatedProduct" data-cs-ref="%ctx%{!ref}_%idx%"><span class="icon-cancel">&nbsp;</span></a>
+            </span>
+        </apex:outputPanel>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" rendered="{!type == 'Radio Button'}">
+        <apex:variable var="rendered" value="true" />
+        <div id="{!domId}_%idx%" name="%ctx%{!ref}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" data-cs-template="CS.RadioButton.Tpl" data-role="none" data-mini="{!mini}" style="margin-top: -6px;"></div>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" rendered="{!type == 'Select List'}">
+        <apex:variable var="rendered" value="true" />
+        <select id="{!domId}_%idx%" name="%ctx%{!ref}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" data-role="none" data-mini="{!mini}"></select>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" rendered="{!type == 'Text Display'}">
+        <apex:variable var="rendered" value="true" />
+        <div id="{!domId}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%">&nbsp;</div>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" rendered="{!type == 'Display Value'}">
+        <apex:variable var="rendered" value="true" />
+        <span id="{!domId}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" data-role="none" data-mini="{!mini}"></span>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none" rendered="{!type == 'User Input'}">
+        <apex:variable var="rendered" value="true" />
+        <apex:outputPanel layout="none" rendered="{!nullvalue(definition.cscfga__Text_input_lines__c, 1) < 2}">
+            <input type="text" id="{!domId}_%idx%" name="%ctx%{!ref}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" value="" data-role="none" data-mini="{!mini}" />
+        </apex:outputPanel>
+        <apex:outputPanel layout="none" rendered="{!nullvalue(definition.cscfga__Text_input_lines__c, 1) > 1}">
+            <textarea rows="{!definition.cscfga__Text_input_lines__c}" id="{!domId}_%idx%" name="%ctx%{!ref}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" value="" data-role="none" data-mini="{!mini}" style="width: 80%" />
+        </apex:outputPanel>
+    </apex:outputPanel>
+
+     <apex:outputPanel layout="none" rendered="{!type == 'Numeric Keypad'}">
+        <!-- supported in CSA only -->
+        <span id="{!domId}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%">&nbsp;</span>
+    </apex:outputPanel>
+
+    <!-- Miguel.20180129.MultipleSelectList START-->
+    <apex:outputPanel layout="none" rendered="{!type == 'MultiSelect Lookup With Quantity'}">
+        <span id="{!domId}_%idx%" data-cs-binding="%ctx%{!ref}_%idx%" data-role="none" data-mini="{!mini}">&nbsp;</span>
+    </apex:outputPanel>
+    <!-- Miguel.20180129.MultipleSelectList END-->
+
+
+    <apex:outputPanel layout="none" rendered="{!rendered == false}">
+        <span>&nbsp;</span>
+    </apex:outputPanel>
+</apex:component>

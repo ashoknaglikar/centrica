@@ -1,0 +1,344 @@
+<apex:page controller="ideaHomeCont" sidebar="false"  >
+<script type="text/javascript">
+
+function togglleDiv(show)
+ {
+     document.getElementById('darkLayer').style.display = show; 
+     document.getElementById('LoadingDiv').style.display = show;      
+ }  
+
+
+
+</script>
+       
+<html> 
+<head>
+</head>
+<apex:form enctype="multipart/form-data" id="frm">
+<body >  
+<div style="width:100%;">
+<div>    
+ <table>
+     <tr>
+         <td>
+ <apex:commandButton action="{!populateMYideas}" value="My Ideas" style="{!myIdeastyle}" immediate="true"/>       
+</td><td>
+ <apex:commandButton value="New Idea"  action="{!createNewIdea}" style="{!newIdeaStyle}" reRender="frm" immediate="true"/>
+         </td><td>
+ <apex:commandButton action="{!populateALlideas}" value="All Ideas" style="{!allIdeasStyle}" immediate="true" id="btnAllIdeas" />  
+         </td><td>
+ <apex:commandButton action="{!populateDistrictView}" value="{!buttonName}" style="{!myDistrictStyle}" immediate="true"/> 
+         </td><td>
+ <apex:image url="/resource/1397473035000/myBusiness"   width="220" height="90" style="float:center;"/>     
+         
+         </td></tr>
+ </table>      
+ 
+</div>
+
+         
+ <apex:outputpanel id="ideasPanel1" style="width:100%;background-color:white;" >
+     <apex:pageMessages />
+     <apex:pageblock id="block" rendered="{!createNew}">
+            <apex:outputpanel style="text-alin:center;margin-left:50%;">
+                    <apex:commandButton value="Post" action="{!post}" onclick="togglleDiv('');" />
+                    <apex:commandButton value="Cancel" action="{!cancelIdea}"  immediate="true"/>
+                    <!--  <apex:commandButton action="{!upload}" value="Save"/>-->
+            </apex:outputpanel>
+           
+            <apex:pageBlockSection columns="1" collapsible="false" id="newIdea">
+                <apex:actionfunction name="findduplicates" action="{!findDuplicates}"   >
+                
+                </apex:actionfunction>
+                <apex:pageBlockSectionItem helpText="Enter Some Title." > 
+                    <apex:outputText value="I’d like to improve our business by..." style="font-weight:bold;float:left;" title="Title"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                   <apex:inputfield value="{!newidea.Title}" required="true" style="width:100%" onchange="findduplicates();" id="title"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageblocksectionItem id="Dupsecitem">
+                    <apex:datatable value="{!duplicateIdeas}"  var="d" rendered = "{!duplicateIdeas.size > 0}" style = "width:70%">
+                        
+                        <apex:column headervalue="Similar ideas" style="margin-let:4px;" width="60%">
+                            <apex:outputlink value="/apex/viewIdea?id={!d.Id}" target="_top">
+                            {!d.Title}
+                            </apex:outputlink>
+                        </apex:column>
+                        
+                        <apex:column value="{!d.Decimalremove__c}" style="margin-left:4px;" headervalue="Likes"/>
+                        <apex:column style="margin-left:4px;" headervalue="Final Resolution Answer">
+                           <apex:outputText Value="{!left(d.Final_Resolution_Answer__c,100)}"/>
+                        </apex:column>
+                    </apex:datatable>
+                </apex:pageblocksectionItem>
+              </apex:pageBlockSection>  
+              
+              <apex:pageBlockSection columns="1" collapsible="false" id="newIdea2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Tell us more" for="body" style="font-weight:bold;float:left;"/>
+                   
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:inputfield value="{!newidea.Body}" style="width:100%" /> <!--required="true"  -->
+                </apex:pageBlockSectionItem>
+                
+                <!--<apex:pageBlockSectionItem helpText="How does this effect you and/or our customers? What do you think benefits are?" >
+                    <apex:outputLabel value="Whats the reason for Idea:" for="Reason" style="font-weight:bold;float:left;"/>
+                </apex:pageBlockSectionItem>
+                
+                 <apex:pageBlockSectionItem >
+                    <apex:inputfield value="{!newidea.Reason__c}" style="width:100%"/>
+                </apex:pageBlockSectionItem>-->
+                
+                
+                 <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="What can we do to help ?" for="body" style="font-weight:bold;float:left"/>
+                    
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:inputfield value="{!newidea.Suggesstion__c}" style="width:100%"/>
+                </apex:pageBlockSectionItem>
+                
+                <!-- Change by Ashok G -->
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Business Area" for="body" style="font-weight:bold;float:left;"/>
+                      <apex:actionRegion >
+                          <apex:inputField value="{!newidea.Business_Area__c }">
+                          <apex:actionSupport event="onchange" reRender="ajaxrequest" />
+                          </apex:inputField>
+                         </apex:actionRegion>
+                </apex:PageBlockSectionItem>
+                 
+                 <apex:outputPanel id="ajaxrequest" >
+                   <apex:pageBlockSection rendered="{!newidea.Business_Area__c == 'Office'}"> 
+                     <!-- <apex:outputLabel value="Department" for="dep" style="font-weight:bold;float:left;"/> -->
+                    
+                      <apex:pageBlockSectionItem >
+                      <apex:outputLabel value="Department" for="dep" style="font-weight:bold;float:left;"/>
+                      <apex:inputField value="{!newidea.Department__c}"/>
+                      </apex:pageBlockSectionItem>  
+                 </apex:pageBlockSection>
+                 
+                 </apex:outputPanel>
+                 
+               
+                <!-- End -->
+                
+                   <apex:pageBlockSectionItem >
+                      <apex:outputLabel value="Attachment" for="file" style="font-weight:bold;float:left"/>
+                      <apex:inputFile value="{!attachment.body}" filename="{!attachment.name}" id="file"/>
+                   </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="On Behalf of" for="onBehalf" style="font-weight:bold;float:left;margin-left:15px;" />
+                    <apex:inputfield value="{!newidea.On_Behalf_Of__c}"/>
+                </apex:pageBlockSectionItem>
+                
+                <!-- Requested To Hide this By : Katie Crowhter : 15/12/2015
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Withhold My Name" for="withHoldName" style="font-weight:bold;float:left;margin-left:15px;" />
+                    <apex:inputfield value="{!newidea.WithHold_Name__c}"/>
+                </apex:pageBlockSectionItem>-->
+                
+            
+            </apex:pageBlockSection>
+            
+        </apex:pageblock>
+     
+         <div style="width:100%;float:right;position:absolute;right:0;z-index:0;">
+         <table align="right" >
+         <tr><td >
+           <apex:outputPanel >
+           
+            <apex:actionfunction name="populateFilter" action="{!populateFilter}" rerender="ideasPanel1"/>
+              
+              <apex:outputpanel style="float:right;">
+                  <apex:outputLabel value="Order By: " style="font-weight:bold;family:calibri;"/>
+                  <apex:selectList value="{!Selected}" size="1" onchange="populateFilter();">
+                      <apex:selectOptions value="{!options}"/>
+                  </apex:selectList>
+               </apex:outputPanel>  
+            </apex:outputpanel> 
+          </td></tr>
+             
+          <tr><td >
+             <apex:outputPanel >
+              <apex:actionfunction name="populateFilter1" action="{!populateFilter1}" rerender="ideasPanel1"/>
+                
+              <apex:outputpanel style="float:right;">
+                  <apex:outputLabel value="Filter By: " style="font-weight:bold;family:calibri;"/>
+                  <apex:selectList value="{!Filter}" size="1" onchange="populateFilter1();">
+                      <apex:selectOptions value="{!options1}"/>
+                  </apex:selectList>
+               </apex:outputPanel>  
+            </apex:outputpanel>
+          </td></tr>
+           
+          <tr><td align="right" >  
+            <apex:outputPanel >
+              <apex:actionfunction name="populateFilter2" action="{!populateFilter1}" rerender="ideasPanel1"/>
+               
+              <apex:outputpanel style="float:right;">
+                  <apex:outputLabel value="Stage: " style="font-weight:bold;family:calibri;">
+                  <apex:inputField value="{!newidea.Sub_Status__c}" onchange="populateFilter2();" style="width:28%"/>
+                  </apex:outputLabel>
+               </apex:outputPanel> 
+            </apex:outputpanel>
+           </td></tr>
+            
+            <tr><td>
+            <apex:outputPanel >
+              <apex:actionfunction name="populateFilter3" action="{!populateFilter1}" rerender="ideasPanel1"/>
+               
+              <apex:outputpanel style="float:right;">
+                  <apex:outputLabel value="BArea: " style="font-weight:bold;family:calibri;">
+                  <apex:inputField value="{!newIdea.Business_Area__c}" onchange="populateFilter3();" />
+                  </apex:outputLabel>
+               </apex:outputPanel>  
+            </apex:outputpanel>
+            </td></tr>
+            <tr><td>
+            <apex:outputPanel rendered="{!enableDe}">
+              <apex:actionfunction name="populateFilter4" action="{!populateFilter1}" rerender="ideasPanel1"/>
+               
+              <apex:outputpanel style="float:right;">
+                  <apex:outputLabel value="Dept: " style="font-weight:bold;family:calibri;">
+                  <apex:inputField value="{!newIdea.Department__c}" onchange="populateFilter4();" />
+                  </apex:outputLabel>
+               </apex:outputPanel>  
+            </apex:outputpanel>
+            </td></tr>
+      </table>   
+    </div> 
+    <br/><br/><br/><br/><br/><br/><br/><br/>
+    <div >
+         
+     <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="otpNav2">  
+         Total Ideas Found: <apex:outputText rendered="{!IF(total_size>=10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(total_size < 10000,true,false)}">{!total_size}</apex:outputText>  
+         <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!DisablePrevious}"/>  
+         <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!NOT(DisablePrevious)}"/>  
+         <apex:commandLink action="{!Previous}" title="Previous Page" value="Previous Page" rendered="{!NOT(DisablePrevious)}"  rerender="ideaPanel,otpNav2,otpNav3"/>&nbsp;  
+         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisablePrevious}">Previous Page</apex:outputPanel>           
+         &nbsp;Showing Page  {!pageNumber} of {!totalPages}&nbsp;&nbsp; 
+         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisableNext}">Next Page</apex:outputPanel>           
+         <apex:commandLink action="{!Next}" title="Next Page" value="Next Page" rendered="{!NOT(DisableNext)}" rerender="ideaPanel,otpNav2,otpNav3"/>&nbsp;  
+         <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!NOT(DisableNext)}"/>  
+         <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!DisableNext}"/>            
+     </apex:outputPanel>
+     </div>
+     
+      
+      <apex:outputpanel id="ideaPanel" style="width=100%">
+        <div style="width:10%;text-align:center; font-weight:bold;font-size:15px;font-family:calibri;">
+           <b style ="font-family:calibri;"> No. of Likes</b>
+        </div>  
+        <apex:repeat value="{!ideasClassList}" var="i">
+        
+         <div style="width:99%;height:100px;border: 2px solid #0000FF;padding:5px 5px 5px 5px; margin-bottom:10px ; border-radius:5px 5px 5px 5px;">
+            <apex:outputpanel style="width:10%;float:left;border: 1px solid #66CCFF;height:100%; margin-right:5px;border-radius: 4px" id="scoreDiv" >
+                <div style="text-align:center;font-weight:bold;height:95%;padding:5px 5px 5px 5px;font-size:80px;color:#66CCFF ;font-family:calibri;">
+                    <apex:outputpanel >
+                    <!--  <apex:outputtext value="{!i.presentIdea.NextNoofLikes__c}" rendered="{!!i.duplicateScore}"/>-->
+                    <!--  <apex:outputtext value="{!i.likes}" rendered="{!i.duplicateScore}"/>  -->
+                    <apex:outputtext value="{!i.likes}" />  
+                    </apex:outputpanel>   
+                </div>
+            </apex:outputpanel>
+            
+            <div style ="height:100%">     
+            <div style ="margin-left:5px;margin-bottom:8px;font: bold 15px calibri,serif; ;height:15px; font-family:calibri;">  
+                <apex:outputLink value="/apex/viewIdea?id={!i.presentIdea.Id}" target="_top" >    <!-- style="color:#330099" -->
+                <apex:outputfield value="{!i.presentIdea.Title}" />
+                </apex:outputLink>
+            </div>    
+               
+            <div style ="margin-left:5px;margin-bottom:4px;height:60%;margin-top:3px;font-family:calibri;">    
+            <!--  <apex:outputfield value="{!i.presentIdea.Body}"/>-->
+            {!i.body}
+            </div >
+                
+                
+             <div  style ="margin:right:10px;height:10px;float:left; ">    
+                
+                <apex:commandlink value="Like" action="{!likeIdea}" style="font-weight:bold;font-family:calibri;" rendered="{!i.likeBln}" rerender="ideaPanel,scoreDiv">
+                    <apex:param name="selected" value="true" assignTo="{!i.selected}"/>
+                 </apex:commandlink>   
+                 <apex:outputtext value="Liked" style="font-weight:bold;font-family:calibri;" rendered="{!!i.likeBln}" /> 
+                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                 <apex:outputlink value="/apex/viewIdea?id={!i.presentIdea.Id}#postcomment" style="font-weight:bold;font-family:calibri;">Comment
+                 </apex:outputlink>   
+                  
+                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                <apex:outputtext value="Submitted By :" style="font-weight:bold;font-family:calibri;"/> &nbsp;
+                <apex:outputtext value="{!i.submittedBy}"  />
+                
+                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                <apex:outputtext value="Submitted Date :" style="font-weight:bold;font-family:calibri;"/> &nbsp;
+                <apex:outputText value="{0,date,dd MMMM yyyy}">
+                    <apex:param value="{!i.presentIdea.CreatedDate}"  />
+                </apex:outputText>
+               
+
+                              
+                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                <apex:outputtext value="Status:" style="font-weight:bold;font-family:calibri;"/> &nbsp;
+                <apex:outputtext value="{!i.presentIdea.Sub_Status__c}"  />
+                <!-- &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                 Present Number of Likes:
+                 <apex:outputtext value="{!i.presentIdea.Decimalremove__c}" /> 
+                 Number of Likes after clicking Like link:
+                 <apex:outputtext value="{!i.presentIdea.NextNoofLikes__c}" />  -->
+                 
+             </div >
+            </div>       
+            </div> 
+            
+        </apex:repeat>
+     </apex:outputpanel>
+     
+     
+     
+  <div>   
+  <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="otpNav3">  
+      Total Ideas Found: <apex:outputText rendered="{!IF(total_size>=10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(total_size < 10000,true,false)}">{!total_size}</apex:outputText>  
+         <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!DisablePrevious}"/>  
+         <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!NOT(DisablePrevious)}"/>  
+         <apex:commandLink action="{!Previous}" title="Previous Page" value="Previous Page" rendered="{!NOT(DisablePrevious)}"  rerender="ideaPanel,otpNav2,otpNav3"/>&nbsp;  
+         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisablePrevious}">Previous Page</apex:outputPanel>           
+         &nbsp;Showing Page  {!pageNumber} of {!totalPages}&nbsp; &nbsp;
+         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisableNext}">Next Page</apex:outputPanel>           
+         <apex:commandLink action="{!Next}" title="Next Page" value="Next Page" rendered="{!NOT(DisableNext)}" rerender="ideaPanel,otpNav2,otpNav3"/>&nbsp;  
+         <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!NOT(DisableNext)}"/>  
+         <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!DisableNext}"/>              
+     </apex:outputPanel>    
+  </div>   
+  </apex:outputpanel> 
+</div>    
+</body>
+
+<div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+        <div style="margin-left:5px; margin-top:5px;">
+        <img src="/img/loading.gif" /> Processing...
+        </div>
+        </div>
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;">
+     </div>   
+</apex:form>    
+</html>
+
+
+</apex:page>

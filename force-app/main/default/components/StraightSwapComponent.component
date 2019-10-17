@@ -1,0 +1,542 @@
+<apex:component controller="StraightSwapExtenstion1" id="SS">
+<script type="text/javascript" src="/soap/ajax/16.0/connection.js"/>
+<script type="text/javascript" src="/soap/ajax/16.0/ajax.js"/>
+<apex:attribute name="combiSwap" description="This is CombiSwapRecord" type="CombiSwapQuestion__c" required="true" assignTo="{!combi}"/>
+<apex:attribute name="PI" description="This attrribute passes the list of engineer questions" type="Opportunity[]" />
+
+
+<style type="text/css">
+ .label{
+    //float: left;
+    //height: 30px;
+    //padding-right: 4px;
+    //padding-top: 2px;
+    //position: relative;
+    //text-align: right;
+    //vertical-align: middle;
+    //width: 20px;
+}
+.label:before{
+ content:"*" ;
+ font-weight: bold;
+ color:red    
+}
+
+.label1{
+
+}
+</style>
+
+<script type="text/javascript">
+    function toggleMe(val,a,b){
+        
+        var e=document.getElementById(a);
+        var f=document.getElementById(b);
+        if(!e)return true;
+        if(!f)return true;
+        
+        if(val.value=='Yes'){  
+        alert('Please click save & continue to progress with CHB boiler lead and book a HSA visit.');
+         if(e.style.display=="none"){
+            e.style.display="block"
+            f.style.display="none"
+         }
+         
+        }else{
+            if(f.style.display=="none"){
+            f.style.display="block"
+            e.style.display="none"
+            }
+           
+        }
+        return true;
+    }
+    
+    function hsaPlan(val){
+        if(val.value == 'No'){
+            alert('Please click OK to progress with CHB boiler lead and book HSA visit');
+        }
+    }
+    function hsaPlan1(val){
+    if(val.value == '3+'){
+    alert('Please click OK to progress with CHB boiler lead and book HSA visit')
+    }
+    }
+    function teleConve(val,a,prod){
+      //alert(a);    
+      //alert(val.value);
+      var g = document.getElementById(a); 
+      //var f = document.getElementById("{$Component.blk1:sect2:TC16:boiler1}").value;
+       
+      if(!g) return true;
+      
+      if((prod == 'lpg' && val.value =='Yes') ||( prod == 'hl' && val.value =='No')){
+       alert('Please click OK to progress with CHB boiler lead and book HSA visit');
+       g.style.display = "none"
+      }else{
+        g.style.display = "block"
+      }
+    }
+    
+    //COnventional & combi change
+    function checkItems(val,a,b){
+        var e=document.getElementById(a);
+        var f=document.getElementById(b);
+        var e1 = document.getElementById('ajaxrequest1'); 
+        var f1 = document.getElementById('ajaxrequest5');
+        if(!e)return true;
+        if(!f)return true;
+        //alert('---->'+val.value);
+        if(val.value == 'Combi'){  
+         if(e.style.display=="none"){
+            e.style.display="block"
+            e1.style.display = "block"
+            f.style.display="none"
+         }
+         
+        }else{
+            if(f.style.display=="none"){
+            f.style.display="block"
+            f1.style.display="block"
+            e.style.display="none"
+            }
+           
+        }
+        return true;
+    }
+    
+    function checkAllFill(ajx,ajx1,ajx2,ajx3){
+        
+        //var e=document.getElementById(ajx);
+        var f=document.getElementById(ajx1); 
+        var g=document.getElementById(ajx2);  
+        var h=document.getElementById(ajx3);  
+        var type = document.getElementById("{!$Component.Block1:prd_sel_sec1:CON:type}").value;
+        //alert(type);
+        if(type=="Combi"){
+            //if(!e)return true;
+            if(!f)return true;
+            
+            if(f.style.display=="block"){
+               var matches = [];
+               var searchEles = document.getElementById(ajx1).getElementsByTagName("select");
+               //alert(searchEles.length);
+               for(var i = 0; i < searchEles.length; i++) {
+                    if(searchEles[i].value == ""){
+                      matches.push(searchEles[i].value);
+                      alert('please Answer all the SS Combi Questions');
+                      return false;
+                    }
+               }
+               
+               if(matches == ""){
+                 alert('Please close it');
+               }
+               return true;
+            } 
+         }else if(type=="Conv"){
+            if(!g)return true;
+            if(!h)return true;
+            
+            if(h.style.display=="block"){
+               var matches = [];
+               var searchEles = document.getElementById(ajx3).getElementsByTagName("select");
+               //alert(searchEles.length);
+               for(var i = 0; i < searchEles.length; i++) {
+                    if(searchEles[i].value == ""){
+                      matches.push(searchEles[i].value);
+                      alert('please Answer all the SS Conv. Questions');
+                      return false;
+                    }
+               }
+               
+               if(matches == ""){
+                 alert('Please close it');
+               }
+             
+            } 
+            return true;
+         }
+        
+    
+    }
+    
+    
+    window.onload = function applyPickListValues(){
+   // alert('entered');
+                          //var d=document.getElementById('ajaxrequest7');
+                          //var f=document.getElementById('ajaxrequest');
+                          var e=document.getElementById('ajaxrequest1');
+                          var g=document.getElementById('ajaxrequest3');
+                          var h=document.getElementById('ajaxrequest4');
+                          var i=document.getElementById('ajaxrequest5');
+                          var j=document.getElementById('ajaxrequest6');
+                          
+                         var type = '{!combi.Type__c}';
+                          //alert('-------->'+type);
+                          if(type=='Combi'){
+                                  g.style.display="block"
+                                  e.style.display="block"
+                                  /* d.style.display="block"
+                                 
+                                  var lpgboiler = '{!combi.S_S_Q1__c}';
+                                  //alert('----'+lpgboiler);
+                                  if(lpgboiler == "Yes"){
+                                        f.style.display="block"
+                                        e.style.display="none"
+                                   
+                                  }else if(lpgboiler == 'No'){
+                                      e.style.display="block"
+                                      f.style.display="none"
+                                   
+                                  }else{
+                                        e.style.display="none"
+                                        f.style.display="none"
+                                  }*/
+                           }else if(type == 'Conv'){
+                               h.style.display = "block"
+                               i.style.display = "block"
+                               //var lpg = '{!combi.S_S_C1__c}';
+                               var outputR = '{!combi.S_S_TC16__c}';
+                               //alert('lpg'+lpg+' '+outputR);
+                               if(outputR=="Yes"){
+                                j.style.display = "block";
+                               }
+                           
+                           }
+                       } 
+</script>
+
+
+    <apex:outputpanel id="panel1">
+        <apex:actionFunction name="toggleQuestion" action="{!toggleQuestion}"/>
+        <!-- <apex:pageblock id="prd_sel">
+            <apex:pageblocksection columns="1" id="prd_sel_sec1">
+            <b>Select Questionnaire:</b>
+            <apex:selectList value="{!prdSelected}" id="prdSelField" size="1"/>
+               <apex:selectOptions value="{!questiomaireItems}"/> 
+            </apex:pageblocksection>
+        </apex:pageblock> -->
+        <apex:pageBlock id="Block1">
+          <apex:pageblocksection columns="1" id="prd_sel_sec1">
+           <apex:pageblocksectionItem labelStyle="text-align:left;" datastyle="width:20%;" id="CON">
+                  <apex:outputLabel value="Select Questionnaire: " style="font-weight:bold;family:calibri;" for="type"/>
+                      <!-- <apex:selectList value="{!prdSelected}" size="1" id="prdSelField" onchange="return checkItems(this,'ajaxrequest3','ajaxrequest4')">
+                          <apex:selectOptions value="{!questiomaireItems}"/>
+                      </apex:selectList> -->
+                    <apex:actionRegion >
+                    <apex:inputField value="{!combiSwap.Type__c}" id="type" onchange="return checkItems(this,'ajaxrequest3','ajaxrequest4')">
+                    </apex:inputField>
+                    </apex:actionRegion>
+            
+            </apex:pageblocksectionItem>
+           </apex:pageblocksection> 
+        </apex:pageBlock>   
+        
+        <apex:pageblock id="blk1">
+          <div id="ajaxrequest3" style="display:none;overflow:auto;height:300px;">
+           <center><apex:pageBlockButtons >
+           <apex:commandButton value="Save" onClick="return checkAllFill('ajaxrequest','ajaxrequest1','ajaxrequest3','ajaxrequest4')" />
+           </apex:pageBlockButtons> </center>
+           <!-- <div id="ajaxrequest7" style="display:none;">
+            <apex:pageblocksection columns="1" id="sec1">
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="QL">
+                    <apex:outputLabel value="Is the current boiler natural gas or LPG?" for="lpg" />
+                    <apex:actionRegion >
+                    <apex:inputField value="{!combiSwap.S_S_Q1__c}" id="Question1" style="float:right;font-weight:bolder;" onchange="return toggleMe(this,'ajaxrequest','ajaxrequest1')">
+                    </apex:inputField>
+                    </apex:actionRegion>
+                               
+                             
+                </apex:pageblocksectionitem> 
+                                  
+            </apex:pageblocksection>   
+            </div>    
+             <div id="ajaxrequest" style="display:none;">
+                <apex:pageblocksection columns="1">  
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Product Interest?" for="pi"/>
+                           <apex:inputfield value="{!opp.Product_Interest__c}"  id="pi" style="float:right;font-weight:bolder;"/>
+                   </apex:pageblocksectionitem>
+                </apex:pageblocksection>
+             </div>-->
+             
+             <div id="ajaxrequest1" style="display:none;">
+                 <apex:pageblocksection columns="1" id="sec2"> 
+                   <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="ggg">
+                        <apex:outputLabel value="Can we achieve the correct boiler clearances if the boiler is fitted in the same place?" for="GF171" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.S_S_CC1__c}" id="GF71" style="float:right;font-weight:bolder;" onchange="hsaPlan(this)"/> 
+                    </apex:pageblocksectionitem> 
+                 
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="ggg1">
+                        <apex:outputLabel value="Can the new horizontal flue be installed to current standards?" for="GF17" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.New_Horizontal_flue_installed_to_current__c}" id="GF7" style="float:right;font-weight:bolder;" onchange="hsaPlan(this)"/> 
+                    </apex:pageblocksectionitem> 
+                     
+                   <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="ggg2">
+                        <apex:outputLabel value="Can the new flue be accessed safely from a ladder?" for="GF1711" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.S_S_C12__c}" id="GF711" style="float:right;font-weight:bolder;" onchange="hsaPlan(this)"/> 
+                    </apex:pageblocksectionitem> 
+                 
+                   <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="QL">
+                    <apex:outputLabel value="Are any horizontal flue extensions required?" for="lpg" style="font-weight:bolder;"/>
+                    <apex:inputField value="{!combiSwap.Horizontal_flue_extensions_required__c}" id="Question1" style="float:right;font-weight:bolder;" onchange="hsaPlan1(this)" />
+                    </apex:pageblocksectionitem>
+                     
+                     <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;"> 
+                        <apex:outputLabel value="Are any flue bends required?" for="fuseSpur" style="font-weight:bolder;"/> <!--  {!CASE(ssObj.S_S_Q2__c,'','label1','label')} --> 
+                        <apex:inputfield value="{!combiSwap.Are_any_flue_bends_required__c}" id="fuseSpur" style="float:right;font-weight:bolder;" onchange="hsaPlan1(this)"/> 
+                     </apex:pageblocksectionitem> 
+                     
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Is a Plume Kit Required?" for="plume" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.Is_a_Plume_Kit_Required__c}" id="plume" style="float:right;font-weight:bolder;" /> 
+                    </apex:pageblocksectionitem>
+                    
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Is a balanced flue brick up required?" for="meb" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.Is_a_balanced_flue_brick_up_required__c}" id="meb" style="float:right;font-weight:bolder;" /> 
+                    </apex:pageblocksectionitem>
+                    
+                      <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Will the new flue terminate less than 2 metres from the ground?" for="meb" style="font-weight:bolder;"/>
+                          <apex:inputfield value="{!combiSwap.S_S_C13__c}" id="meb" style="float:right;font-weight:bolder;" /> 
+                    </apex:pageblocksectionitem>
+                    
+                    <!-- <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Is an internal Filling loop required?" for="loop" styleClass="{!IF((sec5 && ssObj.S_S_Q5__c==''),'label','label1')}"/>
+                        <apex:inputfield value="{!ssObj.S_S_Q5__c}" id="loop" /> 
+                    </apex:pageblocksectionitem> -->
+                      
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" > <!-- style="background-color:{!IF(ssObj.S_S_Q6__c=='--None--','','red')}" -->
+                        <apex:outputLabel value="What fuel type is the boiler?" for="hori" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.What_fuel_type_is_the_boiler__c}" id="hori" style="float:right;font-weight:bolder;" /> 
+                    </apex:pageblocksectionitem>
+                    
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Is a fused spur fitted?" for="flue" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.Is_a_fused_spur_fitted__c}" id="flue" style="float:right;font-weight:bolder;" /> 
+                    </apex:pageblocksectionitem>
+                    
+                    <!-- <apex:pageblocksectionitem labelStyle="text-align:left;width:100%;" datastyle="width:20%;">
+                        <apex:outputLabel value="Which Flue Bend?" for="bend" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.S_S_Q8__c}" id="bend" required="true" style="float:right;font-weight:bolder;"/> 
+                      
+                    </apex:pageblocksectionitem> -->  
+                   <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                      <apex:outputLabel value="Did the socket and see pass?" for="socket1" style="font-weight:bolder;"/>
+                      <apex:inputfield value="{!combiSwap.S_S_C15__c}" id="socket1" style="float:right;font-weight:bolder;"/> 
+                   </apex:pageblocksectionitem>  
+                   
+                  <!-- <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                      <apex:outputLabel value="Is a balance flue brick up/major building work required?" for="building" style="font-weight:bolder;"/>
+                      <apex:inputfield value="{!combiSwap.S_S_TC9__c}" id="building" style="float:right;font-weight:bolder;"/> 
+                   </apex:pageblocksectionitem> -->
+                 
+                   <!-- <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Is a terminal guard required" for="guard" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.S_S_Q9__c}" id="guard" style="float:right;font-weight:bolder;"/> 
+                    </apex:pageblocksectionitem> -->
+                    
+                     <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Is there a visible main earth" for="boost" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.S_S_C16__c}" id="boost" style="float:right;font-weight:bolder;"/> 
+                    </apex:pageblocksectionitem>
+                    
+                     <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Does the customer already have a magnetic system filter" for="boost" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.Already_has_magnetic_filter__c}" id="boost" style="float:right;font-weight:bolder;"/> 
+                    </apex:pageblocksectionitem>
+                     <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Does the customer already have a scale reducer" for="scale" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.Already_have_a_scale_reducer__c}" id="scale" style="float:right;font-weight:bolder;"/> 
+                    </apex:pageblocksectionitem>
+                    <!-- <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Does the customer need central heating controls ?" for="hive" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.S_S_Q12__c}" id="hive" style="float:right;font-weight:bolder;"/> 
+                    </apex:pageblocksectionitem> -->
+                    <!--   <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Is the Customer interested in upgrading to a Wireless Thermostat?" for="therm"/>
+                        <apex:inputfield value="{!ssObj.S_S_Q13__c}" id="therm" /> 
+                    </apex:pageblocksectionitem>-->
+                    <!--<apex:pageblocksection >  
+                        <apex:pageblocksectionitem labelStyle="text-align:left;width:35%;" datastyle="width:50%;" >
+                            <apex:outputLabel value="Is the customer entitled to SM Discretionary Discount?" for="sm" style="width:20%;"/>
+                            <apex:inputfield value="{!combiSwap.S_S_Q14__c}" id="sm" style="float:right;font-weight:bolder;"/> 
+                        </apex:pageblocksectionitem> 
+                        <apex:pageblocksectionitem >
+                            <apex:inputfield value="{!combiSwap.S_M_Authorisation_Number__c}" id="sm" style="float:right;font-weight:bolder;"/>
+                       </apex:pageblocksectionitem>     
+                  </apex:pageblocksection> -->
+                    <!-- <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Have you left the customer a straight swap leaflet/brochure?" for="hive" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.S_S_Q15__c}" id="hive" style="float:right;font-weight:bolder;"/> 
+                    </apex:pageblocksectionitem> -->
+                    
+                     
+                  
+                </apex:pageblocksection> 
+            
+           </div> 
+           </div>
+           <div id="ajaxrequest4" style="display:none;overflow:auto;height:300px;">
+              
+              <div id="ajaxrequest5" style="display:none;">    
+                                   
+                 <apex:pageblocksection columns="1" id="sect2">     
+                  <!--  <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="QL1">
+                        <apex:outputLabel value="Is the current boiler natural gas or LPG?" for="lpg1" style="font-weight:bolder;"/>
+                        <apex:actionRegion >
+                          <apex:inputField value="{!combiSwap.S_S_C1__c}" id="Question11" style="float:right;font-weight:bolder;" onchange="return teleConve(this,'ajaxrequest6', 'lpg')">
+                        </apex:inputField>
+                        </apex:actionRegion>
+                               
+                    </apex:pageblocksectionitem> --> 
+                    
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="ggg">
+                        <apex:outputLabel value="Is the current system fully pumped?" for="GF17" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.C_S_C1__c}" id="GF17" style="float:right;font-weight:bolder;" onchange="return hsaPlan(this)"/> 
+                  </apex:pageblocksectionitem>
+                    
+                    
+                    <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" id="TC16">
+                        <apex:outputLabel value="Is the current boiler 18KW or less?" for="boiler1" style="font-weight:bolder;"/>
+                        <apex:actionRegion >
+                          <apex:inputfield value="{!combiSwap.Is_the_current_boiler_18KW_or_less__c}" id="boiler1" style="float:right;font-weight:bolder;" onchange="return teleConve(this,'ajaxrequest6', 'hl')"/> 
+                        </apex:actionRegion> 
+                     </apex:pageblocksectionitem>
+                  </apex:pageBlockSection>
+               </div>
+               <div id="ajaxrequest6" style="display:none;">
+               <apex:pageBlocksection columns="1" id="sect4">
+                 <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Can we achieve the correct boiler clearances if the boiler is fitted in the same place?" for="rear11" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.C_S_C2__c}" id="rear11" style="float:right;font-weight:bolder;" onchange="return hsaPlan(this)"/> 
+                </apex:pageblocksectionitem>   
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Can the new horizontal flue be installed to current standards?" for="rear1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.Horizontal_flue_be_installed_to__c}" id="rear1" style="float:right;font-weight:bolder;" onchange="return hsaPlan(this)"/> 
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" > 
+                        <apex:outputLabel value="Can the new flue be accessed safely from a ladder?" for="hori1" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.C_S_C3__c}" id="hori1" style="float:right;font-weight:bolder;" onchange="return hsaPlan(this)"/> 
+                </apex:pageblocksectionitem>
+                    
+                 <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Is a top or rear flue required" for="flue1" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.Is_a_top_or_rear_flue_required__c}" id="flue1" style="float:right;font-weight:bolder;"/> 
+                 </apex:pageblocksectionitem>
+                    
+                 <!--<apex:pageblocksectionitem labelStyle="text-align:left;width:100%;" datastyle="width:20%;">
+                        <apex:outputLabel value="Which Flue Bend?" for="bend1" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.S_S_Q8__c}" id="bend1" required="true" style="float:right;font-weight:bolder;"/> 
+                        
+                 </apex:pageblocksectionitem>-->
+                 <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Are any horizontal flue extensions required?" for="guard1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.Any_horizontal_flue_extensions_required__c}" id="guard1" style="float:right;font-weight:bolder;" onchange="return hsaPlan1(this)"/> 
+                </apex:pageblocksectionitem>
+                
+                   
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Are any  flue bends required?" for="fuseSpur1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.Are_any_flue_bend_required__c}" id="fuseSpur1" style="float:right;font-weight:bolder;" onchange="return hsaPlan1(this)"/> 
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a Plume Kit Required?" for="plume1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.Is_a_Plume_Kit_Requiredd__c}" id="plume1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                 
+                 <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a balanced flue brick up required?" for="building1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.Is_balanced_flue_brick_up_required__c}" id="building1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                 <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Will the new flue terminate less than 2 metres from the ground?" for="plume11" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.C_S_C4__c}" id="plume11" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="What fuel type is the boiler?" for="currentboiler" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.C_S_C5__c}" id="currentboiler" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a fused spur fitted?" for="PEB" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.Is_a_fused_spurr_fitted__c}" id="PEB" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                
+                 <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Did the socket and see pass?" for="socketandsee" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.C_S_C6__c}" id="socketandsee" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is there a visible main earth" for="frost1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.Is_there_a_visiblee_main_earth__c}" id="frost1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                
+                <!--<apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Does the customer require a thermostat?" for="therm" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.S_S_TC14__c}" id="therm" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem> -->
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                        <apex:outputLabel value="Does the customer require new controls" for="hive1" style="font-weight:bolder;"/>
+                        <apex:inputfield value="{!combiSwap.C_S_C7__c}" id="hive1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem> 
+                    
+               <!--  -->
+               
+               <!-- <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Internal condensate required (no condensulate)?" for="Intern1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.S_S_TC15__c}" id="Intern1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                
+               
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Does the customer already have a Magnetic System Filter?" for="magna1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.S_S_C10__c}" id="magna1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem> -->
+                               
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a powerflush required?" for="powerFlush1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.Is_a_powerflushh_required__c}" id="powerFlush1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Internal or External Condensate Req?" for="conden1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.S_S_TC6__c}" id="conden1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                 
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is Frost protection required?" for="frostConv" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.S_S_TC3__c}" id="conden1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem>
+                 
+                <!--<apex:pageblocksectionitem labelStyle="text-align:left;width:35%;" datastyle="width:2%;" >
+                    <apex:outputLabel value="Is the customer entitled to SM Discresionary Discount?" for="sm1" style="font-weight:bolder;"/>
+                    <apex:inputfield value="{!combiSwap.S_S_Q14__c}" id="sm1" style="float:right;font-weight:bolder;"/> 
+                </apex:pageblocksectionitem> -->
+                <!--<apex:pageblocksection >  
+                        <apex:pageblocksectionitem labelStyle="text-align:left;width:35%;" datastyle="width:50%;" >
+                            <apex:outputLabel value="Is the customer entitled to SM Discretionary Discount?" for="sm1" style="width:20%;"/>
+                            <apex:inputfield value="{!combiSwap.S_S_C14__c}" id="sm1" style="float:right;font-weight:bolder;"/> 
+                        </apex:pageblocksectionitem> 
+                        <apex:pageblocksectionitem >
+                            <apex:inputfield value="{!combiSwap.S_M_Authorisation_Number__c}" id="sm1" style="float:right;font-weight:bolder;"/>
+                       </apex:pageblocksectionitem>     
+                 </apex:pageblocksection> -->
+                 
+                
+                  
+           
+            </apex:pageblocksection> 
+           </div> 
+           </div>
+         
+        </apex:pageblock>
+   </apex:outputpanel>
+</apex:component>

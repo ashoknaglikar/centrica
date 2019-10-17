@@ -1,0 +1,608 @@
+<apex:page standardController="cscfga__Product_Basket__c" extensions="CS_QuoteOnlineTemplateController" action="{!deleteTempAttachment}"  showHeader="false" applyHtmlTag="false" sidebar="false" >
+<html lang="en">     
+   
+
+    <body>
+        <page size="A4" id="page1">
+            
+            <div class="content" style="width: 700px; margin-left: 5px; margin-right: 5px; height: 950px; ">
+                <div class="clearfix" id="logoPng">
+                    <apex:image id="_theImageBG" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}" width="150" rendered="{!logoBG == true}" />
+                    <apex:image id="_theImageSG" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'SG_logo_s.resource')}" width="150" rendered="{!logoBG == false}" />
+                </div>            
+                <div class="clearfix" id="_summary-wrapper" style="margin-top:15px;margin-bottom:0px;">
+                     <p class="pageHeading" id="summaryTableHeading">Your&nbsp;<apex:outputtext value="{!summaryTableHeading}" escape="false"/>&nbsp;Quotation</p>
+                     <div class="summary" style="position:relative; height: 420px; width: 450px">
+                     <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'tableFullMedium.resource')}" rendered="true" style="position:absolute;top:0;left:0;right:0;bottom:0;height:100%;width:100%;" />
+                     <table id="summary-table" style="position:relative;z-index:100;width:440px;border-collapse:collapse;table-layout:fixed;">
+                        <thead>
+                             <tr>
+                            <td colspan="2">
+                                <apex:outputtext value="{!inputQuoteData.customerName}" escape="false"/>
+                            </td>
+                            </tr>
+                        </thead>
+                        
+                        <apex:repeat var="summaryLine" value="{!topSummaryTable}">
+                            <tr class="{!summaryLine.trClass}">
+                                <td class="{!summaryLine.nameClass}">{!summaryLine.name}</td>
+                                <td class="{!summaryLine.amountClass}">{!summaryLine.amount}</td>                      
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                    <table id="summary-table" style="position: absolute;top:365px;left:0;right:0;bottom:0;z-index:100;width:450px;border-collapse:collapse;table-layout:fixed;">
+                        <apex:outputtext value="{!summaryTableFooter}" escape="false"/>
+                    </table>
+                </div>    
+                    <div class="price-balloons">                  
+                        <div id="balloon-total-text" class="blueBallon" style="width:200px;height:200px;position:relative;top:-67px;">
+                            <p style="padding-top: 22%;"><p style = "font-size:0.75em">The price <br/>you'll pay is <br/></p>
+                                <span id="ballonTotalPrice">
+                                    <apex:outputtext value="{!blueBallonPrice}" escape="false"/>
+                                 <p style = "font-size:0.75em">exc VAT</p></span>
+                            </p>
+                        </div>
+                        
+                    
+                        <div id="small-circle" class="greenBallon" style="width:140px;height:140px;margin-bottom:0px;">
+                           <p style="padding-top: 25%;">Spread <br/>the cost over <br/>
+                           2,3 or 5years <!--<br/> <span id='minMonthlyTotal' class='boldText'><apex:outputtext value="{!greenBallonPrice}" escape="false"/></span> <br/> 
+                           per month&#42;-->
+                           </p>
+                               
+                                
+                                <!--
+                                <p>Spread </p>
+                                <p>the cost from</p>
+                                <p>as little as</p>
+                                <span id='minMonthlyTotal' class='boldText'>£XXX.XX</span>
+                                <p>per month&#42;</p>
+                                
+                                -->
+                           
+                        </div>
+                                        <!--new content-->
+                        <div id="red-circle" class="redBallon" style="width:140px;height:140px;position:relative;top:-250px;left:-30px">
+                            <div id="red-circle-text" style="text-align:center;padding-top: 34%;">
+                                <p style="color:white;">
+                                    2 Years interest<br />
+                                    free credit<br />
+                                    available*
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+                <div id="smallCommercialWilbur" style="position: relative;top:-196px;right:-480px;height:250px;" > 
+                 <apex:image value="{!URLFOR($Resource.CommercialIndicator)}" rendered="true" width="200" height="200"/>
+                </div>
+                   
+                <!--<div class="clearfix leftRadius bg-green" id="green-box" style="position: relative;top:-211px;left:-5px;height:130px;width:700px;">
+                    <h3>The price we quote you is the price you'll pay...Guaranteed</h3>
+                    <p>We'll carry out the work for this price, and that's a promise.</p>
+                </div>-->
+
+                <div class="clearfix" id="acceptance-section" style="position: relative;top:-200px;left:-5px;width:700px;">
+                    <div id="acceptance-box" class="bg-lightBlue leftRadius" style="height:167px;width: 700px;">
+                        <h3 class='darkBlue'>Acceptance of Your Central Heating Installation Quotation</h3>
+                        <p style="font-size: 12px;">I confirm that I am the owner of the property or that I have secured the necessary permission from the homeowner.
+                            <br/> I agree to pay the amount quoted above. I'm aware that I can cancel up to 14 days after the day the goods are delivered (the "cooling off period").
+                            I give permission for the installation to start during the cooling off period. I'm aware that if I cancel I'll have 
+                            to pay for any work carried out or goods installed before I cancel.I also conﬁrm that I accept the Terms and Conditions 
+                            for Commercial Installations and the Business Care Essential Plan (Installation) Terms and Conditions which can both 
+                            be found at https://www.britishgas.co.uk/business/energy-services/commercialboiler-installations<br/></p>
+                        <p style="font-size: 8px;"> <br/></p>
+                        <div style="width:100%;">
+                            <div style="width:228px;float:left;height:50px;" class="signature-box">
+                                <p style="font-size: 12px;" class="signature-box-label">Signature</p>
+                            </div>
+                            <div style="width:228px;float:left;height:50px;" class="signature-box">
+                                <p style="font-size: 12px;" class="signature-box-label">Print Name</p>
+                                <!--Job Role: {!inputQuoteData.}-->
+                                <p style="font-size: 12px; margin-top: 1.5em; margin-left: 7em;" class="signature-box-label"><!--<apex:outputtext value="{!inputQuoteData.jobRole}" escape="false"/>--></p>
+                            </div>
+                            <div style="width:228px;float:left;height:50px;" class="signature-box">
+                                <p style="font-size: 12px;" class="signature-box-label">Date</p>
+                            </div>
+                         </div>
+                    </div>
+                    
+                    <div id="footer-contact" class='leftRadius' style="position: relative;top:-20px;">
+                        <p style="font-size:67%"><span  class='boldText'>To discuss or accept your quotation please contact &nbsp;<apex:outputtext value="{!inputQuoteData.hsaName}" escape="false"/>&nbsp;on {!$Label.PhoneNumber_Office1}.</span> <br/>You can speak to us Mon-Fri 9am-7pm and Sat 8am-6pm. IContact us on 0333 009 5831 or email us at ukbservicesalesteam@britishgas.co.uk. Page two breaks down the products and scope of work required in your quote<br/><br/></p>
+                    </div>
+                    <div style="top:-44px;position:relative; width: 700px;">
+                        <div class="clearfix footer-accesibility">
+                            <div style="width:50%; float:left">
+                                <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'phone.resource')}" rendered="true" />
+                                <p>If you are hard of hearing or speech impaired and use a Textphone, please call <span class='boldtext'>18001 {!$Label.PhoneNumber_Office1}</span></p>
+                            </div>
+                            <div style="width:50%; float:left">
+                                <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'braille.resource')}" rendered="true" />
+                                <p>If you would like this quote in another format such as large print, Braille or audio, please call <span class='boldtext'>{!$Label.PhoneNumber_CustomerRelations}</span></p>
+                            </div>
+                        </div>
+                        <div class="clearfix footer-tradingName">
+                            <p style='font-size:120%'>&#42; See Your Payment Options page for further details.</p>
+                            <p>
+                                Full Terms and Conditions for Business Care Essential Plan (Installation): Our 3 Year Service and Maintenance Plan can be found at https://www.britishgas.co.uk/business/energy-services/commercial-boiler-installations
+                            </p>
+                            <p><span id="company1">British Gas</span> is the trading name of British Gas New Heating Limited. 
+                                Registered in England and Wales(No. 06723244) Registered office: Millstream, Maidenhead Road, 
+                                Windsor, Berkshire SL4 5GD. </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </page>       
+        <!--page-->
+
+        <page size="A4" id='page2'>
+            <div class="clearfix content" id="page2-content" style="page-break-before: always; width: 700px; height: 950px; ">
+                <div class="clearfix" style="page-break-inside: avoid;" id="logoPng2">
+                    <apex:image styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}" width="150" rendered="{!logoBG == true}" />
+                    <apex:image styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'SG_logo_s.resource')}" width="150" rendered="{!logoBG == false}" />
+                </div> 
+                <div class='body'> 
+                    <p class='pageHeading'>Your Quotation Breakdown</p>
+                    <div class="clearfix" id="breakdown-wrapper" style='margin-top:1em'>                     
+                        <div class="breakdown-left" id="breakdownQuoteTable">
+                            <table id="breakdown-table-section">            
+                                <apex:repeat var="quoteDetail" value="{!pdfQuoteDetail}">                 
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="3" class="{!quoteDetail.levelClass}">{!quoteDetail.title}</td>
+                                        </tr>
+                                        <apex:repeat var="quoteItems" value="{!quoteDetail.items}">
+                                            <tr>
+                                                <td class="cellDesc">{!quoteItems.name}</td>
+                                                <td>{!quoteItems.quantity}</td>
+                                                <td align="right">{!quoteItems.price}</td>
+                                            </tr>
+                                        </apex:repeat>  
+                                    </tbody>                                    
+                                </apex:repeat>
+                                        <tr>
+                                            <td colspan="3" class="Level1"><b>Boiler Plus Policy :</b> </td>
+                                        </tr>
+                                    <apex:outputpanel rendered="{!OR(boilerPlusReason == '' , boilerPlusReason == null, boilerPlusReason == 'Not applicable')}">
+                                        <tr><td colspan='3'>
+                                        show something
+                                        </td></tr>    
+                                        </apex:outputpanel>
+
+                                        <apex:outputpanel rendered="{!OR(boilerPlusReason == 'Cost' , boilerPlusReason== 'Disruption')}">
+                                        <tr><td colspan='3'>
+                                            We have explained the Boiler Plus requirements as well as the benefits of having one of the qualifying measures installed. You have requested not to accept a qualifying measure. At some future point your local authority (if appropriate) or a Gas Safe inspector may require this to be installed.
+                                        </td></tr>    
+                                        </apex:outputpanel>
+
+                                        <apex:outputpanel rendered="{!boilerPlusReason =='Existing Product'}">
+                                        <tr><td colspan='3'>
+                                            Your system already contains controls which meet the requirements for Boiler Plus, so no additional products are required.
+                                        </td></tr>    
+                                        </apex:outputpanel>
+
+                                        <apex:outputpanel rendered="{!boilerPlusReason =='Included'}">
+                                        <tr><td colspan='3'>
+                                            Your Heating system is compliant with the Boiler Plus legislation as you have selected a compatible control which will help reduce your energy usage.
+                                        </td></tr>    
+                                    </apex:outputpanel>
+                             </table>        
+                        </div>
+
+                        <div id="breakdown-right">
+                            <div id='installation-details'>
+                                <h4>Installation address</h4>
+                                <div id="customerName"><apex:outputtext value="{!inputQuoteData.customerName}" escape="false"/></div>
+                                <div id="installationAddress"><apex:outputtext value="{!inputQuoteData.installationAddress}" escape="false"/></div>
+                                <div id="installationPostcode"><apex:outputtext value="{!installationPostcode}" escape="false"/></div>
+                               
+                                <h4 class="topMargin">Billing address</h4>
+                                <div id="billingStreet"><apex:outputtext value="{!billingAddress}" escape="false"/></div>
+                                
+                                <div id="billingCounty"><apex:outputtext value="{!inputQuoteData.billingCounty}" escape="false"/></div>
+                                <div id="billingPostcode"><apex:outputtext value="{!inputQuoteData.billingPostcode}" escape="false"/></div>
+                                <h4 class="topMargin">Allowances applied</h4>
+
+                                <div id="allowancesApplied"><apex:outputtext value="{!inputQuoteData.allowancesApplied}" escape="false"/></div>
+                               
+                                <div class="topMargin" id="paymentDetails"></div>
+                                <h4 class="topMargin">Payment</h4>
+
+                                <table style="width:100%;">
+                                <tr><td>Total price payable:</td><td class="right"><apex:outputtext value="{!totalPricePayable}" escape="false"/></td></tr>
+                                <tr><td>Deposit:</td><td class="right"><apex:outputtext value="{!inputQuoteData.deposit}" escape="false"/></td></tr>
+                                <tr><td>Deposit number:</td><td class="right"><apex:outputtext value="{!depositNumber}" escape="false"/></td></tr>
+                                <tr><td>Deposit paid by:</td><td class="right"><apex:outputtext value="{!inputQuoteData.depositPaidBy}" escape="false"/></td></tr>
+                                <tr><td>Balance:</td><td class="right"><apex:outputtext value="{!inputQuoteData.balance}" escape="false"/></td></tr>
+                                <tr><td>Balance to be paid by:</td><td class="right"><apex:outputtext value="{!inputQuoteData.balanceToBePaidBy}" escape="false"/></td></tr>
+                                </table>
+                                <h4 class="topMargin">Quote details</h4>
+                                <table style="width:100%;">
+                                <tr><td>Quote date:</td><td class="right"><apex:outputtext value="{!inputQuoteData.quoteDate}" escape="false"/></td></tr>
+                                <tr><td>Quote number:</td><td class="right"><apex:outputtext value="{!inputQuoteData.quoteNumber}" escape="false"/></td></tr>
+                                <tr><td>Quotation ref:</td><td class="right"><apex:outputtext value="{!inputQuoteData.quoteRef}" escape="false"/></td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </page>     
+        <page size='A4' id="page3">
+            <div class="content" style="page-break-before: always;">
+                <div class="clearfix" id="logoPng3">
+                    <apex:image id="theImageBG2_" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}" width="150"  />
+                   
+                </div>
+                <div style ="position:relative;top:-20px">
+                    <p class="pageHeading">Your Payment Options</p>
+                        <div style = "font-size:12px">
+                            <span class="boldText">BACS/Credit/Debit card/cheque </span> – if you want to pay in one lump sum using your own funds or a loan you have arranged yourself.
+                        </div>
+                        <!--<div class="boldText" style="font-size:14px">BACS</div>-->
+                        <div style = "padding-left: 2em;font-size:12px">
+                           <span class="boldText" >BACS</span> - Please quote <span class="boldText" >British Gas New Heating Limited </span> and the <span class="boldText" >Deposit Number</span> (shown on the payment section of your quotation) as your payment reference for the BACS payment. HSBC bank plc, account number 81578529, sort code 400530.
+                        </div>
+                        <!--<div class="boldText" style="font-size:14px">Credit or Debit Card</div>-->
+                        <div style = "padding-left: 2em;font-size:12px">
+                           <span class="boldText" >Credit or Debit card </span> – call us on <span class="boldText" >0333 009 5831</span> with your card details and British Gas quotation ref number (shown on the quote details section of your quotation).
+                        </div>
+                        <!--<div class="boldText" style="font-size:14px">Cheque</div>-->
+                        <div style = "padding-left: 2em;font-size:12px">
+                           <span class="boldText" >Cheque</span> – made payable to <span class="boldText" >British Gas New Heating Limited</span>. Please write the <span class="boldText" >Deposit Number</span> shown on the payment section of your quotation on the back of the cheque. 
+                        </div>
+                        <h3 style='font-size: 15px;'>2 Year Interest Free Hire Purchase (0% APR)</h3>
+                        <div style = "padding-left: 2em;font-size:12px">
+                            •   Available over 2 years at 0% APR
+                        </div>    
+                        <div style = "padding-left: 2em;font-size:12px">
+                            •   No deposit needed
+                        </div>    
+                        <div style = "padding-left: 2em;font-size:12px">
+                            •   No interest payable during the 2 years (£1 purchase fee is paid with final repayment)
+                        </div> 
+
+                        <h3 style='font-size: 15px;'>3 or 5 Year Hire Purchase (7.9% APR)</h3>
+                        <div style = "padding-left: 2em;font-size:12px">
+                            •   For customers who would like a variety of monthly repayments to choose from.
+                        </div>    
+                        <div style = "padding-left: 2em;font-size:12px">
+                            •   Available over 3 or 5 years.
+                        </div>    
+                        <div style = "padding-left: 2em;font-size:12px">
+                            •   APR 7.9%
+                        </div> 
+                        <div style = "padding-left: 2em;font-size:12px">
+                            •   No deposit needed
+                        </div>
+
+                        <div style = "font-size:12px">
+                            British Gas acts as a <span class="boldText" >credit broker</span> and not the lender and can arrange a Hire Purchase agreement through its specialist business lender Macquarie Corporate &amp; Asset Finance. Access to a Hire Purchase agreement is not guaranteed and you will need to go through a finance provider approval process which will assess your financial circumstances and your ability to repay the loan.
+                        </div>  
+
+                        <h3 style='font-size: 15px;'>Hire Purchase Illustration </h3>
+                        <div style = "font-size:12px">
+                            Shown below are some illustrative examples of monthly payments arising for Hire Purchase of £3,000, £4,000 and £5,000 over 2, 3 and 5 years.
+                        </div>
+                        
+                        <h3 style='font-size: 15px;'>Your personalised hire purchase illustration</h3>
+                        <p style='font-size: 12px;'>
+                            This shows the minimum monthly payment and the total amount repayable over four different periods for a loan amount of
+    
+                            <span id="waysToPayTotalAmount"> 
+                                <apex:outputtext value="{!loanAmountAB}" escape="false"/> 
+                            </span> 
+                            if you were to pay a deposit of 
+                            <span class='boldText' id='waysToPayDeposit'>
+                                <apex:outputtext value="{!depositB}" escape="false"/>
+                            </span>at {!aprUsed} APR.<br /><br />
+                        </p>
+                        <table id='illustration-wrapper' style='width:100%'>
+                            <tr>
+                                <td class='align-center'>
+                                    <div class='flex-box'>
+                                        <p style='font-size: 14px' class='illustration-label boldText'>Total Price (A)</p>
+                                        <p style='font-size: 14px' class='illustration-value'><span id='illustrationTotal'><apex:outputtext value="{!totalPriceA}" escape="false"/></span></p>
+                                    </div>
+                                </td>
+                                <td class='align-center'>
+                                    <div class='flex-box'>
+                                        <p style='font-size: 14px' class='illustration-label boldText'>Deposit (B)</p>
+                                        <p style='font-size: 14px' class='illustration-value'><span id='illustrationDeposit'><apex:outputtext value="{!depositB}" escape="false"/></span></p>
+                                    </div>
+                                </td>
+                                <td class='align-center'>
+                                    <div class='flex-box'>
+                                        <p style='font-size: 14px' class='illustration-label boldText'>Loan amount (A minus B)</p>
+                                        <p style='font-size: 14px' class='illustration-value'><span id='illustrationLoanAmount'><apex:outputtext value="{!loanAmountAB}" escape="false"/></span></p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <table style='width:100%;text-align: center;' id='hpExample' >
+                            <tbody>
+                            <tr>
+                                <th>Amount</th>
+                                <th colspan='3'>£3000</th>
+                                <th colspan='3'>£4000</th>
+                                <th colspan='3'>£5000</th>
+                            </tr>   
+                            <tr>
+                                <td>Term</td>
+                                <td>2 years</td>
+                                <td>3 years</td>
+                                <td>5 years</td>
+                                <td>2 years</td>
+                                <td>3 years</td>
+                                <td>5 years</td>
+                                <td>2 years</td>
+                                <td>3 years</td>
+                                <td>5 years</td>
+                            </tr>
+                            <tr id='trAPR'>
+                                <td>APR</td>
+                                <td>0%</td>
+                                <td colspan='2'>7.9%</td>
+                                <td>0%</td>
+                                <td colspan='2'>7.9%</td>
+                                <td>0%</td>
+                                <td class='' colspan='2'>7.9%</td>
+                            </tr>
+                            <tr>
+                                <td>Minimum monthly payment</td>
+                                <td>£125.00</td>
+                                <td>£93.49&nbsp;</td>
+                                <td>£60.30&nbsp;</td>
+                                <td>£167.00</td>
+                                <td>£124.66</td>
+                                <td>£80.39&nbsp;</td>
+                                <td>£208.00</td>
+                                <td>£155.82</td>
+                                <td>£100.49</td>
+                            </tr>
+                            <tr class= "last">
+                                <td style="border-bottom-left-radius: 14px;">Total amount repayable over the period</td>
+                                <td>£3,000</td>
+                                <td>£3,366</td>
+                                <td>£3,618</td>
+                                <td>£4,000</td>
+                                <td>£4,488</td>
+                                <td>£4,823</td>
+                                <td>£5,000</td>
+                                <td>£5,610</td>
+                                <td>£6,029</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <br/>
+                        <!--<table class="loanTableWithIFC" id="personalisedIllustration">
+                            
+                            <tr>
+                                <th class="boldText" style='padding-left: 1em;text-align: left;'>APR</th>
+                                <th class="boldText" style='text-align: center;'>0%</th>
+                                <th class="boldText" style='text-align: center;' colspan="2">7.9%</th>
+                            </tr>
+                            
+                            <tr>
+                                <td class="boldText" style='padding-left: 1em;text-align: left'>Length of hire purchase agreement</td>
+                                <td class="boldText" style='text-align: center'>2 years</td>
+                                <td class="boldText" style='text-align: center'>3 years</td>
+                                <td class="boldText" style='text-align: center'>5 years</td>
+                            </tr>
+                            <tr>
+                                <td style='padding-left: 1em'>Minimum monthly payment</td>
+                                <td class="centerText"><span id="mmp_8"><apex:outputtext value="{!inputQuoteData.mmp_2}" escape="false"/></span></td>
+                                <td class="centerText"><span id="mmp_3"><apex:outputtext value="{!inputQuoteData.mmp_3}" escape="false"/></span></td>
+                                <td class="centerText"><span id="mmp_5"><apex:outputtext value="{!inputQuoteData.mmp_5}" escape="false"/></span></td>
+                                
+                            </tr>
+                            <tr class="last">
+                                <td style='padding-left: 1em' class='leftRadius'>Total amount repayable over the period</td>
+                                <td class="centerText"><span id="tar_8"><apex:outputtext value="{!inputQuoteData.tar_2}" escape="false"/></span></td>
+                                <td class="centerText"><span id="tar_3"><apex:outputtext value="{!inputQuoteData.tar_3}" escape="false"/></span></td>
+                                <td class="centerText"><span id="tar_5"><apex:outputtext value="{!inputQuoteData.tar_5}" escape="false"/></span></td>
+                                
+                            </tr>
+                        </table>
+
+                        <h3 style='font-size: 15px;'>Representative Example</h3>
+                        <table class="waysToPayTable" id="representativeExample">
+                            <tbody>
+                                <tr class="boldText">
+                                    <th class="centerText">Cash Price of Installation</th>
+                                    <th class="centerText">Advance Payment (Deposit)</th>
+                                    <th class="centerText">Loan Amount</th>
+                                    <th class="centerText">Term of loan</th>
+                                    <th class="centerText">Monthly replayment</th>
+                                    <th class="centerText">Total amount payable (including deposit)</th>
+                                    <th class="centerText">Rate of interest</th>
+                                    <th class="centerText">Representative APR</th>
+                                </tr>
+                                <tr class="last">
+                                    <td class="leftRadius centerText">£3,500</td>
+                                    <td class="centerText">£0</td>
+                                    <td class="centerText">£3,500</td>
+                                    <td class="centerText">2 years</td>
+                                    <td class="centerText">£145.83</td>
+                                    <td class="centerText">£3,500</td>
+                                    <td class="centerText" style="height: 50%;">0%</td>
+                                    <td class="centerText boldText" style='font-size:115%'>0%</td>
+                                </tr>
+                            </tbody>
+                        </table>-->
+                        
+                        
+                        
+                        <p style= "font-size: 9px;margin-left: -10px;margin-right: -10px">
+                        British Gas is the trading name of British Gas New Heating Limited (No. 06723244). British Gas New Heating Limited is an appointed representative of British Gas Services Limited (No. 03141243) which is authorised and regulated by the Financial Conduct Authority (Financial Services Register no. 490568). Both companies are registered in England and Wales. Registered office: Millstream, Maidenhead Road, Windsor, Berkshire SL4 5GD. Hire Purchase is subject to status and are only available to businesses.
+                        </p>
+                </div>
+            </div>
+            
+            
+        </page> 
+       
+    </body>
+   
+    </html> 
+    
+    <apex:form >
+        <script type="text/javascript" src="{!URLFOR($Resource.jquery_1_8_3)}"></script>  
+            <apex:actionFunction name="send" action="{!displayPDF}" rerender="false">
+                <apex:param name="p1" assignto="{!pageContent}" value=""/>
+            </apex:actionFunction>
+    </apex:form>
+
+    <script>
+        jQuery(function() {
+            console.log("Initializing");
+            window.init();
+            var $ = jQuery;
+            var stringToBeSent = $('body').html();
+
+            send(stringToBeSent);
+        });
+
+        window.init = function initialize() {
+            var count = 0;
+            var haveMorePages = true;
+            while (haveMorePages) {
+                haveMorePages = window.doSplit(count++);
+            }
+        }
+
+        window.doSplit = function doSplit(count){
+            var max = 600; //max allowed size for table height
+            //check the size of the table in pixels
+
+            // for the first page id on which we'll be splitting is the original table
+            // for subsequent pages, we'll append a counter on the end of the id
+
+            var tableId = "breakdown-table-section";
+
+
+
+            if (count > 0) {
+                tableId += "-ext-" + (count - 1);
+            }
+            console.warn("******Table ID = " + tableId);
+            var el = document.getElementById(tableId); 
+            var h = el.clientHeight;
+            console.warn(tableId + " is " + h + "px");
+            
+
+
+
+            if(h>max){
+                console.warn("Table is too big, split table!");
+
+                //Create new page elements
+                var newPage=document.createElement('page');
+                newPage.size = "A4";
+
+                var logo=document.getElementById('logoPng3').outerHTML;
+
+                var pageRight=document.getElementById('breakdown-right').outerHTML;
+
+                var header="<p class='pageHeading'>Your Quotation Breakdown</p>";
+
+                var newTable = "<div class='breakdown-left'><table class='breakdown-wrapper' id='breakdown-table-section-ext-" + count +"'></table></div>";
+
+                newPage.innerHTML="<div class='content' id='injectedPage" + count + "' style='page-break-before: always;width:100%;'>"+logo+header+newTable+pageRight+"</div>";
+
+                //console.log(newPage);
+
+                //add the new page into DOM
+                var afterPage=document.getElementById('page2');
+
+                // if it's subsequent page
+
+                if (count > 0) {
+                    previousPage = 'injectedPage' + (count - 1);
+
+                    afterPage = document.getElementById(previousPage);
+                    console.warn('Previous page ' + previousPage);
+                }
+
+
+                console.warn('After page: ' + afterPage.innerHTML);
+
+                console.warn('New page: ' + newPage.innerHTML);
+                //var pagebreak = document.createElement("div");
+
+                //pagebreak.style.pageBreakAfter = "always";
+                //pagebreak.appendChild(document.createElement("br"));
+                //pagebreak.appendChild(document.createElement("br"));
+               // pagebreak.appendChild(document.createElement("br"));
+
+                //insertAfter(pagebreak, afterPage);
+                //insertAfter(newPage, pagebreak);
+
+                if (afterPage == null) {
+                    console.error();
+                }
+
+                insertAfter(newPage, afterPage);
+
+                splitTable(el, max, count);
+                return true;
+
+            } else {
+                return false;
+            }
+
+        }
+
+
+
+        window.splitTable = function splitTable(tbl, max, count){
+            var h = tbl.clientHeight;
+            var r = tbl.rows.length;
+            console.log("table is "+h);
+            console.log("table currently has "+r+" rows");
+            //loop through table rows to find last level 2 section
+            var offset=0;
+
+            for (var i=0; i<r; i++){
+                rowht=tbl.rows[i].offsetHeight;
+                cell=tbl.rows[i].cells[0];
+                //console.log(cell);
+                offset+=rowht;
+                if(cell.className=="Level2" & offset < max){
+                    console.warn("Level2 on row "+i);
+                    var splitRow=i;
+                }
+                console.log("Row "+i+" is "+rowht+"px high, total px = "+offset+", last level 2 was on row: "+splitRow);
+            }
+
+            console.log(splitRow)
+
+            var newTable=document.getElementById("breakdown-table-section-ext-" + count);
+            //copy overflow rows
+
+            while(tbl.rows.length > splitRow) {
+                var node=tbl.rows[splitRow].cloneNode(true);
+                newTable.appendChild(node);
+                tbl.deleteRow(splitRow);
+            }
+
+            //add Continued on next page to original table
+            var pp = document.createElement("div");
+            pp.style.fontSize = "12px";
+            var content = document.createTextNode("Continued on next page");
+            pp.appendChild(content);
+
+
+            tbl.appendChild(pp);
+
+
+        }
+
+        window.insertAfter = function insertAfter(newPage, afterPage) {
+            afterPage.parentNode.insertBefore(newPage, afterPage.nextSibling);
+        }
+    </script>
+    
+</apex:page>

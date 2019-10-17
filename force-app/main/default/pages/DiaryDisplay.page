@@ -1,0 +1,348 @@
+<apex:page Controller="DiaryDisplayController" sidebar="false">
+
+
+<script>
+
+    function showFloat(theTD){
+        for(var i=0; i< theTD.childNodes.length; i++){
+            if(theTD.childNodes[i].nodeName == 'DIV'){
+                if(theTD.childNodes[i].id == 'info'){
+                var ele = theTD.childNodes[i]; 
+                    ele.style.display = 'block';
+                    ele.style.left = (event.x)+'px';
+                    ele.style.top = (event.y+20)+'px';
+                    //set the position
+                    break;
+                }
+            }
+            
+        }
+    }
+    
+    function hideFloat(theTD){
+        for(var i=0; i< theTD.childNodes.length; i++){
+            if(theTD.childNodes[i].nodeName == 'DIV'){
+                if(theTD.childNodes[i].id == 'info'){
+                    theTD.childNodes[i].style.display = 'none';
+                    break;
+                }
+            }
+            
+        }
+    }
+    window.onload=function() {
+      document.getElementById('focusDistraction').focus();
+      }
+      
+   function callLockMethod(Empid){
+     callcontroller(Empid);
+     
+   }
+   
+   function callUnlockMethod(Empid){
+     callUnlockMethod(Empid);
+   }
+   
+   function reloadPage(){
+     window.location.reload();
+    
+   }
+   
+   function openNewWeekLock(wid,LU)
+     {
+        jsPopWindow = window.open('/apex/weekLock?id='+wid+'&Lock='+LU,+"_blank","controls=no,height=250,width=650,scrollbars=0,top=200,left=400");
+        
+     }
+</script>
+<apex:form id="frm">
+   <!-- <apex:actionfunction name="callLockMethod" action="{!lock}"  reRender="chartview">
+         <apex:param name="eobjid" value="" assignTo="{!eobjid}"/>
+      </apex:actionfunction>
+    <apex:actionfunction name="callUnlockMethod" action="{!unlock}" reRender="chartview">
+         <apex:param name="eobjid" value="" assignTo="{!eobjid}"/>
+      </apex:actionfunction>
+    -->
+    <apex:pageBlock title="Diary View">
+      
+     
+        
+        <!-- <apex:dataTable value="{!EmpData.Employees}" var="thisDiaryDisplay" styleClass="list" id="emptable">
+                <apex:column >
+                        <apex:facet name="Employee">Time</apex:facet>
+                        <apex:outputText value="{!thisDiaryDisplay.employeeName}"/>
+                </apex:column>
+                
+                <apex:column >
+                        <apex:facet name="Diary Entries">Time</apex:facet>
+                        <apex:dataTable value="{!thisDiaryDisplay.diaryEntries}" var="thisDiaryEntry" styleClass="list">
+                            <apex:column >
+                                <apex:facet name="Start date">Time</apex:facet>
+                                <apex:outputText value="{!thisDiaryEntry.Start__c}"/>
+                            </apex:column>
+                            <apex:column >
+                                <apex:facet name="End date">Time</apex:facet>
+                                <apex:outputText value="{!thisDiaryEntry.End__c}"/>
+                            </apex:column>
+                            <apex:column >
+                                <apex:facet name="Hours">Time</apex:facet>
+                                <apex:outputText value="{!thisDiaryEntry.Hours__c}"/>
+                            </apex:column>
+                            <apex:column >
+                                <apex:facet name="Type">Time</apex:facet>
+                                <apex:outputText value="{!thisDiaryEntry.Type__c}"/>
+                            </apex:column>
+                            
+                        </apex:dataTable>
+                </apex:column>
+                
+        </apex:dataTable>
+         -->  
+        <br/>
+        <br/>
+        <apex:outputtext value="There was a problem trying to display this page due to an issue which is currently being corrected. " 
+            rendered="{!npeMessage}"/><br/>
+        <apex:outputtext value="We're doing our best to fix it. In the meantime, try the following link to view diaries" 
+            rendered="{!npeMessage}"/>
+        <p><apex:outputlink value="/apex/DiaryDisplay?area={!area}&week={!weeks}&stopNull=true" 
+            rendered="{!npeMessage}">Click here to view diary...</apex:outputlink></p>
+        <b>Week Commencing:</b>
+        <apex:inputfield value="{!Job.Delivery_Date__c}"/>
+        <!--  <apex:selectList style="font-size:7pt;" value="{!Weeks}" multiselect="false" size="1" id="weeksDropDown">
+              <apex:actionSupport event="onchange" action="{!refreshdiary}" rerender="emptable,chartview" status="status1"/>
+                                        
+            <apex:selectOptions value="{!WeekItems}"/>
+            
+        </apex:selectList>-->
+        <apex:outputPanel rendered="{!peopleView}">
+            <br/>
+            <br/>
+            <table>
+            <tr><td>   
+            <b>Select Manager:</b> <!-- -->
+            
+            <apex:selectList style="font-size:8pt;" value="{!peopleName}" multiselect="false" size="1" id="peopleDropdown">
+                <apex:selectOptions value="{!peoples}"/>
+            </apex:selectList> 
+            </td>
+            <td>&nbsp;&nbsp; <b> OR Search </b> <apex:inputField value="{!ph.Manager__c}"/>
+            </td>
+            <!--<td>
+                
+            <c:Autocomplete_Component ComponentLabel="Enter Account Name : "/>
+   
+            </td>-->
+            </tr>     
+            </table>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!!peopleView}">
+            <b>District:</b> 
+            <apex:selectList style="font-size:7pt;" value="{!AreaName}" multiselect="false" size="1" id="areaDropDown">
+                <apex:selectOptions value="{!AreaItems}"/>
+            </apex:selectList>
+        </apex:outputPanel>
+        
+        <br/>
+        <br/>
+        
+        <apex:commandButton action="{!refreshdiary}" value="Refresh" rerender="emptable,chartview,dhmdetails,ttemp" status="status1"/>
+        <!--<apex:commandButton action="{!openWeekReserver}" value="Priority Planning"/>-->
+        <apex:actionStatus startText="Refreshing page..." id="status1" style="padding:0px 15px;font-size:30px;font-weight:bold;font-family: Arial Unicode MS;"/>
+                        
+        <br/>
+        <br/>
+        
+        <!-- Section updated with district_notes__c box - Phil Dennison 24/09/15 -->
+        <apex:outputpanel id="dhmdetails">
+            <b>DHM:</b>  
+                <apex:outputfield value="{!DHM.DHMName__c}">
+                    &nbsp;
+                    <apex:outputfield value="{!dhm.DHMPhone__c}"/>
+                    &nbsp;
+                </apex:outputfield>
+            
+                <br/>
+                <br/>
+                
+                <apex:outputPanel rendered="{!IF(DHM.District_Notes__c=='',False,True)}">
+                    <div style="text-align: center; padding: 10px; border:1px solid black; border-radius:5px; width:40%; color:white; background-color:#66CCFF;">
+                        <apex:outputfield title="District notes field" value="{!DHM.District_Notes__c}"/>
+                    </div> 
+                </apex:outputPanel>
+
+        </apex:outputpanel>
+        
+        <br/>
+        <br/>
+ 
+        <apex:dataTable value="{!EmpData.Employees}" var="thisDiaryDisplay" styleClass="list" id="chartview">
+                <apex:column headervalue="Employee">
+                    
+                        <apex:facet name="Employee">Time</apex:facet>
+                        
+                            <!-- Commented for CR#897 start -->
+<!--                        <apex:outputlink id="empLink" value="{!thisDiaryDisplay.employeeURL}" >-->
+<!--                        <apex:outputText value="{!thisDiaryDisplay.employeeName}"/>-->
+<!--                        </apex:outputlink><br/><br/>-->
+                            <!-- Commented for CR#897 end -->
+                        <!-- Modified for CR#897 start -->
+                        <div ><!-- onmouseout="hideFloat(this);" onmouseover="showFloat(this);" >  -->
+                            <apex:outputlink id="empLink" value="{!thisDiaryDisplay.employeeURL}" >
+                                <apex:outputText value="{!thisDiaryDisplay.employeeName}" style="{!thisDiaryDisplay.alwaysWorksWithStyle}"/>
+                                
+                            </apex:outputlink>
+                            
+                            <br/><br/>
+                            {!thisDiaryDisplay.employeeHoverDetails}
+                            
+                            <br/><br/>
+                            <apex:outputText value="Inactive" style="color:red;font-weight:bold;" rendered="{!thisDiaryDisplay.employeeObject.Inactive__c}"/>
+                            
+                            <!--Code Added By Cognizant on 02032010 for displaying role on Diary View-->
+                            <B>
+                            <!-- <apex:outputlabel value="Role:" rendered="{!IF(thisDiaryDisplay.str_Role=='',False,True)}"/> -->
+                            <apex:outputText value="{!thisDiaryDisplay.str_Role}" rendered="{!IF(thisDiaryDisplay.str_Role=='',False,True)}" style="color:{!IF(thisDiaryDisplay.employeeObject.Inactive__c==true,'red','black')}"/> 
+                            
+                            <br/><br/>
+                            <apex:outputText value="{!thisDiaryDisplay.str_PostCode}" rendered="{!IF(thisDiaryDisplay.str_Role=='',False,True)}" />
+                            </B>
+                            <!--End of Code-->
+                           
+                            <br/><br/> 
+                            <!--<div style="width:250px;word-wrap:break-word;">-->
+                            <apex:outputText value="{!thisDiaryDisplay.employeeObject.Employee_Skills__c}" style="word-wrap:break-word;font-size:12px;font-family: Arial Unicode MS;color:green;"/>
+                            <apex:outputText value="{!thisDiaryDisplay.simpleSkills}" style="word-wrap:break-word;font-size:12px;font-family: Arial Unicode MS;color:darkorange;"/>
+                            <!--</div>-->
+                            &nbsp;
+                            
+                            <div id="info" style="width:250px; background-color:#fff; border:1px solid #000; display: none; z-index:2; position:absolute">
+                                <apex:outputText escape="false" value="{!thisDiaryDisplay.employeeHoverDetails}"/>&nbsp;
+                            </div>
+                        </div>
+                        </apex:column>
+                        <!-- Modified for CR#897 end -->
+                        
+                        <!-- Commented for CR#897 start -->
+                        <!--Code Added By Cognizant on 02032010 for displaying role on Diary View-->
+<!--                        <B>-->
+<!--                         <apex:outputlabel value="Role:" rendered="{!IF(thisDiaryDisplay.str_Role=='',False,True)}"/> -->
+<!--                        <apex:outputText value="{!thisDiaryDisplay.str_Role}" rendered="{!IF(thisDiaryDisplay.str_Role=='',False,True)}"/> -->
+<!--                        &nbsp;-->
+<!--                        <apex:outputText value="{!thisDiaryDisplay.str_PostCode}" rendered="{!IF(thisDiaryDisplay.str_Role=='',False,True)}" />-->
+<!--                        </B>-->
+                        <!--End of Code--> 
+                        <!-- Commented for CR#897 end -->  
+                        
+                                                   
+               
+                
+                <!-- <apex:column headervalue="Segment"> -->
+                 <!--       <apex:facet name="Segment">Time</apex:facet> -->
+                  <!--      <apex:outputText value="{!thisDiaryDisplay.segments}"/> -->
+            <!--   </apex:column>  -->
+                
+                <apex:column headervalue="Available Hours">
+                        <apex:facet name="Available Hours">Time</apex:facet>
+                        <apex:outputText value="{!thisDiaryDisplay.availabilityhours}"/>
+                        <br/> 
+                        <br/>
+                        <br/>  
+                      
+                        <div onmouseout="hideFloat(this);" onmouseover="showFloat(this);" > 
+                            <!-- Lock Entry Change By Ashok G -->
+                                                       
+                            <apex:image url="{!$Resource.Lock}" width="40" height="40" onclick="openNewWeekLock('{!thisDiaryDisplay.thisWeek.id}','{!!thisDiaryDisplay.locked}'); return false;" rendered="{!thisDiaryDisplay.locked}"/>
+                            <apex:image url="{!$Resource.Unlock}" width="40" height="40" onclick="openNewWeekLock('{!thisDiaryDisplay.thisWeek.id}','{!!thisDiaryDisplay.locked}'); return false;" rendered="{!!thisDiaryDisplay.locked}"/>
+                            
+                            <!-- Change End-->
+                            
+                            <!-- End -->                            <!--  <apex:image url="{!$Resource.Vulnerable1}" width="50" height="20" rendered="{!if(thisDiaryDisplay.Category >=1,true,false)}"/> 
+                            <apex:image url="{!$Resource.Emergency2}" width="50" height="20" rendered="{!if(thisDiaryDisplay.Category >=2,true,false)}"/> 
+                            <apex:image url="{!$Resource.NonOp3}" width="50" height="20" rendered="{!if(thisDiaryDisplay.Category ==3,true,false)}"/>-->
+                            <apex:outputtext value="1 & 2 & 3" style="font-weight:bold;" rendered="{!if(thisDiaryDisplay.Category ==3,true,false)}"/>
+                            <apex:outputtext value="1 & 2 " style="font-weight:bold;" rendered="{!if(thisDiaryDisplay.Category ==2,true,false)}"/>
+                            <apex:outputtext value="1 " style="font-weight:bold;" rendered="{!if(thisDiaryDisplay.Category ==1,true,false)}"/>
+                            <div id="info" style="width:150px; background-color:#fff; border:1px solid #000; display: none; z-index:2; position:absolute">
+                                    <apex:outputText escape="false" value="{!thisDiaryDisplay.WeekResrvedDate}"/>
+                             </div>
+                        </div> 
+                </apex:column>
+               
+                <!--  <apex:column >
+                        <apex:facet name="SegmentDebug">Time</apex:facet>
+                        <apex:outputText value="{!thisDiaryDisplay.debugsegment}"/>
+                </apex:column> -->
+                <apex:column >          
+                        <apex:facet name="Diary View">Time</apex:facet>
+                            <table width="100%" border="1" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <apex:repeat value="{!thisDiaryDisplay.allCols}" var="thisCol" >
+                                            <td  style="visibility:collapse; border-right:hidden; border-left:hidden; border-bottom:hidden;border-top:hidden;" width="1%"></td>
+                                    </apex:repeat>
+                                </tr>   
+                                <TR> 
+                                    <TH COLSPAN="20" ><center>Monday<br/>{!thisDiaryDisplay.mon}<br/>{!mondayDate}</center></TH>
+                                    <TH COLSPAN="20" ><center>Tuesday<br/>{!thisDiaryDisplay.tue}<br/>{!tuesDayDate}</center></TH>
+                                    <TH COLSPAN="20" ><center>Wednesday<br/>{!thisDiaryDisplay.wed}<br/>{!wednesdayDate}</center></TH>
+                                    <TH COLSPAN="20" ><center>Thursday<br/>{!thisDiaryDisplay.thu}<br/>{!thursdayDate}</center></TH>
+                                    <TH COLSPAN="20" ><center>Friday<br/>{!thisDiaryDisplay.fri}<br/>{!fridayDate}</center></TH>
+                                    <TH COLSPAN="20" ><center>Saturday<br/>{!thisDiaryDisplay.sat}<br/>{!saturdayDate}</center></TH>
+                                    <TH COLSPAN="20" ><center>Sunday<br/>{!thisDiaryDisplay.sun}<br/>{!sundayDate}</center></TH>
+                                </TR>
+                                <tr border="0">
+                                
+                                    <apex:repeat value="{!thisDiaryDisplay.GraphicDisplay}" var="thisLine" >
+                                        <td onmouseout="hideFloat(this);" onmouseover="if({!thisLine.showInformation})showFloat(this);" colspan="{!thisLine.length}" style="border-right-width:{!thisLine.borderRight}px; border-left-width:{!thisLine.borderLeft}px; border-top-width:1px; border-bottom-width:1px; background-color:{!thisLine.Colour}; height:20px">
+                                            <apex:outputlink id="actionLink" value="{!thisLine.url}" >
+                                                {!thisLine.outputstring}
+                                            </apex:outputlink>
+                                            <div id="info" style="width:250px; background-color:#fff; border:1px solid #000; display: none; z-index:2; position:absolute">
+                                                <apex:outputText escape="false" value="{!thisLine.information}"/>
+                                            </div>
+                                        </td>   
+                                        
+                                    </apex:repeat>  
+                                </tr>
+                                <apex:repeat value="{!thisDiaryDisplay.noPrdLines}" var="Line" >
+                                <tr>
+                                   <apex:repeat value="{!Line.GraphicNonProdLines}" var="nextLine" >
+                                        <td onmouseout="hideFloat(this);" onmouseover="if({!nextLine.showInformation})showFloat(this);" colspan="{!nextLine.length}" style="background-color:{!nextLine.Colour};height:20px">
+                                           <apex:outputlink id="actionLink" value="{!nextLine.url}" rendered="{!nextLine.url != ''}" >
+                                                {!nextLine.outputstring}
+                                            </apex:outputlink>
+                                         
+                                        <div id="info" style="width:250px; background-color:#fff; border:1px solid #000; display: none; z-index:2; position:absolute">
+                                                <apex:outputText escape="false" value="{!nextLine.information}"/>
+                                            </div>
+                                        </td>  
+                                    </apex:repeat> 
+                                </tr>
+                                </apex:repeat>
+                                <apex:repeat value="{!thisDiaryDisplay.NoAvailLines}" var="Line" >
+                                <tr>
+                                    <apex:repeat value="{!Line.GraphicNoAvailabilityLines}" var="nextLine" >
+                                        <td onmouseout="hideFloat(this);" onmouseover="if({!nextLine.showInformation})showFloat(this);" colspan="{!nextLine.length}" style="background-color:{!nextLine.Colour};height:20px">
+                                           <apex:outputlink id="actionLink" value="{!nextLine.url}" rendered="{!nextLine.url != ''}" >
+                                                {!nextLine.outputstring}
+                                            </apex:outputlink>
+                                         
+                                        <div id="info" style="width:250px; background-color:#fff; border:1px solid #000; display: none; z-index:2; position:absolute">
+                                                <apex:outputText escape="false" value="{!nextLine.information}"/>
+                                            </div>
+                                        </td>  
+                                    </apex:repeat>
+                                </tr>
+                                </apex:repeat>
+                                 
+                                 
+                        </table>
+                </apex:column>
+        </apex:dataTable>
+    </apex:pageBlock>
+    
+    
+    
+</apex:form>
+
+
+
+</apex:page>

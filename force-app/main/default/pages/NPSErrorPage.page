@@ -1,0 +1,31 @@
+<apex:page controller="NPSScoreCardController" showHeader="false" sidebar="false" title="British Gas NPS Survey">
+<script>
+window.onload = function applyStyle(){
+ if(history.length>0)
+ history.go(+1);
+ window.moveTo(0,0);
+ window.resizeTo(1096,1096);
+ };
+function closeAndRefresh(){
+window.opener='x';
+window.close(); 
+}
+</script>
+	<apex:form >
+		<apex:outputpanel >
+			<div id="content1"
+				style="border: 3px #00CCFF solid; background-color: #D4F1FF">
+			<div style="margin: 0.25in">
+			<p>There has been some system error with the form submission. Sorry for the inconvenience caused due to this.<br />
+			<br />
+			We have informed our team about this error and they will shortly get back to you. <br />
+			<br />
+			We appreciate your patience in this regard.
+			<center><apex:image onClick="Javascript:closeAndRefresh();"
+				url="{!$Resource.Close_Button}" title="Close this window" /></center>
+			</p>
+			</div>
+			</div>
+		</apex:outputpanel>
+	</apex:form>
+</apex:page>

@@ -1,0 +1,554 @@
+<apex:page standardcontroller="ASP__c" extensions="AspEnhanced" id="page" sidebar="false">
+
+<script type="text/javascript">
+ 
+
+function togglleDiv(show)
+{
+     document.getElementById('darkLayer').style.display = show; 
+     document.getElementById('LoadingDiv').style.display = show;      
+}  
+
+
+function addDiscountJS()
+{
+    //alert('ok');
+    togglleDiv('');
+    var discount = document.getElementById("{!$Component.page.frm.blk1.blk1sec1.cost_cust}").value;
+    addDiscount(discount);
+}
+
+function updateQuoteProdJS()
+{
+    togglleDiv('');
+    updateQuoteProd();
+    //togglleDiv('none');
+}
+
+function updateUDPJS()
+{
+    togglleDiv('');
+    updateUDP();
+    //togglleDiv('none');
+    
+}
+
+function calucalateCustomerPayementVariationJS()
+{
+    togglleDiv('');
+    calucalateCustomerPayementVariation();
+}
+
+</script>
+    <apex:form id="frm">
+    
+      <!-- <apex:actionFunction name="createASP" action="{!createASP}" immediate="true" rerender="blk1,PBSChanges,blk1sec1"> 
+        <apex:param name="func" value=""/>
+        <apex:param name="def" value=""/>
+        <apex:param name="pick" value=""/>
+      </apex:actionFunction>
+      
+      <!--  <apex:actionFunction name="updateASP" action="{!updateASP}" immediate="true" rerender="blk1"> 
+        <apex:param name="func" value=""/>
+        <apex:param name="def" value=""/>
+        <apex:param name="pick" value=""/>
+      </apex:actionFunction>-->
+      
+      <apex:actionFunction name="addDiscount" action="{!addDiscount}" immediate="true" rerender="blk1,blk1sec1" oncomplete="togglleDiv('none');"> 
+        <apex:param name="cost_cust" value=""/> 
+      </apex:actionFunction>
+        
+      
+        <apex:pageBlock id="blk1" title="{!asp.Name}"> 
+        <apex:pageblockbuttons >
+            <apex:commandButton action="{!createNew}" value="New" rendered="{!creNew}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="blk1" />
+            <apex:commandbutton action="{!createASP}"  value="Validate" rerender="blk1" rendered="{!valBtn}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"/>
+            <apex:commandButton action="{!Submit}" value="Submit" rerender="blk1" rendered="{!subBtn}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"/>
+            <apex:commandButton action="{!deleteASP}" value="Cancel" rendered="{!canBtn}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" immediate="true"/> 
+            <apex:commandButton action="{!updateAsp}" value="Update" rendered="{!updBtn}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="blk1"/> 
+        </apex:pageblockbuttons>
+        <apex:pagemessages />
+            <apex:outputpanel id="aspTab" >
+            <apex:pageBlockSection title="Exisiting ASPs" columns="1" collapsible="false" id="aspSec" rendered="{!aspSec}">
+                <apex:outputpanel layout="block" style="overflow:auto;height:150px">
+                <apex:pageblocktable value="{!existingASP}" var="a">
+                     <apex:column headervalue="ASP Number" >
+                        <apex:commandlink action="{!viewSelectedASP}" value="{!a.Name}" rerender="blk1" onclick="togglleDiv('');" oncomplete="togglleDiv('none');">
+                            <apex:param name="paramquoteID1" value="{!a.Id}" assignTo="{!aspId}"/>
+                        </apex:commandlink>
+                     </apex:column> 
+                     <apex:column headervalue="ASP Date" value="{!a.ASP_Date__c}"/>
+                     <apex:column headervalue="Status" value="{!a.Status__c}"/>
+                     <apex:column headervalue="Reason" value="{!a.Picklist__c}"/>
+                     <apex:column headervalue="Description" value="{!a.Description__c}"/>
+                     <apex:column headervalue="Charge to customer" value="{!a.Charge_to_Customer__c}"/>
+                     <apex:column headervalue="Action">
+                        <apex:commandlink action="{!showSelectedASP}" value="Continue" rerender="blk1" rendered="{!if(a.Status__c=='Entered', true,false)}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');">
+                            <apex:param name="paramquoteID1" value="{!a.Id}" assignTo="{!aspId}"/>
+                        </apex:commandlink>
+                     </apex:column>
+                </apex:pageblocktable>
+            </apex:outputpanel>
+            </apex:pageBlockSection>
+                
+            </apex:outputpanel>
+            <apex:pageBlockSection title="ASP Details: " columns="2" collapsible="false" id="blk1sec1" rendered="{!sec1}">
+
+                <apex:outputfield value="{!asp.Status__c}" />
+                <apex:pageblocksectionitem />
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Job Number"/>
+                    <apex:outputLink value="/{!job.Id}" id="theLink" target="_parent">{!job.Name}</apex:outputLink>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Lead Number"/>
+                    <apex:outputfield value="{!bmQuote.Opportunity__c}"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:inputField value="{!asp.Function__c}" required="true"  id="func" /><!--   onchange="createASPJS();"/>-->
+                <apex:inputField value="{!asp.Charge_to_Customer__c}" onchange="addDiscountJS();" id="cost_cust">
+                 <script>document.getElementById('{!$Component.cost_cust}').disabled = {!showField}; </script>
+                 </apex:inputField>
+                <apex:inputField value="{!asp.Definition__c}" required="true"  id="def"/><!--   onchange="updateASPJS();"/>-->
+                <apex:pageblocksectionitem >
+	                <b> Suggested Customer Payment:</b>
+	                <apex:outputtext value="{!suggestedPayment}"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:inputField value="{!asp.Picklist__c}" required="true"  id="pick" /><!--   onchange="updateASPJS();"/>-->
+                <apex:pageblocksectionitem >
+	                <b>Customer Payment Variation:</b>
+	                <apex:outputtext value="{!customePaymentVar}"/>
+                </apex:pageblocksectionitem> 
+                
+                 
+                <apex:inputField value="{!asp.Description__c}" required="true" />
+               
+                 <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Job Status"/>
+                    <apex:outputfield value="{!job.Status__c}"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:inputField value="{!asp.ASP_Type__c}" required="true"/>
+                <apex:inputfield value="{!asp.Asp_Billing_Status__c}" rendered="{!if(asp.Status__c == 'Submitted', true, false)}"/>
+                <apex:outputfield value="{!bmQuote.Billed__c}"/>
+                <apex:outputfield value="{!job.GDIndicator__c}"/>
+                <apex:outputfield value="{!asp.Lock__c}"/>
+                <apex:outputfield value="{!asp.Person_Approved_By__c}"/>
+                <!-- <apex:inputfield value="{!asp.Approved_By__c}"/> -->
+                
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Sum of items"/>
+                    <apex:outputtext value="{!totalVal}"/>
+                </apex:pageblocksectionitem>    
+                <apex:pageblocksectionitem />
+                <apex:pageblocksectionitem >
+                <apex:outputlabel value="Discount "/>
+                <apex:outputtext value="{!discount}"/>
+                </apex:pageblocksectionitem>
+                <apex:inputField value="{!asp.Material_Return_Info__c}"  required="{!showMaterialInfo}" rendered="{!showMaterialInfo}"/> 
+                <apex:inputField value="{!asp.Material_Notes__c}" rendered="{!showMaterialInfo}"/>          
+            </apex:pageBlockSection>
+            
+            
+            
+            <apex:pageBlockSection title="Requested Items " columns="1" collapsible="true" id="reqsec" rendered="{!showReqItm}">
+            <apex:pageblocktable value="{!requestedItems}" var="r">
+                 <apex:column headervalue="Product" value="{!r.Product__c}"/>
+                 <apex:column headervalue="Description" value="{!r.Product_Description__c}"/>
+                 <apex:column headervalue="Quantity" value="{!r.Quantity__c}"/>
+                 <apex:column headervalue="Type" value="{!r.Action__c}"/>
+                 <apex:column headervalue="Processed" value="{!r.Processed__c}"/>
+                 <apex:column headervalue="Process" >
+                    <apex:commandlink action="{!addSelProd}" value="Apply" rerender="blk1" rendered="{!!r.Processed__c}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');">
+                            <apex:param name="productId" value="{!r.id}" assignTo="{!reqPrdId}"/>
+                    </apex:commandlink>
+                    &nbsp;&nbsp;
+                    <apex:commandlink action="{!rejSelProd}" value="Reject" rerender="blk1" rendered="{!!r.Processed__c}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');">
+                            <apex:param name="productId" value="{!r.id}" assignTo="{!reqPrdId}"/>
+                    </apex:commandlink>
+                 </apex:column>
+            </apex:pageblocktable>
+            </apex:pageBlockSection>
+            
+            <apex:outputpanel id="pan1">
+            <!--  <apex:commandButton action="{!OnChangesClick}" value="Changes" rerender="PBSChanges, PBSCurrent, PBSSummary" rendered="{!chgBtn}"/>-->
+            <apex:commandButton action="{!confirm}" value="Confirmation Summary" rerender="blk1,aspHours" rendered="{!cnfBtn}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"/>
+            </apex:outputpanel>
+            <br/>
+            <br/>
+            <apex:outputpanel id="PBSChanges">
+             
+                <apex:commandButton action="{!AddProductQuote}" value="Add" rerender="PBSChanges" immediate="true" rendered="{!addBtn}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"/>
+                &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <apex:commandButton action="{!AddUDP}" value="Add UDP" rerender="PBSChanges" immediate="true" rendered="{!udpBtn}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"/>
+                <apex:pageBlockSection title="Additional Items: " columns="1" rendered="{!sec2}" collapsible="true" id="sec2" >
+                    <apex:pagemessages />
+                 
+                   <apex:actionFunction name="updateQuoteProd" action="{!updateQuoteProd}" rerender="blk1,PBSChanges,blk1sec1" oncomplete="togglleDiv('none');"/> 
+                   <apex:actionFunction name="updateUDP" action="{!updateUDP}" rerender="PBSChanges,blk1sec1" oncomplete="togglleDiv('none');"/>
+                   <apex:actionFunction name="calucalateCustomerPayementVariation" action="{!calucalateCustomerPayementVariation}" rerender="blk1,PBSChanges,blk1sec1" oncomplete="togglleDiv('none');"/>
+                    
+                   <apex:pageBlockTable style="width:100%" value="{!showList}" var="result" rendered="{!addTable}" id="tab1">
+                        <apex:column headerValue="Items" id="proCol" style="{!result.style}">
+                            <apex:inputField value="{!result.qp.Product__c}" id="proName" style="{!result.style}" onchange="updateQuoteProdJS();"/>
+                             <apex:param name="paramquoteQu" value="true" assignTo="{!result.add}"/> 
+                        </apex:column>
+                        
+                        <apex:column headerValue="Description" style="{!result.style}">
+                            <apex:outputtext value="{!result.descript}" style="{!result.style}"/>
+                        </apex:column>
+                        <apex:column headerValue="Price" style="{!result.style}">
+                            <apex:outputfield value="{!result.qp.ASP_Impact__c}" style="{!result.style}"/>
+                        </apex:column>
+                        <apex:column headerValue="Qty" style="{!result.style}">
+                            <apex:inputField value="{!result.qp.Quantity__c}" style="{!result.style}" onchange="updateQuoteProdJS();">
+                                
+                            </apex:inputField>
+                        </apex:column>
+                        
+                         <apex:column headerValue="Charged/Refunded" style="{!result.style}">
+                            <apex:inputField value="{!result.qp.Customer_Charged_Refunded__c}" style="{!result.style}" rendered="{!result.qp.Name != 'D001'}" onchange="calucalateCustomerPayementVariationJS();"/>
+                        </apex:column>
+                        
+                        <apex:column headerValue="+" style="{!result.style}">
+                            <apex:commandButton value="+" action="{!addRemoveAbove}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="PBSChanges,PBSCurrent,blk1sec1" immediate="true" rendered="{!if(result.qp.Name != 'D001' ,true,false)}" style="{!result.style}"><!-- result.qp.ASP_Reason__c != 'Removed' &&  -->
+                                <apex:param name="paramquoteID1" value="true" assignTo="{!result.add}"/>
+                            </apex:commandButton> 
+                        </apex:column>
+                        
+                        <apex:column headerValue="-" style="{!result.style}">
+                            <apex:commandButton value="-" action="{!addRemoveAbove}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="PBSChanges,PBSCurrent,blk1sec1" immediate="true" rendered="{!if( result.qp.Name != 'D001' ,true,false)}" style="{!result.style}">
+                                <apex:param name="paramquoteID1" value="true" assignTo="{!result.sub}"/>
+                            </apex:commandButton>
+                        </apex:column>
+                        <apex:column headerValue="Mats" style="{!result.style}" >
+                            <apex:inputCheckbox value="{!result.qp.Materials__c}" style="{!result.style}" rendered="{!result.qp.Name != 'D001'}" onclick="updateQuoteProdJS();"/>
+                        </apex:column>
+                        
+                        <apex:column headerValue="Labour" style="{!result.style}">
+                            <apex:inputCheckbox value="{!result.qp.Labour__c}" style="{!result.style}" rendered="{!result.qp.Name != 'D001'}" onclick="updateQuoteProdJS();"/>
+                        </apex:column>
+                        
+                        <apex:column headerValue="Type" value="{!result.qp.ASP_Reason__c}" style="{!result.style}"/>
+                        
+                        <!--<apex:column value="{!(result.Quantity__c * result.Unit_Price_Inc_VAT__c)}" headerValue="Price"/>-->
+                        <apex:column headerValue="Remove">
+                            <apex:commandButton action="{!RemovePQabove}" value="Delete" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="PBSCurrent,PBSChanges,blk1sec1"  immediate="true" style="{!result.style}">
+                                <apex:param name="paramquoteID" value="true" assignTo="{!result.remove}"/>
+                            </apex:commandButton>
+                        </apex:column>
+                        
+                        
+                           
+                    </apex:pageBlockTable>
+                    
+                     <!-- <apex:pageBlockTable style="width:100%" value="{!amendmeList}" var="result" rendered="{!addTable}">
+                        <apex:column headerValue="Items" style="{!result.style}">
+                            <apex:inputField value="{!result.qp.Product__c}" style="{!result.style}" onchange="updateQuoteProdJS();"/>
+                        </apex:column>
+                        
+                        <apex:column headerValue="Description" style="{!result.style}">
+                            <apex:outputField value="{!result.qp.Product_Description__c}" style="{!result.style}"/>
+                        </apex:column>
+                        <apex:column headerValue="Price" style="{!result.style}">
+                            <apex:outputfield value="{!result.qp.ASP_Impact__c}" style="{!result.style}"/>
+                        </apex:column>
+                        <apex:column headerValue="Qty" style="{!result.style}">
+                            <apex:inputField value="{!result.qp.Quantity__c}" style="{!result.style}" onchange="updateQuoteProdJS();">
+                                
+                            </apex:inputField>
+                        </apex:column>
+                        
+                       
+                        <apex:column headerValue="Mats" style="{!result.style}">
+                            <apex:inputCheckbox value="{!result.qp.Materials__c}" style="{!result.style}" rendered="{!result.qp.Name != 'D001'}"/>
+                        </apex:column>
+                        
+                        <apex:column headerValue="Labour" style="{!result.style}">
+                            <apex:inputCheckbox value="{!result.qp.Labour__c}" style="{!result.style}" rendered="{!result.qp.Name != 'D001'}"/>
+                        </apex:column>
+                        
+                        <apex:column headerValue="Type" value="{!result.qp.ASP_Reason__c}" style="{!result.style}"/>
+                        
+                         <apex:column headerValue="Remove">
+                            <apex:commandButton action="{!RemovePQabove}" value="Delete" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="PBSCurrent,PBSChanges,blk1sec1" immediate="true" style="{!result.style}">
+                                <apex:param name="paramquoteID" value="true" assignTo="{!result.remove}"/>
+                            </apex:commandButton>
+                        </apex:column>
+                        
+                           
+                    </apex:pageBlockTable> -->
+                  
+                  
+                  <apex:pageBlockTable style="width:100%" value="{!userDefinedList}" var="result" rendered="{!udpTable}" id="udPtab">
+                        <apex:column headerValue="Items" id="proCol" style="{!result.style}">
+                            <apex:outputField value="{!result.qp.Product__c}" id="proName" style="{!result.style}" />
+                            <!-- <apex:param name="prodName" value="{!result.qp.Product__c}" assignTo="{!productName}"/> -->
+                        </apex:column>
+                        
+                        <apex:column headerValue="Description" style="{!result.style}">
+                            <apex:inputField value="{!result.qp.User_Defined_Description__c}" style="{!result.style}"/>
+                        </apex:column>
+                        <apex:column headerValue="Price" style="{!result.style}">
+                            <apex:outputfield value="{!result.qp.ASP_Impact__c}" style="{!result.style}"/>
+                        </apex:column>
+                        <apex:column headerValue="Qty" style="{!result.style}">
+                            <apex:inputField value="{!result.qp.Quantity__c}" style="{!result.style}" >
+                                
+                            </apex:inputField>
+                        </apex:column>
+                        
+                        <apex:column headerValue="Price to Cust" style="{!result.style}">
+                            <apex:inputfield value="{!result.qp.Unit_Price_Inc_VAT__c}" style="{!result.style}" required="true"/>
+                        </apex:column>
+                        
+                         <apex:column headerValue="Price to Supp" style="{!result.style}">
+                            <apex:inputfield value="{!result.qp.Unit_Merchant_Price_Exc_VAT__c}" style="{!result.style}" required="true" onchange="updateUDPJS();"/>
+                         </apex:column>
+                        
+                        <!-- <apex:column headerValue="Merchant" style="{!result.style}">
+                            <apex:outputfield value="{!result.qp.Supplier__c}" style="{!result.style}" />
+                         </apex:column>  -->
+                        
+                        <apex:column headerValue="Mats" style="{!result.style}">
+                            <apex:outputfield value="{!result.qp.Materials__c}" style="{!result.style}" />
+                        </apex:column>
+                          
+                        
+                        <apex:column headerValue="Labour" style="{!result.style}">
+                            <apex:outputfield value="{!result.qp.Labour__c}" style="{!result.style}" />
+                        </apex:column>
+                        
+                        <apex:column headerValue="Type" value="{!result.qp.ASP_Reason__c}" style="{!result.style}"/>
+                        
+                        <!--<apex:column value="{!(result.Quantity__c * result.Unit_Price_Inc_VAT__c)}" headerValue="Price"/>-->
+                        <apex:column headerValue="Remove">
+                            <apex:commandButton action="{!RemoveUDPabove}" value="Delete" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="PBSCurrent,PBSChanges,blk1sec1" immediate="true" style="{!result.style}">
+                                <apex:param name="paramquoteID" value="true" assignTo="{!result.remove}"/>
+                            </apex:commandButton>
+                        </apex:column>
+                        
+                        
+                           
+                    </apex:pageBlockTable>
+                                    
+                </apex:pageBlockSection>
+            </apex:outputpanel>
+                   
+            <apex:outputpanel id="caseItems">
+                
+            </apex:outputpanel>
+                   
+                  <apex:outputField value="{!asp.Material_Return_Info__c}" rendered="{!sec6}"/>
+                  <apex:outputField value="{!asp.Material_Notes__c}" rendered="{!sec6}"/>
+
+            <apex:outputpanel id="PBSCurrent">
+                <apex:pageBlockSection title="Current Items: " columns="1" rendered="{!sec3}" collapsible="true" >
+                    <apex:outputPanel layout="block" style="overflow:auto;height:250px" > 
+                    <apex:pageBlockTable value="{!FullList}" var="result" >
+                        <apex:column value="{!result.qp.Name}" headerValue="Items"/>
+                        <apex:column value="{!result.descript}" headerValue="Description"/>
+                        <apex:column value="{!result.qp.quotingReason__c}" headerValue="Stage Added" />
+                        <apex:column value="{!result.qp.Quantity__c}" headerValue="Qty" />
+                        <apex:column value="{!result.qp.Sales_Price__c}" headerValue="Sale Price" />
+                        <apex:column value="{!result.qp.Gross_Total__c}" headerValue="Gross Total" />
+                        <apex:column headerValue="+">
+                            <apex:commandButton value="+" action="{!AddRemoveQty}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="PBSChanges, PBSCurrent,blk1sec1" immediate="true">
+                                <apex:param name="paramquoteID" value="true" assignTo="{!result.add}"/>
+                            </apex:commandButton> 
+                        </apex:column>
+                        
+                        <apex:column headerValue="-">
+                            <apex:commandButton value="-" action="{!AddRemoveQty}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="PBSChanges, PBSCurrent,blk1sec1" immediate="true">
+                                    <apex:param name="paramquoteID" value="true" assignTo="{!result.sub}"/>
+                                    
+                            </apex:commandButton> 
+                        </apex:column>
+                 
+                       
+                        <apex:column headerValue="Remove">
+                            <apex:commandButton action="{!RemovePQ}" value="Remove" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="PBSChanges,PBSCurrent,blk1sec1" immediate="true">
+                                <apex:param name="paramquoteID" value="true" assignTo="{!result.remove}"/>
+                                
+                            </apex:commandButton>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                    </apex:outputPanel>                
+                </apex:pageBlockSection>
+            </apex:outputpanel>
+            
+            <apex:pageBlockSection title="ASP Details: " columns="2" collapsible="false" id="blk1sec6" rendered="{!sec4}">
+                <apex:outputfield value="{!asp.Status__c}" />
+                <apex:pageblocksectionitem />
+                 <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Job Number"/>
+                    <apex:outputLink value="/{!job.Id}" id="theLink" target="_parent">{!job.Name}</apex:outputLink>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Lead Number"/>
+                   <!--  <apex:outputfield value="{!bmQuote.Opportunity__c}" /> -->
+                    <apex:outputLink value="/{!bmQuote.Opportunity__c}" id="theLink" target="_parent">{!bmQuote.Opportunity__r.Name}</apex:outputLink>
+                </apex:pageblocksectionitem>
+                <!--<apex:pageBlockTable value="{!asps}" var="asp" >-->
+                <apex:outputfield value="{!asp.Function__c}" />
+                <apex:outputfield value="{!asp.Charge_to_Customer__c}" />
+                <apex:outputfield value="{!asp.Definition__c}" />
+                 <apex:pageblocksectionitem >
+	                <b> Suggested Customer Payment:</b>
+	                <apex:outputtext value="{!suggestedPayment}"/>
+                </apex:pageblocksectionitem> 
+                
+                <apex:outputfield value="{!asp.Picklist__c}" />
+                
+                <apex:pageblocksectionitem >
+	                <b>Customer Payment Variation:</b>
+	                <apex:outputtext value="{!customePaymentVar}"/>
+                </apex:pageblocksectionitem> 
+                
+                 
+                <apex:outputfield value="{!asp.Description__c}" />
+               
+                 <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Job Status"/>
+                    <apex:outputfield value="{!job.Status__c}"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:outputField value="{!asp.ASP_Type__c}"/>
+                <apex:outputfield value="{!asp.Asp_Billing_Status__c}"/>
+                <apex:outputfield value="{!bmQuote.Billed__c}"/>
+
+                <apex:outputfield value="{!job.GDIndicator__c}"/>
+                <apex:outputfield value="{!asp.Lock__c}"/>
+                <apex:outputfield value="{!asp.Person_Approved_By__c}"/>
+                
+                 <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Sum of items"/>
+                    <apex:outputtext value="{!totalVal}"/>
+                </apex:pageblocksectionitem>    
+                <apex:pageblocksectionitem />
+                
+                <apex:outputField value="{!asp.Material_Return_Info__c}"/>
+                 <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Discount "/>
+                    <apex:outputtext value="{!discount}"/>
+                </apex:pageblocksectionitem>
+                <apex:outputField value="{!asp.Material_Notes__c}" /> 
+
+            </apex:pageBlockSection>
+            
+            <apex:outputpanel id="pan2">
+            <apex:commandButton action="{!OnChangesClick}" value="Changes" rerender="blk1" rendered="{!chgBtn}" immediate="true" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"/>
+            </apex:outputpanel>
+            
+            <!-- code added for asp hours -->
+            <apex:outputpanel id="aspHours" rendered="{!AND(showAspHours,IF(ASPHoursList!=NULL,true,false))}">
+            <apex:pageBlockSection title="Asp Hours: " columns="2" collapsible="true" id="aspHoursSection" >
+            <!-- <apex:outputText id="hoursText" value="{!ASPHours}"/> -->
+            <apex:pageblocktable value="{!ASPHoursList}" var="skills">
+                <apex:column headerValue="Skill">
+                <apex:outputText value="{!skills[0]}" style="color:{!IF(CONTAINS(skills[1],'-'),'red','green')};"/>
+                </apex:column>
+                <apex:column headerValue="Impact" >
+                <apex:OutputText value="{!skills[1]}" style="color:{!IF(CONTAINS(skills[1],'-'),'red','green')};" />
+                </apex:column>
+            </apex:pageblocktable>
+            </apex:pageBlockSection>
+            </apex:outputpanel>
+            
+            <apex:outputpanel id="PBSSummary">
+                <apex:pageBlockSection title="Confirmation Summary: " rendered="{!sec4}" collapsible="false" columns="1" >
+                    <apex:pageBlockTable value="{!showList}" var="result" rendered="{!addTable}">
+                        <apex:column value="{!result.qp.Product__c}" headerValue="Items" style="{!result.style}"/>
+                        <apex:column value="{!result.descript}" headerValue="Description" style="{!result.style}"/>
+                        <apex:column value="{!result.qp.ASP_Impact__c}" headerValue="Price" style="{!result.style}"/>
+                        <apex:column value="{!result.qp.Quantity__c}" headerValue="Qty" />
+                        <apex:column headerValue="Mats" style="{!result.style}" >
+                            <apex:outputfield value="{!result.qp.Materials__c}" rendered="{!result.qp.Name != 'D001'}"/>
+                        </apex:column>
+                        <apex:column headerValue="Labour" style="{!result.style}">
+                            <apex:outputfield value="{!result.qp.Labour__c}" rendered="{!result.qp.Name != 'D001'}"/>
+                        </apex:column>
+                         <apex:column value="{!result.qp.ASP_Reason__c}" headerValue="Type" style="{!result.style}"/>
+                         <apex:column value="{!result.qp.ASP_Action__c}" headerValue="Action" style="{!result.style}"/>
+                    </apex:pageBlockTable>
+                    
+                    <apex:pageBlockTable value="{!userDefinedList}" var="result" rendered="{!udpTable}">
+                        <apex:column value="{!result.qp.Part_Number__c}" headerValue="Items" style="{!result.style}"/>
+                        <apex:column value="{!result.qp.User_Defined_Description__c}" headerValue="Description" style="{!result.style}"/>
+                        <apex:column value="{!result.qp.ASP_Impact__c}" headerValue="Price" style="{!result.style}"/>
+                        <apex:column value="{!result.qp.Quantity__c}" headerValue="Qty" />
+                        <apex:column headerValue="Mats" style="{!result.style}" >
+                            <apex:outputfield value="{!result.qp.Materials__c}" rendered="{!result.qp.Name != 'D001'}"/>
+                        </apex:column>
+                        <apex:column headerValue="Labour" style="{!result.style}">
+                            <apex:outputfield value="{!result.qp.Labour__c}" rendered="{!result.qp.Name != 'D001'}"/>
+                        </apex:column>
+                         <apex:column value="{!result.qp.ASP_Reason__c}" headerValue="Type" style="{!result.style}"/>
+                         <!--  <apex:column value="{!result.qp.ASP_Action__c}" headerValue="Action" style="{!result.style}"/>-->
+                    </apex:pageBlockTable>
+                    
+                   
+                </apex:pageBlockSection>
+            </apex:outputpanel>
+            
+            
+            <apex:outputpanel id="LastSection" >
+                 <apex:pageBlockSection title="Submission Details " columns="2" rendered="{!sec5}">
+                    <!-- <apex:inputField value="{!asp.ASP_Type__c}" required="true"/> -->
+                    <apex:inputField value="{!asp.Approved_By__c}" required="true" />
+                  <!-- <apex:inputField value="{!asp.Material_Return_Info__c}" rendered="{!mateRem}" required="{!mateRem}"/>
+                    <apex:inputField value="{!asp.Material_Notes__c}" rendered="{!mateRem}"/> -->
+                 </apex:pageBlockSection>
+                 
+                 <apex:pageBlockSection title="Submission Details " columns="2" rendered="{!sec6}">
+                    <apex:outputField value="{!asp.ASP_Type__c}" />
+                    <apex:outputField value="{!asp.Approved_By__c}" />
+                   <!-- <apex:outputField value="{!asp.Material_Return_Info__c}"/>
+                    <apex:outputField value="{!asp.Material_Notes__c}" /> -->
+                 </apex:pageBlockSection>
+             </apex:outputpanel>
+            
+            <apex:pageblocksection title="Job Details" columns="1" rendered="{!showJob}">
+            <apex:pageblocktable value="{!jobList}" var="j">
+                <apex:column headervalue="Job Number" >
+                    <apex:outputLink value="/{!j.Id}" id="theLink">{!j.Name}</apex:outputLink>
+                </apex:column>
+                <apex:column headervalue="Status" value="{!j.Status__c}"/>
+                <apex:column headervalue="Sub Status" value="{!j.Sub_Status__c}"/>
+                <apex:column headervalue="Installation Date" value="{!j.Installation_Date__c}"/>
+                <apex:column headervalue="Customer Pref Date" >
+                    <apex:inputfield value="{!j.Customer_Preferred_Date__c}"/>
+                </apex:column>
+                <!--  <apex:column headervalue="Action" >
+                    <apex:commandlink value="Plan" action="{!planJob}"/>
+                </apex:column>-->
+            </apex:pageblocktable>
+            </apex:pageblocksection> 
+            
+        </apex:pageblock>
+        
+        <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+        <div style="margin-left:5px; margin-top:5px;">
+        <img src="/img/loading.gif" /> Processing...
+        </div>
+        </div>
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;">
+     </div>
+    </apex:form>
+
+
+</apex:page>

@@ -1,0 +1,652 @@
+<apex:page standardController="cscfga__Product_Basket__c" extensions="CS_QuoteOnlineActualPdfController" renderAs="pdf" applyHtmlTag="false" showHeader="false" sidebar="false" action="{!deleteTempAttachment}">
+<html>
+<head> 
+        <title>Quote</title>
+        <style>
+        body {
+            background: #fff;
+        }
+        
+        p {
+            margin: 0
+        }
+        
+        .blueBallon{
+            z-index: 50;
+            margin : 0px;
+            background-image : url("{!URLFOR($Resource.quoteOnlinePageRes, 'blueCircle2.resource')}");
+            background-position : center 100%;
+            background-repeat : no-repeat; 
+        }
+        
+        .greenBallon{
+            z-index: 55;
+            margin : 0px;
+            background-image : url("{!URLFOR($Resource.quoteOnlinePageRes, 'greenCircle2.resource')}");
+            background-position : center 100%;
+            background-repeat : no-repeat; 
+        }
+
+
+        .redBallon{
+            z-index: 45;
+            margin : 0px;
+            background-image : url("{!URLFOR($Resource.quoteOnlinePageRes, 'redCircle2.resource')}");
+            background-position : center 100%;
+            background-repeat : no-repeat; 
+        }
+        
+        .inlineDisplaySignature {
+            width: 70%;
+            display: inline-block;
+            margin: 2px;
+        }
+        
+        .signatureContainer {
+            width: 100%;
+        }
+        
+        .signatureLeft {
+            float: left;
+            width: 100%
+        }
+        
+        .signatureRight {
+            float: right;
+            width: 100%
+        }
+        
+        .signatureCenter {
+            width: 100%;
+            margin-left: 6px;
+        }
+        
+        #page1body {
+            margin-top: 1em
+        }
+        
+        .content {
+            width: 95%;
+            margin-left: auto;
+            margin-right: auto;
+            color: #333F48;
+            overflow: visible;
+        }
+        
+        .clearfix:after {
+            content: " ";
+            visibility: hidden;
+            display: block;
+            height: 0;
+            clear: both;
+        }
+        /*--Tags and classes using bold font--*/
+        
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-weight: bold;
+        }
+
+        h2,
+        h3,
+        h4 {
+            margin-bottom: 0; 
+            padding-bottom: 0;
+        }
+        
+        .boldText {
+            font-weight: bold;
+        }
+        /*---Brand colours for fonts ---*/
+        
+        .darkBlue {
+            color: #0072bc
+        }
+        
+        .midBlue {
+            color: #00baf2
+        }
+        
+        .lightBlue {
+            color: #b9e5fb;
+        }
+        
+        .pink {
+            color: #ec008c
+        }
+        
+        .slate {
+            color: #333F48;
+        }
+        /*---Brand colours for element backgrounds---*/
+        
+        .bg-darkBlue {
+            background-color: #0072bc
+        }
+        
+        .bg-midBlue {
+            background-color: #00baf2
+        }
+        
+        .bg-lightBlue {
+            /*background-color: #b9e5fb*/
+        }
+        
+        .bg-green {
+            /*background-color: #bed62f*/
+        }
+        
+        td .center {
+            text-align: center
+        }
+        
+        td .middle {
+            vertical-align: middle
+        }
+        
+        .tr {
+            display: table-row
+        }
+        
+        .td {
+            display: table-cell
+        }
+        
+        .center {
+            display: block;
+            margin: 0 auto
+        }
+        
+        .mid {
+            vertical-align: middle
+        }
+        
+        .smaller {
+            font-size: smaller;
+        }
+        
+        .bgLogo {
+            float: right;
+            
+        }        
+        
+        .quote-reference {
+            font-size: 70%;
+            margin: 0
+        }
+        
+        div#summary-wrapper {
+            
+        }
+        
+        .leftRadius {
+            border-bottom-left-radius: 14px;
+            -moz-border-radius-bottomleft: 14px;
+            -webkit-border-bottom-left-radius: 14px;
+        }
+        
+        .summary h1 {
+            margin: 0
+        }
+        
+        .summary h4 {
+            margin-bottom: 0
+        }
+        
+       
+        
+        #summary-table {
+            width: 100%;
+            border-spacing: 0;
+            height: 100%;
+        }
+        
+        #summary-table th {
+            background-color: #00BAF2;
+            color: white;
+            font-size: 150%;
+            text-align: left;
+            font-weight: normal;
+        }
+        
+        #summary-table .summary-section {
+            color: #00baf2;
+        }
+        
+        #summary-table .allowance-label {
+            color: #00baf2;
+            font-size: 90%;
+            max-width: 80%;
+        }
+        
+        #summary-table tr td {
+            padding: 4px 0px 3px 10px;
+            
+        }
+        
+        #summary-table tr td.right {
+            padding-right: 20px;
+            text-align: right;
+            max-width: 20%;
+        }
+        
+        #summary-table .topBorder td {
+            border-top: 2px solid #00baf2;
+        }
+        
+        .summary {
+            width: 67%;
+            display: inline-block;
+            float: left;
+        }
+        
+        .price-balloons {
+            width: 33%;
+            display: inline-block;
+            float: left;
+            position: relative;
+            z-index: 150;
+            height: 180px;
+        }
+        
+        #balloon-total-text {
+            position: relative;
+            text-align: center;
+            color: #fff;
+            font-size: 180%;
+            padding-top: 8%;
+            top: -60px;
+            left: -30px;
+        }
+        
+        div#small-circle {
+            position: relative;
+            top: -138px;
+            left: 65px;
+        }
+        
+        div#small-circle {
+            position: relative;
+            color: #333F48;
+            /*top: 18px;*/
+            font-size: 94%;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            text-align: center;
+            line-height: 20px;
+            width: 130px;
+        }
+        
+        div#price-guarantee-section {
+            margin-top: 76px;
+        }
+        
+        #wilbur {
+            height: 240px;
+            position: relative;
+            top: 0px;
+            right: -400px;
+            z-index: 100;
+        }
+        
+        #green-box {
+            position: relative;
+            /*top: -20px;*/
+            top: -50px;
+            background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'greenBoxBig2.resource')}");
+            background-repeat: no-repeat;
+            /*padding-top: 10px;*/
+            padding-top: 3px;
+            padding-left: 10px;
+            padding-bottom: 1px;
+            height: 70px;
+        }
+        
+        #green-box h3 {
+            margin: 0;
+            font-size: 22px;
+        }
+        
+        #green-box p {
+            margin-top: 0.2em;
+            margin-bottom: 0.5em
+        }
+        
+        #acceptance-box {
+            padding: 0.5em 0.5em 0.5em 0.5em;
+            margin-top: 0rem;
+            background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'lightBlueBoxBig2.resource')}");
+            background-repeat: no-repeat;
+            height: 167px;
+        }
+        
+        #acceptance-box h3 {
+            margin: 0
+        }
+        
+        #acceptance-box p {
+            font-size: 84%
+            
+        }
+        
+        .signature-box {
+            background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'whiteBoxSmall2.resource')}");
+            background-repeat: no-repeat;
+            height: 50px;
+            padding: 2px;
+            background-size: 230px 50px;
+        }
+        
+        #footer-contact {
+            padding: 0.5em 0.5em 1em 0.5em;
+            color: white;
+            /*background: #00BAF2;*/
+            background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'blueBoxBig2.resource')}");
+            background-repeat: no-repeat;
+            height: 50px;
+            margin-top: 0.7em
+        }
+        
+        .footer-accesibility {
+            margin-top: 0.5em;
+            font-size: 12px
+        }
+        
+        .footer-accesibility img {
+            float: left;
+            height: 30px;
+            padding-right: 8px
+        }
+        
+        .footer-tradingName {
+            font-size: 9px;
+            margin-top: 0.5em;
+        }
+        
+        .breakdown-left {
+            width: 70%;
+            float: left;
+            border-right: 1px solid #00baf2;
+        }
+        
+        .breakdown-left table {         
+            width: 98%;
+            font-size: 85%;
+        } 
+        
+        
+        td.cellPrice {
+            vertical-align: top;
+            font-weight: bold;
+            text-align: right;
+        }
+        
+        td.cellQty {
+            vertical-align: top;
+        }
+        
+        #breakdown-right {
+            width: 29%;
+            float: left;
+            border-left: 1px solid #00baf2;
+            margin-left: -1px;
+        }
+        
+        #installation-details {
+            padding: 0 1em;
+            font-size: 80%;
+        }
+        
+        #installation-details h4 {
+            border-bottom: 1px solid #00baf2;
+            margin-top: 0;
+            margin-bottom: 0.5em;
+        }
+        
+        #installation-details .topMargin {
+            margin-top: 1em;
+        }
+        
+        #installation-details p {
+            margin: 0;
+        }
+        
+        #installation-details span {
+            float: right;
+        }
+        
+        input[type="email"] {
+            border: none;
+            width: 100%;
+        }
+        
+        .Level1 {
+            font-weight: bold;
+            color: #00baf2;
+        }
+        
+        .Level2 {
+            font-weight: bold;
+        }
+        
+        #page3 .content p {
+            /*font-size: 76%;*/
+            font-size: 12px;
+            
+        }
+        
+        #page3 h5 {
+            font-weight: 100;
+            margin-bottom: 5px;
+            margin-top: 10px;
+        }
+        
+        #page3 h3 {
+            margin-bottom: 6px;
+        }
+        
+        .flex-container {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        
+        .flex-box {
+            display: inline-block;
+            width: 220px;
+            height: 55px;
+            padding-top: 0.2em;
+            background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'whiteBlueBoxSmall.resource')}");
+            background-repeat: no-repeat;
+            padding-left: 0.3em;
+            border-bottom-left-radius: 14px;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        #payment-options li {
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+            .waysToPayTable {
+                font-size: 70%;
+                width: 100%;
+                height: 110%;
+                margin-top: 0em;
+                background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'lightBlueBoxSmall.resource')}");
+                background-size: contain;
+                background-repeat: no-repeat;
+                border-collapse: collapse;
+            }
+        
+            .waysToPayTable td,
+            .waysToPayTable th {
+                padding: 0.5em;
+                border: 2px solid #00baf2;
+            }
+        
+
+            /*.waysToPayTable .last td,
+            .waysToPayTable .last th {
+                border-bottom: 10px;
+                margin-top: -10px;
+                margin-bottom: 10px;
+            }*/
+        
+            .waysToPayTable .centerText {
+                text-align: center;
+            }
+        
+            #allowances-table tr td:nth-child(2) {
+                text-align: right;
+                vertical-align: top;
+                font-weight: bold;
+            }
+
+            .loanTableWithIFC {
+                font-size: 70%;
+                width: 100%;
+                height: 100%;
+                margin-top: 0em;
+                /*background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'LoanITableWithIFCBg.resource')}");
+
+                background-repeat: no-repeat;
+                background-origin: border-box;*/
+                border-collapse: collapse;
+            }
+            
+            .loanTableWithIFC th { background-color: #C1D7E9;}
+            .loanTableWithIFC td { background-color: #DADEE1;}
+
+                .loanTableWithIFC td,
+                .loanTableWithIFC th {
+                    padding: 0.5em;
+                    border: 2px solid #00baf2;
+                    height: 33.5px;
+                }
+
+
+                /*.loanTableWithIFC .last td,
+                .loanTableWithIFC .last th {
+                    border-bottom: 10px;
+                    margin-top: -10px;
+                    margin-bottom: 10px;
+                }*/
+
+                .loanTableWithIFC .centerText {
+                    text-align: center;
+                }
+
+
+            .loanTable {
+                font-size: 70%;
+                width: 100%;
+                height: 110%;
+                margin-top: 0em;
+                background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'lightBlueBoxSmall_loan.resource')}");
+                background-size: contain;
+                background-repeat: no-repeat;
+                border-collapse: collapse;
+            }
+
+                .loanTable td,
+                .loanTable th {
+                    padding: 0.5em;
+                    border: 2px solid #fff;
+                }
+
+
+                .loanTable .last td,
+                .loanTable .last th {
+                    border-bottom: 10px;
+                    margin-top: -10px;
+                    margin-bottom: 10px;
+                }
+
+                .loanTable .centerText {
+                    text-align: center;
+                }
+
+            #allowances-table tr td:nth-child(2) {
+                text-align: right;
+                vertical-align: top;
+                font-weight: bold;
+            }
+        
+        .disclaimer p {
+            font-size: x-small;
+        }
+        
+        .pageIndex {
+            float: right;
+            font-size: 10px
+        }
+        
+        .access-statement {
+            font-size: 90%;
+            padding-left: 1em
+        }
+        
+        .trading-statement {
+            font-size: 60%
+        }
+        
+        .pageHeading {
+            font-size: 2em !important;
+            color: #00baf2
+        }
+        
+        #WTPFooter p {
+            margin-bottom: 1em
+        }
+        
+        .capitalize:first-letter {
+            text-transform: capitalize;
+        }
+        
+        #shrinkTest{
+            zoom: 0.5; /* Old IE only */
+            -moz-transform: scale(0.5);
+            -webkit-transform: scale(0.5);
+            transform: scale(0.5);
+        }
+        
+        
+        *{
+            font-family: sans-serif;
+        }
+       
+        @page {
+            @bottom-right {
+                font-family: sans-serif;
+                font-size: 60%;
+                content: "{!quoteRef} Page " counter(page) " of " counter(pages);
+            }
+        }
+        
+        #smallCommercialWilbur{
+            height: 40px;
+            position: relative;
+            top: 0px;
+            right: -400px;
+            z-index: 100;
+
+        }
+        
+        table#hpExample {font-size:70%;}
+        table#hpExample th {border: 1px solid silver;} table#hpExample td {text-align: center;border: 1px solid silver;} table#hpExample td:nth-child(1) {width:100px;} table#hpExample .noBorder{border: none} table#hpExample #trAPR{background: #00baf2}
+
+        
+       
+        </style>
+    </head>
+    <body>
+        <apex:outputText value="{!pageContent}" escape="false"/>
+    </body>
+</html>
+</apex:page>

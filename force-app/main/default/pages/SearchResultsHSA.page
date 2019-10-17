@@ -1,0 +1,384 @@
+<apex:page controller="SearchResultsController" action="{!runSearch}" DocType="html-5.0" showheader="false" sidebar="false" tabStyle="Job__c" id="page">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css"/>
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+
+<style>
+.candidates 
+{
+    font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+    font-size: 12px;
+    margin: 10px;
+    width: 950px;
+    text-align: center;
+    border-collapse: collapse;
+    
+    
+}
+table.candidates
+{
+  font-size: 13px;
+    font-weight: normal;
+    padding: 8px;
+    
+    ground: #dddddd;
+    border-top: 4px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+    color: #039;
+    
+}
+td.candidates
+{
+    padding: 8px;
+    background: #dddddd; 
+    border-bottom: 1px solid #dddddd;
+    color: #669;
+    border-top: 1px solid transparent;
+    
+}
+.candidates tr:hover td
+{
+    background: #d0dafd;
+    color: #339;
+}
+.header 
+{
+    font-size:10pt;
+    font-weight: bold; 
+    text-align: center;  
+}
+.optiongroup
+{
+    background-color: #FAFAFA;
+}
+.groupcelltop
+{
+    border-top-color : black;
+    border-top-width : thin;
+    border-top-style : solid;
+    padding-right : 8px;
+}
+th.results
+{
+    padding-right : 8px;
+}
+td.secondaryResourceName
+{
+    padding-left : 8px;
+}
+
+Table.Sample {
+         border-collapse: collapse;
+         width: 100%;  
+         border: 1px solid #ddd;
+         text-align: left;         
+                }
+Table.Sample Td {
+    Color: Black;
+    border: 1px solid #ddd;
+    //text-align: center;
+    font-size: 18px;
+    font-family: Times New Roman;
+    
+}
+
+Table.Sample Th {
+    Color: Black;
+    //text-align: center;
+    border: 1px solid #ddd;
+    font-size: 18px;
+    font-family: Times New Roman;
+    
+}
+Table.Sample Tr.D0 Th {
+                    Background-color: #ebebeb;
+                }
+caption {
+  background-color: #006400;
+  color: white;
+  //text-align: left;
+  font-weight: bold;
+  font-size: 18px;
+  font-family: Times New Roman;
+}
+td {
+    padding: 10px;
+    text-align: left;
+}
+th{
+   padding: 10px;
+}
+
+#ui-datepicker-div { font-size:15px; }
+
+
+</style>
+<script>
+   
+   function myFunction(obj){
+     //alert('-----');
+     //var cdate= document.getElementById("cdate").value;
+     
+     var cdate= document.getElementById("cdate").value; //page:frm:Pb:sec1:secitem1:cdate
+     //alert(cdate);
+     dosrch(cdate);
+    
+   }
+   
+   $(function() {
+       $(".datepicker").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd/mm/yy',
+        showOn: 'button',
+        onClose: function(dateText, inst) 
+        { 
+            $(this).attr("disabled", false);
+        },
+        
+        beforeShow: function (input, inst) {
+            $(this).attr("disabled", true);
+            var rect = input.getBoundingClientRect();
+            setTimeout(function () {
+                inst.dpDiv.css({ top: rect.top - 210,
+                    left: rect.left  });
+            }, 0);
+        },
+        buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+        buttonImageOnly: true,
+        //buttonText: "Select date"
+        
+       }); 
+       $(".hasDatepicker").on("blur", function(e) { $(this).datepicker("hide"); });
+   });
+
+   
+    var isClicked = false;
+    function check(obj) {
+      if(isClicked) {
+            alert('Button can only be pressed once');
+            return false;
+        } else {
+            isClicked = true;
+            obj.className = 'btnDisabled';
+            togglleDiv('');
+            
+        }
+    }
+    var isClicked1 = false;
+    function check1(obj) {
+      if(isClicked) {
+            alert('Button can only be pressed once');
+            return false;
+        } else {
+            isClicked1 = true;
+            obj.className = 'btnDisabled';
+            togglleDiv('');
+            
+        }
+    }
+    
+    function isClickedReset(){
+          isClicked = false;
+          togglleDiv('none');
+    }
+    
+    function togglleDiv(show){
+        document.getElementById('darkLayer').style.display = show; 
+        if(isClicked)
+        document.getElementById('LoadingDiv').style.display = show;      
+        else
+        document.getElementById('LoadingDiv1').style.display = show;
+    } 
+</script>
+<!-- Added for Priority Installations CR start -->
+<script type="text/javascript" src="/soap/ajax/15.0/connection.js"></script>
+<script type="text/javascript" src="/soap/ajax/15.0/apex.js"></script>
+<script type="text/javascript" src="/js/functions.js"></script>
+<apex:sectionHeader title="Plan Job - Search Results" subtitle="{!job.name}"/>
+
+<apex:outputPanel id="page1">
+    <apex:form id="frm">
+        
+        <apex:actionfunction name="dosrch" action="{!search}" rerender="frm" status="stat"> <!--  -->
+        <apex:param name="cDate" value=""/>
+        </apex:actionfunction>
+        <apex:actionstatus id="stat" onstart="check(true);" onstop="isClickedReset()"></apex:actionstatus>
+        
+        <apex:outputpanel id="page2">
+            <apex:pageBlock id="lead-edit-block" Title="Please Choose A Date">
+               <apex:outputPanel id="page3"> 
+                <apex:pageblockSection columns="2">
+                   <apex:outputField value="{!job.Customer_Name__c}"/>
+                   <apex:outputField value="{!job.CHI_Lead_Name__c}"/>
+                   <apex:outputField value="{!job.CHI_Lead_Number_Text__c}"/>
+                   <apex:outputField value="{!job.Address__c}"/>
+                    <apex:pageBlockSectionItem rendered="{!job.Engineer_Workload__c!=''}">
+                             <apex:outputText value="Engineer Workload : " style="font-weight:bold;text-align:top;"/>
+                             <apex:image url="{!$Resource.Low_Utilisation}" height="35" width="200" rendered="{!job.Engineer_Workload__c!=''}"/>
+                   </apex:pageBlockSectionItem>
+                </apex:pageblockSection>
+               </apex:outputPanel>
+               <apex:outputpanel id="page4">
+                <!-- <apex:variable value="{!1}" var="count"/> -->
+                <apex:pageblocksection id="sec1" title="Installation Date" collapsible="false">
+                
+                <apex:pageblocksectionitem id="secitem1">
+                
+            
+                 <apex:outputLabel value="Customer Preferred Date" style="font-weight:bold;family:calibri;font-size:120%;"/> 
+                 <input class="datepicker" name="date1" type="text" id="cdate" value="{!custDate}"/>
+                 
+                 <!--<apex:inputText id="reviewDate" size="5"
+                                        onclick="DatePicker.pickDate(false, this, false);" styleClass="cssbody"
+                                        value="{!custDate}" label="Review Date" style="width:20%"/>-->
+                 <!--  <input type="date" value="{!custDate}" onchange="myFunction()" id="cdate"/> -->
+                  <!-- <apex:inputfield value="{!job.Customer_Preferred_Date__c}" id="cdate"/> -->
+                 <!-- <apex:inputfield value="{!job.Customer_Preferred_Date__c}" id="aName" onfocus="DatePicker.pickDate(true, '{!$Component.aName}' , false);"/>
+                    <a href="javascript:DatePicker.pickDate(true, '{!$Component.aName}', false);" >
+                        <img src="data:image/gif;base64,R0lGODlhEAAQAMQAANvn8klVa+bt9Onx9lRpiUWHuXaYtT13uVJgea/S5OPr8ENLXPL1+HiOqerv+m+NrYOqxYyzzFp5npa805/E2KjL3ikxQz5FVUHUD+fv93uhvercjYXaaer0/7jT7P///yH5BAAAAAAALAAAAAAQABAAAAWJ4CeOZCkCSVJRUwRphvFIjZgAGaDvevYRtk5heCgaDz9RZeDpNJ/OTvJDyXg8m+x1+0GIJo5mdhNtdkWRMFbLaXs+ARFEAG1yMBxp/KNRtDlbf28LIhoCd3l1UoQfBoduW1wXIg8MilAfkx8SAAwCnwqhCgADHxYiDQSqCAgBAQsLFxcWXia2IyEAOw==" 
+                             width="20" height="20" alt="Calendar Icon" border="0" id="datePickerImage1" />
+                    </a> -->
+                 </apex:pageblocksectionitem>    
+                 <apex:commandbutton value="Search Again" onclick="myFunction();" rerender="candblock"/>
+               </apex:pageblocksection> 
+           </apex:outputPanel>
+           <br/>
+           <!-- <apex:variable value="{!1}" var="rowNum"/> -->
+              
+             <!-- <apex:variable value="{!1}" var="count"/>  -->
+             <style>
+                 body .bPageBlock .pbBody .red .pbSubheader h3{
+                                color: #Ffffff;
+                          }
+                 body .bPageBlock .pbBody .red{
+                                font-size: 17px;
+                          }
+            
+             </style>
+             <apex:outputPanel styleClass="red" layout="block">
+             <apex:pageblocksection title="Job Results" id="sec" columns="1" collapsible="false"/>
+            
+             </apex:outputpanel>
+             <br/>
+             <apex:outputPanel >
+             <apex:outputText value="Please keep in mind this is a heavy appliance job, and the system will bring in a 2 man team only." style="font-size:15px;font-weight:bold;" rendered="{!job.Heavy_Appliance__c && !job.Override_Heavy_Appliance__c&& resourcesRender == true && errorRender == false && $Label.Heavy_Appliance_Job=='on'}"></apex:outputText>
+             <br/>
+             </apex:outputPanel>
+             <br/>
+             
+             <apex:outputpanel id="error">
+                <apex:pageBlock title="Error" rendered="{!errorRender}" id="pgError">
+                              <font face="verdana" color="red">{!errorMsg}</font>
+                       </apex:pageBlock>
+                </apex:outputPanel>    
+             <!--<apex:outputpanel id="businseslock">
+             <apex:pageblock title="Business Best">
+             <apex:variable value="{!1}" var="rowNum1"/>
+             <center>
+              <apex:pageblockTable value="{!businessBest}" var="b" >
+                   <apex:column headerValue="Options" style="text-align:left;">
+                             <apex:outputText value="{!rowNum1}" style="font-size:18px;"/> 
+                   </apex:column>
+                            
+                   <apex:column headerValue="Start" >
+                     <apex:outputText value="{!b.PrimaryStart}" style="font-size:18px;font-family:Times New Roman;"/>
+                   </apex:column>
+                   
+                    <apex:column >
+                    <apex:outputLink style="font-weight:bold;color:Blue;font-size:20px;font-family:Times New Roman;" value="BookJobOptionHSA?optionID={!b.OptionID}&jobId={!jobId}&dist={!b.primaryResourceDistanceFromJob}&time={!b.primaryResourceTravelTimeFromJob}&date={!b.PrimaryStart}&custDate={!custDate}&p=N" id="theLink" onclick="check1(this)" >Book</apex:outputLink>
+                    <apex:variable var="rowNum" value="{!rowNum1 + 1}"/>
+                    </apex:column>
+                
+                </apex:pageBlockTable> 
+              </center>
+              </apex:pageblock>
+              </apex:outputpanel>-->
+              
+             <apex:outputpanel id="candblock">
+             <apex:pageblock title="Customer Preferred">
+             <apex:variable value="{!1}" var="rowNum"/>
+             <center>
+              <apex:pageblockTable value="{!Candidates1}" var="p">
+                   <apex:column headerValue="Options" style="text-align:left;">
+                             <apex:outputText value="{!rowNum}" style="font-size:18px;"/> 
+                   </apex:column>
+                            
+                   <apex:column headerValue="Start" >
+                     <apex:outputText value="{!p.PrimaryStart}" style="font-size:18px;font-family:Times New Roman;"/>
+                   </apex:column>
+                   
+                    <apex:column >
+                    <apex:outputLink style="font-weight:bold;color:Blue;font-size:20px;font-family:Times New Roman;" value="BookJobOptionHSA?optionID={!p.OptionID}&jobId={!jobId}&dist={!p.primaryResourceDistanceFromJob}&time={!p.primaryResourceTravelTimeFromJob}&date={!p.PrimaryStart}&custDate={!custDate}&p=N" id="theLink" onclick="check1(this)" >Book</apex:outputLink>
+                    <apex:variable var="rowNum" value="{!rowNum + 1}"/>
+                    </apex:column>
+                
+                    <apex:column headerValue="Engineer" rendered="{!$Profile.Name == 'System Administrator'}">
+                     <apex:outputText value="{!p.PrimaryNames}" style="font-size:18px;font-family:Times New Roman;"/>
+                     </apex:column>
+                   
+                    <apex:column headerValue="Travel Time" rendered="{!$Profile.Name == 'System Administrator'}">
+                     <apex:outputText value="{!p.primaryResourceTravelTimeFromJob}" style="font-size:18px;font-family:Times New Roman;"/>
+                     </apex:column>
+
+                </apex:pageBlockTable> 
+              </center>
+              </apex:pageblock>
+              </apex:outputpanel>   
+              <!-- </apex:pageBlockSection> --> 
+             
+            <!-- <apex:commandlink action="{!showmore}" value="Show More" rendered="{!showmore}" rerender="pge" style="color:blue;"/> -->
+            <!-- In case no Customer Preferred results are returned -->
+            <apex:pageBlockSection collapsible="false" title="No Options were returned" rendered="{!resourcesRender == false && errorRender == false}">   
+            </apex:pageBlockSection>
+                <!-- Added for Next 7 days employee search change start -->
+                <apex:pageBlockButtons location="bottom" rendered="{!nextb}">                                                                                                       
+                <apex:commandButton action="{!back}" value="Back To Job" style="font-size:15px;font-family:Times New Roman;" onclick="check(this);"  oncomplete="isClickedReset()" reRender="frm"/> 
+                <apex:commandButton action="{!next7Days}" value="Next 7 days" style="font-size:15px;font-family:Times New Roman;" onclick="check(this);"  oncomplete="isClickedReset()" reRender="frm"/> 
+        
+                </apex:pageBlockButtons>
+           
+            <!-- Added for Next 7 days employee search change end -->
+        </apex:pageBlock>
+        </apex:outputPanel>  
+        
+        <apex:outputpanel id="error">
+        <apex:pageBlock title="Error" rendered="{!errorRender}" id="pgError">
+                    <apex:pageBlockButtons location="bottom">                                                                                                       
+                        <apex:commandButton action="{!returnToJob}" value="Back"/> 
+                        
+                    </apex:pageBlockButtons> 
+                      <font face="verdana" color="red">{!errorMsg}</font>
+               </apex:pageBlock>
+        </apex:outputPanel>     
+       
+        <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:360px; top:320px;display:none;">
+                    <div style="margin-left:5px; margin-top:5px;">
+                    <img src="/img/loading.gif" /> Searching is under progress...please wait...
+                    </div>
+        </div>
+        
+        <div id="LoadingDiv1" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:360px; top:320px;display:none;">
+                    <div style="margin-left:5px; margin-top:5px;">
+                    <img src="/img/loading.gif" /> Loading Booking Page...please wait...
+                    </div>
+        </div>
+        
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;">
+        </div>
+        </apex:form>
+    
+    </apex:outputPanel>
+</apex:page>

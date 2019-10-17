@@ -1,0 +1,211 @@
+<apex:page controller="JobNotificationMail" renderAs="pdf" tabStyle="Job_Diary__tab" title="Job Diary">
+<apex:outputPanel rendered="{!if(ISNULL(lst_JobDiaryDetails),false,true)}">       
+        <apex:pageblock title="{!str_InstallerName}">
+             <apex:pageBlock title="{!str_jobPipelineTimeline}">
+                 <apex:repeat value="{!lst_JobDiaryDetails}" var="v_job">
+                    <apex:pageBlock >
+                        <apex:pageblocksection title="{!v_job.str_JobTitle}" columns="1">
+                            <apex:pageblockSection >                                                        
+                                <apex:pageBlockSectionItem rendered="{!IF((contains($Profile.Name, 'CHI Agency Office User') && ISNULL(specificContractor)),True,False)}">
+                                    <apex:outputLabel value="Installer Name" for="InstallerName"></apex:outputLabel>
+                                    <apex:outputText value="{!v_job.sInstallerNameOfOfficeUser}" id="InstallerName"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem rendered="{!IF((contains($Profile.Name, 'CHI Agency Office User') && ISNULL(specificContractor)),True,False)}">                                    
+                                </apex:pageBlockSectionItem> 
+                                
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Customer Name" for="CustomerName"></apex:outputLabel>
+                                    <apex:outputField value="{!v_job.obj_job5.Customer_Name__c}" id="CustomerName"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="CHI Lead Number" for="CHILeadNUM"></apex:outputLabel>
+                                    <apex:outputField value="{!v_job.obj_job5.CHI_Lead_Number_Text__c}" id="CHILeadNUM"/>
+                                </apex:pageBlockSectionItem>
+                                
+                                <apex:pageBlockSectionItem >
+                                   <apex:outputLabel value="Installation Address" for="InstallationAddress"></apex:outputLabel>
+                                   <apex:outputField value="{!v_job.obj_job5.Address__c}" id="InstallationAddress"/>
+                                </apex:pageBlockSectionItem> 
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Job No" for="JobNo"></apex:outputLabel>
+                                    <apex:outputField id="JobNo" value="{!v_job.obj_job5.Name}" />                                    
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Installation Date" for="InstallationDate"></apex:outputLabel>
+                                    <apex:outputField value="{!v_job.obj_job5.Installation_Date__c}" id="InstallationDate"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageblockSectionItem >
+                                   <apex:outputLabel value="Home Phone" for="HomePhone"></apex:outputLabel>
+                                   <apex:outputField value="{!v_job.obj_job5.Home_Phone__c}" id="HomePhone"/>
+                                </apex:pageblockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Delivery Date" for="DeliveryDate"></apex:outputLabel>
+                                    <apex:outputField value="{!v_job.obj_job5.Delivery_Date__c}" id="DeliveryDate"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageblockSectionItem >
+                                   <apex:outputLabel value="Work Phone" for="WorkPhone"></apex:outputLabel>
+                                   <apex:outputField value="{!v_job.obj_job5.Work_Phone__c}" id="WorkPhone"/>
+                                </apex:pageblockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel value="Job Status" for="JobStatus"></apex:outputLabel>
+                                    <apex:outputField value="{!v_job.obj_job5.Status__c}" id="JobStatus"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageblockSectionItem >
+                                   <apex:outputLabel value="Mobile" for="MobilePhone"></apex:outputLabel>
+                                   <apex:outputField value="{!v_job.obj_job5.Best_Phone_Number__c}" id="MobilePhone"/>
+                                </apex:pageblockSectionItem>
+                                
+                                 
+                                <apex:pageBlockSectionItem rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}">
+                                   <apex:outputLabel value="Amount Outstanding" for="AmountOutstanding"></apex:outputLabel>
+                                   <apex:outputField value="{!v_job.obj_job5.CHI_Lead__r.Balance_Outstanding__c}" id="AmountOutstanding"/>
+                                </apex:pageBlockSectionItem>
+                        
+                                <apex:pageBlockSectionItem rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}">
+                                    <apex:outputLabel value="Salesperson" for="Salesperson"></apex:outputLabel>
+                                    <apex:outputField value="{!v_job.obj_job5.CHI_Lead__r.OwnerId}" id="Salesperson"/>
+                                </apex:pageBlockSectionItem>
+                                
+                                <apex:pageBlockSectionItem rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}">
+                                   <apex:outputLabel value="Payment Method" for="PaymentMethod"></apex:outputLabel>
+                                   <apex:outputField value="{!v_job.obj_job5.CHI_Lead__r.Payment_Method__c}" id="PaymentMethod"/>
+                                </apex:pageBlockSectionItem>      
+        
+                                <apex:pageBlockSectionItem rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}">
+                                    <apex:outputLabel value="Planner" for="Planner"></apex:outputLabel>
+                                    <apex:outputText value="{!v_job.obj_job5.PlannerName__c}" id="planner" /> 
+                                </apex:pageBlockSectionItem>
+                                
+                            </apex:pageblockSection> 
+                              
+                            <apex:pageBlockSection title="Notes" columns="1">
+                                <apex:pageBlockSectionItem > <!-- rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False,True)}" -->
+                                    <apex:outputLabel value="Job Installation Notes" for="Inst_notes"></apex:outputLabel>
+                                    <apex:outputField value="{!v_job.obj_job5.Installer_Notes__c}" id="Inst_notes" /> 
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem > <!-- rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), True,False)}" -->
+                                    <apex:outputLabel value="Boiler Installation Notes" for="Inst_notes_contractor"></apex:outputLabel>
+                                    <apex:outputText value="{!v_job.sBoilerInstallationNotes}" id="Inst_notes_contractor" /> 
+                                </apex:pageBlockSectionItem>
+                                
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel for="statusNotes" value="Status Notes" />
+                                    <apex:outputField value="{!v_job.obj_job5.Quote_Status_Notes__c}" id="statusNotes"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel for="deliveryNotes" value="Delivery Notes" /> 
+                                    <apex:outputField value="{!v_job.obj_job5.Quote_Delivery_Notes__c}" id="deliveryNotes"/>
+                                </apex:pageBlockSectionItem>                                 
+                            </apex:pageBlockSection>
+                            <!-------------- ORDERS SHOULD NOT BE DISLAYED IN PDF VIEW ----------------------------
+                            <apex:pageBlockSection title="Orders" columns="1" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor'),contains($Profile.Name, 'System Administrator')),True,False)}">   
+                                <apex:outputText value="{!orderMessage}" rendered="{! IF(ISNULL(v_job.lst_Order),true,false)}"/>
+                                <apex:pageBlocktable value="{!v_job.lst_Order}" var="order" columns="5" columnsWidth="100px, 100px, 100px, 100px, 100px,100px" rendered="{! IF(NOT(ISNULL(v_job.lst_Order)),true,false)}">
+                                    <apex:Column >
+                                        <apex:facet name="header">Order</apex:facet>
+                                        <apex:outputField value="{!order.name}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">SAP Number</apex:facet>
+                                        <apex:outputField value="{!order.SAP_Number__c}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Status</apex:facet>
+                                        <apex:outputField value="{!order.Status__c}"/>
+                                    </apex:Column>                                    
+                                    <apex:Column >
+                                        <apex:facet name="header">Supplier</apex:facet>
+                                        <apex:outputField value="{!order.Supplier_Name__c}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Order date</apex:facet>
+                                        <apex:outputField value="{!order.CreatedDate}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Order Value</apex:facet>
+                                        <apex:outputField value="{!order.Order_Value_Text__c}"/>
+                                    </apex:Column>                                   
+                                </apex:pageBlocktable>
+                            </apex:pageBlockSection> 
+                            ------------------------------------------------------------->
+                            <apex:pageBlockSection title="Materials" columns="1" rendered="{!IF(OR(AND(contains($Profile.Name, 'CHI Agency Office User'),ISNULL(specificContractor)),ISNULL(v_job.lst_Material)),False,True)}">   
+                                <apex:pageBlocktable value="{!v_job.lst_Material}" var="JobElements" columns="5" columnsWidth="100px, 100px, 100px, 200px,100px">
+                                    <apex:Column >
+                                        <apex:facet name="header">Material Order No</apex:facet>
+                                        <apex:outputField value="{!JobElements.Merchant_Order_Number__c}" rendered="{!IF(AND(contains(JobElements.Type__c, 'Material'),!ISNULL(JobElements.Order__c),contains(JobElements.Status__c, 'Active'),contains(JobElements.Sub_Status__c, 'Ordered')),True,False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Supplier</apex:facet>
+                                        <apex:outputField value="{!JobElements.Current_Supplier__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Material'), True, False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Product Name</apex:facet>
+                                        <apex:outputField value="{!JobElements.Code__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Material'), True, False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Product Description</apex:facet>
+                                        <apex:outputField value="{!JobElements.Description__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Material'), True, False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Quantity</apex:facet>
+                                        <apex:outputField value="{!JobElements.Units__c}"   rendered="{!IF(contains(JobElements.Type__c, 'Material'), True, False)}"/>
+                                    </apex:Column>                                    
+                                </apex:pageBlocktable>
+                            </apex:pageBlockSection>
+                            
+                            <apex:pageBlockSection title="Labour" columns="1" rendered="{!IF(OR(AND(contains($Profile.Name, 'CHI Agency Office User'),ISNULL(specificContractor)),ISNULL(v_job.lst_Labour)),False,True)}">  
+                                <apex:pageBlocktable value="{!v_job.lst_Labour}" var="JobElements" columns="6" columnsWidth="100px, 100px, 100px, 100px,100px,100px">
+                                    <apex:Column >
+                                        <apex:facet name="header">Supplier Order No </apex:facet>
+                                        <apex:outputField value="{!JobElements.Supplier_Order_Number__c}" rendered="{!IF(AND(contains(JobElements.Type__c, 'Work'),!ISNULL(JobElements.Order__c),contains(JobElements.Status__c, 'Active'),contains(JobElements.Sub_Status__c, 'Ordered')),True,False)}" />
+                                    </apex:Column>
+                                     
+                                    <apex:Column >
+                                        <apex:facet name="header">Supplier</apex:facet>
+                                        <apex:outputField value="{!JobElements.Current_Supplier__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Work'), True, False)}"/>
+                                    </apex:Column>
+                                     
+                                     <!-- -------TODAYS DEFECT FIX -->
+                                   <!--  <apex:Column >
+                                        <apex:facet name="header">Supplier</apex:facet>
+                                        <apex:outputField value="{!JobElements.Current_Supplier__c}"  rendered="{!IF(AND(ISNULL(JobElements.New_Supplier__c),contains(JobElements.Type__c, 'Work')), True, False)}" />
+                                    </apex:Column>
+                                   <apex:Column >
+                                        <apex:facet name="header">Supplier</apex:facet>
+                                        <apex:outputField value="{!JobElements.New_Supplier__c}"  rendered="{!IF(AND(!ISNULL(JobElements.New_Supplier__c),contains(JobElements.Type__c, 'Work')), True, False)}" />
+                                    </apex:Column> -->
+                                    <!-- -------TODAYS DEFECT FIX -->
+                                    <apex:Column >
+                                        <apex:facet name="header">Description</apex:facet>
+                                        <apex:outputField value="{!JobElements.Description__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Work'), True, False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Type</apex:facet>
+                                        <apex:outputField value="{!JobElements.Type__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Work'), True, False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Skill</apex:facet>
+                                        <apex:outputField value="{!JobElements.Skill__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Work'), True, False)}"/>
+                                    </apex:Column>
+                                    <apex:Column >
+                                        <apex:facet name="header">Hours</apex:facet>
+                                        <apex:outputField value="{!JobElements.UnitsFormula__c}"  rendered="{!IF(contains(JobElements.Type__c, 'Work'), True, False)}"/>
+                                    </apex:Column>
+                                </apex:pageBlocktable>
+                            </apex:pageBlockSection> 
+                             
+                            <apex:pageBlockSection title="Other Installers" columns="1" >
+                                <apex:pageBlockTable value="{!v_job.obj_job5.User_Jobs__r}" var="UserJob" rendered="{!NOT(ISNULL(v_job.obj_job5.User_Jobs__r))}" columns="3" columnsWidth="200px, 200px, 200px">
+                                    <apex:Column HeaderValue="User" value="{!UserJob.User__c}" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False, True)}" />
+                                    <apex:Column HeaderValue="User" value="{!UserJob.User__r.name}" rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), True, False)}"/>
+                                    <apex:Column HeaderValue="Skills" value="{!UserJob.Sub_Type__c}"  />
+                                    <apex:Column HeaderValue="Mobile No." value="{!UserJob.User__r.MobilePhone}" />
+                                </apex:pageBlocktable>
+                            </apex:pageBlockSection>                                                                              
+                        </apex:pageblocksection>                        
+                    </apex:pageBlock>
+                </apex:repeat>
+            </apex:pageBlock>        
+        </apex:pageblock>            
+        </apex:outputPanel>
+        </apex:page>

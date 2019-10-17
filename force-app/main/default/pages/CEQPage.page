@@ -1,0 +1,270 @@
+<apex:page sidebar="false" controller="CEQController" tabStyle="account" docType="html-5.0"  >
+
+<chatter:feedWithFollowers entityId="{!jobID}" showHeader="true" rendered="{!showCustomer}"/>    
+    
+<apex:form >
+    <apex:pageMessages />
+    <apex:pageBlock >
+    <div align="Center">
+        <h1>Customer Excellence Audit</h1>
+    </div>
+    </apex:pageBlock>
+    
+    <apex:pageBlock title="Search" rendered="{!showSearch}">
+        <apex:outputText value="CHI Lead Number " />
+        <apex:input value="{!searchString}"  />
+        <apex:commandButton value="SEARCH" action="{!search}"/>
+    </apex:pageBlock>
+      
+    <!-- Job & Customer details -->
+    <apex:pageBlock rendered="{!showCustomer}">
+        
+    <apex:pageBlockSection title="Customer Information" columns="2" showHeader="True" collapsible="false" rendered="{!showCustomer}" >
+
+        <apex:outputField value="{!jobDetails.Customer_Name__c}"/>  <!-- Customer Name -->
+        
+        <apex:outputField label="Category" value="{!jobDetails.Latest_customer_category_indicator__c}" />  <!-- Category -->
+        
+        <apex:outputField value="{!jobDetails.Install_Street__c}"/> <!-- street -->
+        <apex:outputField value="{!jobDetails.name}" /> <!-- Job number  -->
+        
+        <apex:outputField value="{!jobDetails.Install_Postcode__c}"/>  <!-- postcode -->     
+        <apex:outputField value="{!jobDetails.CHI_Lead__c}"/> <!-- CHI Lead link -->
+        
+        <apex:outputField label="Completed Surveys" value="{!jobDetails.CHI_Lead__r.Surveys_taken__c}"/> <!--completed Surveys-->        
+         
+        <apex:outputText value="{!jobDetails.Best_Phone_Number__c}" /> <!-- Mobile -->
+        <apex:outputField value="{!jobDetails.Quote__c}"/> <!-- quote link -->
+        
+        <apex:outputField value="{!jobDetails.Home_Phone__c}" /> <!-- home phone -->
+        <apex:outputField value="{!jobDetails.Status__c}"/> <!-- job status -->
+        
+        <apex:outputField value="{!jobDetails.Customer_Email_Address__c}" /> <!-- email -->
+        <apex:outputField value="{!jobDetails.Installation_Date__c}"/> <!-- install date -->  
+        
+        <apex:outputField value="{!jobDetails.HSA_Name__c}" /> <!-- HSA -->
+        <apex:outputField value="{!jobDetails.Mechanical_Installer__c}"/> <!-- mechanical installer --> 
+             
+        <apex:outputField value="{!quoteDetails.Job_Type_Description__c}"/> <!-- Job Type description -->                       
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Notes Link" for="noteslink" style="font-weight:bold"/>
+        <apex:outputLink title="Job Note Link" id="noteslink" value="/apex/AmalgamateNotes?OppId={!jobDetails.CHI_Lead__c}" target="_blank">Job Notes</apex:outputLink>             
+        </apex:pageBlockSectionItem>
+        
+        <apex:outputText value="{!jobDetails.Payment_Method__c}" /> <!-- Payment Method -->
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+        <!-- Hidden as per request from Nicky Hague 29/12/2015 - Phil Dennison 
+        <apex:pageBlockSectionItem >
+        <apex:outputLabel value="Customer Unavailable" for="custUnav" style="font-weight:bold"/>
+        <apex:actionRegion >
+        <apex:inputCheckbox id="custUnav"  label="Customer Unavailable" value="{!customerUnavailable}" onchange="checkbox1();"> 
+            <apex:actionFunction name="checkbox1" reRender="customer,other" action="{!showCustomerSelection}"/>
+        </apex:inputCheckbox>   
+        </apex:actionRegion>
+        </apex:pageBlockSectionItem>
+        -->
+        
+        <apex:pageBlockSectionItem />
+        
+        <apex:inputCheckbox value="{!newCEQ.Pre_Install__c}" label="Pre-Install"/>
+        <apex:inputCheckbox value="{!newCEQ.WIP__c}" label="WIP"/>
+        <apex:inputCheckbox value="{!newCEQ.Post_Install__c}" label="Post Install"/>
+        <apex:inputCheckbox value="{!newCEQ.Deep_Dive__c}" label="Deep Dive"/>
+        
+    </apex:pageBlockSection>
+   
+   <apex:pageBlockSection title="Boiler Notes" columns="1" collapsible="false" rendered="{!showCustomer}">      
+        <apex:outputText value="{!quoteProdNote}" />      
+    </apex:pageBlockSection> 
+                  
+    </apex:pageBlock>
+
+    <apex:pageBlock rendered="{!showQuestions}">
+        
+    <!-- Sales Question block -->  
+    <apex:pageBlockSection columns="1" title="Sales Process" collapsible="false">    
+    <div align="center">
+        <apex:pageBlockTable columns="3" width="100%" align="center" value="{!SQuestionsClass}" var="sq">
+            <apex:column width="60%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="{align:center}"  headerValue="Answer">
+                                                            
+                <apex:selectRadio id="Sales" required="false" value="{!sq.answer}">
+                    <apex:selectOptions value="{!sq.options}"/> 
+                </apex:selectRadio>                    
+                                    
+            </apex:column>
+            <apex:column width="20%" headerValue="Notes" >
+                <apex:inputText size="50" value="{!sq.notes}"/>
+            </apex:column>   
+        </apex:pageBlockTable>
+     </div>       
+    </apex:pageBlockSection> 
+        
+    <!-- Installation Question block -->  
+    <apex:pageBlockSection columns="1" title="Ops Process" collapsible="false">    
+    <div align="center">
+        <apex:pageBlockTable columns="3" width="100%" align="center" value="{!IQuestionsClass}" var="sq">
+            <apex:column width="40%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="{align:center}"  headerValue="Answer">
+
+                <apex:selectRadio id="Installation" required="false" value="{!sq.answer}">
+                    <apex:selectOptions value="{!sq.options}"/>
+                </apex:selectRadio> 
+   
+            </apex:column>
+            <apex:column width="30%" headerValue="Notes" >
+                <apex:inputText size="50" value="{!sq.notes}"/>
+            </apex:column> 
+        </apex:pageBlockTable>
+     </div> 
+     </apex:pageBlockSection>      
+    
+    <!-- Customer Question block --> 
+        <apex:outputPanel id="customer">
+    <apex:pageBlockSection id="customerSection" columns="1" title="Customer" rendered="{!NOT(customerUnavailable)}" collapsible="false">    
+                  
+    <div align="center">
+        <apex:pageBlockTable columns="3" width="100%" align="center" value="{!CQuestionsClass}" var="sq">
+            <apex:column width="40%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>            
+            <apex:column width="20%" style="{align:center}"  headerValue="Answer">
+                
+                <apex:selectRadio id="Customer" required="false" value="{!sq.answer}">
+                    <apex:selectOptions value="{!sq.options}"/>
+                </apex:selectRadio>
+                        
+            </apex:column>               
+            <apex:column width="30%" headerValue="Notes" >
+                <apex:inputText size="50" value="{!sq.notes}"/>
+            </apex:column>             
+        </apex:pageBlockTable>
+     </div>       
+    </apex:pageBlockSection>    
+    </apex:outputPanel>
+        
+    <!-- Other Question block --> 
+    <apex:outputPanel id="other">
+    <apex:pageBlockSection id="otherSection" columns="1" title="Quality" rendered="{!NOT(customerUnavailable)}" collapsible="false">    
+                  
+    <div align="center">
+        <apex:pageBlockTable columns="3" width="100%" align="center" value="{!OQuestionsClass}" var="sq">
+            <apex:column width="40%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>            
+            <apex:column width="20%" style="{align:center}"  headerValue="Answer">
+                
+                <apex:selectRadio id="Customer" required="false" value="{!sq.answer}">
+                    <apex:selectOptions value="{!sq.options}"/>
+                </apex:selectRadio>
+                        
+            </apex:column>               
+            <apex:column width="30%" headerValue="Notes" >
+                <apex:inputText size="50" value="{!sq.notes}"/>
+            </apex:column>             
+        </apex:pageBlockTable>
+     </div>       
+    </apex:pageBlockSection>    
+    </apex:outputPanel>
+        <!-- End of Other Question block -->     
+        
+        
+    <!-- RQM Question block --> 
+    <apex:outputPanel id="RQM">
+    <apex:pageBlockSection id="RQMSection" columns="1" title="Safety" rendered="true" collapsible="false">    
+                  
+    <div align="center">
+        <apex:pageBlockTable columns="3" width="100%" align="center" value="{!RQuestionsClass}" var="sq">
+            <apex:column width="40%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>            
+            <apex:column width="20%" style="{align:center}"  headerValue="Answer">
+                
+                <apex:selectRadio id="Customer" required="false" value="{!sq.answer}">
+                    <apex:selectOptions value="{!sq.options}"/>
+                </apex:selectRadio>
+                        
+            </apex:column>               
+            <apex:column width="30%" headerValue="Notes" >
+                <apex:inputText size="50" value="{!sq.notes}"/>
+            </apex:column>             
+        </apex:pageBlockTable>
+     </div>       
+    </apex:pageBlockSection>    
+    </apex:outputPanel>
+    <!-- End of RQM block --> 
+    
+    <apex:pageBlockButtons >    
+        <apex:commandButton value="SAVE" action="{!save}" />
+        <apex:commandButton value="CANCEL" action="{!cancel}" immediate="true" />
+    </apex:pageBlockButtons>
+    
+    </apex:pageBlock>
+      
+    <apex:pageBlock title="Upload attachment" rendered="{!showCustomer}">
+      
+      <apex:pageBlockSection collapsible="true" showHeader="true" columns="3" id="block1">
+ 
+        <apex:pageBlockSectionItem >
+          <apex:outputLabel value="File" for="file"/>
+          <apex:inputFile value="{!attachment.body}" filename="{!attachment.name}" id="file"/>
+        </apex:pageBlockSectionItem>
+        
+        <apex:pageBlockSectionItem >
+          <apex:outputLabel value="Title" for="name"/>
+          <apex:inputTextarea value="{!fileName}"/>
+        </apex:pageBlockSectionItem>
+ 
+ 
+        <apex:pageBlockSectionItem >
+          <apex:outputLabel value="Description" for="description"/>
+          <apex:inputTextarea value="{!attachment.description}" id="description"/>
+        </apex:pageBlockSectionItem>
+ 
+      </apex:pageBlockSection>
+       
+      <apex:pageBlockButtons >
+            <apex:commandButton action="{!upload}" value="Upload"/>   
+      </apex:pageBlockButtons>
+    
+    </apex:pageBlock>
+    
+    <apex:pageBlock title="JCD List" >
+        <apex:pageBlockSection columns="1" rendered="{!showCustomer}" >
+            <apex:pageBlockTable columns="4" width="100%" align="center" value="{!Documents}" var="JCD">
+                <apex:column title="Reference" headerValue="Reference" >
+                    <apex:outputLink target="_blank" value="/{!JCD.id}" >{!JCD.name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Type" value="{!JCD.Report_Name__c}"/> 
+                <apex:column headerValue="Status" value="{!JCD.Status__c}"/> 
+                <apex:column headerValue="Indicator" value="{!JCD.Status_Indicator__c}"/> 
+            </apex:pageblocktable>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    
+    <apex:pageBlock title="ASP List">
+        <apex:pageBlockSection columns="1" rendered="{!showCustomer}" >
+            <apex:pageBlockTable columns="5" width="100%" align="center" value="{!ASPList}" var="ASP">
+                <apex:column title="Reference" headerValue="Reference" >
+                    <apex:outputLink target="_blank" value="/{!ASP.id}" >{!ASP.name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Function" value="{!ASP.Function__c}"/> 
+                <apex:column headerValue="Definition" value="{!ASP.Definition__c}"/> 
+                <apex:column headerValue="Reason" value="{!ASP.Picklist__c}"/> 
+                <apex:column headerValue="Created" value="{!ASP.createdDate}"/> 
+            </apex:pageblocktable>
+        </apex:pageBlockSection>
+    </apex:pageBlock> 
+    
+    <apex:pageBlock title="Payment Collection Details">
+        <apex:pageBlockSection columns="1" rendered="true" >
+            <apex:pageBlockTable columns="5" width="100%" align="center" value="{!PCNList}" var="PCN">
+                <apex:column title="Reference" headerValue="Reference" >
+                    <apex:outputLink target="_blank" value="/{PCN.id}" >{!PCN.name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Status" value="{!PCN.Payment_Collection_Status__c}"/>
+                <apex:column headerValue="Indicator" value="{!PCN.Status_Indicator__c}"/>
+                <apex:column headerValue="Payment Notes" value="{!PCN.Payment_Notes__c}"/>
+            </apex:pageblocktable>
+        </apex:pageBlockSection>
+    </apex:pageBlock> 
+    
+    
+
+</apex:form> 
+</apex:page>

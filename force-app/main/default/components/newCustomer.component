@@ -1,0 +1,932 @@
+<apex:component controller="newConstomerController" id="newcustomer" >
+    <apex:attribute name="ListContactInfo" description="This attrribute passes the contactInfo list to the controller." type="ContactInfo[]" assignto="{!coninfoList}" />
+    <apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" />
+    <apex:attribute name="ListOpportunity" description="This attrribute passes the opportunity list to the controller." type="Opportunity[]" assignTo="{!Opportunities}"/>
+    <apex:attribute name="accountObject" description="This attrribute passes the Account object to the AccountEditViewComponent type: Edit or View." type="Account" assignTo="{!account}"/>
+    <apex:attribute name="gas1" description="This attrribute is used to capture Gas Council No 1st part." type="string"/>
+    <apex:attribute name="gas2" description="This attrribute is used to capture Gas Council No 2nd part" type="string"/>
+    <apex:attribute name="gas3" description="This attrribute is used to capture Gas Council No 3rd part" type="string"/>
+    <apex:attribute name="uexist" description="This attrribute is used to determine SS Direct User" type="boolean"/>
+    <apex:attribute name="categoryType" description="This attrribute is to enable the customer category indicator functionlaituy" type="string" assignTo="{!customerCateogryType}"/>
+    <apex:attribute name="marketingPreference" description="Selected value for the Marketing preference field" type="PicklistWrapper[]" required="False" assignto="{!piclistValues}"/>
+    <script>
+    
+    var cntrlEmpID, cntrlEmpName;
+    function invokeMsgAlert(){    
+        var gas1 = document.getElementById('{!$Component.pgblk.pgsec.priority1.g1}').value;
+        var gas2 = document.getElementById('{!$Component.pgblk.pgsec.priority1.g2}').value;
+        var gas3 = document.getElementById('{!$Component.pgblk.pgsec.priority1.g3}').value;
+        
+        if(gas1!='' && gas2!='' && gas3!='' ){
+            gcNumCheck(gas1,gas2,gas3);
+            
+        }
+        
+    }
+    function msgAlert(gcNoMatch,msg)
+    {
+        
+        if(msg!=''){
+            if(gcNoMatch){
+                alert(msg);
+                return false;
+            }
+        }
+    }
+    function setEmpData(empName, empID)
+    {
+        try
+        {
+            document.getElementById(cntrlEmpID).value = empName;
+            document.getElementById(cntrlEmpName).value = empID.replace('&#39;','\'');
+        }
+        catch(e){}
+    }
+    
+    var reason1,subreason1,fromOnload;
+    
+    window.onload = function applyPickListValues(){
+        
+        subreason1 = '{!reason}';
+        reason1 = '{!subreason}';
+        fromOnload = true;
+        //alert('Onload:'+subreason1+' '+reason1+' '+fromOnload);
+        checkCustomerCategoryQuestions();
+        
+    }  
+    
+    function checkCustomerCategoryQuestions(){
+        //alert('{!$label.new_Vulnerable_Reason}');
+        var disMod = '{!displayModeVal}';
+        var labe = '{!$label.new_Vulnerable_Reason}';
+        var categryType ='{!categoryType}';
+        //alert(disMod);
+        //alert('{!categoryType}');
+        var customers_boiler_working_element,customer_have_hot_water_element,customer_have_heat_element,vulnerable_reason_element,vulnerable_reason_dependent_element;
+        
+        if(disMod == '3' || disMod == '4'){
+            customers_boiler_working_element = document.getElementById('{!$Component.pgblk.pgsec.priority1.a.ab}');
+            customer_have_hot_water_element = document.getElementById('{!$Component.pgblk.pgsec.priority1.b.cd}');
+            customer_have_heat_element = document.getElementById('{!$Component.pgblk.pgsec.priority1.c.ef}');
+            vulnerable_reason_element = document.getElementById('{!$Component.pgblk.pgsec.priority1.d.gh}');
+            if(labe == 'Yes'){
+                vulnerable_reason_dependent_element = document.getElementById('{!$Component.pgblk.pgsec.priority1.e.ij}');
+            }
+            
+        }
+        else{
+            customers_boiler_working_element = document.getElementById('{!$Component.pgblk.pgsec.priority.a.ab}');
+            customer_have_hot_water_element = document.getElementById('{!$Component.pgblk.pgsec.priority.b.cd}');
+            customer_have_heat_element = document.getElementById('{!$Component.pgblk.pgsec.priority.c.ef}');
+            vulnerable_reason_element = document.getElementById('{!$Component.pgblk.pgsec.priority.d.gh}');
+            if(labe == 'Yes'){
+                vulnerable_reason_dependent_element = document.getElementById('{!$Component.pgblk.pgsec.priority.e.ij}');
+            }
+            
+        }
+        
+        //alert(''+customer_have_heat_element.value);
+        document.getElementById('{!$Component.pgblk.pgsec.priority.chek.Atochek}').checked  = true;
+        
+        
+        var select = document.getElementById('optionList');
+        var optGroup = '';
+        
+        if(categryType == '1'){
+            if(customers_boiler_working_element.value == "Yes" )
+            {
+                customer_have_heat_element.value="Not applicable";
+                customer_have_heat_element.disabled="disabled";
+            }
+            
+            if((customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "Yes") || fromOnload == true )
+            {
+                customer_have_heat_element.value="Not applicable";
+                customer_have_heat_element.disabled="disabled";
+                // vulnerable_reason_element.value="Not applicable";
+                //  vulnerable_reason_element.disabled="disabled"; 
+                
+            }else if((customers_boiler_working_element.value == "No" || customer_have_hot_water_element.value == "No" ) && vulnerable_reason_element.value == "")
+            { 
+                // vulnerable_reason_element.value="";
+                // vulnerable_reason_element.disabled="";
+                
+            }else if(vulnerable_reason_element.value == "")
+            {
+                //vulnerable_reason_element.value="Not applicable";
+                //vulnerable_reason_element.disabled="disabled";
+                
+            }
+            
+            
+            
+            if(vulnerable_reason_element.value == 'Yes' && fromOnload == true){
+                
+                //alert('$$$$'+select.options.length);
+                //alert('subreason:'+subreason1);
+                //setSelectedValue(select, subreason1);
+                optGroup = reason1;
+                //alert('*******'+optGroup+'Reason:'+reason1);
+                for(var i = 0; i < select.options.length; i++) {
+                    
+                    if(select.options[i].text == subreason1) {
+                        //alert('setSelected value:'+subreason1);
+                        select.options[i].selected = true;
+                        return;
+                    }
+                }
+                
+                
+                
+            }else if(vulnerable_reason_element.value == 'Yes' && fromOnload == false){
+                //alert('Inside');
+                //select = document.getElementById('optionList');
+                select.disabled = false;
+                //alert(select.value);
+                var selectedIndex = select.selectedIndex; // 0-based index of which element in the <select> is selected
+                var selectedElement = select.options[selectedIndex]; // DOM element selected
+                optGroup = selectedElement.parentNode.label; // <optgroup> element
+                //alert('optGroup:'+optGroup);
+            }else{
+                select = document.getElementById('optionList');
+                select.disabled = true;
+                select.value = '-- NONE --';
+                //alert('else:'+select.value);
+            }
+            
+            fromOnload = false;
+            if(select == ''){
+                //alert('-------');
+                parafunction(optGroup,select.value,customers_boiler_working_element.value,customer_have_hot_water_element.value,customer_have_heat_element.value,vulnerable_reason_element.value);
+            }
+            //alert(' -=-=-=-=-=-=--=-=-=-=:'+customer_have_heat_element.value);
+            parafunction(optGroup,select.value,customers_boiler_working_element.value,customer_have_hot_water_element.value,customer_have_heat_element.value,vulnerable_reason_element.value);
+            
+        }else{
+            //alert('I am inside Else part');
+            if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "Yes"){
+                
+                customer_have_heat_element.value="Not applicable";
+                customer_have_heat_element.disabled="disabled";
+                //vulnerable_reason_element.value="Not applicable";
+                // vulnerable_reason_element.disabled="disabled";
+                
+                if(labe == 'Yes'){
+                    vulnerable_reason_dependent_element.value ="";
+                    vulnerable_reason_dependent_element.disabled ="disabled";
+                }else{
+                    select = document.getElementById('optionList');
+                    select.disabled = true;
+                    select.value = '-- NONE --';
+                }
+                
+            }else if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "No"){
+                
+                customer_have_heat_element.value="Not applicable";
+                customer_have_heat_element.disabled="disabled";
+                
+                if(vulnerable_reason_element.disabled){
+                    
+                    vulnerable_reason_element.disabled="";
+                    vulnerable_reason_element.value="";
+                    
+                }
+                if(labe == 'Yes'){
+                    if(vulnerable_reason_dependent_element.disabled){
+                        
+                        vulnerable_reason_dependent_element.disabled="";
+                        vulnerable_reason_dependent_element.value="";
+                        
+                    }
+                }else{
+                    if(select.disabled){
+                        select.disabled = true;
+                        select.value = '-- NONE --';
+                    }
+                }  
+            }else{
+                
+                if(customer_have_heat_element.disabled){
+                    
+                    customer_have_heat_element.disabled="";
+                    customer_have_heat_element.value="";
+                    
+                }
+                
+                if(vulnerable_reason_element.disabled){
+                    
+                    vulnerable_reason_element.disabled="";
+                    vulnerable_reason_element.value="";
+                    
+                }
+                
+                if(labe == 'Yes'){
+                    if(vulnerable_reason_dependent_element.disabled){
+                        
+                        vulnerable_reason_dependent_element.disabled="";
+                        vulnerable_reason_dependent_element.value="";
+                        
+                    }
+                }else{
+                    if(select.disabled){
+                        select.disabled = true;
+                        select.value = '-- NONE --';
+                    }
+                }
+            }
+            
+            if(vulnerable_reason_element.value != "Yes"){
+                
+                if(labe == 'Yes'){
+                    vulnerable_reason_dependent_element.disabled="disabled";
+                    vulnerable_reason_dependent_element.value="";
+                }else{
+                    select.disabled = true;
+                    select.value = '-- NONE --';
+                }
+                
+                
+            }  
+            
+            if(labe == 'Yes'){
+                if(vulnerable_reason_dependent_element.disabled && vulnerable_reason_element.value == "Yes"){
+                    
+                    vulnerable_reason_dependent_element.disabled="";
+                    vulnerable_reason_dependent_element.value="";
+                    
+                }  
+            }else{
+                if(select.disabled && vulnerable_reason_element.value == "Yes"){
+                    
+                    select.disabled = false;
+                    select.value = '-- NONE --';
+                    
+                }
+            }
+            
+            if(labe != 'Yes'){
+                if(!select.disabled && fromOnload == false){
+                    select = document.getElementById('optionList');
+                    select.disabled = false;
+                    
+                    var selectedIndex = select.selectedIndex; // 0-based index of which element in the <select> is selected
+                    var selectedElement = select.options[selectedIndex]; // DOM element selected
+                    optGroup = selectedElement.parentNode.label; // <optgroup> element
+                    //alert('======>'+select.value);
+                    
+                }
+                
+                if(vulnerable_reason_element.value == 'Yes' && fromOnload == true){
+                    console.log('Inside onload');
+                    // alert('Inside onload');
+                    select.disabled = false;
+                    optGroup = reason1;
+                    for(var i = 0; i < select.options.length; i++) {        
+                        if(select.options[i].text == subreason1) {
+                            //alert('setSelected value:'+subreason1);
+                            select.options[i].selected = true;
+                            //return;
+                        }
+                    }
+                    
+                }
+            }
+            
+            /* if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Operational}');
+              }else if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "No" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "No" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Vulnerable}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Vulnerable}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else{
+                       setIndicatorImage('{!$Resource.Undefined}');
+              }*/
+            fromOnload = false;
+            if(labe != 'Yes'){
+                //alert('------->'+customers_boiler_working_element.value);
+                //parafunction(optGroup,select.value); 
+                //alert('-=-=I am inside else');              
+                parafunction(optGroup,select.value,customers_boiler_working_element.value,customer_have_hot_water_element.value,customer_have_heat_element.value,vulnerable_reason_element.value);
+                
+            }
+        }
+    }
+    
+    function setIndicatorImage(imageSource){
+        //alert('-==-=-=-=-=-=-');
+        var disMod = '{!displayModeVal}';
+        if(disMod == '3' || disMod == '4'){
+            var customercategoryindicator = document.getElementById('yz');
+            var customercategoryindexinputvalue = document.getElementById('{!$Component.pgblk.pgsec.priority1.g.mn}');
+        }else{
+            var customercategoryindicator = document.getElementById('kl');
+            var customercategoryindexinputvalue = document.getElementById('{!$Component.pgblk.pgsec.priority.g.mn}');
+        }
+        customercategoryindicator.src = imageSource;
+        
+        
+        if(imageSource.indexOf('Vulnerable') != -1){
+            customercategoryindexinputvalue.value = 1;
+        }else if(imageSource.indexOf('Emergency_Non_Op') != -1){
+            customercategoryindexinputvalue.value = 2;
+        }else if(imageSource.indexOf('Non_Op') != -1){
+            customercategoryindexinputvalue.value = 3;
+        }else if(imageSource.indexOf('Operational') != -1){
+            customercategoryindexinputvalue.value = 4;
+        }else if(imageSource.indexOf('Undefined') != -1){
+            customercategoryindexinputvalue.value = 99;
+        }
+        
+    }
+    
+    
+    </script>
+    <apex:actionFunction name="parafunction" action="{!indicator}" immediate="true" reRender="faaa,faaa1">
+        <apex:param name="reason" value="" assignTo="{!subreason}"/> <!--Holds customer category  -->
+        <apex:param name="subreason" value="" assignTo="{!reason}"/> <!-- Holds category Reason -->
+        <apex:param name="Heat" value=""/>
+        <apex:param name="HW" value=""/>
+        <apex:param name="OH" value=""/>
+        <apex:param name="vul" value=""/> 
+    </apex:actionFunction>
+    <apex:actionFunction name="gcNumCheck" action="{!verifyGCNumber}" immediate="true" rerender="none" oncomplete="msgAlert('{!gcNoMatch}','{!gasCMsg}');">
+        <apex:param id="anode" name="g1" value="" />
+        <apex:param id="anode1" name="g2" value="" />
+        <apex:param id="anode2" name="g3" value="" />
+    </apex:actionFunction>
+    
+    <!-- <apex:actionFunction name="parafunction1" action="{!indicator1}" immediate="true" reRender="faaa,faaa1">
+<apex:param name="reason" value="" assignTo="{!subreason}"/>
+<apex:param name="subreason" value="" assignTo="{!reason}"/>
+
+</apex:actionFunction> -->
+    <apex:pageblock id="pgblk">
+        
+        <apex:pageblocksection columns="3" id="pgsec">
+            
+            <apex:pageblocksection columns="1" rendered="{!if(OR(displayModeVal == 3,displayModeVal == 4), true, false)}" id="priority1">
+                <apex:outputpanel >
+                    <table>
+                        <tr><td>   
+                            <b>
+                                <apex:outputlabel value="Referral Engineer" for="txtEmpID" />
+                            </b>    
+                            </td>
+                            <td>
+                                <table border="0" cellspacing="0" cellpadding="0"><tr>
+                                    <td><apex:inputText id="txtEmpName" onchange="javascript: setEmpData('',this.value);" /></td>
+                                    <td>                
+                                        <a href="#" onclick="javascript:window.open('/apex/employeesearch','_new','width=700,height=500,menubar=no,directories=no,status=yes,location=no,toolbar=no,scrollbars=yes');" title="Referral Employee Lookup (New Window)">
+                                            <img src="/s.gif" alt="Referral Employee Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Referral Employee Lookup (New Window)"/>
+                                        </a>
+                                    </td></tr>
+                                </table>
+                                
+                                
+                                <apex:inputText value="{!Opportunities[0].Referral_Employee__c}" id="txtEmpID" style="display:none;" required="true"/>
+                                <script>
+                                cntrlEmpName = '{!$Component.txtEmpName}';
+                                cntrlEmpID = '{!$Component.txtEmpID}'; 
+                                </script>
+                            </td></tr>
+                    </table>    
+                    
+                </apex:outputpanel>
+                <!-- <apex:inputfield value="{!Opportunities[0].SM_discount_given__c}" /> -->
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="With Customer"/>
+                    <apex:inputfield value="{!Opportunities[0].WithCustomer__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Not With Customer Reason"/>
+                    <apex:inputfield value="{!Opportunities[0].WithCustReasons__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Reason for Quote"/>
+                    <apex:inputfield value="{!Opportunities[0].Enquiry_Reason__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Unsafe Reason"/>
+                    <apex:inputfield value="{!Opportunities[0].Unsafe_Appliance_Reason__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Asbestos"/>
+                    <apex:inputfield value="{!account.Asbestos_found__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:outputpanel >
+                    
+                    <table >
+                        <tr>
+                            <td>
+                                <b>
+                                    <apex:outputLabel value="GC Number"/>
+                                </b>
+                            </td>
+                            <td>
+                                <apex:inputText value="{!gas1}" maxlength="2" id="g1"  size="1" onchange="invokeMsgAlert();return false;"/> 
+                            </td>
+                            <td>-</td>
+                            <td>
+                                <apex:inputText value="{!gas2}" maxlength="3" id="g2" size="3" onchange="invokeMsgAlert();return false;"/> 
+                            </td>
+                            <td>-</td>
+                            <td>
+                                <apex:inputText value="{!gas3}" maxlength="2" id="g3"  size="1" onchange="invokeMsgAlert();return false;"/>
+                            </td>
+                        </tr>
+                    </table>
+                </apex:outputpanel>
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Existing Boiler"/>
+                    <apex:inputfield value="{!Opportunities[0].Boiler_type__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <!--<apex:pageblocksectionitem >
+<apex:outputLabel value="No. Of bedrooms" />
+<apex:inputfield value="{!account.Number_of_Bedrooms__c}" required="true" id="gs1"/>
+</apex:pageblocksectionitem>-->
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Product Interest"/>
+                    <apex:inputfield value="{!Opportunities[0].Product_Interest__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Home Care"/>
+                    <apex:inputfield value="{!Opportunities[0].Home_care__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem id="a">
+                    
+                    <apex:outputLabel value="Heating"/>
+                    <apex:inputfield value="{!Opportunities[0].Is_the_customers_boiler_working__c}" required="true" onChange="checkCustomerCategoryQuestions();" id="ab"/>
+                    
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="b">
+                    <apex:outputLabel value="Hot Water"/>
+                    <apex:inputfield value="{!Opportunities[0].Does_the_customer_have_hot_water__c}" required="true"   onChange="checkCustomerCategoryQuestions();" id="cd"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="c">
+                    <apex:outputLabel value="Other Form Of Heat That Heats The Entire Home"/>
+                    <apex:inputfield value="{!Opportunities[0].Customer_have_any_other_form_of_HEAT__c}" onChange="checkCustomerCategoryQuestions();" id="ef" />
+                </apex:pageblocksectionitem>
+                <!--<b>Is there anything else you would like us to be aware of about yourself or the property during our appointment?</b>-->
+                <b>Vulnerable</b>
+                <apex:pageblocksectionitem id="d">
+                    <apex:outputLabel value="       "/>
+                    <apex:inputfield value="{!Opportunities[0].Is_the_customer_vulnerable__c}" required="true" onChange="checkCustomerCategoryQuestions();" id="gh"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="e" rendered="{!$Label.new_Vulnerable_Reason == 'Yes'}">
+                    <apex:outputLabel value="Reason"/>
+                    <apex:inputfield value="{!Opportunities[0].Vulnerable_reason__c}" required="true" id="ij"/>
+                </apex:pageblocksectionitem> 
+                
+                <apex:pageblocksectionItem id="e1" rendered="{!$Label.new_Vulnerable_Reason != 'Yes'}">
+                    <apex:outputLabel value="Reason"/>
+                    <apex:outputpanel id="se">
+                        <select name="categoryMap" id="optionList" onchange="checkCustomerCategoryQuestions()">
+                            <option> -- NONE -- </option>
+                            <apex:repeat value="{!rMap}" var="key" id="re">
+                                <optgroup label="{!key}" id="myOptgroup">
+                                    <apex:repeat value="{!rMap[key]}" var="keyvalue" id="re1">
+                                        <option value="{!keyvalue}" id="a">{!keyvalue}</option>
+                                    </apex:repeat>              
+                                </optgroup>
+                            </apex:repeat>
+                        </select>
+                    </apex:outputpanel>
+                </apex:pageblocksectionItem>
+                
+                <!--<apex:pageblocksectionitem id="f">
+<apex:outputLabel value="category indicator" style="font-weight:bold"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img width="90" height="25" id="yz"></img>
+</apex:pageblocksectionitem>
+
+<apex:pageblocksectionitem id="g">
+<apex:outputLabel value="customer category"/>
+<apex:inputField value="{!Opportunities[0].Latest_customer_category__c}" id="mn"/>
+</apex:pageblocksectionitem> -->
+                <apex:outputpanel id="faaa1">
+                    <apex:pageBlocksection >
+                        <apex:pageblocksectionitem id="f" >
+                            <apex:outputLabel value="category indicator" style="font-weight:bold"/>
+                            <apex:outputText value="{!catIndicator}" escape="false"/>
+                        </apex:pageblocksectionitem>
+                    </apex:pageblocksection>
+                    
+                    <apex:pageblocksection >
+                        <apex:pageblocksectionitem id="g" >
+                            <apex:outputLabel value="customer category"/>
+                            <apex:inputField value="{!Opportunities[0].Latest_customer_category__c}" id="mn"/>
+                        </apex:pageblocksectionitem>
+                    </apex:pageblocksection>
+                </apex:outputpanel>
+                
+                <!--<apex:pageblocksectionitem >
+<apex:outputLabel value="Agreed To Appt"/>
+<apex:inputfield value="{!Opportunities[0].Customer_agreed_to_appointment__c}" />
+</apex:pageblocksectionitem> -->
+            </apex:pageblocksection>
+            
+            
+            <apex:pageblocksection columns="1"  rendered="{!if(OR(displayModeVal == 5,displayModeVal == 6), true, false)}">
+                <apex:outputpanel >
+                    <table>
+                        <tr>
+                            <td width = "25%">   
+                                <b>
+                                    <apex:outputlabel value="Referral Employee" for="txtEmpID" />
+                                </b>    
+                            </td>
+                            <td>
+                                <table border="0" cellspacing="0" cellpadding="0"><tr>
+                                    <td><apex:inputText id="txtEmpName" onchange="javascript: setEmpData('',this.value);" /></td>
+                                    <td>                
+                                        <a href="#" onclick="javascript:window.open('/apex/employeesearch','_new','width=700,height=500,menubar=no,directories=no,status=yes,location=no,toolbar=no,scrollbars=yes');" title="Referral Employee Lookup (New Window)">
+                                            <img src="/s.gif" alt="Referral Employee Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Referral Employee Lookup (New Window)"/>
+                                        </a>
+                                    </td></tr>
+                                </table>
+                                
+                                
+                                <apex:inputText value="{!Opportunities[0].Referral_Employee__c}" id="txtEmpID" style="display:none;" required="true"/>
+                                <script>
+                                cntrlEmpName = '{!$Component.txtEmpName}';
+                                cntrlEmpID = '{!$Component.txtEmpID}'; 
+                                </script>
+                            </td></tr>
+                    </table>    
+                    
+                </apex:outputpanel>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="MGM Source CHI"/>
+                    <apex:inputfield value="{!Opportunities[0].MGM_Source_Opp__c}" />
+                </apex:pageblocksectionitem>
+                <!-- <apex:pageblocksectionitem >
+<apex:outputLabel value="Product Interest"/>
+<apex:inputfield value="{!Opportunities[0].Product_Interest__c}" required="true"/>
+</apex:pageblocksectionitem>
+<apex:pageblocksectionitem >
+<apex:outputLabel value="Agreed To Appt"/>
+<apex:inputfield value="{!Opportunities[0].Customer_agreed_to_appointment__c}" />
+</apex:pageblocksectionitem>
+-->
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection columns="1"  id="Priority">
+                
+                <apex:pageblocksectionitem id="chek">
+                    <apex:outputLabel value="Primary"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.Primary_Contact__c}" id="Atochek"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Title"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.Salutation}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="First Name"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.FirstName}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Last Name"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.LastName}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Type"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.Contact_Type__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Occupier"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.Occupier__c}" required="true" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Home Phone"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.HomePhone}" />
+                </apex:pageblocksectionitem>
+                
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Mobile"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.MobilePhone}" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Email"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.Email__c}" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="gs" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                    <apex:outputLabel value="Gas Supply" />
+                    <apex:inputfield value="{!account.Gas_Supply_At_Address1__c}" required="true" id="gs1"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                    <apex:outputLabel value="Product Interest"/>
+                    <apex:inputfield value="{!Opportunities[0].Product_Interest__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="EB" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                    <apex:outputLabel value="Exisiting Boiler" />
+                    <apex:actionregion >
+                        <apex:inputfield value="{!Opportunities[0].Boiler_type__c}" required="true" id="EB1">
+                            <apex:actionsupport event="onchange" rerender="combib"/>
+                        </apex:inputField>
+                    </apex:actionregion>
+                </apex:pageblocksectionitem>
+                
+                <!--
+                <apex:pageblocksectionitem id="bedroom">
+                    <apex:outputLabel value="No. Of bedrooms" />
+                    <apex:inputfield value="{!account.Number_of_Bedrooms__c}" required="true" id="gs1"/>
+                </apex:pageblocksectionitem>
+                -->
+                
+                <!--{!displayModeVal}  {!uexist}  {!Opportunities[0].Boiler_type__c}-->
+                <apex:outputpanel id="combib">
+                    <apex:pageblocksection rendered="{!if(AND(OR(displayModeVal == 1,displayModeVal == 2),Opportunities[0].Boiler_type__c == 'Combi boiler', uexist),  true, false)}" columns="1"> <!-- rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}"> -->
+                        <apex:pageblocksectionitem id="NB" >
+                            <apex:outputLabel value="Number of Bathrooms" />
+                            <apex:inputfield value="{!account.Number_of_Bathrooms__c}" required="true" id="NB1"/>
+                        </apex:pageblocksectionitem>
+                        
+                        <apex:pageblocksectionitem rendered="{!if(AND(OR(displayModeVal == 1,displayModeVal == 2),Opportunities[0].Boiler_type__c == 'Combi boiler', uexist),  true, false)}" id="BL" > <!-- rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}"> -->
+                            <apex:outputLabel value="Boiler Location" />
+                            <apex:inputfield value="{!Opportunities[0].Location_of_Current_Boiler__c}" required="true" id="BL1"/>
+                        </apex:pageblocksectionitem>
+                    </apex:pageblocksection>
+                </apex:outputPanel>
+                
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                    <apex:outputLabel value="Homecare"/>
+                    <apex:inputfield value="{!Opportunities[0].Home_Care__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="a" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                    
+                    <apex:outputLabel value="Heating" />
+                    <apex:inputfield value="{!Opportunities[0].Is_the_customers_boiler_working__c}" required="true" onChange="checkCustomerCategoryQuestions();" id="ab"/>
+                    
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="b" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                    <apex:outputLabel value="Hot Water" />
+                    <apex:inputfield value="{!Opportunities[0].Does_the_customer_have_hot_water__c}" required="true"   onChange="checkCustomerCategoryQuestions();" id="cd"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="c" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                    <apex:outputLabel value="Other Form Of Heat That Heats The Entire Home"/>
+                    <apex:inputfield value="{!Opportunities[0].Customer_have_any_other_form_of_HEAT__c}" onChange="checkCustomerCategoryQuestions();" id="ef" />
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}" >
+                    <!--<b>Is there anything else you would like us to be aware of about yourself or the property during our appointment?</b>-->
+                    <b>Vulnerable</b>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem id="d" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                    <apex:outputLabel value="       "/>
+                    <apex:inputfield value="{!Opportunities[0].Is_the_customer_vulnerable__c}" required="true" onChange="checkCustomerCategoryQuestions();" id="gh"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="e" rendered="{!AND(if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false),$Label.new_Vulnerable_Reason == 'Yes')}">
+                    <apex:outputLabel value="Reason"/>
+                    <apex:inputfield value="{!Opportunities[0].Vulnerable_reason__c}" required="true" id="ij"/>
+                </apex:pageblocksectionitem> 
+                
+                <apex:pageblocksectionitem id="e1" rendered="{!AND(if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false),$Label.new_Vulnerable_Reason != 'Yes')}">
+                    
+                    <apex:outputLabel value="Reason"/>
+                    <apex:outputpanel id="se">
+                        <select name="categoryMap" id="optionList" onchange="checkCustomerCategoryQuestions()">
+                            <option> -- NONE -- </option>
+                            <apex:repeat value="{!rMap}" var="key" id="re">
+                                <optgroup label="{!key}" id="myOptgroup">
+                                    <apex:repeat value="{!rMap[key]}" var="keyvalue" id="re1">
+                                        <option value="{!keyvalue}" id="a">{!keyvalue}</option>
+                                    </apex:repeat>              
+                                </optgroup>
+                            </apex:repeat>
+                        </select>
+                    </apex:outputpanel>
+                    
+                </apex:pageblocksectionitem>
+                <!--
+<apex:pageblocksectionitem id="f" rendered="{!if(AND(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6),categoryType!='1'), true, false)}">
+<apex:outputLabel value="category indicator" style="font-weight:bold"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img width="90" height="25" id="kl"></img>
+</apex:pageblocksectionitem>
+
+<apex:pageblocksectionitem id="g" rendered="{!if(AND(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6),categoryType!='1'), true, false)}">
+<apex:outputLabel value="customer category"/>
+<apex:inputField value="{!Opportunities[0].Latest_customer_category__c}" id="mn"/>
+</apex:pageblocksectionitem> 
+-->
+                <apex:outputpanel id="faaa">
+                    <apex:pageBlocksection rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                        <apex:pageblocksectionitem id="f1" >
+                            <apex:outputLabel value="category indicator" style="font-weight:bold"/>
+                            
+                            <apex:outputText value="{!catIndicator}" escape="false"/>
+                        </apex:pageblocksectionitem>
+                    </apex:pageblocksection>
+                    
+                    <apex:pageblocksection rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                        <apex:pageblocksectionitem id="g1" >
+                            <apex:outputLabel value="customer category"/>
+                            <apex:inputField value="{!Opportunities[0].Latest_customer_category__c}" id="mn"/>
+                        </apex:pageblocksectionitem>
+                    </apex:pageblocksection>
+                </apex:outputpanel>
+                
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 5,displayModeVal == 6,displayModeVal == 3,displayModeVal == 4), true, false)}">
+                    <apex:outputLabel value="Agreed To Appt"/>
+                    <apex:inputfield value="{!Opportunities[0].Customer_agreed_to_appointment__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                
+            </apex:pageblocksection>  
+            
+            <apex:pageblocksection columns="1"  id="contact2">
+                
+                <apex:pageblocksectionitem rendered="{!!showSecCon}">
+                    <apex:commandbutton value="Add Contact" action="{!showSecCon}" rerender="contact2" immediate="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                    <apex:outputLabel value="Primary"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.Primary_Contact__c}" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                    <apex:outputLabel value="Title"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.Salutation}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                    <apex:outputLabel value="First Name"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.FirstName}" required="true" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                    <apex:outputLabel value="Last Name"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.LastName}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                
+                
+                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                    <apex:outputLabel value="Type"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.Contact_Type__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                    <apex:outputLabel value="Occupier"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.Occupier__c}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                    <apex:outputLabel value="Home Phone"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.HomePhone}" />
+                </apex:pageblocksectionitem>
+                
+                
+                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                    <apex:outputLabel value="Mobile"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.MobilePhone}" />
+                </apex:pageblocksectionitem>
+                
+                
+                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                    <apex:outputLabel value="Email"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.Email__c}" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!showSecCon}">
+                    <apex:commandbutton value="Hide Contact" action="{!showSecCon}" rerender="contact2" immediate="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:outputpanel rendered="{!!if(OR(displayModeVal == 1,displayModeVal == 2), true, false)}">
+                     
+                    <apex:pagemessage summary="Is it that you don’t want to hear from us at all?  You can choose to be contacted by any of the following options – mail, mobile, landline, email or text. Do any of these sound ok?" severity="warning" strength="3" 
+                                      rendered="{!Opportunities[0].Customer_Marketing_Consent__c == 'No'}"   />
+                    
+                </apex:outputpanel>
+                
+                <apex:outputpanel >
+                    <apex:pagemessage summary="Thanks, you can update your preferences or opt out online or email  generalenquiry@britishgas.co.uk at anytime.For more details on how we use your data, please read our privacy policy online" severity="warning" strength="3" 
+                                      rendered="{!(Opportunities[0].Customer_Marketing_Consent__c == 'Yes' && acceptBttnClr=='red')}"  />
+                    
+                    
+                
+                </apex:outputpanel>
+                <apex:outputpanel rendered="{!!if(OR(displayModeVal == 1,displayModeVal == 2), true, false)}" id="empCchMessage">
+                    <apex:pagemessages rendered="{!cchMessage}"  />
+                    
+                </apex:outputpanel> 
+                
+                <apex:pageblocksectionitem rendered="{!if(AND($Label.CCHSwitch == 'on',NOT(OR(displayModeVal == 1,displayModeVal == 2))), true, false)}">
+                   <apex:outputlabel value="We’d like to let you know about personalised offers and relevant products from British Gas and its related brands (Scottish Gas, Local Heroes, Dyno and Hive), is that ok ?
+                                             " style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!if(AND($Label.CCHSwitch == 'on',NOT(OR(displayModeVal == 1,displayModeVal == 2))), true, false)}">
+                    <apex:outputlabel value="I prefer to be contacted by" style="font-weight:bold;"  />
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem rendered="{!if(AND($Label.CCHSwitch == 'on',NOT(OR(displayModeVal == 1,displayModeVal == 2))), true, false)}">
+                <apex:dataTable value="{!marketingPreference}" var="wrapper"  >
+                    <apex:column >
+                        <apex:outputtext value="{!wrapper.value}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:inputCheckbox value="{!wrapper.isSelected}" />
+                    </apex:column>
+                </apex:dataTable> 
+                </apex:pageblocksectionitem>
+                <apex:pageBlockSectionItem rendered="{!if(AND($Label.CCHSwitch == 'on',NOT(OR(displayModeVal == 1,displayModeVal == 2))), true, false)}" >
+                    <apex:commandButton value="Agree and Accept" action="{!AgreeAndAccept}" rerender="contact2" style="background:{!acceptBttnClr};text-align:center ;font-size:10pt;font-weight:bold;padding: 12px 15px;border-radius: 12px;width:150px;" />
+                    <apex:commandButton value="Opt-Out" action="{!OptOut}" rerender="contact2" style="background:{!optOutBttnClr};text-align:center ;font-size:10pt;font-weight:bold;padding: 12px 15px;border-radius: 12px;width:150px;"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageblocksection>  
+            
+            
+            
+            <apex:pageblocksection columns="1" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2), true, false)}" id="csutdetx">
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel value="Media Code" />
+                    <apex:inputfield value="{!Opportunities[0].CampaignId}" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:outputpanel id="mktRefx">
+                    <apex:pagemessage summary="Is it that you don’t want to hear from us at all?  You can choose to be contacted by any of the following options – mail, mobile, landline, email or text. Do any of these sound ok?" severity="warning" strength="3" 
+                                      rendered="{!Opportunities[0].Customer_Marketing_Consent__c == 'No'}"   />
+                    
+                </apex:outputpanel>
+                
+                <apex:outputpanel >
+                    <apex:pagemessage summary="Thanks, you can update your preferences or opt out online or email  generalenquiry@britishgas.co.uk at anytime.For more details on how we use your data, please read our privacy policy online" severity="warning" strength="3" 
+                                      rendered="{!(Opportunities[0].Customer_Marketing_Consent__c == 'Yes' && acceptBttnClr=='red')}"  />
+                    
+                    <apex:pagemessages rendered="{!cchMessage}"  />
+                </apex:outputpanel> 
+                
+                <apex:pageblocksectionitem rendered="{!$Label.CCHSwitch == 'on'}">
+                    <apex:outputlabel value="We’d like to let you know about personalised offers and relevant products from British Gas and its related brands (Scottish Gas, Local Heroes, Dyno and Hive), is that ok ?
+                                             " style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                <br/>
+                <apex:pageblocksectionitem rendered="{!$Label.CCHSwitch == 'on'}">
+                    <apex:outputlabel value="I prefer to be contacted by
+                                             " style="font-weight:bold;"  />
+                </apex:pageblocksectionitem>
+                
+                <apex:dataTable value="{!marketingPreference}" var="wrapper" rendered="{!$Label.CCHSwitch == 'on'}">
+                    <apex:column >
+                        <apex:outputtext value="{!wrapper.label}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:inputCheckbox value="{!wrapper.isSelected}" />
+                    </apex:column>
+                </apex:dataTable> 
+                <apex:pageblocksectionitem rendered="{!$Label.CCHSwitch == 'on'}">
+                    <apex:commandButton value="Agree and Accept" action="{!AgreeAndAccept}" rerender="mktRefx,csutdetx" style="background:{!acceptBttnClr};text-align:center ;font-size:10pt;font-weight:bold;padding: 12px 15px;border-radius: 12px;width:150px;" />
+                    <apex:commandButton value="Opt-Out" action="{!OptOut}" rerender="mktRefx,csutdetx" style="background:{!optOutBttnClr};text-align:center ;font-size:10pt;font-weight:bold;padding: 12px 15px;border-radius: 12px;width:150px;"/>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            
+        </apex:pageblocksection>
+    </apex:pageblock>
+    <apex:actionfunction name="checkCustomerMarketing" rerender="pgblk" action="{!checkCustomerMarketing}"/>
+    
+</apex:component>

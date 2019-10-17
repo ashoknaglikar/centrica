@@ -1,0 +1,113 @@
+<apex:page standardController="Case" extensions="bg_Case_Details_Extension" title="Case Details">
+    <apex:pageMessages />
+     <script type="text/javascript">
+    function togglleDiv(show)
+     {
+         document.getElementById('darkLayer').style.display = show; 
+         document.getElementById('LoadingDiv').style.display = show;      
+     }  
+</script> 
+
+     <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+    </div>
+    <div id="darkLayer" style ="background-color: white; 
+             filter:alpha(opacity=50); /* IE */ 
+             opacity: 0.5; /* Safari, Opera */ 
+             -moz-opacity:0.50; /* FireFox */ 
+             z-index: 20; 
+             height: 100%; 
+             width: 100%; 
+             background-repeat:no-repeat; 
+             background-position:center; 
+             position:absolute; 
+             top: 0px; 
+             left: 0px; 
+             display:none;">
+    </div>  
+    <apex:form >
+        <b> <apex:actionStatus startText=" Loading..." stopText="" id="loading"/> </b>
+        <apex:pageBlock mode="mainDetail" id="mainBlock">
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton action="{!saveAndExit}" value="Exit" />
+                <apex:commandButton action="{!save}" value="Save"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="ASP Request Details" collapsible="true" id="mainRecord" columns="2" >          
+            
+                <apex:inputField value="{!Case.CaseNumber}"/><br/>
+                <apex:inputField value="{!Case.Function__c}" required="true" />
+                <apex:inputField value="{!Case.Status}" required="true" />
+                <apex:inputField value="{!Case.Definition__c}" required="true" />
+                <apex:inputField value="{!Case.Priority}" required="true" />
+                <apex:inputField value="{!Case.Reason__c}" required="true" />
+                <apex:inputField value="{!Case.Is_there_a_CHARGE_REFUND_to_customer__c}" required="true">
+                <apex:actionSupport event="onchange" action="{!disableChargeToCustomer}" reRender="mainRecord" status="wait"/>
+                <apex:actionStatus startText=" (wait...)" stopText="" id="wait"/>
+                </apex:inputField>
+                <apex:inputField value="{!Case.Material_Return_Info__c}"/>
+                <apex:inputField value="{!Case.Charge_to_Customer_Info__c}" required="true"/>
+                <apex:inputField value="{!Case.Person_Approved_By__c}" required="true" />
+                <apex:inputField value="{!Case.Supplementary_Notes__c}" />
+                
+            </apex:pageBlockSection>
+           <b><apex:outputLabel value="ASP Request Item Details" for="opanel"> </apex:outputLabel></b><br/>
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------         
+ <apex:outputPanel title="ASP Request Item Details"  id="opanel">
+                <apex:repeat value="{!ASPRequestItems}" var="ASPRequestedItem" >
+                               
+                                 <table title="ASP Request Item Details" border="0" cellspacing="0" cellpadding="5" >
+                                 <tr><td><B> <apex:outputlabel value="Product" for="txtProdID" > </apex:outputlabel></B>
+                                 <apex:inputText value="{!ASPRequestedItem.Product__c}" id="txtProdID" style="display:none;" /> &nbsp;&nbsp;&nbsp;
+                                 <apex:inputText value="{!ASPRequestedItem.Product__r.Name}" id="txtProdName" onchange="javascript: setProdData('',this.value);" />
+                                 <a href="#" onclick="javascript:window.open('/apex/ProductSearch','_new','width=700,height=500,menubar=no,directories=no,status=yes,location=no,toolbar=no,scrollbars=yes');" title="Product Lookup (New Window)">
+                                 <img src="/s.gif" alt="Product Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Product Lookup (New Window)"/>
+                                 </a> </td>
+ 
+                                 <td><b><apex:outputlabel value="Quantity" for="Quant" > </apex:outputlabel></b>&nbsp;&nbsp;&nbsp;
+                                 <apex:inputField value="{!ASPRequestedItem.Quantity__c}" id="Quant"/></td> 
+                                 <td><b> <apex:outputlabel value="Action" for="Action" > </apex:outputlabel></b>&nbsp;&nbsp;&nbsp;
+                                 <apex:inputField value="{!ASPRequestedItem.Action__c}" id="Action"/> </td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                 <td><apex:commandButton value="Delete" rerender="mainBlock" action="{!deleteASPRequestedItem}" status="wait">
+                                 <apex:param name="ASPId" value="{!ASPRequestedItem.id}" assignTo="{!chosenChildId}" />
+                                 </apex:commandButton> </td></tr></table>
+
+                                 
+                                  <script>
+                                        cntrlProdName = '{!$Component.txtProdName}';
+                                        cntrlProdID = '{!$Component.txtProdID}'; 
+                                    </script>
+                                 <script>
+                                    var cntrlProdID, cntrlProdName;
+                                    function setProdData(ProdID, ProdName)
+                                    {
+                                        try
+                                        {
+                                            document.getElementById(cntrlProdID).value = ProdID;
+                                            document.getElementById(cntrlProdName).value = ProdName.replace('&#39;','\'');
+                                        }
+                                        catch(e){}
+                                    }
+                                 </script>
+                   
+    
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------       
+             </apex:repeat>
+           </apex:outputPanel> 
+            <apex:pageBlockButtons location="bottom">
+                    <apex:commandButton action="{!saveAndExit}" value="Exit" />
+                    <apex:commandButton action="{!save}" value="Save" />
+                    <apex:commandButton action="{!newASPRequestedItem}" value="New ASP Requested Item" reRender="mainBlock"  onclick="togglleDiv('');" oncomplete="togglleDiv('none');"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <!-- <apex:pageBlock mode="bottomButtons">
+            <apex:pageBlockButtons location="bottom">
+                    <apex:commandButton action="{!saveAndExit}" value="Exit" />
+                    <apex:commandButton action="{!save}" value="Save" />
+                    <apex:commandButton action="{!newASPRequestedItem}" value="New ASP Requested Item" reRender="mainBlock"  onclick="togglleDiv('');" oncomplete="togglleDiv('none');"/>
+            </apex:pageBlockButtons>
+       </apex:pageBlock> -->
+    </apex:form>        
+  <apex:relatedList list="ASPs__r" rendered="true" /> 
+</apex:page>

@@ -1,0 +1,96 @@
+<apex:page controller="OnlinePaymentCollection" title="Online Payment Portal" tabStyle="Payment_Collection__c">
+    <apex:sectionHeader Title="Payment Collection" subTitle="Confirm Payment" ></apex:sectionHeader>
+    <apex:pageblock title="Your Details" >
+        <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+        <html>
+            <head>
+            <script type="text/javascript">
+                function findForm(){
+                    for (var i=0; i < document.forms.length ; i++) {
+                        alert(document.forms[i].name);
+                    }
+                    
+                }
+                function AmendDetails(){
+                    var PCId='{!obj_PymtCol.Id}';
+                    var urlStr='/apex/OnlineCPIPayment?id=' + PCId; 
+                    window.location.href =urlStr;   
+                }
+                function ConvertBR(input) {
+                    // Converts carriage returns 
+                    // to <BR> for display in HTML
+                    var output = "";
+                    for (var i = 0; i < input.length; i++) {
+                        if ((input.charCodeAt(i) == 13) && (input.charCodeAt(i + 1) == 10)) {
+                            i++;
+                            output += " ";
+                        } else {
+                            output += input.charAt(i);
+                        }
+                    }
+                    return output;
+                }
+                
+            </script>
+            </head>
+            <body>
+<!--            <form action="https://secure2.mde.epdq.co.uk/cgi-bin/CcxBarclaysEpdq.e" method="post" name="barclaysForm"> -->
+                <form action="https://secure2.epdq.co.uk/cgi-bin/CcxBarclaysEpdq.e" method="post" name="barclaysForm">
+                    <center>
+                        <table width="90%" border=1 BORDERCOLOR="#FFFFFF" cellSpacing=0 cellPadding="5px" >
+                            <tr>
+                                <td>
+                                    <table width="96%" border=0 BORDERCOLOR="#FFFFFF" cellSpacing=0 cellPadding="20px" style="visibility:visible" id="initialPayment">
+                                        <tr bgcolor=#3D8D8D  >
+                                            <td height="30" style="word-wrap=break-word" ><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Customer Name</font></B></CENTER></td>
+                                            <td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Payment Reference Number</font></B></CENTER></td>
+                                            <td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Customer Address</font></B></CENTER></td>
+                                            <td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Balance Outstanding</font></B></CENTER></td>                                                            
+                                            <td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Amount Paid</font></B></CENTER></td>
+                                        </tr>
+                                        <tr >
+                                            <td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" >{!obj_PymtCol.ContactName__c}</font></CENTER></td>
+                                            <td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" >{!obj_PymtCol.BGS_Payment_Reference_Num__c}</font></CENTER></td>
+                                            <td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" >
+                                            {!strAddr1}<br>
+                                            {!strCity}<br>
+                                            {!strCountyProvince}<br>
+                                            United Kingdom<br>
+                                            {!strPostalCode}</font></CENTER>
+                                            </td>
+                                            <td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" ><apex:outputField value="{!obj_PymtCol.Balance_Outstanding1__c}"></apex:outputField></font></CENTER></td>
+                                            <td style="word-wrap=break-word" ><CENTER><font face="Verdana" size="1.5" ><apex:outputField value="{!obj_Payment.Amount_Collected__c}"></apex:outputField></font></CENTER></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <INPUT type=hidden name=epdqdata id="epdqdata" value="{!strEPDQFeed}">
+                        <INPUT type=hidden name=baddr1 value="{!strAddr1}">
+                        <INPUT type=hidden name=bcity value="{!strCity}">
+                        <INPUT type=hidden name=bcountyprovince value="{!strCountyProvince}">
+                        <INPUT type=hidden name=bcountry value="UK">
+                        <INPUT type=hidden name=bpostalcode value="{!strPostalCode}">
+                        <INPUT type=hidden name=bstate value="">
+                        <INPUT type=hidden name=email value="{!obj_PymtCol.Opportunity__r.Account.Primary_Contact__r.Email__c}">
+                        <input type=hidden name=returnurl value="https://{$label.Salesforce_Server}.salesforce.com/apex/OnlineCPIPaymentRedirection">
+                        <input type="hidden" name="merchantdisplayname" value="British Gas">
+                        <INPUT type="HIDDEN" NAME="collectdeliveryaddress" VALUE="0">
+                        <input type="hidden" name="supportedcardtypes" value="125">
+                        <INPUT type=hidden name="cpi_logo" value="https://{$label.Salesforce_Server}.salesforce.com/resource/1271005636000/Online_Card_Payment_British_Gas_Logo">                                                
+                        <table width="20%" border="0" cellspacing="0">
+                            <tr>
+                                <td>
+                                    <input type="button" onClick="AmendDetails();" value="Amend Payment Details" class="btn" />
+                                </td>
+                                <td>
+                                    <input type="submit"  value="Make Payment" id="confirmButton" class="btn" >
+                                </td>
+                            </tr>
+                        </table>
+                    </center>
+                </form>
+            </body> 
+        </html>         
+    </apex:pageblock>
+</apex:page>

@@ -1,0 +1,97 @@
+<apex:page standardController="Product2" extensions="ProductSearchController" sidebar="false" showHeader="false" id="SearchProduct" >
+ <apex:form id="form1">
+    <script type='text/javascript'>
+    var tmpProdID, tmpProdName;
+    function f_SetValue(prodID, prodName) 
+    {
+        if(prodID != '' && prodName != '')
+        {
+            try
+            {
+            if(window.opener)
+            {
+               window.opener.setProdData(prodID, prodName);
+            }
+            }catch(e){}
+            window.close();
+        }
+    }
+    
+    function SetValues()
+    {
+        f_SetValue(tmpProdID, tmpProdName);
+    }
+
+</script>
+
+    <div style="font-size:10pt; padding:8px; mapping:8px;">
+        <div class="lookupTab  LookupSearchFrame">
+            <div class="bPageTitle">
+                <div class="ptBody secondaryPalette">
+                    <div class="content">
+                        <img src="/s.gif" alt=""  class="pageTitleIcon" title=""/>
+                        <h1>Lookup</h1>
+                    </div>
+                </div>
+            </div>&nbsp;&nbsp;&nbsp;
+            <apex:OutputLabel value="Search" style="font-weight:bold;font-size:10pt;" id="search_contact">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:outputLabel>
+            <apex:inputText value="{!SearchText}" id="SearchText" onkeyup="return CallSearchFunc(event)"></apex:inputText>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:commandButton value=" Search " action="{!SearchProduct}" id="Go" ></apex:commandButton> 
+            <apex:commandButton value=" Refresh " action="{!onClickRefresh}" reRender="form1"></apex:commandButton> 
+            <div style="font-size:10pt" align="center"><br/>
+            Results are searched containing the text you have provided anywhere in the product details. For ex. If you search for 'P01', all the products are returned containing 'P01' in their Name or Description or Family i.e. in all fields.
+            <br/><br/>
+            <script>
+                function CallSearchFunc(e)
+                {
+                    var evt = e != null? e : window.event;
+                    var key = evt.charCode? evt.charCode: evt.keyCode;
+                    if(key == 13)
+                    {
+                        document.getElementById('{!$Component.Go}').click();                        
+                    }
+                    return false;
+                }
+            </script>
+        </div>
+
+             <apex:outputPanel id="data" >
+            <apex:outputPanel id="mystatus" >
+            
+            </apex:outputPanel>
+        
+            <apex:outputPanel id="error">
+                <apex:outputText >
+                    <b> <font color="red"> {!err_msg} </font> </b><br/>
+                </apex:outputtext>
+            </apex:outputPanel>
+            
+            <!-- Panel for creating searching new user -->
+            <apex:pageBlock title="Product" tabstyle="Product2" rendered="{!searchMode}">
+                 
+                <apex:pageBlockTable value="{!ProductList}" var="prod">
+                    <apex:column headerValue="Name">
+                       <apex:commandLink value="{!prod.Name}" onclick="javascript: f_SetValue('{!prod.ID}','{!HTMLENCODE(prod.Name)}')"></apex:commandLink>
+                    </apex:column>
+                    
+                    <apex:column headerValue="ProductCode">
+                       <apex:outputLabel value="{!prod.ProductCode}" />
+                    </apex:column>
+                    
+                    <apex:column headerValue="Description">
+                       <apex:outputLabel value="{!prod.Description}" />
+                    </apex:column>
+                    
+                    <apex:column headerValue="Family">
+                       <apex:outputLabel value="{!prod.Family}" />
+                    </apex:column>
+
+                </apex:pageBlockTable>
+                </apex:pageBlock>
+                </apex:outputPanel>
+                <!-- Panel for creating new user -->
+
+      </div></div>           
+</apex:form>
+</apex:page>

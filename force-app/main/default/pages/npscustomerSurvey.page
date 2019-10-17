@@ -1,0 +1,236 @@
+<apex:page controller="npsSurveyController" sidebar="false" showHeader="false" id="page">
+    <html>
+        <head>  
+            
+            <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=0"/>
+            <script>
+            function previousButton() {
+                document.getElementById("prevButton").disabled = true;
+            }
+            </script>
+            <style>
+                @page {
+                
+                size: A4;
+                
+                }
+                
+                
+                #page_div{
+                margin-left:10%;
+                width:80%;
+                font-family: Arial;
+                
+                }
+                
+                
+                
+                .next {
+                text-align:center;
+                font-size:10pt;
+                font-weight:bold;
+                padding: 10px 15px;
+                border-radius: 12px;
+                background-color:#b3e000;
+                width:500px;
+                }
+                
+                .nextBtn {
+                
+                text-align:center;
+                font-size:10pt;
+                font-weight:bold;
+                padding: 10px 28px;
+                border-radius: 12px;
+                background-color:#b3e000;
+                width:500px;
+                }
+                
+                
+                
+                #myProgress {
+                width: 100%;
+                background-color: #ddd;
+                border-radius: 20px;
+                
+                }
+                
+                #myBar {
+                width:{!progressBar};
+                height: 30px;
+                background-color: #4CAF50;
+                text-align: center;
+                line-height: 30px;
+                color: white;
+                border-radius: 20px;
+                }
+                
+                .welcome_image{
+                height:40;
+                width:70;
+                }
+                
+                p{
+                font-size:140%;
+                }
+                
+                #button
+                {
+                padding-bottom:3em;
+                padding-top:5em;
+                }
+                
+                .alignRight
+                {
+                text-align:right;
+                }
+                
+                .completeMsg {
+                width: 66%;
+                border: 2px solid red;
+                margin: auto;
+                }
+                
+                @media only screen and (max-width:414px)
+                {
+                p{
+                font-size:100%;
+                }
+                
+                #page_div{
+                margin-left:2%;
+                width:98%;
+                
+                }
+                }     
+                
+                
+                
+                
+                
+            </style>
+        </head>  
+        <body>        
+            <apex:form >          
+                <div id = "page_div">
+                    
+                    <div id = "welcome_page" align = "center">
+                        <apex:outputPanel rendered="{!showWelcomePage}">
+                            <div class ="welcome_image">
+                             <apex:image value="{!$Resource.GiveUsFeedback }" width="1000" height="600" />    
+                            </div> 
+                            <br></br>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!startSurvey}">
+                        <div class="StartButton" onclick="firstPage();previousButton();">
+                            <a href="#" class="next round">Start Survey </a>
+                        </div> 
+                    </apex:outputPanel>
+                </div>
+                
+                <apex:outputPanel rendered="{!showCompleteMessage}">
+                    <div class="completeMsg" align = "center">
+                        <p>You have already completed the survey.Thank you.</p>
+                    </div>
+                </apex:outputPanel>
+                
+                
+                <!--  Question page -->
+                <div id = "question_page">
+                    
+                    <apex:outputPanel rendered="{!showErrorMessage}">
+                        <div>
+                            <apex:pageMessages /> 
+                        </div>
+                    </apex:outputPanel>
+                    
+                    <apex:actionFunction action="{!firstPage}" name="firstPage"/>
+                    <apex:actionFunction action="{!previous}" name="previous" />
+                    <apex:actionFunction action="{!Next}" name="NextPage" >
+                        
+                    </apex:actionFunction>
+                    <apex:outputpanel rendered="{!showQuestionSection}" id="buttonSection">       
+                          <apex:outputPanel rendered="{!tradingName = 'British Gas'}">
+                        <div >
+                            <apex:image value="https://c.cs81.content.force.com/servlet/servlet.ImageServer?id=01520000000i0Ur&oid=00D26000000DP3e&lastMod=1518778611000" />
+                        </div>
+                        </apex:outputPanel>    
+                     <apex:outputPanel rendered="{!tradingName = 'Scottish Gas'}">
+                        <div >
+                            <apex:image value="https://c.cs81.content.force.com/servlet/servlet.ImageServer?id=01520000000i0V1&oid=00D26000000DP3e&lastMod=1468227543000" />
+                        </div>
+                        </apex:outputPanel>
+                        <div class="alignRight" align="right">
+                            <p > Page {!intNextVal+1} of {!totalPage} </p>
+                        </div>
+                        
+                        <div id="myProgress">
+                            <div id="myBar">{!progressBar}</div>
+                        </div>
+                        <apex:outputPanel rendered="{!showfeedBackMessage}">
+                            <p>Thank you for agreeing to provide your feedback. We promise to use your feedback to improve our service to you.
+                                Please tell us what went well and what could have been better. 
+                                Please note your answers may be added to other information we hold,
+                                but will only be used for research and analysis purposes. 
+                            </p>
+                        </apex:outputPanel>
+                        <p>Please answer all the questions marked with <span style="color:red;">*</span> to enable you to move to the next page.</p>
+                        
+                        <div >
+                            <apex:pageMessages /> 
+                        </div>
+                        <apex:repeat var="Ques" value="{!npsSurveyQuestions}"  id="OP1" >
+                            <c:NPSMobile Question="{!SUBSTITUTE(Ques.questionRecord.NPS_Question_Text__c, '%BRAND%',  tradingName)}"  
+                                         description="{!SUBSTITUTE(Ques.questionRecord.Section_Description__c, '%BRAND%',  tradingName)}"
+                                         selectOptions="{!Ques.selectOptions}"
+                                         QuestionType="{!Ques.questionRecord.Question_Type__c}"
+                                         selectValue="{!Ques.selectValue}" 
+                                         rowNum="{!Ques.dynamicNumber}"
+                                         questoinRecord="{!Ques.questionRecord}"
+                                         QuesColor="{!if(Ques.questionRecord.Required__c = 'Yes' && Ques.selectValue = null && required = true, 'color:red', 'color:#00bfff')}" 
+                                         />
+                            
+                        </apex:repeat>
+                        
+                        
+                        
+                        <div id="button" align ="center">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div onclick="previous()" id="prevButton" >
+                                            <a href="#" class="next">Previous</a>
+                                        </div>    
+                                    </td>
+                                    <td width="20px">
+                                        
+                                    </td>
+                                    
+                                    <td>
+                                        <div onclick="NextPage()">
+                                            <a href="#" class="nextBtn">{!buttonName}</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>   
+                        </div>
+                        
+                    </apex:outputpanel>
+                </div>
+                
+                <!--- Final page -->
+                <apex:outputPanel rendered="{!showThankyouPage}" id="ThankYouSection">
+                    <div  align = "center" >
+                        <!--<apex:image value="https://c.cs81.content.force.com/servlet/servlet.FileDownload?file=01526000000JHbS" />-->
+                        <img src="https://c.cs81.content.force.com/servlet/servlet.ImageServer?id=01526000000JWwV&oid=00D26000000DP3e&lastMod=1516106529000" height="50%" width = "70%"/>
+                        <p>
+                            Thank you for completing this survey. Your input is greatly appreciated.
+                        </p>
+                    </div> 
+                </apex:outputPanel>
+            </div>    
+        </apex:form>
+    </body>  
+</html>
+
+</apex:page>

@@ -1,0 +1,26 @@
+<apex:page controller="InboundCallController">
+    <apex:form >
+    <apex:pageblock title="Select appropriate customer profile">
+        
+        <apex:pageblocktable value="{!CustomerDetails}" var="customerInfo" >
+            <apex:column > 
+                <apex:commandLink value="Select" action="{!selectUCRN}" style="color:#0D3EDE" 
+                    title="Click to associate with current customer account">
+                    <apex:param name="cUCRN" value="{!customerInfo.UCRN}" />
+                    <apex:param name="scID" value="{!customerInfo.SchemeID}" />
+                    <apex:param name="scAID" value="{!customerInfo.SchemeAgencyID}" />
+                </apex:commandLink>
+            </apex:column>
+            <!--<apex:column headerValue="UCRN" value="{!customerInfo.UCRN}" />-->
+            <apex:column headerValue="Customer Name" value="{!customerInfo.FirstName}" />
+            <!--<apex:column headerValue="Last Name" value="{!customerInfo.LastName}" />-->
+            <apex:column headerValue="Address" value="{!customerInfo.Address}" />
+        </apex:pageblocktable>
+        
+        <apex:pageblockbuttons >
+            <apex:commandbutton value="Skip" action="{!skipProfileSelection}" />
+        </apex:pageblockbuttons>
+        
+    </apex:pageblock>
+    </apex:form>
+</apex:page>

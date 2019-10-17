@@ -1,0 +1,10 @@
+<apex:page extensions="DevelopmentSurveyQuestionNewController"
+           standardcontroller="Development_Survey_Question__c"
+           tabStyle="Development_Survey_Question__c">
+    <apex:form >
+        <apex:pageBlock title="New Question">
+            <apex:inputField value="{!question.Question__c}" label="Name" style="width: 100%;"/>
+            <apex:commandButton action="{!save}" value="save"/>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,209 @@
+<apex:page sidebar="false" showHeader="false" renderas="pdf" controller="CEQPDFController" standardStylesheets="false">
+
+<!-- https://cs20.salesforce.com/apex/CEQPDFPage?ceqid=a4Cw00000000XJh -->
+    <html>
+    <head>
+        
+    </head>
+    
+    <!-- style="page-break-after:always;" -->
+    
+    <body>
+
+    <p align="right">
+    <apex:image value="{!$Label.Logo_BG_header}" alt="Company Logo" height="auto" width="187"/>
+    </p>
+
+
+    <div>
+        <h2>Service &amp; Standards Visit</h2>
+        <hr/>
+    </div>
+
+
+    <div style="width: 100%" id="SummaryLeft">
+        
+        <p>CHI Lead:&nbsp;&nbsp;&nbsp;&nbsp;<apex:outputtext style="color:blue;" value="{!CEQHeader.job__r.CHI_Lead_Name__c}"/></p>
+        
+        <div>
+        <table width="100%">
+            <tr>
+                <td width="65%">Job Number:&nbsp;<apex:outputtext style="color:blue;" value="{!CEQHeader.job__r.name}"/></td>
+                <td>HSA:&nbsp;<apex:outputtext style="color:blue;" value="{!CEQHeader.job__r.HSA_Name__c}"/></td>
+            </tr>
+            <tr>
+                <td width="65%"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td width="65%">EQ Ref:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<apex:outputtext style="color:blue;" value="{!CEQHeader.name}"/></td>
+                <td>Installer:&nbsp;<apex:outputtext style="color:blue;" value="{!CEQHeader.job__r.Mechanical_Installer__c}"/></td>
+            </tr>
+            <tr>
+                <td>Created By:&nbsp;<apex:outputfield value="{!CEQHeader.createdByid}"/></td>
+                <td>Created Date:&nbsp; <apex:outputText style="color:blue;" value="{0,date,dd'/'MM'/'yyyy}">
+                        <apex:param value="{!CEQHeader.createdDate}" /> </apex:outputText>
+                </td>
+            </tr>
+        </table>
+        </div>
+        
+        
+        <hr/><br/>
+    </div>
+    
+    <div style="padding-left: 2cm;"><form>
+        <table width='100%'>
+            <tr>
+                <th width="250px">Pre-Install</th>
+                <th width="250px">WIP</th>
+                <th width="250px">Post Install</th>
+                <th width="250px">Deep Dive</th>
+            </tr>
+            <tr>
+                <td style="font-style: italic;">{!IF(CEQHeader.Pre_Install__c,'Yes','')}</td>
+                <td style="font-style: italic;">{!IF(CEQHeader.WIP__c,'Yes','')}</td>
+                <td style="font-style: italic;">{!IF(CEQHeader.Post_Install__c,'Yes','')}</td>
+                <td style="font-style: italic;">{!IF(CEQHeader.Deep_Dive__c,'Yes','')}</td>
+            </tr>
+        </table>
+    </form>
+    </div>
+    <hr/>
+    
+     <!-- Q&A Score section - 11/12/2015 -->
+     <!-- Commented out as per request from Andy Holland 08/01/2018 by Phil Dennison
+    <div style="padding-left: 2cm;">
+        <table width='100%'>
+            <tr>
+                <th width="250px">Installation Score</th>
+                <th width="250px">Sales Score</th>
+                <th width="250px">Overall Score</th>
+            </tr>
+            <tr>
+                <td style="font-style: italic;">{!CEQHeader.Installation_score__c}%</td>
+                <td style="font-style: italic;">{!CEQHeader.Sales_Score__c}%</td>
+                <td style="font-style: italic;">{!CEQHeader.Overall_Score__c}%</td>
+            </tr>
+        </table>
+    </div>
+    <hr/><br/>
+    -->
+    <!-- End of Q&A Score section -->
+    
+    <!-- Customer section -->
+    <div >
+    	<apex:dataTable width="100%" value="{!CEQItemCustomer}" var="c">
+    		<apex:facet name="caption"><i>Customer Questions and Answers</i></apex:facet>
+    		<apex:column style="border-top:1px solid black; border-right:1px solid black; border-left:1px solid black;" width="70%">
+    			<apex:facet name="header">Question</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!c.Question_Text__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black;" width="10%">
+    			<apex:facet name="header">Answer</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!c.AnswerPick__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black; border-left:1px solid black; border-right:1px solid black;" width="20%">
+    			<apex:facet name="header">Notes</apex:facet>
+    			<apex:outputText style="font-size:11px; " value="{!c.Notes__c}"/>
+    		</apex:column>
+    	</apex:dataTable>
+    	<hr/>
+    	<br/>
+    	<br/>
+    </div>
+    
+    <!-- Installer Questions section -->
+    <div>
+    	<apex:dataTable width="100%" value="{!CEQItemInstaller}" var="i">
+    		<apex:facet name="caption"><i>Ops Process Questions and Answers</i></apex:facet>
+    		<apex:column style="border-top:1px solid black; border-right:1px solid black; border-left:1px solid black;" width="70%">
+    			<apex:facet name="header">Question</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!i.Question_Text__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black;" width="10%">
+    			<apex:facet name="header">Answer</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!i.AnswerPick__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black; border-left:1px solid black; border-right:1px solid black;" width="20%">
+    			<apex:facet name="header">Notes</apex:facet>
+    			<apex:outputText style="font-size:11px;" value="{!i.Notes__c}"/>
+    		</apex:column>
+    	</apex:dataTable>
+    	<hr/>
+    	<br/>
+    	<br/>
+    </div>
+    
+    <!-- Sales section -->
+    <div>
+    	<apex:dataTable width="100%" value="{!CEQItemSales}" var="s">
+    		<apex:facet name="caption"><i>Sales Process Questions and Answers</i></apex:facet>
+    		<!-- <apex:facet name="header"><u>Customer Questions</u></apex:facet> -->
+    		<apex:column style="border-top:1px solid black; border-right:1px solid black; border-left:1px solid black;" width="70%">
+    			<apex:facet name="header">Question</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!s.Question_Text__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black;" width="10%">
+    			<apex:facet name="header">Answer</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!s.AnswerPick__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black; border-left:1px solid black; border-right:1px solid black;" width="20%">
+    			<apex:facet name="header">Notes</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!s.Notes__c}"/>
+    		</apex:column>
+    	</apex:dataTable>
+    	<hr/>
+    	<br/>
+    	<br/>
+    </div>
+    
+    <!-- Other section -->
+    <div>
+    	<apex:dataTable width="100%" value="{!CEQItemOther}" var="o" >
+    		<apex:facet name="caption"><i>Other Questions and Answers</i></apex:facet>
+    		<!-- <apex:facet name="header"><u>Customer Questions</u></apex:facet> -->
+    		<apex:column style="border-top:1px solid black; border-right:1px solid black; border-left:1px solid black;" width="70%">
+    			<apex:facet name="header">Question</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!o.Question_Text__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black;" width="10%">
+    			<apex:facet name="header">Answer&nbsp;&nbsp;</apex:facet>
+    			<!-- <apex:outputText style="font-size:11px; color:{!IF(o.AnswerPick__c=="No","red","green")}" value="{!o.AnswerPick__c}"/> -->
+    			<apex:outputText style="font-size:11px" value="{!o.AnswerPick__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black; border-left:1px solid black; border-right:1px solid black;" width="20%">
+    			<apex:facet name="header">Notes</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!o.Notes__c}"/>
+    		</apex:column>
+    		<hr/>
+    	</apex:dataTable>
+    </div>
+    
+    <!-- Safety / RQM section - Added 07/02/19 - Phil Dennison (WP52052) -->
+    <br/>
+    <br/>
+    <div>
+    	<apex:dataTable width="100%" value="{!CEQItemRQM}" var="R" >
+    		<apex:facet name="caption"><i>Safety Questions and Answers</i></apex:facet>
+    		<apex:column style="border-top:1px solid black; border-right:1px solid black; border-left:1px solid black;" width="70%">
+    			<apex:facet name="header">Question</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!R.Question_Text__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black;" width="10%">
+    			<apex:facet name="header">Answer&nbsp;&nbsp;</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!R.AnswerPick__c}"/>
+    		</apex:column>
+    		<apex:column style="border-top:1px solid black; border-left:1px solid black; border-right:1px solid black;" width="20%">
+    			<apex:facet name="header">Notes</apex:facet>
+    			<apex:outputText style="font-size:11px" value="{!R.Notes__c}"/>
+    		</apex:column>
+    		<hr/>
+    	</apex:dataTable>
+    </div>
+    
+	</body>
+    </html>
+    
+
+</apex:page>

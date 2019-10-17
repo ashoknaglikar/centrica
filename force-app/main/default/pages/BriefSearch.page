@@ -1,0 +1,142 @@
+<apex:page controller="BriefSearchController">
+ <apex:form id="formId">
+ 	<apex:sectionHeader title="Mandatory Briefing Search"/>
+ 	<apex:PageBlock >
+ 		<apex:PageMessages ></apex:PageMessages>
+ 	    <apex:pageMessage summary="No brief records found." severity="error" strength="2" rendered="{!noBriefRecords}"/>
+	 	<apex:PageblockSection title="Mandatory Brief Search Parameters">
+	 		<apex:PageBlockSectionItem >
+	 			<apex:outputLabel value="Start Date"/>  
+	 			<apex:inputField value="{!mbc.Actual_Start_Date_Time__c}"/>
+	 		</apex:PageBlockSectionItem>
+	 		<apex:PageBlockSectionItem >
+	 			<apex:outputLabel value="End Date"/>  
+	 			<apex:inputField value="{!mbc.Actual_End_Date_Time__c}"/>
+	 		</apex:PageBlockSectionItem>
+	 		<apex:PageBlockSectionItem >
+	 			<apex:outputLabel value="Name"/>  
+	 			<apex:inputText value="{!mbcName}"/>
+	 		</apex:PageBlockSectionItem>
+	 	</apex:PageblockSection>
+	 	<apex:pageBlockButtons location="bottom">
+	 		<apex:commandButton action="{!searchCreator}" value="Search" reRender="formId"/>
+	 	</apex:pageBlockButtons>
+	</apex:PageBlock>
+	
+	<apex:PageBlock rendered="{!IF(briefCreatorList.size > 0 ,true ,false)}" >
+		<apex:PageblockSection title="Breif Header Details"  columns="1">
+			<apex:PageBlockTable value="{!briefCreatorList}" var="brief1" width="100%">
+				<apex:column value="{!brief1.Name__c}" headervalue="Name"/>
+				<apex:column headervalue="MBC Number">
+					<apex:commandLink action="{!searchBriefs}" reRender="formId">{!brief1.Name}
+						<apex:param name="MBCID"
+		                value="{!brief1.Id}"
+		                assignTo="{!mbcId}"/>
+		            </apex:commandLink>
+				</apex:column>
+				<apex:column value="{!brief1.Issued_Date_Time__c}" headervalue="Issued Date Time"/>
+				<apex:column value="{!brief1.Actual_End_Date_Time__c}" headervalue="Due Date Time"/>
+				<!-- <apex:column value="{!brief1.Active_Count__c}" headervalue="Active Count"/>  -->
+				<apex:column value="{!brief1.Status_Indicator__c}" headervalue="Over All Status"/>
+			</apex:PageBlockTable>
+		</apex:PageblockSection>
+	</apex:PageBlock>
+	
+	<apex:pageBlock rendered="{!IF(briefList.size > 0 ,true ,false)}">
+		<apex:outputPanel rendered="{!IF(briefList.size > 0 ,true ,false)}">
+			<apex:pageMessage summary="No green brief records found." severity="error" strength="2" rendered="{!noGreenBriefs}"/>
+			<apex:pageMessage summary="No amber brief records found." severity="error" strength="2" rendered="{!noAmberBriefs}"/>
+			<apex:pageMessage summary="No red brief records found." severity="error" strength="2" rendered="{!noRedBriefs}"/>
+			<apex:pageMessage summary="No blue brief records found." severity="error" strength="2" rendered="{!noBlueBriefs}"/>
+			<table width="100%">
+				<tr>
+					<td width="20%" align="center">
+						<apex:image url="{!$Resource.Greenflag}" width="15" height="15"/>&nbsp;
+							<apex:commandLink value="{!greenBriefs.size}" action="{!showBriefs}" reRender="formId">
+								<apex:param name="MBCName"
+				                value="Green"
+				                assignTo="{!flagName}"/>
+							</apex:commandLink>
+					</td>
+					<td width="20%" align="center">
+						<apex:image url="{!$Resource.Amberflag}" width="15" height="15"/>&nbsp;
+							<apex:commandLink value="{!amberBriefs.size}" action="{!showBriefs}" reRender="formId">
+								<apex:param name="MBCName"
+				                value="Amber"
+				                assignTo="{!flagName}"/>
+							</apex:commandLink>
+					</td>
+					<td width="20%" align="center">
+						<apex:image url="{!$Resource.Redflag}" width="15" height="15"/>&nbsp;
+							<apex:commandLink value="{!redBriefs.size}" action="{!showBriefs}" reRender="formId">
+								<apex:param name="MBCName"
+				                value="Red"
+				                assignTo="{!flagName}"/>
+							</apex:commandLink>
+					</td>
+					<td width="20%" align="center">
+						
+						<apex:image url="{!$Resource.Blueflag}" width="15" height="15"/>&nbsp;
+							<apex:commandLink value="{!blueBriefs.size}" action="{!showBriefs}" reRender="formId">
+								<apex:param name="MBCName"
+				                value="Blue"
+				                assignTo="{!flagName}"/>
+							</apex:commandLink>
+					</td>
+					<td width="20%" align="center">
+						<apex:commandLink value="Show All" action="{!showBriefs}" reRender="formId">
+							<apex:param name="MBCName"
+			                value="All"
+			                assignTo="{!flagName}"/>
+						</apex:commandLink>
+					</td>
+				</tr>
+			</table>
+		</apex:outputPanel>
+		<apex:outputPanel layout="block" styleClass="pSearchShowMore" id="otpNav2" rendered="{!IF(tempList.size > 0 ,true ,false)}" >  
+              Total Records Found: <apex:outputText rendered="{!IF(Con.resultSize==10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(Con.resultSize < 10000,true,false)}">{!Con.resultSize}</apex:outputText>  
+                  <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!NOT(Con.HasPrevious)}"/>  
+                  <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!Con.HasPrevious}"/>  
+                  <apex:commandLink action="{!con.previous}" title="Previous Page" value="Previous Page" rendered="{!Con.HasPrevious}"/>  
+                  <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!NOT(Con.HasPrevious)}">Previous Page</apex:outputPanel>           
+                  &nbsp;({!IF(Con.PageNumber == 1,1,((Con.PageNumber -1) * Con.PageSize)+1)}-{!IF(Con.resultSize < Con.PageSize,Con.resultSize,Con.PageNumber * Con.pageSize)})&nbsp;  
+                  <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!NOT(Con.HasNext)}">Next Page</apex:outputPanel>           
+                  <apex:commandLink title="Next Page" value="Next Page" rendered="{!Con.HasNext}" action="{!con.next}"/>&nbsp;  
+                  <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!Con.HasNext}"/>  
+                  <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!NOT(Con.HasNext)}"/>            
+              </apex:outputPanel> 
+		
+		<apex:PageblockSection title="{!mbName}"  columns="1" id="section" rendered="{!IF(tempList.size > 0 ,true ,false)}" >
+		 	<apex:PageBlockTable value="{!tempList}" var="brief" width="100%">
+		 		<!-- <apex:column value="{!brief.Briefing_Name__c}" headerValue="Brief Name" />  -->
+		 		<apex:column value="{!brief.Employee__r.Name}" headerValue="Assigned To" />
+		 		<apex:column headerValue="MB Number" >
+		 			  <apex:outPutLink value="/{!brief.Id}">{!brief.Name}</apex:outPutLink>
+		 		</apex:column>
+<!--		 		<apex:column value="{!brief.Issued_Date_Time__c}" headervalue="Issued Date Time"/>-->
+<!--				<apex:column value="{!brief.Actual_End_Date_Time__c}" headervalue="Due Date Time"/>-->
+				<apex:column value="{!brief.District__c}" headervalue="District"/>
+				<apex:column value="{!brief.Region__c}" headervalue="Region"/>
+		 		<apex:column value="{!brief.Status_Indicator__c}" headerValue="Status Indicator" />
+		 	</apex:PageBlockTable>
+	 	</apex:PageblockSection>
+	 	
+	 	<apex:outputPanel layout="block" styleClass="pSearchShowMore" id="otpNav" rendered="{!IF(tempList.size > 0 ,true ,false)}" >  
+              Total Records Found: <apex:outputText rendered="{!IF(Con.resultSize==10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(Con.resultSize < 10000,true,false)}">{!Con.resultSize}</apex:outputText>  
+                  <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!NOT(Con.HasPrevious)}"/>  
+                  <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!Con.HasPrevious}"/>  
+                  <apex:commandLink action="{!con.previous}" title="Previous Page" value="Previous Page" rendered="{!Con.HasPrevious}"/>  
+                  <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!NOT(Con.HasPrevious)}">Previous Page</apex:outputPanel>           
+                  &nbsp;({!IF(Con.PageNumber == 1,1,((Con.PageNumber -1) * Con.PageSize)+1)}-{!IF(Con.resultSize < Con.PageSize,Con.resultSize,Con.PageNumber * Con.pageSize)})&nbsp;  
+                  <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!NOT(Con.HasNext)}">Next Page</apex:outputPanel>           
+                  <apex:commandLink title="Next Page" value="Next Page" rendered="{!Con.HasNext}" action="{!con.next}"/>&nbsp;  
+                  <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!Con.HasNext}"/>  
+                  <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!NOT(Con.HasNext)}"/>            
+              </apex:outputPanel>  
+              
+              
+	</apex:pageBlock>
+	
+	
+ </apex:form>
+</apex:page>

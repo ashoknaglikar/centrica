@@ -1,0 +1,242 @@
+<apex:page StandardController="order__c" extensions="TopcallFaxExtn"  renderAs="pdf" showHeader="false" sidebar="false">
+    <HTML>
+        <HEAD>
+            <style type="text/css" media="print,screen">
+                @page {
+                    margin:0.25in;
+                    @top-left {
+                        content: " ";
+                        font-size: 8pt;
+                    }
+                    @top-center{
+                        content: "Installer Order";
+                        font-size: 8pt;
+                    }
+                    @top-right{
+                        content: "Enquiry Number : {!order__c.Enquiry_Number__c}";
+                        font-size: 8pt;
+                    }
+                
+                    @bottom-center {
+                        content: "British Gas Services Limited Registered in England No.3141243 Registered Office Millstream, Maidenhead Road, Windsor, Berkshire, SL4 5GD.";
+                        font-size: 8pt;
+                     }
+                } 
+                
+                th {
+                    font-family:Arial;
+                    color:black;
+                    background-color:lightgrey;
+                }
+                thead {
+                        display:table-header-group;
+                }
+                tbody {
+                    display:table-row-group;
+                } 
+                body{
+                    font-family:Arial;
+                    color:black;
+                    font-size: 8pt;
+                }
+            </style>
+        </HEAD>
+        <body>
+            <TABLE width="100%" border="0">
+                <TR>
+                    <TD width="30%" >Total Hours :  {!dblTotalJobHrs}</TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%">Job Address</TD>
+                </TR>         
+                <TR>
+                    <TD width="30%" ></TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%">{!order__c.Job__r.Customer_Name__c}</TD>
+                </TR>  
+                <TR>
+                    <TD width="30%" ></TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%">{!order__c.Job__r.CHI_Lead__r.Account.BillingStreet}</TD>
+                </TR>   
+                <TR>
+                    <TD width="30%" >{!strPrimInstaller}</TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%">{!order__c.Job__r.CHI_Lead__r.Account.BillingCity}</TD>
+                </TR>   
+                <TR>
+                    <TD width="30%" >{!strPrimInstaStreet}</TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%">{!order__c.Job__r.CHI_Lead__r.Account.BillingState}</TD>
+                </TR>  
+                <TR>
+                    <TD width="30%" >{!strPrimInstaCity}</TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%">{!order__c.Job__r.CHI_Lead__r.Account.BillingCountry}</TD>
+                </TR>       
+                <TR>
+                    <TD width="30%" >{!strPrimInstaCounty}</TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%">{!order__c.Job__r.CHI_Lead__r.Account.BillingPostalCode}</TD>
+                </TR>
+                <TR>
+                    <TD width="30%" >{!strPrimInstaPostCode}</TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%"></TD>
+                </TR>                 
+                <TR>
+                    <TD width="30%" ></TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%">Home Tel: {!order__c.Job__r.Telephone_Number__c}</TD>
+                </TR>       
+                <TR>
+                    <TD width="30%" ></TD>
+                    <TD width="30%"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%">Work Tel: {!order__c.Job__r.Telephone_Number_Work__c}</TD>
+                </TR>       
+            </TABLE>
+            <TABLE width="100%" border="0">
+                <TR>
+                    <TD width="25%" >Job Type: {!order__c.Job__r.Quote__r.Pricebook_Id__c}</TD>
+                    <TD width="25%">Non -Op Blr: N</TD>
+                    <TD width="25%">Property:</TD>
+                    <TD width="25%">No of Storeys:</TD>
+                </TR>        
+            </TABLE>
+            <br/>
+            <table WIDTH="100%" BORDER="0">
+                <TR>
+                    <TH width="20%" style="word-wrap=break-word">Event</TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Date</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Responsible</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Contact No.</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Event Text</CENTER></TH>
+                </TR>
+                <TR >
+                    <Td Height="10" Colspan="5" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                </TR>
+                <apex:repeat value="{!eventDetailsLst}" var="eventdetails" >
+                    <TR>
+                        <TD width="20%" style="word-wrap=break-word">{!eventdetails.sEvent}</TD>
+                        <TD width="20%" ><Center>{!eventdetails.sEventDt}</Center></TD>
+                        <TD width="20%" ><Center>{!eventdetails.sResponsible}</Center></TD>
+                        <TD width="20%"><Center>{!eventdetails.sContactNo}</Center></TD>
+                        <TD width="20%"><center>{!eventdetails.sEventText}</center></TD>
+                    </TR>
+                </apex:repeat>
+            </table>
+            <TABLE WIDTH="100%" BORDER="0">
+                <TR>
+                    <TH width="20%" style="word-wrap=break-word">Code</TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Description</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Order Enquiries</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Order Date</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Installation</CENTER></TH>
+                </TR>
+                <TR >
+                    <Td Height="10" Colspan="5" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                </TR>
+                <TR>
+                    <TD width="20%" style="word-wrap=break-word">I</TD>
+                    <TD width="20%" style="word-wrap=break-word"><CENTER>ASP PILOT</CENTER></TD>
+                    <TD width="20%" style="word-wrap=break-word"><CENTER>{!order__c.Job__r.PlannerName__c}</CENTER></TD>
+                    <TD width="20%" style="word-wrap=break-word"><CENTER><apex:outputField value="{!order__c.Order_Date__c}" /></CENTER></TD>
+                    <TD width="20%" style="word-wrap=break-word"><CENTER><apex:outputField value="{!order__c.Job__r.Installation_Date__c}"/></CENTER></TD>
+                </TR>
+            </TABLE>
+            
+            <TABLE WIDTH="100%" BORDER="0">
+                <TR>
+                    <TH width="90%" style="word-wrap=break-word">Special Instruction</TH>
+                </TR>
+                <TR >
+                    <Td Height="10" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                </TR>
+                <TR>
+                    <TD width="90%" style="word-wrap=break-word">{!order__c.Job__r.Installation_Special_Instructions__c}</TD>
+                </TR>
+            </TABLE>
+            <BR/>
+                FIXED RATE ITEMS
+            <BR/>
+            <apex:outputPanel rendered="{!if(ISNULL(fixedRateItems),false,true)}">
+                <TABLE WIDTH="100%" BORDER="0">
+                    <TR>
+                        <TH width="20%" style="word-wrap=break-word">Code</TH>
+                        <TH width="30%" style="word-wrap=break-word"><CENTER>Description</CENTER></TH>
+                        <TH width="12%" style="word-wrap=break-word"><CENTER>Skill</CENTER></TH>
+                        <TH width="12%" style="word-wrap=break-word"><CENTER>Qty</CENTER></TH>
+                        <TH width="12%" style="word-wrap=break-word"><CENTER>Unit Value</CENTER></TH>
+                        <TH width="12%" style="word-wrap=break-word"><CENTER>Total Hrs</CENTER></TH>
+                    </TR>
+                    <TR >
+                        <Td Height="10" Colspan="6" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                    </TR>
+                    <apex:repeat value="{!fixedRateItems}" var="objJob">
+                        <TR>
+                            <TD width="20%">{!objJob.sCode}</TD>
+                            <TD width="30%" style="word-wrap=break-word">{!objJob.sDescription}</TD>
+                            <TD width="12%"style="word-wrap=break-word"><center>{!objJob.sSkill}</center></TD>
+                            <TD width="12%"><center>{!objJob.sQty}</center></TD>
+                            <TD width="12%"><center>{!objJob.dblUnitValue}</center></TD>
+                            <TD width="12%"><center>{!objJob.dblTotalHrs}</center></TD>
+                        </TR>
+                    </apex:repeat>
+                    <TR >
+                        <Td Height="10" Colspan="6" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                    </TR>
+                </TABLE>
+            </apex:outputPanel>
+            <BR/>
+                HOURLY RATE ITEMS
+            <BR/>
+                <apex:outputPanel rendered="{!if(ISNULL(hourlyRateItems),false,true)}">
+                <TABLE WIDTH="100%" BORDER="0">
+                    <TR>
+                        <TH width="20%" style="word-wrap=break-word">Code</TH>
+                        <TH width="30%" style="word-wrap=break-word"><CENTER>Description</CENTER></TH>
+                        <TH width="12%" style="word-wrap=break-word"><CENTER>Skill</CENTER></TH>
+                        <TH width="12%" style="word-wrap=break-word"><CENTER>Qty</CENTER></TH>
+                        <TH width="12%" style="word-wrap=break-word"><CENTER>Unit Value</CENTER></TH>
+                        <TH width="12%" style="word-wrap=break-word"><CENTER>Total Hrs</CENTER></TH>
+                    </TR>
+                    <TR >
+                        <Td Height="10" Colspan="6" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                    </TR>
+                    <apex:repeat value="{!hourlyRateItems}" var="objJob">
+                        <TR>
+                            <TD width="20%">{!objJob.sCode}</TD>
+                            <TD width="30%" style="word-wrap=break-word">{!objJob.sDescription}</TD>
+                            <TD width="12%"style="word-wrap=break-word">{!objJob.sSkill}</TD>
+                            <TD width="12%"><center>{!objJob.sQty}</center></TD>
+                            <TD width="12%"><center>{!objJob.dblUnitValue}</center></TD>
+                            <TD width="12%"><center>{!objJob.dblTotalHrs}</center></TD>
+                        </TR>
+                    </apex:repeat>
+                    <TR >
+                        <Td Height="10" Colspan="6" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                    </TR>
+                </TABLE>
+            </apex:outputPanel>
+            <TABLE WIDTH="100%" BORDER="0">
+                <TR>
+                    <TD width="20%"></TD>
+                    <TD width="30%" style="word-wrap=break-word"></TD>
+                    <TD width="12%" Align="Right"></TD>
+                    <TD width="12%"></TD>
+                    <TD width="12%">Total Hours : </TD>
+                    <TD width="12%">{!dblTotalJobHrs}</TD>
+                </TR>                
+            </TABLE>
+        </body>
+    </HTML>
+    </apex:page>

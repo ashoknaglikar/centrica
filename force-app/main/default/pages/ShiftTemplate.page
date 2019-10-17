@@ -1,0 +1,1129 @@
+<apex:page standardController="Shift_template__c" extensions="ShifttemplateExtension" docType="html-5.0" >  
+    
+    <script type="text/javascript">
+    function togglleDiv(show)
+    {
+        document.getElementById('darkLayer').style.display = show; 
+        document.getElementById('LoadingDiv').style.display = show;      
+    }  
+    
+    function checkTest(event,a){
+        if(event.which == 9){
+            var num = a;
+            methodOneInJavascript(a);
+        }
+    }
+    
+    
+    </script> 
+    
+    <apex:form id="frm">
+        <apex:pagemessages />
+        
+        <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+                <img src="/img/loading.gif" /> Processing...
+            </div>
+        </div>
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;">
+        </div>  
+        
+        
+        
+        <!--Capture Record Type -->
+        <apex:pageblock id="AvailBlk" >
+            <apex:pageBlockButtons >
+                <apex:commandbutton value="Save" action="{!saveAvailability}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"  rerender="frm" rendered="{!(recAvail)}"/> 
+                <!--  <apex:commandbutton value="Save" action="{!saveUnavailDetails}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rendered="{!recAvail}" rerender="frm"/>   -->                   
+                <apex:commandbutton value="Validate" action="{!doNothing}" /> 
+            </apex:pageBlockButtons> 
+            
+            <!--Capture Shift template details details -->
+            <apex:pageblocksection title="Shift Template Details:">
+                <apex:inputfield value="{!shiftTemplate.Name}" required="true"/>
+                <apex:inputfield value="{!shiftTemplate.Description__c}" />             
+                <!--  <apex:inputfield value="{!deReq.Start__c}" required="true"/>
+<apex:inputfield value="{!deReq.No_Of_Weeks__c}" required="true"/> -->
+                <apex:inputfield value="{!shiftTemplate.Week_1__c}"  required="true"/>       
+                <apex:inputfield value="{!shiftTemplate.Week_2__c}" />
+                <apex:inputfield value="{!shiftTemplate.Week_3__c}" />
+                <apex:inputfield value="{!shiftTemplate.Week_4__c}" />
+                <apex:inputfield value="{!shiftTemplate.Cycle__c}" />
+                <apex:inputfield value="{!deReq.Team__c}" required="true"/>
+            </apex:pageblocksection>
+            
+            <!---Define week template pattern--->
+            <apex:pageBlock rendered="{!week1}">
+            <apex:pageblocksection title="Availabilty Pattern:"/>
+            <table style="width:100%;padding-left:15%;padding-right:20%;padding-top:1%;">
+                <tr>
+                    <td style="width:20%"><b>Start Time</b></td>
+                    <td style="width:20%"><b>End Time</b></td>
+                     <td style="width:20%"><b>Slot Duration</b></td>
+                      <td style="width:20%"><b>Lunch Time</b></td>
+                       <td style="width:20%"><b>Lunch Duration</b></td>
+                </tr>
+                <tr>
+                    <td style="width:20%"><apex:input type="time"  value="{!startTime }" /></td>
+                    <td style="width:20%"><apex:input type="time"  value="{!endTime }"/></td>
+                    <td style="width:20%"><div> <apex:input value="{!slotDurationHour}" style="width:30px;"/>Hour&nbsp; <apex:input value="{!slotDurationMin}" style="width:30px;position:relative;"/>Mins</div></td>
+                    <td style="width:20%"><apex:input type="time"  value="{!lunchTime }"/></td>
+                    <td style="width:20%"><div><apex:input value="{!lunchDurationHour}" style="width:30px;"/>Hour&nbsp; <apex:input value="{!lunchDurationMin}" style="width:30px;position:relative;"/>Mins</div></td>
+                </tr>
+            </table>
+                                           
+             <table style="width:100%;padding-left:10%;padding-right:10%;padding-top:3%;">
+                <tr>
+                    <td style="width:15%"><b>Monday</b></td>
+                    <td style="width:15%"><b>Tuesday</b></td>
+                     <td style="width:15%"><b>Wednesday</b></td>
+                      <td style="width:15%"><b>Thursday</b></td>
+                       <td style="width:15%"><b>Friday</b></td>
+                        <td style="width:15%"><b>Saturday</b></td>
+                         <td style="width:15%"><b>Sunday</b></td>
+                </tr>
+                <tr>
+                    <td style="width:15%"> <apex:inputCheckbox value="{!mondayCheck}"/></td>
+                    <td style="width:15%"><apex:inputCheckbox value="{!tuesdayCheck}"/></td>
+                    <td style="width:15%"><apex:inputCheckbox value="{!wednesdayCheck}"/></td>
+                    <td style="width:15%"><apex:inputCheckbox value="{!thursdayCheck}"/></td>
+                    <td style="width:15%"><apex:inputCheckbox value="{!fridayCheck}"/></td>
+                    <td style="width:15%"><apex:inputCheckbox value="{!saturdayCheck}"/></td>
+                    <td style="width:15%"><apex:inputCheckbox value="{!sundayCheck}"/></td>
+                </tr>
+            </table>
+            
+            <table style="width:100%;padding-left:20%;padding-right:20%;padding-top:3%;">
+                <tr>
+                    <td style="width:25%"><b><apex:outputText value="Week 1" rendered="{!shiftTemplate.Week_1__c}"/></b></td>
+                    <td style="width:25%"><b><apex:outputText value="Week 2" rendered="{!shiftTemplate.Week_2__c}"/></b></td>
+                     <td style="width:25%"><b><apex:outputText value="Week 3" rendered="{!shiftTemplate.Week_3__c}"/></b></td>
+                      <td style="width:25%"><b><apex:outputText value="Week 4" rendered="{!shiftTemplate.Week_4__c}"/></b></td>
+                       
+                </tr>
+                <tr>
+                    <td style="width:25%"><apex:inputCheckbox value="{!week_1}" rendered="{!shiftTemplate.Week_1__c}"/></td>
+                    <td style="width:25%"><apex:inputCheckbox value="{!week_2}" rendered="{!shiftTemplate.Week_2__c}"/></td>
+                    <td style="width:25%"><apex:inputCheckbox value="{!week_3}" rendered="{!shiftTemplate.Week_3__c}"/></td>
+                    <td style="width:25%"><apex:inputCheckbox value="{!week_4}" rendered="{!shiftTemplate.Week_4__c}"/></td>
+                </tr>
+            </table>
+            
+            <!--<div align="center" style="padding-top:20px;">-->
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandbutton value="Click Generate" action="{!clickGenerate}"/> 
+            </apex:pageBlockButtons>
+             </apex:pageBlock>
+            
+            
+            <apex:outputPanel id="week" rendered="{!week1}"> 
+                <apex:tabPanel switchType="client" selectedTab="week1">
+                    
+                    <apex:tab label="Week1" name="week1" id="week1" rendered="{!AND(week1,recAvail)}"> 
+                        
+                        <apex:pageBlockSection title="Week 1 Availability" rendered="{!AND(week1,OR(recAvail))}"> </apex:pageBlockSection>
+                        <apex:outputpanel title="Week 1 Availability" rendered="{!AND(week1,OR(recAvail))}"> 
+                            <br/>
+                            <!--     <apex:outputpanel rendered="{!deReq.Team__c=='Straight Swap'}"> -->
+                            <apex:pageBlock id="thPB">
+                                <!--    <apex:commandButton value="Add New Row" action="{!methodOne}" reRender="thPB"/> -->
+                                
+                                <apex:pageBlockSection title="Monday" columns="1" collapsible="false" id="pbw1mon">
+                                    <apex:pageBlock mode="maindetail">
+                                        <apex:variable var="c" value="{!1}" />
+                                        <apex:repeat var="availability" value="{!availabilityWrapIns.weekTemplateMondayList }">
+                                            <apex:pageBlockSection columns="5" rendered="{!c==1}" >
+                                                <apex:pageBlockSectionItem >
+                                                    Start time
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    End Time
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlocKSectionItem >
+                                                    Type
+                                                </apex:pageBlocKSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    No of Appointments
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    Select
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{!availability.startTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{!availability.endTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{!availability.type}" multiselect="false" size="1">
+                                                        <apex:selectOptions value="{!availabilitytypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,1)" />
+                                                    
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            <apex:variable var="c" value="{!c+1}" />
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                
+                                <apex:pageBlockSection title="Tuesday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.weekTemplateTuesdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.startTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.endTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1">
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,2)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Wednesday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.weekTemplateWednesdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.endTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1">
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,3)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Thursday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.weekTemplateThursdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.endTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1">
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,4)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                         <!-- <apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Friday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.weekTemplateFridayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.startTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.endTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1">
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,5)"/>
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                
+                                <apex:pageBlockSection title="Saturday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.weekTemplateSaturdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.startTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.endTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1">
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputtext value="{! availability.appointments }" onkeydown="checkTest(event,6)"/>
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                         <!-- <apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Sunday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.weekTemplateSundayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.startTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time"  value="{! availability.endTime }"/>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1">
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,7)"/>
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                         <!-- <apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                            </apex:pageBlock>
+                        </apex:outputpanel>
+                        
+                        <!--     </apex:outputPanel> -->
+                    </apex:tab>
+                    
+                    <apex:tab label="Week2" name="week2" id="week2" rendered="{!AND(week2,OR(recAvail))}">     
+                        <apex:pageBlockSection title="Week 2 Availability" rendered="{!AND(week2,OR(recAvail))}"> </apex:pageBlockSection>
+                        <!--<apex:outputpanel rendered="{!deReq.Team__c=='Straight Swap'}">-->
+                            <apex:pageBlock id="thPB1">
+                                <apex:pageBlockSection title="Monday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail">
+                                        <apex:variable var="c" value="{!1}" />
+                                        <apex:repeat var="availability" value="{!availabilityWrapIns.week2TemplateMondayList }">
+                                            <apex:pageBlockSection columns="5" rendered="{!c==1}" >
+                                                <apex:pageBlockSectionItem >
+                                                    Start time
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    End Time
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlocKSectionItem >
+                                                    Type
+                                                </apex:pageBlocKSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    No of Appointments
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    Select
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{!availability.startTime }"  />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{!availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{!availability.type}" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilitytypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,8)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB1" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            <apex:variable var="c" value="{!c+1}" />
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Tuesday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week2TemplateTuesdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,9)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB1" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Wednesday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week2TemplateWednesdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,10)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB1" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Thursday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week2TemplateThursdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,11)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB1" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Friday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week2TemplateFridayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,12)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB1" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Saturday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week2TemplateSaturdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,13)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB1" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Sunday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week2TemplateSundayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,14)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                         <!-- <apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB1" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                            </apex:pageBlock>
+                       <!-- </apex:outputpanel>-->
+                        
+                    </apex:tab>  
+                    
+                    <apex:tab label="Week3" name="week3" id="week3" rendered="{!AND(week3,OR(recAvail))}">      
+                        <apex:pageBlockSection title="Week 3 Availability" rendered="{!AND(week3,OR(recAvail))}"> </apex:pageBlockSection>
+                        <!--<apex:outputpanel rendered="{!deReq.Team__c=='Straight Swap'}">-->
+                            <apex:pageBlock id="thPB2" >
+                                <apex:pageBlockSection title="Monday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail">
+                                        <apex:variable var="c" value="{!1}" />
+                                        <apex:repeat var="availability" value="{!availabilityWrapIns.week3TemplateMondayList }">
+                                            <apex:pageBlockSection columns="5" rendered="{!c==1}" >
+                                                <apex:pageBlockSectionItem >
+                                                    Start time
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    End Time
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlocKSectionItem >
+                                                    Type
+                                                </apex:pageBlocKSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    No of Appointments
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    Select
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{!availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{!availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{!availability.type}" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilitytypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,15)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB2" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            <apex:variable var="c" value="{!c+1}" />
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Tuesday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week3TemplateTuesdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,16)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB2" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Wednesday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week3TemplateWednesdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,17)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                         <!-- <apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB2" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Thursday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week3TemplateThursdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,18)"  />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB2" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Friday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week3TemplateFridayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,19)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB2" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Saturday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week3TemplateSaturdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,20)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                         <!-- <apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB2" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Sunday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week3TemplateSundayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,21)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                        <!--  <apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB2" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                            </apex:pageBlock>
+                        <!--</apex:outputpanel>-->
+                        
+                    </apex:tab>
+                    
+                    <apex:tab label="Week4" name="week4" id="week4" rendered="{!AND(week4,OR(recAvail))}">        
+                        <apex:pageBlockSection title="Week 4 Availability" rendered="{!AND(week4,OR(recAvail))}"> </apex:pageBlockSection>
+                        <!--<apex:outputpanel rendered="{!deReq.Team__c=='Straight Swap'}">-->
+                            <apex:pageBlock id="thPB3">
+                                <apex:pageBlockSection title="Monday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail">
+                                        <apex:variable var="c" value="{!1}" />
+                                        <apex:repeat var="availability" value="{!availabilityWrapIns.week4TemplateMondayList }">
+                                            <apex:pageBlockSection columns="5" rendered="{!c==1}" >
+                                                <apex:pageBlockSectionItem >
+                                                    Start time
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    End Time
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlocKSectionItem >
+                                                    Type
+                                                </apex:pageBlocKSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    No of Appointments
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    Select
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{!availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{!availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{!availability.type}" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilitytypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,22)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB3" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            <apex:variable var="c" value="{!c+1}" />
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Tuesday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week4TemplateTuesdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,23)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB3" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Wednesday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week4TemplateWednesdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,24)"  />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB3" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Thursday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week4TemplateThursdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,25)"  />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB3" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Friday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week4TemplateFridayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,26)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                         <!-- <apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB3" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Saturday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week4TemplateSaturdayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,27)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                          <!--<apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB3" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Sunday" columns="1" collapsible="false">
+                                    <apex:pageBlock mode="maindetail"  >
+                                        <apex:repeat var="availability" value="{! availabilityWrapIns.week4TemplateSundayList }">
+                                            
+                                            <apex:pageBlockSection columns="5">
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.startTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:input type="time" value="{! availability.endTime }" />
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:selectList value="{! availability.type }" multiselect="false" size="1" >
+                                                        <apex:selectOptions value="{!availabilityTypes}"/>
+                                                    </apex:selectList>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem >
+                                                    <apex:inputText value="{! availability.appointments }" onkeydown="checkTest(event,28)" />
+                                                </apex:pageBlockSectionItem>
+                                                
+                                                 <apex:pageBlockSectionItem >
+                                                    <apex:inputCheckbox value="{!availability.active}">
+                                                         <!-- <apex:actionSupport event="onchange" action="{!dummy}" rerender="thPB3" />-->
+                                                    </apex:inputCheckbox>
+                                                </apex:pageBlockSectionItem>
+                                            </apex:pageBlockSection>
+                                            
+                                        </apex:repeat>
+                                    </apex:pageBlock>
+                                </apex:pageBlockSection>
+                                
+                            </apex:pageBlock>
+                        <!--</apex:outputpanel>-->
+                    </apex:tab>
+                </apex:tabPanel>
+            </apex:outputPanel>
+            
+            
+        </apex:pageblock>
+        <apex:actionFunction action="{!methodOne}" name="methodOneInJavascript" rerender="frm">
+            <apex:param name="myparam" value="" />
+        </apex:actionFunction>
+        
+        
+    </apex:form>    
+</apex:page>

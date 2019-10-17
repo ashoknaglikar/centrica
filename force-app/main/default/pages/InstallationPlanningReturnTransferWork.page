@@ -1,0 +1,576 @@
+<apex:page standardController="Job__c"
+    extensions="InstallPlanningReturnTransferController"
+    tabStyle="Product_Work_Code__c" id="transferworkPage">
+    <script type="text/javascript" src="/soap/ajax/15.0/connection.js"></script>
+    <script type="text/javascript" src="/soap/ajax/15.0/apex.js"></script>
+    <script type="text/javascript" src="/js/functions.js"></script>
+    <script>
+    
+     function togglleDiv(show){
+
+         document.getElementById('darkLayer').style.display = show;
+
+      }  
+
+     function checkEmployeeSelected(){       
+
+        var inputs = document.getElementsByTagName('input');
+        var inputsArray = new Array();
+                     
+        for (var i=0;i<inputs.length;i++) {
+            if (inputs[i].type == 'text' && (inputs[i].id.indexOf("pgTransfer")>-1 && inputs[i].value.length == 0)) {                                        
+                inputsArray.push(inputs[i].value);                
+               }                                       
+        }
+       
+        if(inputsArray.length > 0)
+        {
+            alert('Please enter a valid employee/not before date for each item in the transfer list.');
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+
+    }
+    
+    function checkSelected(){
+    
+        var selectedChkbox = true;
+        var inputs = document.getElementsByTagName('input');
+       
+        for (var i = 0; i < inputs.length; i++) {
+
+          if (inputs[i].type == 'checkbox') {
+
+            if (inputs[i].checked) {
+
+              selectedChkbox = false;
+              break;
+
+            }
+          }
+        }
+        
+        var wizardtype = '{!wizardType}';
+        
+        if(selectedChkbox && wizardtype == 'Transfer'){
+
+            alert ("Warning: No work elements have been selected. Select at least one work element to return before clicking the Return Work button.");
+            return false;
+
+        }
+        
+        return true;
+               
+    }
+    
+    //check the value. Can only be a number (int or decimal) and the total must be less than the max for each employee
+   
+    function checkValue(txtBox, max){
+        
+        var selectedChkbox = true;
+
+        //var patt=/^[0-9]*\.?[0-9]*$/g; // brm - 11-01-2010 - Pattern doesn't work in firefox
+
+        var patt=/^[0-9]*\.?[0-9]*$/; // brm - 11-01-2010 - New pattern works in firefox
+        
+        if (!patt.test(txtBox.value)) {
+
+            alert('The supplied value is incorrect.');
+            return false;
+
+         }
+         
+         if(parseFloat(txtBox.value) > max){
+
+            alert('Please only enter values up to the Skill Hours for each individual.');
+            return false;
+
+         }
+         
+        return true;
+        
+    }
+    
+    var hisIds = '';
+
+    function doSubmit(){
+        
+        var ids = hisIds.split(',');
+        var max = 0;
+        var runningTotal = 0;
+         
+        for(var i=0; i< ids.length; i++){
+
+            max = runningTotal = 0;
+            var d = document.getElementById(ids[i]);
+            
+            var inputs = d.getElementsByTagName('Input');
+            
+            //set the max
+            for(var j=0; j< inputs.length; j++){
+
+                if(inputs[j].id == 'total'){
+
+                    max = parseFloat(inputs[j].value);
+                    break;
+
+                }
+
+            }
+            
+            //get the running total
+            for(var j=0; j< inputs.length; j++){
+
+                if(inputs[j].id.indexOf('reduction') > 0 && inputs[j].value != ''){
+
+                    runningTotal += parseFloat(inputs[j].value);
+
+                }
+
+            }
+            
+            if(!(Math.abs(parseFloat(runningTotal - max)) < 0.01 )){
+
+                alert('All sub totals for each skill type must add up to the total hours for that skill.');
+                return false;
+
+            }
+
+        }
+
+        return true;
+
+    }
+
+</script>
+<style>
+    .hourClass{
+    color:blue;
+    }
+</style>
+    <apex:outputPanel id="page">
+
+        <apex:sectionHeader title="Installation Planning - {!wizardType} Work" />
+
+        <apex:form id="frm">
+
+            <apex:pagemessages id="pageMess"/>
+
+            <h2><apex:actionstatus id="fetchStatus"
+                startText="Fetching data, please wait..." /></h2>
+
+
+
+            <!-- //////////////////// This is the first page of journey for transfer as well as re-plan. START //////////////////////////////////////////-->
+
+            <apex:pageBlock title="Error" rendered="{!stepIndex == 'error'}"
+                id="pgError">
+
+                <apex:pageBlockButtons location="bottom">
+
+                    <apex:commandButton action="{!returnToJob}" value="Back" />
+
+                </apex:pageBlockButtons> 
+                
+                {!errorText}
+                
+            </apex:pageBlock>
+
+            <apex:outputPanel id="innerPanel">
+
+                <apex:actionFunction name="selectAll" action="{!selectAll}"
+                    rerender="innerPanel" status="myStatus" />
+
+                <apex:actionStatus startText="Processing..." id="myStatus">
+
+                </apex:actionStatus>
+
+                <apex:pageBlock title="{!wizardType} Hours"
+                    rendered="{!stepIndex == 'start'}" id="pgStart">
+
+                    <apex:pageBlockButtons >
+
+                        <apex:commandButton action="{!returnToJob}" value="Back" />
+
+                        <apex:commandButton action="{!defineWork}"
+                            value="{!wizardType} Work"
+                            onclick="if(!checkSelected()) return false;" rerender="page"
+                            status="fetchStatus" />
+
+                    </apex:pageBlockButtons>
+
+                    <font face='calibri' size='4'><b><apex:outputText rendered="{!wizardType == 'Transfer'}">Please select work items to {!wizardType} hours and then
+                    click '{!wizardType} Work'.</apex:outputText> <apex:outputText rendered="{!wizardType == 'Plan additional'}">
+                        <p>Please find the below work items which needs to be
+                        re-planned on this job.</p>
+                    </apex:outputText> </b></font>
+
+                    <br />
+                    <br />
+                    <!--  Added for CR#884 start-->
+                        <apex:outPutPanel id="blankDIV" style="overflow-y:auto;" layout="block">
+                        <apex:outPutPanel id="hours" rendered="{!wizardType == 'Transfer'}" layout="block" style="margin:auto;">
+                            <apex:pageblockSection columns="2" showHeader="false">
+                                <apex:pageblockSectionItem labelStyle="text-align:left;border:none;vertical-align:middle;" dataStyle="text-align:left;border:none;vertical-align:middle;">
+                                    <apex:outputLabel value="Total Hours Selected : " styleClass="{!IF(totalHours > 0,'hourClass','')}"/>
+                                    <apex:outputText value="{!totalHours}" styleClass="{!IF(totalHours > 0,'hourClass','')}"/>
+                                </apex:pageblockSectionItem>
+                                <apex:pageblockSectionItem labelStyle="text-align:left;border:none;vertical-align:middle;" dataStyle="text-align:left;border:none;vertical-align:middle;">
+                                    <apex:outputText />
+                                </apex:pageblockSectionItem>    
+                                <apex:repeat value="{!hourList}" var="h">
+                                    <apex:pageblockSectionItem labelStyle="text-align:left;border:none;vertical-align:middle;" dataStyle="text-align:left;border:none;vertical-align:middle;">
+                                        <apex:outputLabel value="{!h.skill}" style="{!h.skillStyle}"/>
+                                        <apex:outputLabel value="{!h.hours}" style="{!h.skillStyle}"/>
+                                    </apex:pageblockSectionItem>
+                                </apex:repeat>
+                            </apex:pageblockSection>
+                        </apex:outPutPanel>
+                        </apex:outPutPanel><br/>
+                    <!--  Added for CR#884 end-->
+                    <apex:pageBlockSection title="Work Details for {!thisJob.Name}"
+                        columns="1" collapsible="false">
+
+                        <font face='calibri' color='#880000' size='2'><b> <apex:outputText rendered="{!wizardType == 'Transfer'}">Select All Work Elements</apex:outputText></b></font>
+
+                        <apex:inputCheckbox value="{!selectAll}" onclick="selectAll()"
+                            rendered="{!wizardType == 'Transfer'}"
+                            disabled="{!wizardType == 'Plan additional'}" />
+
+                        <apex:pageBlockTable value="{!Items}" var="workElement"
+                            columns="8">
+
+                            <apex:column rendered="{!wizardType == 'Transfer'}">
+                                <apex:facet name="header">Select</apex:facet>
+                                <apex:inputCheckbox id="select" onclick="calculateHours();"
+                                    value="{!workElement.IsSelected}"
+                                    disabled="{!wizardType == 'Plan additional'}"/>
+                            </apex:column>
+                            <apex:column value="{!workElement.jE.Name}" headerValue="ID" />
+                            <apex:column value="{!workElement.jE.Code__c}" headerValue="Code" />
+                            <apex:column value="{!workElement.jE.Product_ID__c}"
+                                headerValue="Product ID" />
+                            <apex:column width="35%" value="{!workElement.jE.Description__c}"
+                                headerValue="Description" />
+                            <apex:column value="{!workElement.jE.Skill__c}"
+                                headerValue="Skill" />
+                            <apex:column value="{!workElement.jE.Units__c}"
+                                headerValue="Units" />
+                            <apex:column value="{!workElement.jE.Status__c}"
+                                headerValue="Status" />
+
+                        </apex:pageBlockTable>
+
+                    </apex:pageBlockSection>
+
+                </apex:pageBlock>
+                
+            <!-- Added for CR#884  start-->
+            <apex:actionFunction action="{!calculateSelectedHours}" name="calculateHours" reRender="hours" />
+            <apex:actionstatus id="status11" onstart="togglleDiv('');"
+                    onstop="togglleDiv('none');"></apex:actionstatus>
+            <!-- Added for CR#884  end-->
+            </apex:outputPanel>
+
+            <!-- //////////////////// This is the first page of journey for transfer as well as re-plan. END //////////////////////////////////////////-->
+
+
+
+
+
+
+
+
+            <!-- //////////////////// This is the page block for transfer as well as re-plan step. This is the second page of this journey. START /////////////////////////////////////////-->
+
+            <apex:pageBlock title="{!wizardType} Hours"
+                rendered="{!stepIndex == 'define' || stepIndex == 'Plan additional'}"
+                id="pgDefine">
+
+                <apex:pageBlockButtons location="bottom">
+
+                    <apex:commandButton action="{!returnToStart}" value="Back"
+                        rerender="page" status="fetchStatus" />
+
+                    <apex:commandButton action="{!confirm}" value="Remove Work"
+                        status="fetchStatus" rendered="{!wizardType == 'Return'}"
+                        onclick="if(!doSubmit()) return false;" />
+
+                    <apex:commandButton action="{!confirm}" value="Confirm"
+                        status="fetchStatus" rendered="{!wizardType == 'Transfer'}"
+                        onclick="if(!doSubmit()) return false;" />
+
+                    <apex:commandButton value="Check availability"
+                        action="{!checkAvailability}"
+                        rendered="{!wizardType == 'Plan additional'}" />
+                        
+                    <apex:commandButton value="Book Remedial"
+                        action="{!planRemedialJob}"
+                        rendered="{!remedial}" />
+
+                </apex:pageBlockButtons>
+
+
+
+                <!--  This is rendered for transfer mode START -->
+
+                <div style="width: 450px"><apex:pageBlockSection title=""
+                    columns="1" collapsible="false" rendered="{!NOT(replanMode)}">
+
+                    <apex:Repeat value="{!breakdown}" var="hi">
+
+                        <b>Please return {!hi.totalHours} hours <span
+                            style="text-decoration: underline">{!hi.skill}</span> work:</b>
+                        <br />
+
+                        <div id="{!hi.myId}"><apex:pageBlockTable value="{!hi.entries}" var="entry" columns="3">
+
+                            <apex:column value="{!entry.ent.Employee_Name__c}"
+                                headerValue="Name" width="200px" />
+                            <apex:column value="{!entry.totalHours}"
+                                headerValue="Skill Hours" width="100px" />
+                            <apex:column headerValue="Reduction" width="100px">
+                                <apex:inputText id="reduction" value="{!entry.reduction}"
+                                    onchange="return checkValue(this,{!entry.totalHours});"
+                                    onBlur="return checkValue(this,{!entry.totalHours});" />
+                            </apex:column>
+
+                        </apex:pageBlockTable> <input id="total" value="{!hi.totalHours}" type="hidden" /></div>
+
+                        <br />
+                        <br />
+
+                    </apex:Repeat>
+
+                </apex:pageBlockSection></div>
+
+                <!--  This is rendered for transfer mode END-->
+
+
+
+
+                <!--  This is rendered for re-plan mode START-->
+
+                <apex:pageBlockSection title="" columns="1" collapsible="false"
+                    rendered="{!replanMode}">
+
+                    <apex:pageBlockTable value="{!listReplanhoursInfo}" var="entry"
+                        columns="4">
+                        <apex:column value="{!entry.skill}" headerValue="Skill Name"
+                            width="25%" />
+                        <apex:column value="{!entry.totalHours}" headerValue="Skill Hours"
+                            width="25%" />
+                        <apex:column headerValue="Named Employee" width="25%">
+                            <apex:inputField value="{!entry.job.Named_Employee__c}" />
+                        </apex:column>
+                        <apex:column headerValue="Not Before" width="25%" rendered="{!!remedial}">
+                            <!--<b>Not Before : </b>-->
+                            <apex:inputField value="{!entry.job.Customer_Preferred_Date__c}" />
+                        </apex:column>
+                        
+                        <apex:column headerValue="Diary Start Date/Time" width="25%" rendered="{!remedial}">
+                            <apex:inputField value="{!entry.job.Previous_Start_Time__c}" />
+                        </apex:column>
+                        
+                    </apex:pageBlockTable>
+
+                </apex:pageBlockSection>
+
+                <!--  This is rendered for re-plan mode ENDS -->
+
+
+
+                <script>
+                    hisIds = '{!HoursIds}';
+                </script>
+
+            </apex:pageBlock>
+
+            <!-- //////////////////// This is the page block for transfer as well as re-plan step. This is the second page of this journey. End /////////////////////////////////////////-->
+
+
+
+
+
+
+
+
+
+            <!-- //////////////////// This is the page block for confirm transfer step. START /////////////////////////////////////////-->
+
+
+            <apex:pageBlock title="{!wizardType} Hours"
+                rendered="{!stepIndex == 'transfer'}" id="pgTransfer">
+
+                <apex:pageBlockButtons location="bottom">
+
+                    <apex:commandButton action="{!returnToDefine}" value="Back"
+                        rerender="page" status="fetchStatus" />
+
+                    <apex:commandButton action="{!confirmTransfer}"
+                        value="Confirm Transfer" onclick="togglleDiv('');"
+                        oncomplete="togglleDiv('none');"
+                        rendered="{!isConfirmRendered && !isEmployeeNotHaveSkill && !isEmployeeNotActive}" rerender="pageMess"/>
+
+                </apex:pageBlockButtons>
+
+                <apex:pageBlockSection title="" columns="1" collapsible="false">
+
+                    <apex:Repeat value="{!breakdown}" var="hi">
+
+                        <b>Select an employee to transfer {!hi.totalReduction} hours <span
+                            style="text-decoration: underline">{!hi.skill}</span> work to:</b>
+                        <br />
+
+                        <table>
+
+                            <tr>
+
+                                <td>Employee</td>
+
+                                <td><apex:inputField value="{!hi.Job.Named_Employee__c}" /></td>
+
+                                <td>Not Before</td>
+
+                                <td><apex:inputField value="{!hi.Job.Customer_Preferred_Date__c}" /></td>
+
+                            </tr>
+
+                        </table>
+
+                        <br />
+                        <br />
+
+                    </apex:Repeat>
+
+                    <apex:CommandButton action="{!checkAvailability}"
+                        onClick="if(!checkEmployeeSelected()) return false;"
+                        value="Check Availability" rerender="pgTransfer,pageMess"
+                        status="fetchStatus" />
+
+                </apex:pageBlockSection>
+
+
+                <apex:pageBlockSection title="" collapsible="false"
+                    id="transferData" columns="1">
+
+                    <apex:dataTable cellpadding="2" 
+                        value="{!employeebreakdown}" var="em" id="availabilityTable"
+                        rendered="{!isAvailabilityRendered && !isEmployeeNotHaveSkill}">
+
+                        <apex:column width="300" value="{!em.employeeName}"
+                            headerValue="Employee" />
+                        <apex:column width="150" value="{!em.availability.Start__c}"
+                            headerValue="Start" />
+                        <apex:column width="150" value="{!em.combinedHours}"
+                            headerValue="Hours" />
+                        <apex:column width="150" value="{!em.availability.Overbooked_Hours__c}"
+                            headerValue="Overbooked Hours" />
+                        <apex:column value="{!em.backTravel}"
+                            headerValue="Travel Time" />
+
+                    </apex:dataTable>
+
+                </apex:pageBlockSection>
+
+                <br />
+                <br />
+
+                <apex:outputText rendered="{!!isConfirmRendered && isAvailabilityRendered}">At least one employee does not have availability. Please amend the 'not before' date or choose a different employee. 
+                </apex:outputText>
+
+                <apex:outputText rendered="{!isEmployeeNotHaveSkill}">Selected employee does not have one or more required skills to do this work.
+                </apex:outputText>
+                
+                <apex:outputText rendered="{!isEmployeeNotActive}">One or more of the selected employees is/are Inactive. Please choose a different employee.
+                </apex:outputText>
+
+            </apex:pageBlock>
+
+
+            <!--!!!!!!!!!!!!!!!! This is the page block for confirm transfer step. END !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+
+
+
+
+
+
+
+
+
+            <!-- //////////////////// This is the page block for confirm re-plan step. START //////////////////////////////////////////-->
+
+            <apex:pageBlock title="{!wizardType} Hours"
+                rendered="{!stepIndex == 'Plan additional' && isConfirmRendered}"
+                id="pgTransferReplan">
+
+                <apex:pageBlockButtons location="bottom">
+
+                    <apex:commandButton value="Confirm"
+                        rendered="{!isConfirmRendered && !isEmployeeNotHaveSkill}"
+                        action="{!confirmTransfer}" onclick="togglleDiv('');"
+                        oncomplete="togglleDiv('none')" status="myStatusOne" />
+
+                    <apex:actionStatus startText="Processing..." id="myStatusOne">
+                    </apex:actionStatus>
+
+                </apex:pageBlockButtons>
+
+                <apex:pageBlockSection title="" collapsible="false" id="replanData"
+                    columns="1">
+
+                    <br />
+                    <br />
+
+                    <apex:pageblockTable cellpadding="2" 
+                        value="{!employeebreakdown}" var="em" id="availabilityTableReplan"
+                        rendered="{!isAvailabilityRendered && !isEmployeeNotHaveSkill}">
+
+                        <apex:column width="200" value="{!em.employeeName}"
+                            headerValue="Employee" />
+                        <apex:column width="200" value="{!em.availability.Start__c}"
+                            headerValue="Start" />
+                        <apex:column width="200" value="{!em.combinedHours}"
+                            headerValue="Total Hours To Transfer" />
+                        <apex:column width="200" value="{!em.nonOverBookedHours}"
+                            headerValue="Normal Hours" />
+                        <apex:column width="200"
+                            value="{!em.availability.Overbooked_Hours__c}"
+                            headerValue="Overbooked Hours" />
+                         <apex:column value="{!em.backTravel}"
+                            headerValue="Travel Time" />
+
+                    </apex:pageblockTable>
+
+                </apex:pageBlockSection>
+
+                <br />
+                <br />
+
+            </apex:pageBlock>
+
+
+            <!--!!!!!!!!!!!!!!!! This is the page block for confirm re-plan step. END !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+
+
+
+            <apex:outputPanel style="display:none;">
+
+                <apex:inputField value="{!dummyJob.Customer_Preferred_Date__c}" />
+
+            </apex:outputPanel>
+
+            <div id="darkLayer"
+                style="background-color: white; filter: alpha(opacity =                                                         50); /* IE */ opacity: 0.5; /* Safari, Opera */ -moz-opacity: 0.50; /* FireFox */ z-index: 20; height: 100%; width: 100%; background-repeat: no-repeat; background-position: center; position: absolute; top: 0px; left: 0px; display: none;">
+            </div>
+
+        </apex:form>
+
+    </apex:outputPanel>
+
+</apex:page>

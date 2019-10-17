@@ -1,0 +1,85 @@
+<apex:page controller="Cont_JobBookingPage" id="thePage">
+   <apex:form >
+   		<script>
+   		function confirmDel()
+			{
+				if(confirm('Clicking OK button will Delete Records.'))
+				{
+					togglleDiv('');
+					return true;
+					
+				}
+				else
+				{
+					return false;
+				}
+			}
+			function togglleDiv(show)
+			{
+				document.getElementById('darkLayer').style.display = show; 
+				document.getElementById('LoadingDiv').style.display = show; 
+			}  
+		</script>
+		<apex:pageblock rendered="{!(NOT(IsData))}">
+             <apex:pageBlockSection title="Message" columns="1" collapsible="false">
+                             <apex:outputText >No Job Bookings records exist for this employee.</apex:outputText>
+                             <apex:commandButton value="Click to Close" oncomplete="window.top.close()"/>
+             </apex:pageBlockSection>
+		</apex:pageblock>
+		<apex:pageblock rendered="{!IsData}">
+             <apex:pageBlockButtons >
+                             <apex:commandButton action="{!deleterecords}" value="Clear Report" onclick="if(!confirmDel()) return;"oncomplete="togglleDiv('none');alert('JobBooking Entries Sucessfully Deleted');window.top.close()"  />
+                            <!--<apex:commandButton action="{!suspendrecords}" value="Suspend all Jobs"  oncomplete="alert('Sucessfully Suspended');window.top.location.reload();"/>-->
+             </apex:pageBlockButtons>
+			    <apex:pageBlockSection title="List Of Affected Jobs" columns="1">
+                    <apex:pageBlockTable value="{!JobEntries}" var="j" id="theTable" title="Job Booking List">
+                      	<apex:column value="{!j.Name}"/>
+						<apex:column value="{!j.Employee_Name__c}"/>
+						<!--  <apex:column value="{!j.Job_Number__c}"/>-->
+						<apex:column headervalue="Job Number">
+							<apex:outputlink value="/{!j.Job__c}">
+								<apex:outputtext value="{!j.Job_Number__c}"/>
+							</apex:outputlink>
+						</apex:column>
+						<apex:column value="{!j.Job_Status__c}"/>
+						<!-- - <apex:column value="{!j.Sub_Type__c}"/>  
+						<apex:column value="{!j.Start__c}"/>
+                        <apex:column value="{!j.End__c}"/>-->
+                        <apex:column value="{!j.Installation_Date__c}"/>
+                        <apex:column headervalue="Action">
+                        <!-- rendered="{!IF(j.IsSuspended__c && NOT(j.IsUnsuspended__c),True,False)}" -->
+							<apex:commandLink value="Suspend" action="{!Suspended}" onclick="togglleDiv('');" rendered="{!NOT(j.IsSuspended__c)}" oncomplete="togglleDiv('none');alert('Sucessfully Suspended');window.location.reload(true);">								
+								<apex:param assignTo="{!JobId}" name="p" value="{!j.Job__c}"/>
+							</apex:commandLink>
+							<apex:commandLink value="Unsuspend" action="{!UnSuspended}" onclick="togglleDiv('');" rendered="{!AND(j.IsSuspended__c,NOT(j.IsUnsuspended__c))}" oncomplete="togglleDiv('none');alert('Sucessfully Unsuspended');window.location.reload(true);">								
+								<apex:param assignTo="{!JobId}" name="p" value="{!j.Job__c}"/>
+							</apex:commandLink>
+							<apex:outputtext value="" rendered="{!AND(j.IsSuspended__c,j.IsUnsuspended__c)}"/>
+							<!-- <apex:commandLink value="" action="" onclick="togglleDiv('');" rendered="{!AND(j.IsSuspended__c,j.IsUnsuspended__c)}" oncomplete="togglleDiv('none');alert('Sucessfully Unsuspended');window.location.reload(true);">								
+								<apex:param assignTo="{!JobId}" name="p" value="{!j.Job__c}"/>
+							</apex:commandLink> -->
+						</apex:column>             
+                    </apex:pageBlockTable>
+			    </apex:pageBlockSection>
+		</apex:pageblock>
+		 <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+			<div style="margin-left:5px; margin-top:5px;">
+			<img src="/img/loading.gif" /> Processing...
+			</div>
+		</div>
+		<div id="darkLayer" style ="background-color: white; 
+								    filter:alpha(opacity=50); /* IE */ 
+								    opacity: 0.5; /* Safari, Opera */ 
+								    -moz-opacity:0.50; /* FireFox */ 
+								    z-index: 20; 
+								    height: 100%; 
+								    width: 100%; 
+								    background-repeat:no-repeat; 
+								    background-position:center; 
+								    position:absolute; 
+								    top: 0px; 
+								    left: 0px; 
+								    display:none;"></div>
+		
+   </apex:form>
+</apex:page>

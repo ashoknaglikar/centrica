@@ -1,0 +1,160 @@
+<apex:page controller="searchExcessTravelClaimController" sidebar="false">
+<style>
+.ct{
+text-align:center;
+}
+</style>
+<script>
+    function confirmDel()
+            {
+                if(confirm('Clicking OK button will Delete Records.'))
+                {
+                    togglleDiv('');
+                    return true;
+                    
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            function togglleDiv(show)
+            {
+                document.getElementById('darkLayer').style.display = show; 
+                document.getElementById('LoadingDiv').style.display = show;      
+            }  
+  
+  </script> 
+   
+   
+<div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+        </div>
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;"></div>
+
+ <apex:form id="formId" >
+    <apex:pageMessages />
+    <apex:pageBlock title="Search Excess travel Claims" id="pgBlk">
+        <apex:pageBlockButtons >
+            <apex:commandButton value="Show Claims" action="{!searchClaims}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" reRender="formId"/>
+            <apex:commandButton value="Complete Requests" action="{!onComplete}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');alert('Sucessfully Completed Selected Records');" reRender="formId" rendered="{!CAM}"/>
+        </apex:pageBlockButtons>
+        <apex:pageBlockSection title="Enter Duration">
+            <apex:pageBlockSectionItem > 
+                <apex:outputLabel value="Start Date:" for="StartDate"> </apex:outputLabel>
+                <apex:inputfield value="{!jb.Customer_Journey_First_Update__c}" id="StartDate"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem > 
+                <apex:outputLabel value="End Date:" for="EndDate"> </apex:outputLabel>
+                <apex:inputfield value="{!jb.BGNE_Install_Date__c}" id="EndDate"/>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Additional Filters" columns="2">
+                 <apex:pageblocksectionitem >
+                        <b>District:</b> 
+                        <apex:selectList style="font-size:7pt;" value="{!AreaName}" multiselect="false" size="1" id="areaDropDown">
+                            <apex:selectOptions value="{!AreaItems}"/>
+                        </apex:selectList>
+                 </apex:pageblocksectionitem> 
+                 <apex:pageblocksectionitem >     
+                        <b>Region:</b> 
+                        <apex:selectList style="font-size:7pt;" value="{!RegionName}" multiselect="false" size="1" id="areaDropDown1">
+                            <apex:selectOptions value="{!RegionItems}"/>
+                        </apex:selectList>
+                 </apex:pageblocksectionitem>
+                 <apex:pageblocksectionitem >
+                        <b>Status:</b> 
+                        <apex:selectList style="font-size:7pt;" value="{!Status}" multiselect="false" size="1" id="areaDropDown">
+                            <apex:selectOptions value="{!StatusItems}"/>
+                        </apex:selectList>
+                 </apex:pageblocksectionitem> 
+        </apex:pageBlockSection>
+        
+            
+            <apex:actionStatus id="wait" startText="wait...." stopText=""> </apex:actionStatus>
+        <apex:pageBlockSection title="Excess Travel Claims" columns="1" rendered="{!show}">
+            <apex:outputpanel rendered="{!CAM}">
+            <apex:outputlabel value="Select All requests" for="all" />
+            <apex:inputCheckbox value="{!selectAll}" id="all" immediate="true"/>
+            <apex:actionSupport event="onchange" action="{!onSelectAll}" status="wait" reRender="formId"/>
+            </apex:outputpanel>
+            <apex:pageblocksectionitem >
+            <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="Pag1_1">  
+             Total Available Appts : <apex:outputText rendered="{!IF(total_size>=10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(total_size < 10000,true,false)}">{!total_size}</apex:outputText>  
+             <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!DisablePrevious}"/>  
+             <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!NOT(DisablePrevious)}"/>  
+             <apex:commandLink action="{!Previous}" title="Previous Page" value="Previous Page" rendered="{!NOT(DisablePrevious)}"  rerender="formId"/>&nbsp;  
+             <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisablePrevious}">Previous Page</apex:outputPanel>           
+             &nbsp;Showing Page  {!pageNumber} of {!totalPages}&nbsp;&nbsp; 
+             <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisableNext}">Next Page</apex:outputPanel>           
+             <apex:commandLink action="{!Next}" title="Next Page" value="Next Page" rendered="{!NOT(DisableNext)}" rerender="formId"/>&nbsp;  
+             <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!NOT(DisableNext)}"/>  
+             <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!DisableNext}"/>            
+        </apex:outputPanel>
+        </apex:pageblocksectionitem>
+        <apex:pageblocksectionitem >
+            <apex:pageblockTable value="{!lst_wrap}" var="lw" style="width:100%" align="Center">
+                <apex:Column styleClass="ct" rendered="{!CAM}">
+                    <apex:facet name="header">Select</apex:facet>
+                    <apex:inputCheckbox value="{!lw.isSelected}" immediate="true" />
+                </apex:Column>
+                <apex:Column styleClass="ct">
+                    <apex:facet name="header">Req. No.</apex:facet>
+                    <apex:outputlink value="/{!lw.etc.id}">   
+                    <apex:outputField value="{!lw.etc.Name}"/>
+                    </apex:outputlink>
+                </apex:Column>
+                <apex:Column styleClass="ct">
+                    <apex:facet name="header">Greater than 30 min and less than 60 min</apex:facet>
+                    <apex:outputField value="{!lw.etc.Total_Time_for_30_and_60_OfficeUser__c}"/>
+                </apex:Column>
+                <apex:Column styleClass="ct">
+                    <apex:facet name="header">Greater than 60 min</apex:facet>
+                    <apex:outputField value="{!lw.etc.Total_Time_for_60_OfficeUser__c}"/>
+                </apex:Column>
+                <apex:Column styleClass="ct">
+                    <apex:facet name="header">Requestor</apex:facet>
+                    <apex:outputField value="{!lw.etc.Employee__c}"/>
+                </apex:Column>
+                <apex:Column styleClass="ct">
+                    <apex:facet name="header">Job</apex:facet>
+                    <apex:outputField value="{!lw.etc.Job__c}"/>
+                </apex:Column>
+                <apex:Column styleClass="ct">
+                    <apex:facet name="header">Installation Date</apex:facet>
+                    <apex:outputField value="{!lw.etc.Installation_date__c}"/>
+                </apex:Column>
+                <apex:Column styleClass="ct">
+                    <apex:facet name="header">District</apex:facet>
+                    <apex:outputField value="{!lw.etc.District__c}"/>
+                </apex:Column>
+                <apex:Column styleClass="ct">
+                    <apex:facet name="header">Status</apex:facet>
+                    <apex:outputField value="{!lw.etc.Status__c}"/>
+                </apex:Column>
+                <apex:Column styleClass="ct">
+                    <apex:facet name="header">Approved Date</apex:facet>
+                    <apex:outputField value="{!lw.etc.Approved_Date_Time__c}"/>
+                </apex:Column>
+
+            </apex:pageblockTable>
+            </apex:pageblocksectionitem>
+        </apex:pageBlockSection>
+        
+    </apex:pageBlock>
+</apex:form> 
+</apex:page>

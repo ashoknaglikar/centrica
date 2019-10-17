@@ -1,0 +1,74 @@
+<apex:page sidebar="false" showHeader="false" >
+<html>
+    <header>
+        <style type="text/css">
+
+            body{
+                font-family: 'BG Flame', sans-serif;
+            }
+
+            #rcorners1 {
+                border-radius: 25px;
+                background: #73AD21;
+                padding: 20px; 
+                width: 200px;
+                height: 50px; 
+                text-align: center;
+                font-weight: bold;
+                vertical-align: middle;
+            }
+
+            #rcorners2 {
+                border-radius: 25px;
+                border: 2px solid black;
+                padding: 10px; 
+                width: 200px;
+                height: 55px;   
+                text-align: center;         
+            }
+        </style>
+    </header>
+    <body>
+        <h1 align="center">Diary View Legend</h1>
+        <div align="center">
+        <table style="width: 80%; align: center;">
+
+            <tr>
+                <td><p id="rcorners1" style="background: #73AD21; text:">Job Booking</p></td>
+                <td><p id="rcorners1" style="background: grey">Unavailability - Not working</p></td>
+                <td><p id="rcorners1" style="background: pink">Job Booking + Non Op</p></td>
+                <td><p id="rcorners1" style="background: blue">Job Booking ECH</p></td>
+                <td><p id="rcorners1" style="background: #53d80a">Job Booking - Green Deal</p></td>
+            </tr>
+            <tr>
+                <td><p id="rcorners1" style="background: #8D38C9">Job Booking - Affordable Warmth</p></td>
+                <td><p id="rcorners1" style="background: #CD96CD">Job Booking - Non Working Day</p></td>
+                <td><p id="rcorners1" style="background: yellow">Travel Time</p></td>
+                <td><p id="rcorners1" style="background: brown">Job Booking - Straight Swap</p></td>
+                <td><p id="rcorners1" style="background: white; border-color: black; border-style: solid;">Available</p></td>
+            </tr>
+            <tr>
+                <td><p id="rcorners1" style="background: #F93F26">Unavailability</p></td>
+                <td><p id="rcorners1" style="background: #663399">Unavailability - NWD Working</p></td>
+                <td><p id="rcorners1" style="background: #F9E04C">Unavailability - Survey</p></td>
+                <td><p id="rcorners1" style="background: blue">Unavailability - Service Upgrade Work</p></td>
+                <td><p id="rcorners1" style="background: Orange">Unavailability - Emergency Installation Resource</p></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><p id="rcorners1" style="background: #66FFCC">Unavailability - Contingency</p></td>
+                <td><p id="rcorners1" style="background: #DC2BD0">Unavailability - Survey Duties</p></td>
+                <td><p id="rcorners1" style="background: #FF3399">Unavailability - Non productive</p></td>
+                <td><p id="rcorners1" style="background: #00DCFF">Job Booking - Operational</p></td>
+            </tr>
+            
+        </table>
+        </div>
+    </body>
+
+
+</html>
+
+
+
+</apex:page>

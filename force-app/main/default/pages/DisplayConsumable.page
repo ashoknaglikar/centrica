@@ -1,0 +1,10 @@
+<apex:page controller="DisplayConsumable" sidebar="false"  showHeader="false">
+    <apex:form >
+        <apex:pageblock title="{!consu.Name}">
+            <!--<apex:image url="{!consu.Image_URL__c}"  alt="No image" title="Other" width="350" height="350"/>
+            <apex:image url="{!URLFOR($Resource.Consumables_1, 'Consumables_1/173-028.jpg')}" width="350" height="350"/>-->
+            <apex:image url="{!URLFOR($Resource[resource] , location)}" width="350" height="350"/>
+
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,121 @@
+<apex:page Standardcontroller="order__c" extensions="CancelOrderLineItemsCntrl" >
+
+<!-- Added for PTS CR -->
+<script>
+    var jsCheckInterval;
+    function openNewPTSWindow()
+     {
+        jsPopPTSWindow = window.open('/apex/PTSForm?id={!job.id}&dt=' + '{!job.Formatted_Delivery_Date__c}',"_blank","controls=no,height=705,width=1020,scrollbars=1");
+     }
+     
+     function openPTSScrren()
+     {
+        jsPopPTSWindow = window.open('/apex/CancelSlotInPTS?jobId={!job.id}&slot=C');
+        //jsCheckInterval = setInterval(checkNewPTSWindowClosed, 300);
+     }
+     
+</script>
+<!-- Added for PTS CR -->
+
+    <apex:pageBlock title="Cancel Order Line Items for : {!order__c.Name}">
+        <apex:form >
+            <apex:pageBlockSection collapsible="false" columns="2" title="Order Details for {!order__c.Name}">       
+                <apex:outputField title="SAP Number" value="{!order__c.SAP_Number__c}">
+                </apex:outputField>
+                <apex:outputField title="Supplier" value="{!order__c.Supplier__c}">
+                </apex:outputField>
+                <apex:outputField title="Order Value" value="{!order__c.Order_Value__c}">
+                </apex:outputField>
+                <apex:outputField title="Order Date" value="{!order__c.Order_Date__c}">
+                </apex:outputField>
+                <apex:outputField title="Delivery Date" value="{!order__c.Job_Delivery_Date__c}">
+                </apex:outputField>
+                <apex:outputField title="Note" value="{!order__c.Order_Note__c}">
+                </apex:outputField>
+                <apex:outputField title="Category" value="{!order__c.Type__c}">
+                </apex:outputField>
+                <apex:outputField title="Status" value="{!order__c.Status__c}">
+                </apex:outputField>
+            </apex:pageBlockSection>    
+            <font face='calibri' color='#FF0000' size='2'><b><apex:messages layout="list"/></b></font>
+            <p/>
+            <font face='calibri' color='#880000' size='2'><b>{!result}</b></font>
+            
+            <!-- Added below block for PTS CR start -->
+            <apex:outputPanel id="PTSSection">
+                <apex:PageblockSection title="Cancellation of PTS Slot" rendered="{!isMaterialOrder}" id="PTSSection1" columns="1" collapsible="false">
+                            Before cancelling the order or line items you have to cancel the slot in the PTS system.<br/><br/>
+                            You have to click the link to proceed further.<br/><br/>
+                            After clicking the link you will be redirected to PTS screen for cancellation of delivery slot in PTS system.<br/><br/>
+                            <apex:outputLink value="" onclick="openNewPTSWindow(); return false;">Cancel Slot in PTS</apex:outputLink>
+                             <!--<apex:outputLink value="" onclick="openPTSScrren(); return false;">Cancel Slot in PTS</apex:outputLink> -->
+                </apex:PageblockSection>
+            </apex:outputPanel> <br/><br/>
+            <!-- Added below block for PTS CR end -->
+            
+            <apex:outputPanel rendered="{!NOT(ISNULL(lineItems))}" >
+                <p/>
+                <table width='100%'>
+                    <tr bgcolor='#99FFFF'>
+                        <td>
+                            <font face='calibri' size='2'><b>To Cancel the entire order please select all the Order Line Items and hit on Cancel.</b>
+                            </font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <apex:inputCheckbox value="{!selectAll}" onchange="selectAll()"/><font face='calibri' color='#880000' size='2'><b> Select All Line Items </b></font>
+                        </td>
+                    </tr>
+                </table>
+                
+                <p/>
+                
+                <apex:outputPanel id="innerPanel" >
+                    <apex:actionFunction name="selectAll" action="{!selectAll}" rerender="innerPanel" status="myStatus"/>
+                    <apex:actionStatus startText="Processing..." id="myStatus">
+                    </apex:actionStatus>
+                    
+                    <apex:pageBlockTable id="Linetab" value="{!lineItems}" var="lines">
+                        <apex:column headerValue="Action">
+                            <apex:inputCheckbox value="{!lines.isSelected}">
+                            </apex:inputCheckbox> 
+                        </apex:column>
+                        <apex:column headerValue="Name">
+                            <apex:outputtext value="{!lines.ordLineItm.Name}">
+                            </apex:outputtext>
+                        </apex:column>
+                        <apex:column headerValue="Product Name">
+                            <apex:outputtext value="{!lines.ordLineItm.Code__c}">
+                            </apex:outputtext>
+                        </apex:column>
+                        <apex:column headerValue="Description">
+                            <apex:outputtext value="{!lines.ordLineItm.Description__c}">
+                            </apex:outputtext>
+                        </apex:column>
+                        <apex:column headerValue="Type">
+                            <apex:outputtext value="{!lines.ordLineItm.P5_Type__c}">
+                            </apex:outputtext>
+                        </apex:column>
+                        <apex:column headerValue="Skill">
+                            <apex:outputtext value="{!lines.ordLineItm.Skill__c}">
+                            </apex:outputtext>
+                        </apex:column>
+                        <apex:column headerValue="Unit(s)">
+                            <apex:outputtext value="{!lines.ordLineItm.Units__c}">
+                            </apex:outputtext>
+                        </apex:column>
+                        <apex:column headerValue="Unit Price">
+                            <apex:outputtext value="{!lines.ordLineItm.P5_Unit_Price_c__c}">
+                            </apex:outputtext>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <center>
+                <apex:commandButton action="{!cancelOLI}" value="Cancel Items"  rendered="{!NOT(ISNULL(lineItems))}" />
+                <apex:commandButton action="{!goBack}" value="Go Back" />
+            </center>
+        </apex:form>    
+    </apex:pageBlock>
+</apex:page>

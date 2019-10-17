@@ -1,0 +1,8 @@
+<apex:component access="global" >
+
+    <apex:attribute name="tradingName" description="Will show British or Scottish gas" type="string"/>
+    
+    <p>Thanks</p>
+    <p>Your&nbsp;{!tradingName}&nbsp;team</p>
+    
+</apex:component>

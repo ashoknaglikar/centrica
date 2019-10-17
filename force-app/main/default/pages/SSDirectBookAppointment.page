@@ -1,0 +1,61 @@
+<apex:page controller="ssDirectUpdate" sidebar="false" showHeader="false">
+  <script type="text/javascript">
+        function closeAndRefresh(){
+            //alert('-------');
+            window.close();
+            if (window.opener && !window.opener.closed) {
+               var oppid = '{!opp.Id}';
+               var accid = '{!opp.AccountId}';
+               var newInbound = '{!newInbound}';
+               window.opener.location.href="/apex/new_Wrapupscreenpage?chiLeadId="+oppid+"&accId="+accid+"&new="+newInbound;
+            } 
+        }    
+        
+        function closeAndRedirect(){
+          // alert('{!tenant}'+' '+'{!Landlord}');
+           
+           window.close();
+           if (window.opener && !window.opener.closed) {
+               var oppid = '{!opp.Id}';
+               var accid = '{!opp.AccountId}';
+               var newInbound = '{!newInbound}';
+               var conid = '{!opp.Account.Primary_Contact__c}';
+               var tentant = '{!tenant}';
+               var Landlord = '{!Landlord}';
+               
+              
+               
+               if(tentant=='true' || Landlord=='true')
+               window.opener.location.href="/apex/captureLandlordDetails?edit=1&source=IC&chiLeadId="+oppid+"&accId="+accid+"&new="+newInbound;
+               else
+               window.opener.location.href="/apex/availability?var_OpptyId="+oppid+"&var_Source=ICL&view=null&var_date=null&var_contactId="+conid+"&gDeal=3&new="+newInbound;
+               
+            } 
+        }
+         
+    </script>
+  <apex:form >
+     <apex:pageblock >
+     <apex:outputPanel >
+                
+                    <font face='calibri' color = '#787878' size ='3'>
+                        <p>
+                        <b><center>
+                            Based on the information you’ve provided we’re able to provide you with a quote over the phone. Would you like me to book a telephone appointment for you ? .
+                           </center></b>
+                        </p>
+                    </font>
+                
+                
+       </apex:outputPanel>
+         <center>
+         <apex:pageblockButtons location="bottom">
+                  <apex:commandButton value="Yes" action="{!confirm}" oncomplete="Javascript:closeAndRedirect();"/>
+                  <apex:commandbutton value="No" onclick="Javascript:closeAndRefresh();"/>
+          </apex:pageblockButtons>
+          </center>
+     </apex:pageblock>
+     
+  </apex:form>
+  
+</apex:page>

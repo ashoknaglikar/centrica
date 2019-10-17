@@ -1,0 +1,130 @@
+<apex:component controller="AccountEditViewController">
+    <apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" required="true"/>
+    <apex:attribute name="accountObject" description="This attrribute passes the Account object to the AccountEditViewComponent type: Edit or View." type="Account" assignTo="{!account}"/>
+    <apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+    <apex:attribute name="CallModeobj" description="This attrribute passes the CallMode." type="CallMode"/>
+    <apex:attribute name="callModeVal" description="This attrribute is used to determine the call type." type="Integer"/>
+    <apex:attribute name="region" description="This attrribute is used to determine region." type="String"/>
+    <apex:attribute name="district" description="This attrribute is used to determine district." type="String"/>
+    <apex:attribute name="ListOpportunity" description="This attrribute passes the opportunity list to the controller." type="Opportunity[]" />
+
+    {!TempData}
+<!--<apex:pageBlockSection title="Account" rendered="{!IF(displayModeVal==DisplayModeobj.EDIT,true,false)}" columns="17" collapsible="false">
+        <apex:pageblocksectionitem >&nbsp;</apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>District</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Region</b></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><b>Gas Supply at Address</b></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><b>Current Heating System</b></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><b>Number of Bedrooms</b></apex:pageblocksectionitem>
+         <!--<apex:pageblocksectionitem ><apex:outputtext value="Asbestos Found" style="font-weight:bold" rendered="{!IF(OR(callModeVal == Ca<!--llModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST),true,false)}"/></apex:pageblocksectionitem>
+         
+         <!--<apex:pageblocksectionitem ><apex:outputtext value="Healthy & Safety Notes" style="font-weight:bold" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST),true,false)}"/></apex:pageblocksectionitem> //end here
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         
+         
+         
+         
+         <apex:pageblocksectionitem ><apex:outputText value="{!accountAddress}"/></apex:pageblocksectionitem>
+         <!-- Change 04/11 Amended as part of CR to introduce gas supply confirmation 
+         <apex:pageblocksectionitem ><apex:outputtext value="{!district}"/></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><apex:outputtext value="{!region}"/></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><apex:inputField required="true" value="{!account.Gas_Supply_Confirmation__c}"/></apex:pageblocksectionitem>         
+         <!-- <apex:pageblocksectionitem ><apex:inputField value="{!account.Gas_Supply_At_Address__c}"/></apex:pageblocksectionitem>
+         
+         <apex:pageblocksectionitem ><apex:inputField value="{!account.Current_Heating_System__c}"/></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><apex:inputField value="{!account.Number_of_Bedrooms__c}"/></apex:pageblocksectionitem> 
+         <!--<apex:pageblocksectionitem ><apex:inputField value="{!account.Asbestos_found__c}" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST),true,false)}"/></apex:pageblocksectionitem> 
+         <!--<apex:pageblocksectionitem ><apex:inputtext value="{!account.healthSafety_Notes__c}" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST),true,false)}"/></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+        <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+         <apex:pageblocksectionitem >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:pageblocksectionitem>
+        </apex:pageBlockSection>-->
+
+    
+
+<!--Select a.Number_of_Bedrooms__c, a.Gas_Supply_At_Address__c, a.Current_Heating_System__c, a.BillingStreet, a.BillingState, a.BillingPostalCode, a.BillingCountry, a.BillingCity From Account a    -->
+    
+    <apex:pageBlockSection title="Account" rendered="{!IF(or(displayModeVal==DisplayModeobj.VIEW,displayModeVal==DisplayModeobj.EDIT),true,false)}" columns="3" collapsible="false">
+        <apex:pageblocksectionitem >&nbsp;</apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>District</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Region</b></apex:pageblocksectionitem>
+       <!--  <apex:pageblocksectionitem ><b>Gas Supply at Address</b></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><b>Current Heating System</b></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><b>Number of Rooms</b></apex:pageblocksectionitem>-->
+                   
+         <apex:pageblocksectionitem ><apex:outputText value="{!accountAddress}"/></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><apex:outputtext value="{!district}"/></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><apex:outputtext value="{!region}"/></apex:pageblocksectionitem>
+        <!--   <apex:pageblocksectionitem ><apex:outputField value="{!account.Gas_Supply_At_Address1__c}"/></apex:pageblocksectionitem>
+          <apex:pageblocksectionitem ><apex:outputField value="{!account.Current_Heating_System1__c}"/></apex:pageblocksectionitem>
+          <apex:pageblocksectionitem ><apex:outputField value="{!account.Number_of_Bedrooms__c}"/></apex:pageblocksectionitem>-->
+         
+    </apex:pageBlockSection>
+    
+    <apex:pageBlockSection title="Campaign" columns="1" rendered="{!IF(AND(displayModeVal==DisplayModeobj.EDIT,OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST)),true,false)}">
+         <apex:repeat value="{!ListOpportunity}" var="opp">
+              <apex:inputField value="{!opp.campaignId}" required="true" /> 
+         </apex:repeat>     
+    </apex:pageBlockSection> 
+    
+    <apex:pageBlockSection title="Campaign" columns="1" rendered="{!IF(AND(displayModeVal==DisplayModeobj.VIEW,OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST)),true,false)}">
+         <apex:repeat value="{!ListOpportunity}" var="opp">
+              <apex:outputField value="{!opp.campaignId}" /> 
+         </apex:repeat>     
+    </apex:pageBlockSection> 
+    
+    <apex:pageBlockSection title="Address" rendered="{!IF(displayModeVal==DisplayModeobj.ADDRESSONLY,true,false)}"  columns="1">
+        <table width="100%">
+            <tr>
+                <td width="40%"><apex:outputText value=""/></td>
+                <td width="40%"><apex:outputText value="District"/></td>
+                <td width="40%"><apex:outputText value="Region"/></td>
+            </tr>
+            <tr>
+                <td><apex:outputText value="{!accountAddress}"/></td>
+                <td><apex:outputtext value="{!district}"/></td>
+                <td><apex:outputtext value="{!region}"/></td>
+
+            </tr>
+        </table>
+    </apex:pageBlockSection>
+    
+    <apex:pageBlockSection title="Account" rendered="{!IF(displayModeVal==DisplayModeobj.STATUS,true,false)}" columns="6" collapsible="false">
+        <apex:pageblocksectionitem >&nbsp;</apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>District</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Region</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Status</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Date Created</b></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><b>Name</b></apex:pageblocksectionitem>
+        
+        <apex:pageblocksectionitem >{!accountAddress}</apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><apex:outputtext value="{!district}"/></apex:pageblocksectionitem>
+         <apex:pageblocksectionitem ><apex:outputtext value="{!region}"/></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem >{!account.Status__c}</apex:pageblocksectionitem>
+        <apex:pageblocksectionitem ><apex:outputText value="{0,date,d MMMMMM yyyy}">
+                     <apex:param value="{!account.CreatedDate}" />
+                </apex:outputText></apex:pageblocksectionitem>
+        <apex:pageblocksectionitem >{!account.Name}</apex:pageblocksectionitem>
+        
+        
+        
+    </apex:pageBlockSection>    
+</apex:component>

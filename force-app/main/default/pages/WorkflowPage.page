@@ -1,0 +1,373 @@
+<apex:page controller="WorkflowPageController" sidebar="true"  id="page_id"><!--action="{!BtnRefreshPH_click}"-->
+<apex:includeScript value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryUI/js/jquery-1.2.7.min.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/js/jquery.simplemodal.js')}" />
+<apex:stylesheet value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/css/basic.css')}" />
+<apex:stylesheet value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/css/style.css')}" />
+<style type="text/css"> 
+.popupSpan {
+    Display: none;
+}
+a.describe:link { 
+    color: #ff0000;
+    font: bold;
+}
+
+a.describe:visited {
+    color: #0000ff;
+}
+
+a.describe:hover {
+    background: #66ff66;
+}
+#simplemodal-container{
+    background-color: #333;
+    border: 4px solid #444;
+    color: #BBB;
+    height: 480px;
+    padding: 12px;
+    width: 750px;
+}
+.oddRow {
+    border: medium thick #ff0000;
+    background-color: #95B9C7;
+    color: black;
+}
+
+.customPopup {
+    background-color: white;
+    border-style: solid;
+    border-width: 2px;
+    left: 40%;
+    padding: 10px;
+    position: absolute;
+    z-index: 9999;
+    /* These are the 3 css properties you will need to tweak so the pop 
+                            up displays in the center of the screen. First set the width. Then set 
+                            margin-left to negative half of what the width is. You can also add 
+                            the height property for a fixed size pop up.*/
+    width: 500px;
+    top: 20%;
+}
+
+.disabledTextBox {
+    background-color: white;
+    border: 1px solid;
+    color: black;
+    cursor: default;
+    width: 90px;
+    display: table;
+    padding: 2px 1px;
+    text-align:right;
+}   
+
+.closeButton {
+    float: right;
+}
+
+
+
+</style>
+<apex:form id="form_id">
+<script type="text/javascript">
+$ac = jQuery.noConflict(); 
+function invokePopUp(idOfDiv){$ac('#'+idOfDiv).modal({persist:true});}
+//function invokePopUp1(idOfDiv1){$ac('#'+idOfDiv1).modal({persist:true});}
+</script>
+<script type="text/javascript" src="/soap/ajax/16.0/connection.js"/>
+<script type="text/javascript" src="/soap/ajax/16.0/ajax.js"/>
+<script>
+    function ConfirmLeadCreate(obj)
+    {
+        var isClicked = false;
+        var orignalClassName = obj.className;
+        if(isClicked) {
+                 alert('Button can only be pressed once');
+                 
+                return false;
+        } else {
+                 isClicked = true;
+                 obj.className = 'btnDisabled';
+         }
+        //alert('{!$Currentpage.parameters.c}');
+        var callId='{!$Currentpage.parameters.c}';
+        var str = "Select CHI_Lead__r.AccountId,CHI_Lead__c From Inbound_Call__c where Id='"+callId +"'" ;
+        //alert(str);
+        var result;
+        var con;
+        try{
+        con = sforce.connection; 
+        con.sessionId = '{!$Api.Session_ID}';
+        
+        result = con.query(str);
+        }catch(error)
+        {
+            //alert(error);
+            alert('Error occured while connecting to salesforce. Please contact system administrator');
+            return false;
+        }
+        var resultArray = result.getArray('records');
+        //alert('result array: '+resultArray[0].CHI_Lead__r.AccountId);
+        var accId = resultArray[0].CHI_Lead__r.AccountId;
+        var acc15 = accId.substring(0,15);
+        //alert(accId.substring(0,15));
+        var count;
+        // Ashok CR:12 Start
+        var count2;
+        var appstatus = 0;
+        var CHILeadId = resultArray[0].CHI_Lead__c;
+        var appquery = "Select Start__c From Appointment__c where Opportunity__c='"+CHILeadId+"' and Is_future_dated_app__c=1";
+        var appnt = con.query(appquery);
+        var resultAppt = appnt.getArray('records');
+        
+        if(resultAppt.length > 0){
+                appstatus = 2;
+        }else if(resultAppt.length <= 0){
+                appstatus = 1;
+         }
+        //Ashok CR:12 End
+            
+        try{
+            count = con.query("Select count() from Opportunity where AccountId='"+accId+"' AND StageName!='Closed Lost'");
+            // Ashok CR:12 Start
+            count2 = con.query("Select count() from Job__c where Account_Id__c='"+acc15+"' AND Status__c!='Cancelled'");
+        //alert(count.size);
+        if(count2.size>0)
+        {
+            
+            if(confirm('                           \"IMPORTANT!\"                        \nThere are one or more active jobs present on this Lead.\nIf you still proceed then new CHI Lead will be created without closing the present lead.\nRemember the 90 day rule.\nDo you wish to proceed?'))
+            {
+                  obj.className = orignalClassName;
+                  return true;
+            }
+            else
+            {     obj.className = orignalClassName;
+                  return false;
+            }
+        } // Ashok CR:12 End        
+        else if(count.size>0 && count2.size==0 && appstatus == 1)
+        {   //Creating new CHI Lead will close down existing active CHI Leads for this account.\n Do you want to proceed?
+            if(confirm('                           \"IMPORTANT!\"                        \nCreating a new CHI lead will close down all the previous leads for this address.\nRemember the 90 day rule.\nDo you wish to proceed?'))
+            {
+                  obj.className = orignalClassName;
+                  return true;
+            }
+            else
+            {     obj.className = orignalClassName;
+                  return false;
+            }
+        }else if(count.size>0 && count2.size==0 && appstatus == 2)
+        {   
+            alert('                           \"IMPORTANT!\"                        \nNew CHI Lead can not be created because there are future dated appointments booked on this lead.\nPlease proceed with the existing CHI Lead.')
+            obj.className = orignalClassName;
+            return false;
+        } else if(count.size>0)
+        {  
+            if(confirm('                           \"IMPORTANT!\"                        \nCreating a new CHI lead will close down all the previous leads for this address.\nRemember the 90 day rule.\nDo you wish to proceed?'))
+            {
+                  obj.className = orignalClassName;
+                  return true;
+            }
+            else
+            {     obj.className = orignalClassName;
+                  return false;
+            }
+        }
+        }catch(error)
+        {
+            //alert(error);
+            alert('Error occured while connecting to salesforce. Please contact system administrator');
+            return false;
+        }
+        return true;
+    }
+    
+    function copyDefaultValues() {
+    // Copy billing fields to shipping fields
+    //alert('--------->'+document.getElementById('{!$Component.CustomerQuestions:CustComp:pageblock65:repeat:0:ashok5}'));
+    if({!checkProfile}){
+    
+    //Contact to auto Populate ----
+    //id="page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c1"
+    
+        document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c1").checked = true;    
+        document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c2").value='Mr';    
+        document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c3").value='Test';    
+        document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c4").value='Record1';    
+        document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c5").value='Test@britishgas.com';    
+        document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c6").value='Owner';    
+        document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c7").value='01473000000';    
+        //document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c8").value='';    
+        //document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c9").value='';    
+        //document.getElementById("page_id:form_id:pageBlock_id:AddNewContact:contactComp:pageblock:pageblocktable:0:c10").value='Phone';    
+
+    
+    //Customer Question auto populate----
+    //page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ1
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ1").value='Boiler is broken';
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ2").value='Giving Lead';
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ3").value='Yes';
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ4").value=3;
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ5").value='Bedroom';    
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ6").value='Post 1976';    
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ7").value=4;    
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ16").value='Yes';    
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ9").value='Terrace';    
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ10").value='Water heater';    
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ8").value='Bedroom';    
+
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ11").value='Under 1500 GBP';    
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ12").value='5 - 9 years';    
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ13").value='Yes';    
+    document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ14").value='Yes';    
+    //document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:CQ15").value='Yes';    
+    //document.getElementById("page_id:form_id:pageBlock_id:CustomerQuestions:CustComp:pageblock66:repeat:0:ashok5").value=4;    
+    
+    
+    //Priority Install Section-- Default values
+       /* document.getElementById("page_id:form_id:pageBlock_id:EditOpportunities1:PriortyComp:PBS:rep:0:P1").value='Yes';    
+        document.getElementById("page_id:form_id:pageBlock_id:EditOpportunities1:PriortyComp:PBS:rep:0:P2").value='Yes';    */
+  
+   } 
+    
+    
+    }
+    
+</script>
+
+
+<!--<apex:outputLabel value="{!$Label.SMRT_Group}"/>-->
+
+<apex:pagemessage severity="info" detail="Customer holds no current products with British Gas" strength="2" rendered="{!if($CurrentPage.parameters.uc = '0', true, false)}" />
+<apex:pagemessage severity="info" detail="Customer profile selection has been skipped" strength="2" rendered="{!if($CurrentPage.parameters.uc = '2', true, false)}" />
+<apex:pagemessage severity="info" detail="Error while retrieving Customer profile" strength="2" rendered="{!if($CurrentPage.parameters.uc = '3', true, false)}" />
+<apex:pagemessage severity="info" detail="{!$Label.SMRT_Group}" strength="2" rendered="{!var}" />
+
+<apex:pagemessages />
+
+<apex:pageblock id="pageBlock_id">
+ <apex:outputPanel id="popup" rendered="true">
+    <apex:outputPanel id="popInnerOutputPnl" styleClass="customPopup" layout="block" rendered="{!var}">
+           <apex:commandButton value="X" title="Close the popup" action="{!closePopup}" styleClass="closeButton" rerender="popup">
+           </apex:commandButton>
+           <apex:pageblockSection columns="1">                         
+               
+                "{!$Label.SMRT_Group}"
+               
+           </apex:pageblockSection>
+          
+          
+      </apex:outputPanel>
+  </apex:outputPanel>
+<apex:outputpanel rendered="{!WorkflowInfo.ShowFWAMessage}">
+<table border="2" bordercolor="##8DAE84">
+<tr>
+<td>
+<apex:repeat value="{!MessageFWAArray}" var="msg" rendered="{!WorkflowInfo.ShowFWAMessage}">
+    <apex:outputText value="{!msg}"/><br/> 
+</apex:repeat>
+</td>
+</tr>
+</table><br/><br/>
+</apex:outputpanel>
+
+<!-- Panel to display messages for the related district -->
+<apex:outputPanel >
+<div style="color:blue;font-size:20px;">
+<apex:outputText value="{!WorkflowInfo.messageStr1}" rendered="{!WorkflowInfo.messageBool1}"/><br/>
+<apex:outputText value="{!WorkflowInfo.messageStr2}" rendered="{!WorkflowInfo.messageBool2}"/>
+</div>
+<apex:outputPanel rendered="{!checkProfile}" style="float:right;">
+<input type="checkbox" value="deafaultvalues" onclick="javascript: copyDefaultValues();return false;" />
+</apex:outputPanel>
+<apex:outputpanel ><!-- rendered="{!WorkflowInfo.showCombiswap}">-->
+<!--<a href="#" onclick="invokePopUp('CombiQues')" class="describe">Combi Swap Questionnaire</a><br/><br/>-->
+<a href="#" onclick="invokePopUp('CombiQues')" class="describe">Straight Swap Questionnaire</a><br/><br/>
+
+<!--<apex:outputLink value="javascript: copyDefaultValues();return false;">DefaultValues</apex:outputLink>-->
+
+<!--<apex:inputcheckbox value="{!autoPopulate}">
+  <apex:actionsupport event="onchange" action="{!autoPopulateValues}" rerender="ashok"/>
+</apex:inputcheckbox>-->
+
+</apex:outputpanel>
+</apex:outputPanel>
+
+
+<!-- Change by Ashok G -- Remove COPY Text from Component name ends with COPY -->
+<c:ContactEditViewComponentcopy displayModeVal="{!WorkflowInfo.ViewModeAddNewContact}" DisplayModeobj="{!DisplayMode}" id="AddNewContact" rendered="{!WorkflowInfo.ShowAddNewContact}" ListContact="{!WorkflowInfo.Contacts}" ListContactInfo="{!WorkflowInfo.ContactInfos}" ListNewContactInfo="{!WorkflowInfo.NewContactInfos}" />
+
+<c:ContactEditViewComponentcopy displayModeVal="{!WorkflowInfo.ViewModeViewContacts}" DisplayModeobj="{!DisplayMode}" id="ViewContacts" rendered="{!WorkflowInfo.ShowViewContacts}" ListContact="{!WorkflowInfo.Contacts}" ListContactInfo="{!WorkflowInfo.ContactInfos}" ListNewContactInfo="{!WorkflowInfo.NewContactInfos}"/>
+
+<!--changes for IPD3653 begin - dated 2/18/2013-->
+<c:ContactEditViewComponentcopy displayModeVal="{!WorkflowInfo.ViewModeAddNewContact}" HeaderTitle="Update Contacts" DisplayModeobj="{!DisplayMode}" id="AddNewContacts" rendered="{!shownewContacts}" ListContact="{!WorkflowInfo.Contacts}" ListContactInfo="{!WorkflowInfo.ContactInfos}" ListNewContactInfo="{!WorkflowInfo.NewContactInfos}" />
+<!--changes for IPD3653 end - dated 2/18/2013-->
+
+<c:SelectContactComponentcopy id="SelectContacts" rendered="{!WorkflowInfo.ShowSelectContacts}" ListContactInfo="{!WorkflowInfo.ContactInfos}" />
+
+<c:EngineerQuestionsComponentcopy id="ViewEngineerQues" EngineerQues="{!WorkflowInfo.Opportunities}" rendered="{!WorkflowInfo.ShowEngineerQues}" displayModeVal="{!WorkflowInfo.ViewModeEngineerQues}" gas4="{!WorkflowInfo.gasCouncil1}" gas5="{!WorkflowInfo.gasCouncil2}" gas6="{!WorkflowInfo.gasCouncil3}" DisplayModeobj="{!DisplayMode}" callModeVal="{!WorkflowInfo.WorkflowType}" CallModeobj="{!CallMode}" accountobject="{!WorkflowInfo.currentaccount}"/>
+
+<c:EmployeeQuesComponent id="ViewEmployeeQues" EmpQues="{!WorkflowInfo.Opportunities}" rendered="{!WorkflowInfo.ShowEmployeeQuestions}" callModeVal="{!WorkflowInfo.WorkflowType}" CallModeobj="{!CallMode}"  displayModeVal="{!WorkflowInfo.ViewModeEmployee}" DisplayModeobj="{!DisplayMode}" accountobject="{!WorkflowInfo.currentaccount}"/>
+
+<c:PriorityEditViewComponent id="EditOpportunities1" renderPriorityInstallDetails="{!WorkflowInfo.include_priority_install}" displayModeVal="{!WorkflowInfo.ViewModeEditOpportunities}" rendered="{!WorkflowInfo.ShowEditOpportunities}" ListOpportunity="{!WorkflowInfo.Opportunities}" callModeVal="{!WorkflowInfo.WorkflowType}" DisplayModeobj="{!DisplayMode}" CallModeobj="{!CallMode}" WrapUp="false" gas1="{!WorkflowInfo.gasCouncil1}" gas2="{!WorkflowInfo.gasCouncil2}" gas3="{!WorkflowInfo.gasCouncil3}" />
+
+ <c:customerQuesComponent id="CustomerQuestions" displayModeVal="{!WorkflowInfo.ViewModeCustomer}" rendered="{!WorkflowInfo.ShowCustQuestions}" ListOpportunity="{!WorkflowInfo.Opportunities}" callModeVal="{!WorkflowInfo.WorkflowType}" DisplayModeobj="{!DisplayMode}" CallModeobj="{!CallMode}" accountobject="{!workflowInfo.currentaccount}" WrapUp="false" />
+
+<c:AccountEditViewComponentcopy id="AccountView" rendered="{!WorkflowInfo.ShowAccountView}" DisplayModeobj="{!DisplayMode}" displayModeVal="{!WorkflowInfo.ViewModeAccountView}" accountObject="{!WorkflowInfo.CurrentAccount}" CallModeobj="{!CallMode}" callModeVal="{!WorkflowInfo.WorkflowType}" region="{!WorkflowInfo.region}" district="{!WorkflowInfo.district}" ListOpportunity="{!WorkflowInfo.Opportunities}"/>
+
+<c:ExistingOpportunityComponent opportunityList="{!WorkflowInfo.SelectedOpportunities}" id="ViewOpportunities" callModeVal="{!WorkflowInfo.WorkflowType}" CallModeobj="{!CallMode}" rendered="{!WorkflowInfo.ShowSelectOpportunities}" />
+ 
+<c:AppointViewComponent id="ViewAppointments" rendered="{!WorkflowInfo.ShowAppointments}" displayModeVal="{!WorkflowInfo.ViewModeAppointments}" appointViewList="{!WorkflowInfo.Appointments}" appointExistList="{!WorkflowInfo.SelectedAppointments}" DisplayModeobj="{!DisplayMode}"/>
+
+<!--<c:OpportunityEditViewComponentcopy id="EditOpportunities" renderPriorityInstallDetails="{!WorkflowInfo.include_priority_install}" displayModeVal="{!WorkflowInfo.ViewModeEditOpportunities}" rendered="{!WorkflowInfo.ShowEditOpportunities}" ListOpportunity="{!WorkflowInfo.Opportunities}" callModeVal="{!WorkflowInfo.WorkflowType}" DisplayModeobj="{!DisplayMode}" CallModeobj="{!CallMode}" WrapUp="false" gas1="{!WorkflowInfo.gasCouncil1}" gas2="{!WorkflowInfo.gasCouncil2}" gas3="{!WorkflowInfo.gasCouncil3}" />-->
+
+
+<c:EventViewComponent id="ViewEvents" rendered="{!WorkflowInfo.ShowEvents}" eventList="{!WorkflowInfo.Calls}" />
+
+<c:PaymentComponent payment="{!WorkflowInfo.payment}" paymentMessage="{!WorkflowInfo.DisplayPaymentMessage}" id="ViewPayment" rendered="{!WorkflowInfo.ShowPayment}" />
+
+
+
+
+<!--<apex:pageblockSection title="Product Holding Information" columns="1" collapsible="false" rendered="{!WorkflowInfo.ShowProductHoldingInfo && WorkflowInfo.ProductHoldingEnabled}">
+    <c:ProductHoldingInfo id="ViewProductHoldingInfo" ProductHolding="{!WorkflowInfo.ProductHoldingInfo}" ProductHoldingAccounts="{!WorkflowInfo.ProductHoldingAccounts}" />
+</apex:pageblockSection>
+<apex:pageblockSection title="Product Holding Information (Optional)" columns="1" collapsible="false" rendered="{!WorkflowInfo.ShowProductHoldingInfo && WorkflowInfo.ProductHoldingEnabled}">
+    <c:ProductHoldingInfoNotMapped id="ViewProductHoldingInfo" ProductHolding="{!WorkflowInfo.ProductHoldingInfo}" />
+</apex:pageblockSection>-->
+
+<apex:pageblockbuttons >
+    <!--added for IPD 3653 - begin dated 25-Feb 2013-->
+    <apex:commandbutton action="{!updateContacts}" id="UpdateContact" rendered="{!showUpdateContacts}" value="Save Contact" />
+    <apex:commandbutton action="{!BtnContinue_Click}" id="BtnContinue1" rendered="{!SaveAndContinue}" value="Save Contact & Continue" />
+    <!--added for  IPD 3653 - end dated 25-Feb 2013-->
+    <apex:commandbutton action="{!BtnContinue_Click}" id="BtnContinue" rendered="{!Continue}" value="Continue" />
+    <apex:commandbutton action="{!BtnCreateLead_Click}" id="BtnCreateLead" rendered="{!WorkflowInfo.ShowBtnCreateLead}" value="Create Lead" />
+    <apex:commandbutton action="{!BtnCreateNewLead_Click}" id="BtnCreateNewLead" rendered="{!WorkflowInfo.ShowBtnCreateNewLead}" value="Create New Lead" onclick="return ConfirmLeadCreate(this);"/>
+    <apex:commandbutton action="{!BtnSalesAppointment_Click}" id="BtnSalesAppointment" rendered="{!WorkflowInfo.ShowBtnSalesAppointment}" value="Sales Appointment" />
+    <apex:commandbutton action="{!BtnNewSalesAppointment_Click}" id="BtnNewSalesAppointment" rendered="{!WorkflowInfo.ShowBtnNewSalesAppointment}" value="New Sales Appointment" />
+    
+    <apex:commandbutton action="{!BtnSaveCustCategoryDetails_Click}" id="BtnSaveCustCategoryDetails" rendered="{!AND(WorkflowInfo.include_priority_install,WorkflowInfo.ShowBtnNewSalesAppointment)}" value="Save updates" />
+    
+    <apex:commandbutton action="{!BtnCancelAppointment_Click}" id="BtnCancelAppointment" rendered="{!WorkflowInfo.ShowBtnCancelAppointment}" value="Cancel Appointment" />
+    <apex:commandbutton action="{!BtnRearrangeAppointment_Click}" id="BtnRearrangeAppointment" rendered="{!WorkflowInfo.ShowBtnRearrangeAppointment}" value="Rearrange Appointment" />
+    <apex:commandbutton action="{!BtnBookSurveyAppointment_Click}" id="BtnBookSurveyAppointment" rendered="{!WorkflowInfo.ShowBtnBookSurveyAppointment}" value="Book Survey Appointment" />
+    <apex:commandbutton action="{!BtnCreatePayment_Click}" id="BtnCreatePayment" rendered="{!WorkflowInfo.ShowBtnCreatePayment}" value="Create Payment" />
+    <apex:commandbutton action="{!BtnWrapUpCall_Click}" id="BtnWrapUpCall" rendered="{!WorkflowInfo.ShowBtnWrapUpCall}" value="Wrap Up" />
+    <apex:commandbutton action="{!BtnWasteCall_Click}" id="BtnWasteCall" rendered="{!WorkflowInfo.ShowBtnWasteCall}" value="Waste Call/Prospect" />
+    <apex:commandbutton action="{!BtnGreenDeal_Click}" id="greenDeal" rendered="{!WorkflowInfo.showGDBtn}" value="New Green Deal Appointment" />
+    <apex:commandbutton action="{!BtnLandlordDetails}" id="Landlord" rendered="{!WorkflowInfo.ShowBtnWrapUpCall}" value="Landord Details" />
+    <!-- <apex:commandbutton action="{!BtnRefreshProductHoldingPH}" id="BtnRefreshPH" rendered="{!showRefreshProducttHolding}" value="Refresh Product Holding Data" /> -->
+    <apex:commandbutton action="{!updateMarketingPreference}" id="mktPref" rendered="{!WorkflowInfo.ShowBtnWrapUpCall}" value="update Marketing Preference" />
+</apex:pageblockbuttons> 
+</apex:pageblock>
+     
+<!--<div id="CombiQues" class="popupSpan"> 
+    <c:CombiSwapComponent id="ViewCombiQues" CombiSwap="{!WorkflowInfo.combiSwap}"/>
+</div>-->
+
+<div id="CombiQues" class="popupSpan"> 
+    <c:StraightSwapComponent id="ViewCombiQues" CombiSwap="{!WorkflowInfo.combiSwap}"  />
+</div>
+
+</apex:form>
+</apex:page>

@@ -1,0 +1,130 @@
+<apex:page sidebar="false" showHeader="false" renderas="pdf" standardController="Coaching_Header__c" extensions="CoachingFormController" >
+<apex:form >
+<html>
+<body>
+<apex:pageBlock >
+    <div align="Center">
+        <h2 style="color:blue">Delivering great service to our customers through applying  ‘The Standards’, the CHI guide to in home selling</h2>
+    </div>
+</apex:pageBlock>
+    
+<apex:pageBlock >
+    <div style="height:30px;"/>
+    <div style="page-break-after:always;">
+    <table>
+    <tr style="height:50px;"> <td><b>HSA Name:</b></td> <td><apex:OutputText value="{!emp.Name}" /></td> </tr>
+    <tr style="height:50px;"> <td><b>Visit Completed By:</b></td> <td><apex:OutputText value="{!Manager}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>District:</b></td> <td><apex:OutputText value="{!emp.District__r.Name}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Region:</b></td> <td><apex:OutputText value="{!emp.Region__c}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Coaching Type:</b></td> <td><apex:OutputText value="{!header.Coaching_Type__c}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Sub Group:</b></td> <td><apex:OutputText value="{!header.Sub_Group__c}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Coaching start Date:</b></td> <td><apex:OutputText value="{!ConductedOn}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Completed On:</b></td> <td><apex:OutputText value="{!CompletedOn}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Score:</b></td> <td><apex:OutputText value="{!header.Final_Score__c}"/></td> </tr>
+    </table>       
+    </div>
+      
+    <h2 style="text-align: center;"> AUDIT-{!header.Final_Score__c} </h2><br/>
+    <apex:outputpanel rendered="{!size1}">
+    <table  Style="border: 1px solid black;width=100%;">
+    <tr><td style="border: 1px solid black;background-color:#BDBDBD;height:50px;font-weight:bold;">{!section1}</td></tr>
+    <tr><td Style="border: 1px solid black;">
+    <apex:pageBlockSection columns="1" >
+        <apex:pageBlockTable columns="3" width="700px" columnswidth="300px,100px,300px" align="center" value="{!CQuestionsClass}" var="sq" border="1" >
+            <apex:column headerValue="Question" value="{!sq.question.Question_Text__c}" style="height:60px;"/>
+            <apex:column style="height:60px;text-align: center;background-color:{!IF(sq.answer=="Yes","green","red")};"  headerValue="Answer" value="{!sq.answer}" />
+            <apex:column headerValue="Notes" value="{!sq.notes}" style="height:60px;"/> 
+        </apex:pageBlockTable>     
+    </apex:pageBlockSection> </td></tr>
+    </table>
+    </apex:outputpanel>
+    <apex:outputpanel rendered="{!size2}">
+    <table  Style="border: 1px solid black;width=100%;page-break-after:always;">
+    <tr><td style="border: 1px solid black;background-color:#BDBDBD;height:50px;font-weight:bold;">{!section2}</td></tr>
+    <tr><td Style="border: 1px solid black;">
+    <apex:pageBlockSection columns="1">   
+        <apex:pageBlockTable columns="3" width="700px" columnswidth="300px,100px,300px" align="center" value="{!MQuestionsClass}" var="sq" border="1">
+            <apex:column headerValue="Question" value="{!sq.question.Question_Text__c}" style="height:60px;"/>
+            <apex:column style="height:60px;text-align: center;background-color:{!IF(sq.answer=="Yes","green","red")};"  headerValue="Answer" value="{!sq.answer}" />
+            <apex:column headerValue="Notes" value="{!sq.notes}" style="height:60px;"/> 
+        </apex:pageBlockTable>    
+    </apex:pageBlockSection> </td></tr>
+    </table>
+    </apex:outputpanel> 
+    <apex:outputpanel rendered="{!size3}">
+    <div Style="height:50px" />
+    <table  Style="border: 1px solid black;width=100%;">
+    <tr><td style="border: 1px solid black;background-color:#BDBDBD;height:50px;font-weight:bold;">{!section3}</td></tr>
+    <tr><td Style="border: 1px solid black;">
+    <apex:pageBlockSection columns="1">
+        <apex:pageBlockTable columns="3"  width="700px" columnswidth="300px,100px,300px" align="center" value="{!sQuestionsClass}" var="sq" border="1">
+            <apex:column headerValue="Question" value="{!sq.question.Question_Text__c}" style="height:60px;"/>
+            <apex:column style="height:60px; text-align: center;background-color:{!IF(sq.answer=="Yes","green","red")};"  headerValue="Answer" value="{!sq.answer}" />
+            <apex:column headerValue="Notes" value="{!sq.notes}" style="height:60px;"/> 
+        </apex:pageBlockTable>     
+    </apex:pageBlockSection> </td></tr>
+    </table>
+    </apex:outputpanel> 
+    <apex:outputpanel rendered="{!size4}">
+    <table  Style="border: 1px solid black;width=100%;page-break-after:always;">
+    <tr><td style="border: 1px solid black;background-color:#BDBDBD;height:50px;font-weight:bold;">{!section4}</td></tr>
+    <tr><td Style="border: 1px solid black;">
+    <apex:pageBlockSection columns="1">    
+        <apex:pageBlockTable columns="3"  width="700px" columnswidth="300px,100px,300px" align="center" value="{!CPBQuestionsClass}" var="sq" border="1">
+            <apex:column headerValue="Question" value="{!sq.question.Question_Text__c}" style="height:60px;"/>
+            <apex:column style="height:60px;text-align: center;background-color:{!IF(sq.answer=="Yes","green","red")};"  headerValue="Answer" value="{!sq.answer}" />
+            <apex:column headerValue="Notes" value="{!sq.notes}" style="height:60px;"/> 
+        </apex:pageBlockTable>    
+    </apex:pageBlockSection> </td></tr>
+    </table>
+    </apex:outputpanel> 
+    <div Style="height:50px" />
+    <apex:outputpanel rendered="{!size5}">
+    <table  Style="border: 1px solid black;width=100%;page-break-after:always;">
+    <tr><td style="border: 1px solid black;background-color:#BDBDBD;height:50px;font-weight:bold;">{!section5}</td></tr>
+    <tr><td Style="border: 1px solid black;">
+    <apex:pageBlockSection columns="1">    
+        <apex:pageBlockTable columns="3"  width="700px" columnswidth="300px,100px,300px" align="center" value="{!OQuestionsClass}" var="sq" border="1">
+            <apex:column headerValue="Question" value="{!sq.question.Question_Text__c}" style="height:60px;"/>
+            <apex:column style="height:60px;text-align: center;background-color:{!IF(sq.answer=="Yes","green","red")};"  headerValue="Answer" value="{!sq.answer}" />
+            <apex:column headerValue="Notes" value="{!sq.notes}" style="height:60px;"/> 
+        </apex:pageBlockTable>    
+    </apex:pageBlockSection> </td></tr>
+    </table>
+    </apex:outputpanel> 
+    
+    <div>
+    <table Style="border: 1px solid black;width=100%;">
+    <tr style="height:100px;"> <td width="20%" Style="border: 1px solid black;"><b>Follow Up Actions:</b></td> 
+    <td width="30%" Style="border: 1px solid black;"><apex:outputField value="{!header.Follow_up_actions__c}"/></td> </tr>
+    </table>
+    </div>
+    
+    <div Style="height:50px" />
+    
+    <h3> Sign Off </h3>
+    <div style="width:100%;height=100px">
+    <table Style="border: 1px solid black;width=100%;">
+    <tr><td style ="border: 1px solid black; text-align:justify;font-weight:bold;width:30%;"> DSM Sign Off:</td>
+    <td style ="border: 1px solid black; text-align:justify;width:25%;"><apex:outputText value="{!Manager}"/></td>
+    <td style =" border: 1px solid black;text-align:justify;width:25%;"><apex:outputField value="{!header.Manager_Signed_Date__c}"/></td>
+    <td style =" border: 1px solid black;text-align:justify;width:20%;"><apex:image width="300px" height="100px" url="https://c.{$label.Salesforce_Server}.content.force.com/servlet/servlet.FileDownload?file={!signList[0]}" rendered="true"/></td></tr>
+    </table>
+    </div>
+    
+    <div Style="height:10px" />
+    
+    <div style="width:100%;height=100px">
+    <table Style="border: 1px solid black;width=100%;">
+     <tr><td style ="border: 1px solid black; text-align:justify;font-weight:bold;width:30%;"> Employee Sign Off:</td>
+    <td style ="border: 1px solid black; text-align:justify;width:25%;"><apex:outputField value="{!emp.Name}"/></td>
+    <td style =" border: 1px solid black;text-align:justify;width:25%;"><apex:outputField value="{!header.HSA_Signed_Date__c}"/></td>
+    <td style =" border: 1px solid black;text-align:justify;width:20%;"><apex:image width="300px" height="100px" url="https://c.{$label.Salesforce_Server}.content.force.com/servlet/servlet.FileDownload?file={!signList[1]}" rendered="true"/></td></tr>
+    </table>
+    </div>
+
+</apex:pageBlock>
+</body>
+</html>
+</apex:form>
+</apex:page>

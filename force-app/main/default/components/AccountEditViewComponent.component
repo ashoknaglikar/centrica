@@ -1,0 +1,24 @@
+<apex:component controller="AccountEditViewController">
+    <apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" required="true"/>
+    <apex:attribute name="accountObject" description="This attrribute passes the Account object to the AccountEditViewComponent type: Edit or View." type="Account" assignTo="{!account}"/>
+    <apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+    <apex:attribute name="CallModeobj" description="This attrribute passes the CallMode." type="CallMode"/>
+    <apex:attribute name="callModeVal" description="This attrribute is used to determine the call type." type="Integer"/>
+    <apex:attribute name="region" description="This attrribute is used to determine region." type="String"/>
+    <apex:attribute name="district" description="This attrribute is used to determine district." type="String"/>
+    <apex:attribute name="ListOpportunity" description="This attrribute passes the opportunity list to the controller." type="Opportunity[]" />
+
+    <apex:pageBlockSection title="Account - Install Address" rendered="{!IF(or(displayModeVal==DisplayModeobj.VIEW,displayModeVal==DisplayModeobj.EDIT),true,false)}" columns="1" collapsible="false">
+        
+      
+                   
+         <apex:pageblocksectionitem ><apex:outputText value="{!accountAddress}"/></apex:pageblocksectionitem>
+     
+         
+    </apex:pageBlockSection>
+    
+   
+    
+
+   
+</apex:component>

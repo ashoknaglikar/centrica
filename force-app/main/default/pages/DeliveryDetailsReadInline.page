@@ -1,0 +1,55 @@
+<apex:page standardController="Job__c"
+    extensions="DeliveryDetailsReadEditInlineController">
+    <style type="text/css">
+body {
+    background: #F3F3EC;
+    padding-top: 25px
+}
+</style>
+    <apex:form >
+        <apex:messages />
+        <apex:pageblock >
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Edit delivery details" action="{!editJob}" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Delivery Details">
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Delivery Notes" />
+                    <apex:outputField value="{!job.Delivery_Notes__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Installer Notes" />
+                    <apex:outputField value="{!job.Installer_Notes__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Mechanical Installer" />
+                    <apex:outputField value="{!job.Mechanical_Installer__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Installation Special Instructions" />
+                    <apex:outputField value="{!job.Installation_Special_Instructions__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Electrical Installer" />
+                    <apex:outputField value="{!job.Electrical_Installer__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Specialist Builder" />
+                    <apex:outputField value="{!job.Specialist_Builder__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Delivery Date" />
+                    <apex:outputField value="{!job.Delivery_Date__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Delivery Slot" />
+                    <apex:outputField value="{!job.Delivery_Slot__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Last Re-plan Email Sent Timestamp" />
+                    <apex:outputField value="{!job.Re_plan_Email_Sent_Timestamp__c}"/>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

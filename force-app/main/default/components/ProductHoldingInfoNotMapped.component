@@ -1,0 +1,36 @@
+<apex:component >
+        <apex:attribute name="ProductHolding" type="ProductHolding__c" description="Record of Product Holding" />
+            <apex:pageblocksection columns="1" collapsible="false" >    
+                <apex:pageblocksection columns="3">
+                    <apex:inputField value="{!ProductHolding.LengthOfTimeProductHeld__c}" />
+<!--                    <apex:inputField value="{!ProductHolding.GasMonthlySpend__c}" />-->
+<!--                    <apex:inputField value="{!ProductHolding.ElectricityMonthlySpend__c}" />-->
+                    
+                    <apex:inputField value="{!ProductHolding.MakeOfBoiler__c}" />
+                    <apex:inputField value="{!ProductHolding.ModelOfBoiler__c}" />
+<!--                    <apex:inputField value="{!ProductHolding.DateOfInstallation__c}" />-->
+                    
+<!--                    <apex:inputField value="{!ProductHolding.DateOfLastCertification__c}" />-->
+                    <apex:inputField value="{!ProductHolding.BoilerBreakdownHistory__c}" />
+                    <apex:inputField value="{!ProductHolding.CustomerTypeOrMarketingCode__c}" />
+                    
+<!--                    <apex:inputField value="{!ProductHolding.IsExistingPropertiesHaveCentralHeating__c}" />-->
+<!--                    <apex:inputField value="{!ProductHolding.IsPetOwner__c}" />-->
+<!--                    <apex:inputField value="{!ProductHolding.IsParent__c}" />-->
+                    
+<!--                    <apex:inputField value="{!ProductHolding.IsPartTimeOrNightWorker__c}" />-->
+                    <apex:inputField value="{!ProductHolding.BestTimeToCall__c}" />
+<!--                    <apex:inputField value="{!ProductHolding.DateOfPreviousQuotes__c}" />-->
+                    
+<!--                    <apex:inputField value="{!ProductHolding.QuoteDetails__c}" />-->
+<!--                    <apex:inputField value="{!ProductHolding.IsCustomerHasCavityWallInsulation__c}" />-->
+                    <apex:inputField value="{!ProductHolding.IsCustomerHasLoftInsulation__c}" />
+                    
+<!--                    <apex:inputField value="{!ProductHolding.ExistingFinanceProducts__c}" />-->
+<!--                    <apex:inputField value="{!ProductHolding.NumberOfExistingProperties__c}" />-->
+<!--                    <apex:inputField value="{!ProductHolding.IsVulnerableCustomer__c}" />-->
+                    <apex:inputField value="{!ProductHolding.NumberOfPreviousQuotes__c}" />
+                                        
+                </apex:pageblocksection>
+        </apex:pageblocksection>
+</apex:component>

@@ -1,0 +1,792 @@
+<apex:component >
+<apex:attribute name="AccountCode" type="String" description="The Postcode Anywhere Account Code to use"/>
+<apex:attribute name="LicenseKey" type="String" description="The Postcode Anywhere License Key to use"/>
+<apex:attribute name="StreetLabel" type="String" description="The street field label"/>
+<apex:attribute name="StreetLabel" type="String" description="The street field label"/>
+<apex:attribute name="StreetField" type="String" description="The street field"/>
+<apex:attribute name="CityLabel" type="String" description="The city field label"/>
+<apex:attribute name="CityField" type="String" description="The city field"/>
+<apex:attribute name="StateLabel" type="String" description="The state field label"/>
+<apex:attribute name="StateField" type="String" description="The state field"/>
+<apex:attribute name="PostalCodeLabel" type="String" description="The postal field label"/>
+<apex:attribute name="PostalCodeField" type="String" description="The postal code field"/>
+<apex:attribute name="CountryLabel" type="String" description="The country field label"/>
+<apex:attribute name="CountryField" type="String" description="The country field"/>
+<apex:attribute name="BuildingNumber" type="String" description="The Building / House No."/>
+<apex:attribute name="BuildingName" type="String" description="The Building / House Name"/>
+<apex:attribute name="POBoxNumber" type="String" description="The POBox Number"/>
+
+<apex:inputHidden id="pcaAccountCode" value="{!AccountCode}"/>
+<apex:inputHidden id="pcaLicenseKey" value="{!LicenseKey}"/>
+
+<apex:panelGrid columns="2">
+<apex:outputLabel for="pcaPostalCodeField" value="{!PostalCodeLabel}"/>
+<apex:inputText id="pcaPostalCodeField" value="{!PostalCodeField}"/>
+<apex:outputLabel for="pcaStreetField" value="{!StreetLabel}"/>
+<apex:inputTextarea id="pcaStreetField" value="{!StreetField}" style="width:180px"/>
+<apex:outputLabel for="pcaCityField" value="{!CityLabel}"/>
+<apex:inputText id="pcaCityField" value="{!CityField}"/>
+<apex:outputLabel for="pcaStateField" value="{!StateLabel}"/>
+<apex:inputText id="pcaStateField" value="{!StateField}"/>
+<apex:outputLabel for="pcaCountryField" value="{!CountryLabel}"/>
+<apex:inputText id="pcaCountryField" value="{!CountryField}"/>
+<apex:outputLabel for="pcaBuildingNo" value="Building / House No."/>
+<apex:inputText id="pcaBuildingNo" value="{!BuildingNumber}"/>
+<apex:outputLabel for="pcaBuildingName" value="Building / House Name"/>
+<apex:inputText id="pcaBuildingName" value="{!BuildingName}"/>
+<apex:outputLabel for="pcaPOBox" value="Po Box Number"/>
+<apex:inputText id="pcaPOBox" value="{!POBoxNumber}"/>
+</apex:panelGrid>
+
+<script type="text/javascript">
+
+if(typeof pcaAddressControls == "undefined") {
+pcaAddressControls = new Array();
+}
+
+pcaAddressControls[pcaAddressControls.length] = new pca_control();
+
+function pca_control() {
+
+//Identity of control
+this.uid = pcaAddressControls.length;
+
+//Input Fields to be set
+this.StreetField = document.getElementById("{!$Component.pcaStreetField}");
+this.PostcodeField = document.getElementById("{!$Component.pcaPostalCodeField}");
+this.CountryField = document.getElementById("{!$Component.pcaCountryField}");
+this.CityField = document.getElementById("{!$Component.pcaCityField}");
+this.StateField = document.getElementById("{!$Component.pcaStateField}");
+this.BuildingNo = document.getElementById("{!$Component.pcaBuildingNo}");
+this.BuildingName = document.getElementById("{!$Component.pcaBuildingName}");
+this.POBox = document.getElementById("{!$Component.pcaPOBox}");
+//Internal Fields
+this.AutoComplete = "";
+
+//Internal Data
+this.AddressFields
+this.AddressData;
+this.AddressCount;
+this.StreetList;
+this.DataSource;
+
+//State Fields
+this.blnDataLoaded = false;
+this.blnUseFreeText = false;
+this.blnAutoSelect = false;
+this.strLastLine1 = "";
+this.strLastLine2 = "";
+this.strBefore = "";
+this.strStreet = "";
+this.strLastSearch = "";
+this.intLastItem = 0;
+
+this.FilterStreets = function(ShowAll) {
+
+var strHtml = new this.StringBuffer();
+var strFilter="";
+var intItems=0;
+var intCounter=0;
+var intLastMatch=0;
+var strLocation="";
+
+var strThisLine1 = "";
+var strThisLine2 = "";
+var strOtherLines = "";
+var intChangedLine = 0;
+
+this.strBefore = "";
+this.strStreet = "";
+
+//Get the address lines
+var strLines = this.StreetField.value.split("\n");
+
+if (strLines.length == 0) {
+
+strThisLine1 = "";
+strThisLine2 = "";
+strOtherLines = "";
+}
+else if (strLines.length == 1) {
+
+strThisLine1 = strLines[0];
+strThisLine2 = "";
+strOtherLines = "";
+}
+else {
+
+strThisLine1 = strLines[0];
+strThisLine2 = strLines[1];
+strOtherLines = "";
+for (intCounter = 2; intCounter < strLines.length; intCounter++) {
+
+strOtherLines += strLines[intCounter] + "\n";
+}
+}
+
+//Work out which line has changed
+if (strThisLine1 != this.strLastLine1) {
+
+intChangedLine=1;
+}
+else if (strThisLine2 != this.strLastLine2) {
+
+intChangedLine=2;
+}
+else {
+
+intChangedLine=0;
+}
+
+//Get the address parts
+if (intChangedLine == 1 || intChangedLine == 0) {
+
+if (this.IsStreetBeforeBuilding()) {
+
+//Assumes the building number is after the street name
+this.strBefore = "";
+this.strStreet = strThisLine1;
+}
+else {
+
+//Assumes that the building number is before the street name
+if (this.StartsWithNumber(strThisLine1)) {
+
+this.strBefore = this.GetBuildingNumber(strThisLine1);
+this.strStreet = this.GetStreet(strThisLine1);
+}
+else if (this.IsNumeric(strThisLine1)) {
+
+this.strBefore = strThisLine1;
+this.strStreet = "";
+}
+else {
+
+this.strBefore = "";
+this.strStreet = strThisLine1;
+}
+}
+}
+else if (intChangedLine == 2) {
+
+if (this.IsStreetBeforeBuilding()) {
+
+//Assumes the building number is after the street name
+this.strBefore = strThisLine1 + "\n";
+this.strStreet = strThisLine2;
+}
+else {
+
+//Assumes that the building number is before the street name
+if (this.StartsWithNumber(strThisLine2)) {
+
+this.strBefore = strThisLine1 + "\n" + this.GetBuildingNumber(strThisLine2);
+this.strStreet = this.GetStreet(strThisLine2);
+}
+else if (this.IsNumeric(strThisLine2)) {
+
+this.strBefore = strThisLine1 + "\n" + strThisLine2;
+this.strStreet = "";
+}
+else {
+
+this.strBefore = strThisLine1;
+this.strStreet = strThisLine2;
+}
+}
+}
+
+//Update the history information
+this.strLastLine1 = strThisLine1;
+this.strLastLine2 = strThisLine2;
+
+//Remove the diacritics for the filter
+strFilter = this.RemoveDiacritics(this.strStreet);
+
+//Change synonyms
+strFilter = this.Synonym(strFilter).replace(/^\s+/, '');
+
+//If someone just entered a building number still show all streets
+if (strFilter == "" && !ShowAll) {
+
+return;
+}
+
+if (this.blnDataLoaded) {
+
+//Draw the autocomplete items
+strHtml.append("<div style=\'height:179px;overflow:auto;border-left:solid 1px #aaaaaa; border-right:solid 1px #aaaaaa; background-color:#fafafa\'>");
+for (intCounter=0; intCounter<this.AddressCount; intCounter++) {
+
+if((strFilter!="" && this.StreetList[intCounter].indexOf(strFilter) >= 0) || (ShowAll && this.StreetList.length >= 0)) {
+
+strHtml.append("<div style=\'padding:5px; border-bottom:solid 1px #aaaaaa; background-color:#fafafa\' onmouseover=\"this.style.backgroundColor=\'#f0f0f0\';\" onmouseout=\"this.style.backgroundColor=\'#fafafa\';\">");
+strHtml.append("<a href=\'javascript:pcaAddressControls[" + this.uid + "].SelectItem(" + intCounter + ")\'>");
+
+if (this.AddressData[intCounter][this.AddressFields["organisation_name"]]=="") {
+
+strHtml.append("<b>" + this.AddressData[intCounter][this.AddressFields["line1"]] + "</b><br>");
+}
+else {
+
+strHtml.append("<b>" + this.AddressData[intCounter][this.AddressFields["organisation_name"]] + "<br>" + this.AddressData[intCounter][this.AddressFields["line1"]] + "</b><br>");
+}
+strLocation="";
+if (this.AddressData[intCounter][this.AddressFields["double_dependent_locality"]]!="") strLocation += ", " + this.AddressData[intCounter][this.AddressFields["double_dependent_locality"]];
+if (this.AddressData[intCounter][this.AddressFields["dependent_locality"]]!="") strLocation += ", " + this.AddressData[intCounter][this.AddressFields["dependent_locality"]];
+if (this.AddressData[intCounter][this.AddressFields["post_town"]]!="") strLocation += ", " + this.AddressData[intCounter][this.AddressFields["post_town"]];
+
+strHtml.append(strLocation.substring(2,strLocation.length));
+strHtml.append("</a>");
+strHtml.append("</div>");
+intLastMatch = intCounter;
+intItems += 1;
+}
+}
+//Add the branding
+strHtml.append("</div>")
+strHtml.append("<div style=\'height:20px;font-family:arial;font-size:7pt;color:#aaaaaa;border:solid 1px #aaaaaa; background-color:#ffffff;\'>");
+strHtml.append("<div style=\'float:left;padding-left:5px;padding-top:4px;\'>" + intItems + " item(s)</div>");
+strHtml.append("<div style=\'float:right;padding-right:5px;padding-top:4px;color:darkblue\'><b>Postcode</b>Anywhere</div>");
+strHtml.append("</div>")
+
+if (intItems==0) {
+
+this.AutoComplete.draw("");
+this.AutoComplete.hide();
+}
+else if (intItems==1 && !ShowAll && this.blnAutoSelect) {
+
+this.blnAutoSelect = false;
+this.AutoComplete.hide();
+this.SelectItem(intLastMatch);
+}
+else {
+
+this.AutoComplete.draw(strHtml.toString());
+}
+}
+}
+
+this.Lookup = function() {
+
+this.FetchBegin();
+}
+
+this.FetchBegin = function() {
+var scriptTag = document.getElementById("pcaScript");
+var headTag = document.getElementsByTagName("head").item(0);
+var strUrl = "";
+
+if (this.PostcodeField.value != "") {
+
+if (this.PostcodeField.value != this.strLastSearch) {
+
+//Save the search
+this.strLastSearch = this.PostcodeField.value;
+this.blnDataLoaded = false;
+
+//Build the url
+strUrl = "https://services.postcodeanywhere.co.uk/inline2.aspx?";
+strUrl += "&action=fetch";
+strUrl += "&options=all_results";
+strUrl += "&style=raw";
+strUrl += "&postcode=" + escape(this.PostcodeField.value);
+strUrl += "&account_code=" + escape(document.getElementById("{!$Component.pcaAccountCode}").value);
+strUrl += "&license_key=" + escape(document.getElementById("{!$Component.pcaLicenseKey}").value);
+strUrl += "&machine_id=";
+strUrl += "&application=Salesforce3";
+strUrl += "&callback=pcaAddressControls[" + this.uid + "].FetchEnd";
+
+//Make the request
+if (scriptTag) { try { headTag.removeChild(scriptTag) } catch (e) { } }
+scriptTag = document.createElement("script");
+scriptTag.src = strUrl;
+scriptTag.type = "text/javascript";
+scriptTag.id = "pcaScript";
+headTag.appendChild(scriptTag);
+}
+}
+}
+
+
+this.FetchEnd = function () {
+
+var intFields=0;
+var intField=0;
+
+//Test for an error
+if (pcaIsError) {
+
+//Show the error message
+pcaSettings.action("Error", pcaErrorMessage);
+}
+else
+{
+//Check if there were any items found
+if (pcaRecordCount == 0) {
+
+pcaSettings.action("Error", "Sorry, no matching items found");
+}
+else {
+
+var intCounter;
+
+//Create the new array to level the diacritics
+this.StreetList = new Array(pcaRecordCount);
+intFields = this.ArrayLength(pcaFields);
+
+//Expand the results
+for (intCounter = 0; intCounter < pcaRecordCount; intCounter++) {
+
+if (intCounter > 0) {
+
+
+//Expand the data where required
+for (intField = 0; intField < intFields; intField++) {
+
+if (pcaData[intCounter][intField]=="=") {
+
+pcaData[intCounter][intField]=pcaData[intCounter-1][intField];
+}
+}
+}
+
+this.StreetList[intCounter]=pcaData[intCounter][pcaFields["organisation_name"]].toUpperCase() + " " + pcaData[intCounter][pcaFields["line1"]].toUpperCase();
+
+//tidy up counties with long names - dodgy fix
+if (pcaData[intCounter][pcaFields["county"]] == 'Dumfries and Galloway') pcaData[intCounter][pcaFields["county"]] = 'Dumfries & Galloway';
+if (pcaData[intCounter][pcaFields["county"]] == 'East Riding of Yorkshire') pcaData[intCounter][pcaFields["county"]] = 'E. Riding, Yorkshire';
+}
+
+//Store the data for this control
+this.AddressFields = pcaFields;
+this.AddressData = pcaData;
+this.AddressCount = pcaRecordCount;
+this.DataSource = "UK";
+
+//Notify completion
+this.blnDataLoaded = true;
+
+//Fill City and State now
+this.CityField.value=this.AddressData[0][this.AddressFields["post_town"]];
+this.StateField.value=this.AddressData[0][this.AddressFields["county"]];
+this.PostcodeField.value=this.AddressData[0][this.AddressFields["postcode"]];
+
+//Show streets
+this.FilterStreets(true);
+}
+}
+}
+
+this.SelectItem = function(item) {
+
+//--------------------- TEST CODE - TO BE REMOVED ----------------------
+/*
+var divData = document.getElementById('addData');
+divData.innerHTML = ''; 
+for(val in this.AddressFields)
+{
+    if (this.AddressData[item][this.AddressFields[val]] != "")
+    divData.innerHTML += '<br/> ' + val + ' = ' + this.AddressData[item][this.AddressFields[val]];
+}
+*/
+//--------------------- TO BE REMOVED ----------------------------------
+
+
+//--------------------- CODE ADDED FOR PRODUCT HOLDING STARTS ----------------------------------
+this.BuildingNo.value = '';
+this.BuildingName.value = '';
+this.POBox.value = '';
+
+if (this.AddressData[item][this.AddressFields["reformatted_building_number"]] != "")
+{
+    //this.BuildingNo.value = this.AddressData[item][this.AddressFields["reformatted_building_number"]];
+    
+    this.BuildingNo.value = this.ExtractBuildingNumber( this.AddressData[item][this.AddressFields["line1"]]);
+    
+    
+    if (this.AddressData[item][this.AddressFields["reformatted_building_name"]] != "")
+    this.BuildingName.value = this.AddressData[item][this.AddressFields["reformatted_building_name"]];
+}   
+else if (this.AddressData[item][this.AddressFields["reformatted_sub_building"]] != "")
+    this.BuildingName.value = this.AddressData[item][this.AddressFields["reformatted_sub_building"]];
+else if (this.AddressData[item][this.AddressFields["reformatted_building_name"]] != "")
+    this.BuildingName.value = this.AddressData[item][this.AddressFields["reformatted_building_name"]];
+    
+
+if (this.AddressData[item][this.AddressFields["po_box_number"]] != "")
+this.POBox.value = this.AddressData[item][this.AddressFields["po_box_number"]];
+
+//--------------------- CODE ADDED FOR PRODUCT HOLDING ENDS ----------------------------------
+
+
+this.StreetField.value = this.AddressData[item][this.AddressFields["line1"]];
+if (this.AddressData[item][this.AddressFields["line2"]] != "")
+this.StreetField.value += "\n" + this.AddressData[item][this.AddressFields["line2"]];
+if (this.AddressData[item][this.AddressFields["line3"]] != "")
+this.StreetField.value += "\n" + this.AddressData[item][this.AddressFields["line3"]];
+if (this.AddressData[item][this.AddressFields["line4"]] != "")
+this.StreetField.value += "\n" + this.AddressData[item][this.AddressFields["line4"]];
+if (this.AddressData[item][this.AddressFields["line5"]] != "")
+this.StreetField.value += "\n" + this.AddressData[item][this.AddressFields["line5"]];
+this.CityField.value = this.AddressData[item][this.AddressFields["post_town"]];
+this.StateField.value = this.AddressData[item][this.AddressFields["county"]];
+this.CountryField.value = "United Kingdom";
+
+//Blur the street control for IE
+this.StreetField.blur()
+
+//Hide the control
+this.AutoComplete.hide();
+}
+
+this.RemoveDiacritics = function(what) {
+var strResult="";
+var strChar="";
+for (i=0; i<what.length;i++) {
+strChar = what.substring(i, i+1).toUpperCase();
+if ("ÀÁÂÃàáâã".indexOf(strChar)>=0)
+strResult+="A";
+else if ("Åå".indexOf(strChar)>=0)
+strResult+="AA";
+else if ("ÆæÄä".indexOf(strChar)>=0)
+strResult+="AE";
+else if ("Çç".indexOf(strChar)>=0)
+strResult+="C";
+else if ("Čč".indexOf(strChar)>=0)
+strResult+="CH";
+else if ("đĐ".indexOf(strChar)>=0)
+strResult+="DJ";
+else if ("ÈÉÊËèéêë".indexOf(strChar)>=0)
+strResult+="E";
+else if ("ÌÍÏìíîï".indexOf(strChar)>=0)
+strResult+="I";
+else if ("Ññ".indexOf(strChar)>=0)
+strResult+="N";
+else if ("ÒÓÔÕOòóôõo".indexOf(strChar)>=0)
+strResult+="O";
+else if ("ŒœØøÖö".indexOf(strChar)>=0)
+strResult+="OE";
+else if ("Šš".indexOf(strChar)>=0)
+strResult+="SH";
+else if ("ß".indexOf(strChar)>=0)
+strResult+="SS";
+else if ("ÙÚÛUùúûu".indexOf(strChar)>=0)
+strResult+="U";
+else if ("Üü".indexOf(strChar)>=0)
+strResult+="UE";
+else if ("ŸÝýÿ".indexOf(strChar)>=0)
+strResult+="Y";
+else if ("Žž".indexOf(strChar)>=0)
+strResult+="ZH";
+else if ("-".indexOf(strChar)>=0)
+strResult+=" ";
+else if (".,".indexOf(strChar)>=0)
+strResult+="";
+else
+strResult+=strChar;
+}
+return strResult;
+}
+
+this.Synonym = function(what) {
+var strStreet = " " + what.toUpperCase();
+
+strStreet = strStreet.replace(" N "," NORTH ");
+strStreet = strStreet.replace(" NE "," NORTH EAST ");
+strStreet = strStreet.replace(" NORTHEAST "," NORTH EAST ");
+strStreet = strStreet.replace(" NW "," NORTH WEST ");
+strStreet = strStreet.replace(" NORTHWEST "," NORTH WEST ");
+strStreet = strStreet.replace(" S "," SOUTH ");
+strStreet = strStreet.replace(" SE "," SOUTH EAST ");
+strStreet = strStreet.replace(" SOUTHEAST "," SOUTH EAST ");
+strStreet = strStreet.replace(" SW "," SOUTH WEST ");
+strStreet = strStreet.replace(" SOUTHWEST "," SOUTH WEST ");
+strStreet = strStreet.replace(" E "," EAST ");
+strStreet = strStreet.replace(" W "," WEST ");
+strStreet = strStreet.replace(" ST "," SAINT ");
+
+return strStreet;
+}
+
+this.getPosition = function(obj) {
+var curleft = curtop = 0;
+while (obj && obj.tagName !="BODY") {
+curleft += obj.offsetLeft;
+curtop += obj.offsetTop;
+obj = obj.offsetParent;
+}
+return [curleft,curtop];
+}
+
+this.IsStreetBeforeBuilding = function() {
+return false
+}
+
+this.ArrayLength = function(what) {
+var intItems=0;
+var strKey;
+
+for (strKey in what) {
+intItems+=1;
+}
+
+return intItems;
+}
+
+
+this.ArrayKey = function(what, index) {
+var intItems=0;
+var key;
+
+for (strKey in what) {
+if (intItems==index) {
+return strKey
+}
+intItems+=1;
+}
+
+return -1;
+}
+
+this.StringBuffer = function() {
+this.buffer = [];
+this.append = function(what) {
+this.buffer.push(what);
+}
+this.toString = function() {
+return this.buffer.join("");
+}
+}
+
+this.StartsWithNumber = function(what) {
+var strFirst = "";
+var strLast = "";
+
+//Get the 1st word
+if (what.indexOf(" ") > 0) {
+strFirst = what.substring(0,what.indexOf(" "));
+strLast = what.substring(what.indexOf(" "), what.length);
+return this.IsNumeric(strFirst);
+}
+else {
+return false;
+}
+}
+
+this.GetBuildingNumber = function(what) {
+//Return the first word if present
+if (what.indexOf(" ") > 0) {
+return what.substring(0,what.indexOf(" "));
+}
+else {
+return "";
+}
+}
+
+//--------------------- CODE ADDED FOR PRODUCT HOLDING STARTS ----------------------------------
+this.ExtractBuildingNumber = function(what){
+    //return word containing no.
+    var buildNo = "";
+    //var divaddData = document.getElementById('addData');
+    if(what != '')
+    {
+        var strOptions="i"; //ignore case               
+        var oREGEXP = new RegExp('\\d',strOptions);
+        
+        //divaddData.innerHTML += '<hr/><br/> what = ' + what; 
+        var arrWords = what.split(" ");
+         
+        for(var i=0 ; i < arrWords.length; i++ )
+        {
+            var word = arrWords[i];
+            //divaddData.innerHTML += '<br/> word = ' + word; 
+            if(word != null && word != "" && word.match(oREGEXP))
+            {
+                buildNo = word;
+                break; 
+            }
+            
+        }
+        //divaddData.innerHTML += '<br/> buildNo = ' + buildNo; 
+        //divaddData.innerHTML += '<hr/>';
+    }
+    return buildNo;
+}
+//--------------------- CODE ADDED FOR PRODUCT HOLDING ENDS ----------------------------------
+
+this.GetStreet = function(what) {
+//Return everything after the first word
+if (what.indexOf(" ") > 0) {
+return what.substring(what.indexOf(" "), what.length);
+}
+else {
+return "";
+}
+}
+
+this.IsNumeric = function(what) {
+var objValidChars = "0123456789.-/";
+var blnResult=true;
+var strCharacter;
+
+for (i = 0; i < what.length && blnResult == true; i++) {
+strCharacter = what.charAt(i);
+if (objValidChars.indexOf(strCharacter) == -1) {
+blnResult = false;
+}
+}
+return blnResult;
+}
+
+//Create autocomplete
+this.AutoComplete = new pca_autocomplete(this);
+
+//Setup the functions
+switch (this.uid) {
+case 0:
+this.StreetField.onkeyup = function() {try{if(event.keyCode!=8)pcaAddressControls[0].FilterStreets(false)}catch(e){pcaAddressControls[0].FilterStreets(false)}}
+this.StreetField.onfocus = function() {pcaAddressControls[0].FilterStreets(true)}
+this.StreetField.onclick = function() {pcaAddressControls[0].FilterStreets(true)}
+this.StreetField.onblur = function() {pcaAddressControls[0].AutoComplete.hide()}
+this.PostcodeField.onblur = function() {pcaAddressControls[0].Lookup()}
+this.PostcodeField.onfocus = function() {pcaAddressControls[0].AutoComplete.hide()}
+this.AutoComplete.div.onclick = function() {pcaAddressControls[0].AutoComplete.div.onmouseout=function(){pcaAddressControls[0].AutoComplete.hide();pcaAddressControls[0].StreetField.onblur=function(){pcaAddressControls[0].AutoComplete.hide()};pcaAddressControls[0].AutoComplete.div.onmouseout=function(){pcaAddressControls[0].StreetField.onblur=function(){pcaAddressControls[0].AutoComplete.hide()}}}}
+this.AutoComplete.div.onmouseover = function() {pcaAddressControls[0].StreetField.onblur=function(){}}
+this.AutoComplete.div.onmouseout = function() {pcaAddressControls[0].StreetField.onblur=function(){pcaAddressControls[0].AutoComplete.hide()}}
+break;
+case 1:
+this.StreetField.onkeyup = function() {try{if(event.keyCode!=8)pcaAddressControls[1].FilterStreets(false)}catch(e){pcaAddressControls[1].FilterStreets(false)}}
+this.StreetField.onfocus = function() {pcaAddressControls[1].FilterStreets(true)}
+this.StreetField.onclick = function() {pcaAddressControls[1].FilterStreets(true)}
+this.StreetField.onblur = function() {pcaAddressControls[1].AutoComplete.hide()}
+this.PostcodeField.onblur = function() {pcaAddressControls[1].Lookup()}
+this.PostcodeField.onfocus = function() {pcaAddressControls[1].AutoComplete.hide()}
+this.AutoComplete.div.onclick = function() {pcaAddressControls[1].AutoComplete.div.onmouseout=function(){pcaAddressControls[1].AutoComplete.hide();pcaAddressControls[1].StreetField.onblur=function(){pcaAddressControls[1].AutoComplete.hide()};pcaAddressControls[1].AutoComplete.div.onmouseout=function(){pcaAddressControls[1].StreetField.onblur=function(){pcaAddressControls[1].AutoComplete.hide()}}}}
+this.AutoComplete.div.onmouseover = function() {pcaAddressControls[1].StreetField.onblur=function(){}}
+this.AutoComplete.div.onmouseout = function() {pcaAddressControls[1].StreetField.onblur=function(){pcaAddressControls[1].AutoComplete.hide()}}
+break;
+case 2:
+this.StreetField.onkeyup = function() {try{if(event.keyCode!=8)pcaAddressControls[2].FilterStreets(false)}catch(e){pcaAddressControls[2].FilterStreets(false)}}
+this.StreetField.onfocus = function() {pcaAddressControls[2].FilterStreets(true)}
+this.StreetField.onclick = function() {pcaAddressControls[2].FilterStreets(true)}
+this.StreetField.onblur = function() {pcaAddressControls[2].AutoComplete.hide()}
+this.PostcodeField.onblur = function() {pcaAddressControls[2].Lookup()}
+this.PostcodeField.onfocus = function() {pcaAddressControls[2].AutoComplete.hide()}
+this.AutoComplete.div.onclick = function() {pcaAddressControls[2].AutoComplete.div.onmouseout=function(){pcaAddressControls[2].AutoComplete.hide();pcaAddressControls[2].StreetField.onblur=function(){pcaAddressControls[2].AutoComplete.hide()};pcaAddressControls[2].AutoComplete.div.onmouseout=function(){pcaAddressControls[2].StreetField.onblur=function(){pcaAddressControls[2].AutoComplete.hide()}}}}
+this.AutoComplete.div.onmouseover = function() {pcaAddressControls[2].StreetField.onblur=function(){}}
+this.AutoComplete.div.onmouseout = function() {pcaAddressControls[2].StreetField.onblur=function(){pcaAddressControls[2].AutoComplete.hide()}}
+break;
+case 3:
+this.StreetField.onkeyup = function() {try{if(event.keyCode!=8)pcaAddressControls[3].FilterStreets(false)}catch(e){pcaAddressControls[3].FilterStreets(false)}}
+this.StreetField.onfocus = function() {pcaAddressControls[3].FilterStreets(true)}
+this.StreetField.onclick = function() {pcaAddressControls[3].FilterStreets(true)}
+this.StreetField.onblur = function() {pcaAddressControls[3].AutoComplete.hide()}
+this.PostcodeField.onblur = function() {pcaAddressControls[3].Lookup()}
+this.PostcodeField.onfocus = function() {pcaAddressControls[3].AutoComplete.hide()}
+this.AutoComplete.div.onclick = function() {pcaAddressControls[3].AutoComplete.div.onmouseout=function(){pcaAddressControls[3].AutoComplete.hide();pcaAddressControls[3].StreetField.onblur=function(){pcaAddressControls[3].AutoComplete.hide()};pcaAddressControls[3].AutoComplete.div.onmouseout=function(){pcaAddressControls[3].StreetField.onblur=function(){pcaAddressControls[3].AutoComplete.hide()}}}}
+this.AutoComplete.div.onmouseover = function() {pcaAddressControls[3].StreetField.onblur=function(){}}
+this.AutoComplete.div.onmouseout = function() {pcaAddressControls[3].StreetField.onblur=function(){pcaAddressControls[3].AutoComplete.hide()}}
+break;
+}
+}
+
+function pca_autocomplete(ParentControl) {
+
+this.table = document.createElement("table");
+this.div;
+this.frame;
+
+this.table.id = "pcaAutoComplete";
+this.table.cellSpacing = 0;
+this.table.cellPadding = 0;
+
+this.table.insertRow(0);
+this.table.rows[0].insertCell(0);
+this.table.insertRow(1);
+this.table.rows[1].insertCell(0);
+
+this.parent = ParentControl;
+this.controlField = this.parent.StreetField;
+
+//Initialise Elements
+this.div = document.createElement("div");
+this.div.className = "autocomplete";
+this.div.style.position = "absolute";
+this.div.style.height = "200px";
+this.div.style.zIndex = "100";
+this.div.style.width = this.parent.StreetField.offsetWidth + "px";
+
+if (navigator.appName=="Microsoft Internet Explorer") {
+this.div.style.width = "180px";
+}
+
+this.parent.StreetField.parentNode.appendChild(this.table);
+this.table.rows[0].cells[0].appendChild(this.parent.StreetField);
+this.table.rows[1].cells[0].appendChild(this.div);
+
+//Load iframe for ie6 to fix dropdown display bug
+if (parseFloat(navigator.userAgent.substring(navigator.userAgent.indexOf("MSIE")+5)) == 6) {
+this.frame = document.createElement("iframe");
+this.frame.src = "https://www.postcodeanywhere.co.uk/blank.htm"
+this.frame.style.position = "absolute";
+this.frame.style.height = "200px";
+this.frame.style.zIndex = "99";
+//this.frame.style.width = this.parent.StreetField.offsetWidth + "px";
+this.frame.style.width = "180px";
+this.table.rows[1].cells[0].appendChild(this.frame);
+}
+
+this.hide = function () {
+this.div.style.display = "none";
+
+if (parseFloat(navigator.userAgent.substring(navigator.userAgent.indexOf("MSIE")+5)) == 6) {
+this.frame.style.display = "none";
+}
+
+if (navigator.appName=="Microsoft Internet Explorer") {
+if (this.parent.CityField.parentNode.className == "requiredInput") this.parent.CityField.parentNode.style.position = "relative";
+if (this.parent.StateField.parentNode.className == "requiredInput") this.parent.StateField.parentNode.style.position = "relative";
+}
+}
+
+this.show = function () {
+this.div.style.display = "";
+
+if (parseFloat(navigator.userAgent.substring(navigator.userAgent.indexOf("MSIE")+5)) == 6) {
+this.frame.style.display = "";
+}
+
+if (navigator.appName=="Microsoft Internet Explorer") {
+if (this.parent.CityField.parentNode.className == "requiredInput") this.parent.CityField.parentNode.style.position = "static";
+if (this.parent.StateField.parentNode.className == "requiredInput") this.parent.StateField.parentNode.style.position = "static";
+}
+}
+
+this.isVisible = function() {
+return this.div.style.display == "" ? true : false;
+}
+
+this.draw = function (html) {
+this.div.innerHTML = html;
+this.show();
+}
+
+this.append = function(field) {
+this.table.parentNode.appendChild(this.controlField);
+field.parentNode.appendChild(this.table);
+this.table.rows[0].cells[0].appendChild(field);
+this.controlField = field;
+
+this.div.style.width = field.offsetWidth + "px";
+}
+
+this.hide();
+}
+
+</script> 
+
+<div id="addData"></div>
+
+</apex:component>

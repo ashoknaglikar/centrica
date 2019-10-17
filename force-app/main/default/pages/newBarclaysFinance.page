@@ -1,0 +1,493 @@
+<apex:page extensions="financeApplicationController" tabstyle="Finance_Application__c" standardController="Finance_Application__c" id="page">
+        <script type="text/javascript">
+        
+
+        function financeProductSelJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block1.quote.ProdPanel.item1.fpSelected}").value;
+            //alert(txtVal1);
+            financeProductSel(txtVal1);
+        }
+        
+        function aliasSelJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block2.customerDetails.aliasItem.alias}").value;
+            //alert(txtVal1);
+            hideAlias(txtVal1);
+        }
+        
+        
+        function empSelectedJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block2.empDetails.empStatusItem.eStatus}").value;
+            //alert(txtVal1);
+            empSelected(txtVal1);
+        }
+        
+        function partEmpSelectedJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block2.empDetails.partEmpsStatus}").value;
+            //alert(txtVal1);
+            partEmpSelected(txtVal1);
+        }
+        
+        function financeTypeJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block2.block2Sec1.financeType}").value;
+            //alert(txtVal1);
+            financeTypeSel(txtVal1);
+        }
+        
+        function changeLabelJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block2.proofSection.signProof}").value;
+            //alert(txtVal1);
+            changeSignProof(txtVal1);
+        }
+        
+        function changeAddressLabelJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block2.proofSection.adressProof}").value;
+           changeAddProof(txtVal1);
+        }
+        
+     function  showGrossIncomeJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block2.pgPensionDetails.incBand}").value;
+            
+            showGrossIncome(txtVal1);
+        }
+   
+        
+        var isClicked = false;
+            function check(obj) {
+              if(isClicked) {
+                    alert('Button can only be pressed once');
+                    return false;
+                } else {
+                    isClicked = true;
+                    obj.className = 'btnDisabled';
+                    togglleDiv('');
+                    
+                }
+            }
+            
+            function isClickedReset(){
+                  isClicked = false;
+                  togglleDiv('none');
+            }
+            
+            function togglleDiv(show){
+                document.getElementById('darkLayer').style.display = show; 
+                document.getElementById('LoadingDiv').style.display = show;      
+            }  
+        
+    </script>   
+    <apex:form id="commercialForm"  rendered="{!!domestic}">
+        <apex:pageblock id="comblock1" >
+        <apex:pageblocksection >
+             <apex:repeat value="{!$ObjectType.Finance_Application__c.FieldSets.Commercial_Fieldset}" 
+                    var="field">
+              <apex:inputField value="{!Finance_Application__c[field]}" />
+           </apex:repeat>
+        </apex:pageblocksection> 
+        <apex:pageBlockButtons >
+            <apex:commandButton action="{!save}" value="Save"/>
+            <apex:commandButton action="{!cancel}" value="Cancel"/>
+        </apex:pageBlockButtons>
+
+        </apex:pageblock>
+
+
+    </apex:form> 
+    <apex:form id="form" rendered="{!domestic}">
+        
+            <apex:pageblock id="block1" >
+                <apex:actionFunction action="{!financeProductSel}" name="financeProductSel" rerender="block1" immediate="true">
+                     <apex:param name="financeProduct" value="" assignTo="{!fpSelected}"/>
+                </apex:actionFunction>
+                <apex:actionFunction action="{!hideAlias}" name="hideAlias" rerender="aliasPanel" immediate="true">
+                    <apex:param name="financeProduct" value="" assignTo="{!fa.Alias__c}"/>
+                </apex:actionFunction>
+                
+                <apex:actionFunction name="empSelected" rerender="incomeSection,EmployeeDetails,empDetails" immediate="true">
+                    <apex:param name="financeProduct" value="" assignTo="{!fa.Employment_Status__c}"/>
+                </apex:actionFunction>
+                
+                <apex:actionFunction name="partEmpSelected" rerender="incomeSection,EmployeeDetails,empDetails" immediate="true">
+                    <apex:param name="financeProduct" value="" assignTo="{!fa.Partner_Employment_Status__c}"/>
+                </apex:actionFunction>
+                
+                 <apex:actionFunction name="financeTypeSel" rerender="block2,proofSection,customerDetails" immediate="true" action="{!financeTypeSel}">
+                     <apex:param name="financeProduct"  value="" assignTo="{!fa.Type_of_Finance__c}"/>
+                </apex:actionFunction>
+                
+                <apex:actionFunction name="changeSignProof" rerender="proofSection" immediate="true">
+                     <apex:param name="signProof" value="" assignTo="{!fa.Signature_Proof_of_Id__c}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="changeAddProof" rerender="proofSection" immediate="true">
+                     <apex:param name="addProof" value="" assignTo="{!fa.Adress_Proof_ID__c}"/>
+                </apex:actionFunction>
+                 
+                <apex:actionFunction name="secondarySelection" action="{!secondarySelection}" rerender="block1" />
+                 <apex:actionFunction name="showGrossIncome" rerender="annualInc,incomeSection" immediate="true">
+                     <apex:param name="incomeBand" value="" assignTo="{!fa.Income_Band__c}"/>
+                </apex:actionFunction>    
+              
+                
+                <apex:pageblocksection title="Finance Quote" id="quote" columns="1">
+                <apex:pagemessages />
+                <apex:pageblocksection columns="1" rendered="{!!productPanel}">
+                    <apex:pageblocksectionItem >
+                        <apex:outputlabel value="Existing Bigmachines Quote (Delete last digit to search all)" for="portalQuote"/>
+                        <apex:inputfield value="{!fa.Portal_Quote__c}"  id="portalQuote"/>
+                    </apex:pageblocksectionItem>
+                    <apex:pageblocksectionItem >
+                        <apex:outputlabel value="Quote Number (HSA Finance Only)" for="portalQuote"/>
+                        <apex:inputField value="{!fa.Quote_Number__c}"  id="quoteNumber"/>
+                    </apex:pageblocksectionItem>
+                </apex:pageblocksection> 
+                <apex:pageblocksection columns="1" rendered="{!productPanel}">
+                    <!--  <apex:pageblocksectionitem id="item1" >
+                        <apex:outputlabel value="Finance Product" />
+                        <apex:selectList value="{!fpSelected}"  onchange="financeProductSelJS()" size="1" required="true" id="fpSelected" >
+                            <apex:selectOptions value="{!financeProducts}"/>
+                        </apex:selectList>
+                    </apex:pageblocksectionitem>-->
+                    <!--<apex:outputfield value="{!fp.Selling_Type__c}" />
+                    <!--  <apex:inputfield value="{!fp.Payment_Options__c}" required="true"/>-->
+                    <!--<apex:outputfield value="{!fp.Promotional_period__c}"/>
+                    <!--  <apex:outputfield value="{!fp.Interest_Rate__c}"/>-->
+                    <!--  <apex:pageblockSectionitem />-->
+                    <apex:outputfield value="{!fa.Portal_Quote__c}"/>
+                    <apex:outputfield value="{!fa.Quote_Number__c}"/>
+                    <apex:inputfield value="{!fa.Job_Total__c}" required="true"/>
+                    <!--  <apex:pageblockSectionitem />-->
+                    <apex:inputfield value="{!fa.Deposit__c}" required="true"/>
+                    <!--  <apex:pageblockSectionitem />-->
+                    <apex:outputfield value="{!fa.Cash_Price__c}" />
+                    <apex:inputField value="{!fa.Finance_Options__c}" required="true"/>
+                    <apex:outputField value="{!fa.Monthly_Repayments__c}" />
+                    
+                 </apex:pageblocksection>
+                 <!--<apex:pageblocksection id="ProdPanel" rendered="{!productPanel}" columns="1">
+                   		
+        	            <apex:pageblocksectionitem id="item1" >
+        	                <apex:outputlabel value="Finance Product" />
+        	                <apex:selectList value="{!fpSelected}"  onchange="financeProductSelJS()" size="1" required="true" id="fpSelected" >
+        	                    <apex:selectOptions value="{!financeProducts}"/>
+        	                </apex:selectList>
+        	            </apex:pageblocksectionitem>  
+        	           
+        	            <apex:pageblockSectionitem rendered="{!if(CONTAINS(fpSelected , $Label.barclaysProduct), true, false)}">
+        	            	<apex:outputLabel value="Secondary Product" />
+        	                <apex:selectList size="1" value="{!fpProdValue}" required="true" onchange="secondarySelection()" id="secondaryList">
+        	                    <apex:selectOptions value="{!fpProdOptions }"/>
+        	                </apex:selectList>
+        	            </apex:pageblocksectionitem>
+        	            
+        	            <apex:outputfield value="{!fa.payment_Options__c}" rendered="{!if(CONTAINS(fpSelected , $Label.barclaysProduct), true, false)}"/>
+        	            <apex:inputfield value="{!fp.Payment_Options__c}" required="true"  rendered="{!if(!CONTAINS(fpSelected , $Label.barclaysProduct), true, false)}"/>
+        	             <!--  <apex:pageblockSectionitem />-->
+        	            <!--<apex:outputfield value="{!fp.Interest_Rate__c}"/>
+        	            
+        	            <apex:outputField value="{!fa.Monthly_Repayments__c}" />
+                </apex:pageblocksection>-->
+                </apex:pageblocksection>
+                <apex:pageblockbuttons location="bottom" id="btn1">
+                 
+                    <apex:commandbutton value="Cancel" action="{!goToOpp}" immediate="true" />
+                    <apex:commandbutton value="Calculate" action="{!getQuote}" onclick="check(this);" oncomplete="isClickedReset()" rerender="block1" rendered="{!productPanel}"/>
+                    <apex:commandbutton value="Start Application"  action="{!startApplication}" rerender="form" rendered="{!if(AND(stage == 2,productPanel) , true, false)}" />
+                    <apex:commandbutton value="Continue" action="{!calculateFinance}" rendered="{!!productPanel}" rerender="block1"/>
+                    
+                </apex:pageblockbuttons>
+            </apex:pageblock>
+            
+            <apex:pageblock id="block2" rendered="{!if(stage == 3, true, false)}">
+                <apex:pageblocksection id="block2Sec1"> 
+                    <apex:inputfield value="{!fa.Type_of_Finance__c}" required="true" onchange="financeTypeJS()" id="financeType"/>
+                    <apex:pageblocksectionitem />
+                    <apex:inputfield value="{!fa.HSA__c}" required="{!OR(fa.Type_of_Finance__c == 'HSA',fa.Type_of_Finance__c == 'Manual Finance')}"/>
+                </apex:pageblocksection>
+                
+                <apex:pageblockSection title="Customer Details" id="customerDetails">
+                    <apex:inputfield value="{!fa.Title__c}" required="true"/>
+                    <apex:inputfield value="{!fa.Home_Phone__c}" />
+                    <apex:inputfield value="{!fa.First_Name__c}" required="true"/>
+                    <apex:inputfield value="{!fa.Work_Phone__c}" />
+                    <apex:inputfield value="{!fa.Middle_Name__c}" />
+                    <apex:inputfield value="{!fa.Mobile__c}"/>
+                    <apex:inputfield value="{!fa.Last_Name__c}" required="true"/>
+                    <apex:inputfield value="{!fa.Email__c}" required="{!fa.Type_of_Finance__c == 'e-Finance'}" />
+                    <!--<apex:pageblocksectionitem id="aliasItem">
+                        <apex:outputlabel value="Alias" for="alias"/>
+                        <apex:actionregion >
+                        <apex:inputfield value="{!fa.Alias__c}" onchange="aliasSelJS()" required="true" id="alias"/>
+                        </apex:actionregion>
+                    </apex:pageblocksectionitem>-->
+                    <apex:pageblocksectionitem />
+                    <apex:inputfield value="{!fa.Confirm_Email__c}"  required="{!fa.Type_of_Finance__c == 'e-Finance'}"/>
+                </apex:pageblockSection>   
+                <apex:outputpanel id="aliasPanel">
+                <apex:pageblockSection title="Alias Details" rendered="{!fa.Alias__c == 'Yes'}">
+                    <apex:inputfield value="{!fa.Alias_Title__c}" required="{!fa.Alias__c == 'Yes'}"/>
+                    <apex:pageblocksectionitem />
+                    <apex:inputfield value="{!fa.Alias_First_Name__c}" required="{!fa.Alias__c == 'Yes'}"/>
+                    <apex:pageblocksectionitem />
+                    <apex:inputfield value="{!fa.Alias_Middle_Name__c}" />
+                    <apex:pageblocksectionitem />
+                    <apex:inputfield value="{!fa.Alias_Last_Name__c}" required="{!fa.Alias__c == 'Yes'}"/>
+                </apex:pageblockSection>
+                </apex:outputpanel>
+                <apex:pageblockSection title="contd..">
+                    
+                    <apex:inputField value="{!fa.Date_Of_Birth__c}" required="true"/>
+                   
+                    <apex:pageblocksectionitem >
+                            <apex:outputlabel value="Nationality" />
+                            <apex:selectList value="{!fa.Nationality__c}"   size="1" required="true"  >
+                                <apex:selectOptions value="{!country1}"/>
+                            </apex:selectList>
+                    </apex:pageblocksectionitem>   
+                    
+                    <apex:inputfield value="{!fa.Marital_Status__c}" required="true"/>
+                    <apex:inputfield value="{!fa.Number_Of_Dependents__c}" required="true"/>
+                    <apex:inputfield value="{!fa.Gender__c}" required="true"/>
+                </apex:pageblockSection>
+                <apex:outputpanel id="AddressPanel">
+                <apex:pagemessages />
+                <apex:pageblockSection title="Current Address 1">
+                 <apex:pageblockSection columns="1">
+                 <c:barclaysAddressComponent AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+                        StreetLabel="Street" StreetField="{!fa.Street1__c}" 
+                        CityLabel="City" CityField="{!fa.City1__c}" StateLabel="State" 
+                        StateField="{!fa.State1__c}" PostalCodeLabel="Postcode" 
+                        PostalCodeField="{!fa.Post_Code1__c}"  BuildingNumber="{!fa.Building_Number1__c}" BuildingName="{!fa.Building_Name1__c}"
+                        />
+                    <apex:pageblocksectionitem >
+                            <apex:outputlabel value="Country " />
+                            <apex:selectList value="{!fa.Country1__c}"   size="1" required="true"  >
+                                <apex:selectOptions value="{!country1}"/>
+                            </apex:selectList>
+                    </apex:pageblocksectionitem>   
+                </apex:pageblockSection>
+                
+                <apex:pageblockSection columns="1">
+                    <apex:outputpanel >
+                        <b><apex:outputlabel value="Time at Address"/></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <apex:inputtext value="{!year1}" maxlength="2"  size="1"/>
+                        Years &nbsp;
+                        <apex:inputtext value="{!month1}" maxlength="2"  size="1"/>
+                        Months
+                    </apex:outputpanel>
+                    <apex:inputfield value="{!fa.Date_From1__c}" />
+                    <apex:inputfield value="{!fa.Occupancy_Status1__c}" required="true"/>
+                </apex:pageblockSection>
+                </apex:pageblockSection>
+                
+                <apex:pageblockSection title="Previous Address 1" rendered="{!address2}">
+                 <apex:pageblockSection columns="1">
+                 <c:barclaysAddressComponent AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+                        StreetLabel="Street" StreetField="{!fa.Street2__c}" 
+                        CityLabel="City" CityField="{!fa.City2__c}" StateLabel="State" 
+                        StateField="{!fa.State2__c}" PostalCodeLabel="Postcode" 
+                        PostalCodeField="{!fa.Post_Code2__c}" BuildingNumber="{!fa.Building_Number2__c}" BuildingName="{!fa.Building_Name2__c}"
+                        />
+                        <apex:pageblocksectionitem >
+                            <apex:outputlabel value="Country " />
+                            <apex:selectList value="{!fa.Country2__c}"   size="1" required="true"  >
+                                <apex:selectOptions value="{!country2}"/>
+                            </apex:selectList>
+                    </apex:pageblocksectionitem>
+                </apex:pageblockSection>
+                
+                <apex:pageblockSection columns="1">
+                    <apex:outputpanel >
+                        <b><apex:outputlabel value="Time at Address"/></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <apex:inputtext value="{!year2}" maxlength="2"  size="1" />
+                        Years &nbsp;
+                        <apex:inputtext value="{!month2}" maxlength="2"  size="1" />
+                        Months
+                    </apex:outputpanel>
+                    <apex:inputfield value="{!fa.Date_From2__c}" />
+                    <apex:inputfield value="{!fa.Occupancy_Status2__c}" required="true"/>
+                </apex:pageblockSection>
+                </apex:pageblockSection>
+                
+                
+                <apex:pageblockSection title="Previous Address 2" rendered="{!address3}" >
+                 <apex:pageblockSection columns="1">
+                 <c:barclaysAddressComponent AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+                        StreetLabel="Street" StreetField="{!fa.Street3__c}" 
+                        CityLabel="City" CityField="{!fa.City3__c}" StateLabel="State" 
+                        StateField="{!fa.State3__c}" PostalCodeLabel="Postcode" 
+                        PostalCodeField="{!fa.Post_Code3__c}" BuildingNumber="{!fa.Building_Number3__c}" BuildingName="{!fa.Building_Name3__c}"
+                        />
+                        <apex:pageblocksectionitem >
+                            <apex:outputlabel value="Country " />
+                            <apex:selectList value="{!fa.Country3__c}"   size="1" required="true"  >
+                                <apex:selectOptions value="{!country3}"/>
+                            </apex:selectList>
+                    </apex:pageblocksectionitem>
+                </apex:pageblockSection>
+               
+                <apex:pageblockSection columns="1">
+                    <apex:outputpanel >
+                        <b><apex:outputlabel value="Time at Address"/></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <apex:inputtext value="{!year3}" maxlength="2"  size="1"/>
+                        Years &nbsp;
+                        <apex:inputtext value="{!month3}" maxlength="2"  size="1"/>
+                        Months
+                    </apex:outputpanel>
+                    <apex:inputfield value="{!fa.Date_From3__c}" />
+                    <apex:inputfield value="{!fa.Occupancy_Status3__c}" required="true"/>
+                </apex:pageblockSection>
+                </apex:pageblockSection>
+               </apex:outputpanel>
+                <apex:commandbutton value="Check Address" action="{!checkAddress}" />
+                <apex:commandbutton value="Remove Address" action="{!removeAddress}" rendered="{!removeAdd}" immediate="true"/>
+                
+               <apex:outputPanel rendered="{!!CheckAddressBtn}" id="EmployeeDetails">
+                <apex:pageblockSection title="Employment Details" id="empDetails">
+                     <apex:pageblocksectionItem id="empStatusItem">
+                        <apex:outputLabel value="Employment Status" for="eStatus"/>
+                        <apex:actionregion >
+                        <apex:inputfield value="{!fa.Employment_Status__c}" required="true" id="eStatus" onchange="empSelectedJS();" />
+                        </apex:actionregion>
+                     </apex:pageblocksectionItem>
+                     <!--<apex:pageblocksectionitem />
+                     <apex:inputfield value="{!fa.Partner_Employment_Status__c}"  id="partEmpsStatus"  onchange="partEmpSelectedJS();" required="{!OR(fa.Marital_Status__c == 'Married',  fa.Marital_Status__c == 'Cohabiting')}"/>
+                     <apex:pageblocksectionitem />
+                     <apex:inputfield value="{!fa.Employment_Category__c}" required="{!AND(fa.Employment_Status__c != 'Retired', fa.Employment_Status__c != 'Benefits')}"/>
+                     <apex:pageblocksectionitem />-->
+                     <apex:inputfield value="{!fa.Job_Description__c}" required="{!AND(fa.Employment_Status__c != 'Retired', fa.Employment_Status__c != 'Benefits')}" />  
+                </apex:pageblockSection>  
+                <apex:pageblockSection title="Employer Details ">
+                 <!--<apex:pageblockSection columns="1" id="EmpAddr">
+                 
+                 <c:barclaysAddressComponent AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+                        StreetLabel="Street" StreetField="{!fa.Street_E__c}" 
+                        CityLabel="City" CityField="{!fa.City_E__c}" StateLabel="State" 
+                        StateField="{!fa.State_E__c}" PostalCodeLabel="Postcode" 
+                        PostalCodeField="{!fa.Post_Code_E__c}" 
+                        />
+                        <apex:pageblocksectionitem >
+                            <apex:outputlabel value="Country " />
+                            <apex:selectList value="{!fa.Country_E__c}"   size="1" required="true"  >
+                                <apex:selectOptions value="{!countrye}"/>
+                            </apex:selectList>
+                    </apex:pageblocksectionitem>
+                </apex:pageblockSection>-->
+                
+                <apex:pageblockSection columns="1" id="emplSec">
+                    
+                    <apex:inputfield value="{!fa.Employer_Name__c}" required="{!OR(fa.Employment_Status__c ==  'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}"/>
+                    <!--<apex:inputfield value="{!fa.Employer_Phone__c}" required="{!OR(fa.Employment_Status__c ==  'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}"/>-->
+                    
+                    <apex:outputPanel style="width:100%">
+                        <b><apex:outputlabel value="Time at Employer"/></b>
+                        <apex:inputtext value="{!year4}" maxlength="2"  size="1" required="{!OR(fa.Employment_Status__c ==  'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}" id="Employers_Year"/>
+                        Years &nbsp;
+                        <apex:inputtext value="{!month4}" maxlength="2"  size="1" required="{!OR(fa.Employment_Status__c ==  'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}" id="Employers_Month"/>
+                        Months
+                    </apex:outputpanel>
+                    </apex:pageblockSection>
+                   </apex:pageblockSection>
+                   <apex:outputPanel id="incomeSection">
+                       <apex:pageblockSection title="Income & Outgoing Details" id="pgPensionDetails">
+                           
+                           <apex:inputfield value="{!fa.Income_Band__c}" id="incBand" required="true"/><!-- onchange="showGrossIncomeJS()" rendered="{!OR(fa.Employment_Status__c ==  'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}"
+                                                required="{!OR(fa.Employment_Status__c == 'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}"/>
+                           <!--<apex:inputfield value="{!fa.Gross_Annual_Income__c}" id="annualInc" rendered="{!OR(fa.Income_Band__c=='Other')}" required="{!OR(fa.Income_Band__c == 'Other')}"/> 
+                           
+                           <!--  <apex:inputfield value="{!fa.Gross_Annual_Income__c}" rendered="{!OR(fa.Employment_Status__c ==  'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}"
+        required="{!OR(fa.Employment_Status__c ==  'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}"/> -->
+                           <!--<apex:inputfield value="{!fa.Applicant_Other_Income__c}" rendered="{!OR(fa.Employment_Status__c ==  'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}"/>
+                           <apex:inputfield value="{!fa.Applicant_Net_Monthly_income__c}" rendered="{!OR(fa.Employment_Status__c ==  'Employed', fa.Employment_Status__c ==  'Self employed', fa.Employment_Status__c ==  'Part-time', fa.Employment_Status__c ==  'Housepersons')}" required="true"/>
+                           <!--<apex:inputfield value="{!fa.Partner_Income__c}" rendered="{!AND(OR(fa.Partner_Employment_Status__c ==  'Employed', fa.Partner_Employment_Status__c ==  'Self employed', fa.Partner_Employment_Status__c ==  'Part-time', fa.Partner_Employment_Status__c ==  'Housepersons'), OR(fa.Marital_Status__c == 'Married',  fa.Marital_Status__c == 'Cohabiting'))}"
+                                            required="{!AND(OR(fa.Partner_Employment_Status__c ==  'Employed', fa.Partner_Employment_Status__c ==  'Self employed', fa.Partner_Employment_Status__c ==  'Part-time', fa.Partner_Employment_Status__c ==  'Housepersons'), OR(fa.Marital_Status__c == 'Married',  fa.Marital_Status__c == 'Cohabiting'))}" />
+                           <apex:inputfield value="{!fa.Gross_Annual_Disability_Allowance__c}" rendered="{!fa.Employment_Status__c ==  'Benefits'}" required="{!fa.Employment_Status__c ==  'Benefits'}"/>
+                           <apex:inputfield value="{!fa.Gross_Annual_State_Pension__c}" rendered="{!fa.Employment_Status__c ==  'Retired'}" required="{!fa.Employment_Status__c ==  'Retired'}" />
+                           <!--<apex:pageblocksectionitem />-->
+                           <!--<apex:inputfield value="{!fa.Applicant_Net_Monthly_income__c}" rendered="{!OR(fa.Employment_Status__c ==  'Benefits', fa.Employment_Status__c ==  'Retired')}" required="{!OR(fa.Employment_Status__c ==  'Benefits', fa.Employment_Status__c ==  'Retired')}" />
+                           <apex:inputfield value="{!fa.Gross_Annual_Private_Pension__c}" rendered="{!fa.Employment_Status__c ==  'Retired'}" required="{!fa.Employment_Status__c ==  'Retired'}"/>  
+                           <apex:inputfield value="{!fa.Applicant_Other_Income__c}" rendered="{!OR(fa.Employment_Status__c ==  'Benefits', fa.Employment_Status__c ==  'Retired')}" required="{!OR(fa.Employment_Status__c ==  'Benefits', fa.Employment_Status__c ==  'Retired')}"/> 
+                           <apex:inputfield value="{!fa.Gross_Annual_Other_Pension__c}" rendered="{!fa.Employment_Status__c ==  'Retired'}" required="{!fa.Employment_Status__c ==  'Retired'}"/> 
+                           <apex:inputfield value="{!fa.Gross_Annual_additional_benefit__c}" rendered="{!OR(fa.Employment_Status__c ==  'Benefits', fa.Employment_Status__c ==  'Retired')}" required="{!fa.Employment_Status__c ==  'Benefits'}"/> -->
+                           <apex:inputfield value="{!fa.Mortgage__c}" rendered="{!OR(fa.Occupancy_Status1__c == 'Owner Occupier', fa.Occupancy_Status1__c == 'Joint Owner')}" required="true" />
+                           <apex:inputfield value="{!fa.Rent__c}" rendered="{!OR(fa.Occupancy_Status1__c == 'Tenant Unfurnished', fa.Occupancy_Status1__c == 'Tenant Furnished', fa.Occupancy_Status1__c == 'Tenant', fa.Occupancy_Status1__c == 'Council Tenant')}" required="true" />
+                           
+                       </apex:pageblockSection>
+                    
+                    
+
+                </apex:outputPanel>
+                
+                 <!--<apex:pageblockSection title="Proof of ID" id="proofSection" ><!--</apex:pageblockSection>rendered="{!OR(fa.Type_of_Finance__c == 'HSA',fa.Type_of_Finance__c == 'Manual Finance')}" >
+                    <apex:inputfield value="{!fa.Signature_Proof_of_Id__c}" required="true" id="signProof" onchange="changeLabelJS()"/>
+                    <apex:pageblocksectionitem >
+                        <apex:outputlabel value="{!fa.Signature_Proof_of_Id__c} Details" />
+                        <apex:inputfield value="{!fa.Sign_Proof_Details__c}" required="true" />
+                    </apex:pageblocksectionitem>
+                    <apex:inputfield value="{!fa.Adress_Proof_ID__c}" required="true"   id="adressProof" onchange="changeAddressLabelJS()" /> <!--rendered="{!fa.Type_of_Finance__c != 'HSA'}"-->
+                    <!--<apex:pageblocksectionitem >
+                        <apex:outputlabel value="{!fa.Adress_Proof_ID__c} Details" />
+                        <apex:inputfield value="{!fa.Address_Proof_Details__c}" required="true" rendered="{!fa.Adress_Proof_ID__c != 'Home Delivery'}"/>
+                    </apex:pageblocksectionitem>
+                </apex:pageblockSection>-->
+                
+                
+                <apex:pageblockSection title="Bank Details">
+                    <!--<apex:inputfield value="{!fa.Number_Of_Credit_Cards__c}" required="true"/>-->
+                    
+                    <apex:outputfield value="{!fa.Repayment_Method__c}" />
+                    <apex:pageblocksectionitem />
+                    <apex:inputfield value="{!fa.Bank_Account_Name__c}"  required="true"/>
+                    <apex:pageblocksectionitem />
+                    <apex:inputfield value="{!fa.Bank_Account_Number__c}"  required="true"/>
+                    
+                    <apex:inputfield value="{!fa.Sort_Code__c}"  required="true"/>
+                    <apex:inputfield value="{!fa.Time_At_Bank__c}"  required="true"/>
+                </apex:pageblockSection>
+                
+                <!--<apex:pageblockSection title="Security Questions" columns="1"  >
+                        
+                    <apex:inputfield value="{!fa.Security_Question__c}"  required="true"/>
+                    <apex:inputfield value="{!fa.Security_Answer__c}"  required="true"/>
+                    
+                </apex:pageblockSection>-->
+               </apex:outputpanel> 
+               
+               <apex:pageMessages />
+              
+               <apex:pageblockbuttons location="bottom">
+               <apex:commandbutton value="Save & Submit" onclick="check(this);" oncomplete="isClickedReset()" action="{!saveApp}" rerender="form" rendered="{!savebtn}" />
+               <!--<apex:commandbutton value="Validate Payment"  action="{!validatePayment}" rerender="form" rendered="{!validatebtn}" />-->
+               </apex:pageblockbuttons>
+            </apex:pageblock>
+            
+        <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:600px; top:150px;display:none;">
+                    <div style="margin-left:5px; margin-top:5px;">
+                    <img src="/img/loading.gif" /> Application is under progress...please wait...
+                    </div>
+        </div>
+
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;">
+        </div>
+    
+    
+</apex:form>
+</apex:page>

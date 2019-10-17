@@ -1,0 +1,205 @@
+<apex:page StandardController="order__c" extensions="TopcallFaxExtension"  renderAs="pdf" showHeader="false" sidebar="false">
+<HTML>
+<HEAD>
+<style type="text/css" media="print,screen">
+            @page {
+                margin:0.25in;
+                @top-left {
+                    content: "Material Confirmation/Return Document ";
+                    font-size: 8pt;
+                }
+                @top-right{
+                    content: "Enquiry Number : {!order__c.Enquiry_Number__c}";
+                    font-size: 8pt;
+                }
+
+                @bottom-center {
+                    content: "British Gas Services Limited Registered in England No.3141243 Registered Office Millstream, Maidenhead Road, Windsor, Berkshire, SL4 5GD.";
+                    font-size: 8pt;
+                }
+            } 
+
+            th {
+                font-family:Arial;
+                color:black;
+                background-color:lightgrey;
+            }
+            thead {
+                    display:table-header-group;
+            }
+            tbody {
+                display:table-row-group;
+            } 
+            body{
+                font-family:Arial;
+                color:black;
+                font-size: 8pt;
+            }
+        </style>
+</HEAD>
+<BODY>
+    <Caption><CENTER><apex:outputLabel value="Return to NCHO by:{!sReturnDate}" style="{font-family:Arial;color:black;font-size: 4pt;}">  </apex:outputLabel></CENTER></Caption>
+    <BR/>
+    <P/>  <FONT SIZE="2pt">Please detail below any job amendments that were required during the course of the installation (materials/labour/specification). Ensure any relevant documentation is attached to this paperwork and NOT sent in seperately.</FONT>
+    <BR/>
+<table border="1" cellspacing="0" cellpadding="0" width="100%">
+    <tr >
+        <td width="336" rowspan="2" >
+            <p align="center" style='text-align:center'>Description of Amendment</p>
+        </td>
+        <td width="273" colspan="2" >
+            <p align="center" style='text-align:center'>Type</p>
+        </td>
+        <td width="147" rowspan="2" >
+            <p align="center" style='text-align:center'>Addition</p>
+            <p align="center" style='text-align:center'>/Return</p>
+            <p align="center" style='text-align:center'>/Exchange</p>
+        </td>
+        <td width="483" colspan="4" >
+            <p align="center" style='text-align:center'>Cost to Customer</p>
+        </td>
+    </tr>
+    <tr>
+        <td width="147" >
+            <p align="center" style='text-align:center'>Materials/ Labour/ Specs</p>
+        </td>
+        <td width="126">
+            <p align="center" style='text-align:center'>Qty/Hrs</p>
+        </td>
+        <td width="84">
+            <p align="center" style='text-align:center'>Y/N</p>
+        </td>
+        <td width="147">
+            <p align="center" style='text-align:center'>Addition/ Reduction</p>
+        </td>
+        <td width="126">
+            <p align="center" style='text-align:center'>Amount</p>
+        </td>
+        <td width="126">
+            <p align="center" style='text-align:center'>VO No</p>
+        </td>
+    </tr>
+    <tr >
+        <td width="336" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="84" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p >&nbsp;</p>
+        </td>
+    </tr>
+    <tr >
+        <td width="336" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="84" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p >&nbsp;</p>
+        </td>
+    </tr>
+    <tr >
+        <td width="336" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="84" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p >&nbsp;</p>
+        </td>
+    </tr>
+    <tr >
+        <td width="336" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p >&nbsp;</p>
+        </td>
+        <td width="84" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="147" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p>&nbsp;</p>
+        </td>
+        <td width="126" valign="top">
+            <p >&nbsp;</p>
+        </td>
+    </tr>
+</table>
+    <BR/>
+    <P/><FONT SIZE="8pt"> I accept the amendments to the original Specification as detailed above and agree to pay the additional costs shown.</FONT>
+    <BR/>
+    <P/>
+    <TABLE width="100%" border="0">
+        <TR>
+            <TD width="30%" Align="left"><FONT SIZE="8pt">Customer's Signature</FONT></TD>
+            <TD width="5%"></TD>
+            <TD width="30%"><FONT SIZE="8pt">Print Name</FONT></TD>
+        </TR>
+        <TR>
+            <TD width="30%" Align="left"><FONT SIZE="8pt">Date</FONT></TD>
+            <TD width="5%"></TD>
+            <TD width="30%"><FONT SIZE="8pt"></FONT></TD>
+        </TR>
+    </TABLE>    
+</BODY>
+</HTML>
+</apex:page>

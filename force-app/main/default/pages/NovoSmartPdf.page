@@ -1,0 +1,58 @@
+<apex:page sidebar="false" showHeader="false" renderas="pdf" standardController="Employee_NOVO_Log__c" extensions="NovoSmartController" >
+<apex:form >
+<html>
+<body>
+<apex:pageBlock >
+    <div align="Center">
+        <h2 style="color:blue">SMART Objective/Action Summary</h2>
+    </div>
+    <div>
+      <apex:image url="{!$Resource.Novo_Smart}" width="700" height="150"/>
+    </div>
+    
+</apex:pageBlock>
+    
+<apex:pageBlock >
+    <div style="height:30px;"/>
+    <div style="page-break-after:always;">
+    <table>
+    <!--tr style="height:50px;"> <td><b>HSA Name:</b></td> <td><apex:OutputText value="{!emp.Name}" /></td> </tr>-->
+    <tr style="height:50px;"> <td><b>Related Strategic Priority:</b></td> <td><apex:OutputText value="{!header.Related_Strategic_Priority__c}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>SMART NOVO Goal:</b></td> <td><apex:OutputText value="{!header.Name}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Reason for entry:</b></td> <td><apex:OutputText value="{!header.Reason__c}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Job number:</b></td> <td><apex:OutputText value="{!header.Job_CHI_Lead_Number__c}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Employee</b></td> <td><apex:OutputText value="{!header.Employee__r.Name}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Pay Number:</b></td> <td><apex:OutputText value="{!header.Pay_Number__c}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Goal:</b></td> <td><apex:OutputText value="{!header.Goal_Novo__c}"/></td> </tr>
+    
+    <tr style="height:50px;"> <td><b>Where are you now?:</b></td> <td><apex:OutputText value="{!header.Where_Are_U_Now__c}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>How will you measure progress? :</b></td> <td><apex:OutputText value="{!header.How_will_you_measure_prog__c}"/></td> </tr>
+    <tr style="height:50px;"> <td><b>Goal Target Date:</b></td> <td><apex:outputfield value="{!header.Goal_Target_Date__c}"/></td> </tr>
+     <tr style="height:50px;"> <td><b>PDF Generated Date:</b></td> <td><apex:outputtext value=" {!NOW()}"/></td> </tr>
+    </table>       
+    </div>
+    
+    <apex:outputpanel rendered="{!header.NOVO_Activities__r.size>0}">
+    <table  Style="border: 1px solid black;width=100%;page-break-inside:avoid;border-bottom-style: double;">
+    <tr><td style="border: 1px solid black;background-color:#BDBDBD;height:40px;font-weight:bold;">Novo Activities</td></tr>
+    <tr><td Style="border: 1px solid black;">
+    <apex:pageBlockSection columns="1" >
+        <apex:pageBlockTable columns="4" width="700px" columnswidth="200px,50px,200px" align="center" value="{!header.NOVO_Activities__r}" var="na" border="1" >
+           <!-- <apex:column headerValue="Name" value="{!na.name}" style="height:50px;"/> -->
+            <apex:column style="height:40px;text-align:left;width:150px;"  headerValue="Action" value="{!na.Action_activity__c}"  />
+            <apex:column style="height:40px;text-align:center;width:250px;"  headerValue="Owner" value="{!na.Owner__r.name}" />
+            <apex:column style="height:40px;text-align:center;width:150px;"  headerValue="Action Completion Date" >
+            <apex:outputText value="{0,date,dd-MMM-yyyy hh:mm}"> <apex:param value="{!na.Action_Completion_Date__c}" /> </apex:outputText>
+            </apex:Column>
+            <apex:column style="height:40px;text-align:center;width:150px;background-color:{!IF(na.Status__c!="Completed","yellow","green")};"  headerValue="Status" value="{!na.Status__c}"  />
+            
+        </apex:pageBlockTable>     
+    </apex:pageBlockSection> </td></tr>
+    </table>
+    </apex:outputpanel>
+    
+</apex:pageBlock>
+</body>
+</html>
+</apex:form>
+</apex:page>

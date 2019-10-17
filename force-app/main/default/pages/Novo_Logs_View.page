@@ -1,0 +1,308 @@
+<apex:page controller="EmployeeNovoSummaryCont" tabstyle="Employee_NOVO_Log__c" sidebar="false" id="pge" showHeader="true">
+<apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" />
+<apex:stylesheet value="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-lightness/jquery-ui.css"/>
+<style>
+body .bPageBlock .helpIcon, body .tagDropDown .tagHelp .helpIcon
+{
+background : url(/img/help/helpOrbs.gif);
+}
+</style>
+
+  <script> 
+      var isClicked = false;
+        function check(obj) {
+          if(isClicked) {
+                alert('Button can only be pressed once');
+                return false;
+            } else {
+                isClicked = true;
+                obj.className = 'btnDisabled';
+                togglleDiv('');
+                
+            }
+        }
+           
+        function isClickedReset(){
+              isClicked = false;
+              togglleDiv('none');
+        }
+        
+        
+        function togglleDiv(show){
+            //document.getElementById('darkLayer').style.display = show; 
+            document.getElementById('LoadingDiv').style.display = show;     
+        } 
+        
+       
+           
+            
+            var lastRow;
+            function highlight(elem){
+                 var catId = $(elem).find("input[type=hidden]").val();
+                  // alert(catId);
+                   reportee(catId);
+                
+                if(lastRow != undefined)
+                    lastRow.style.backgroundColor = 'white';
+            
+                elem.style.backgroundColor = 'Yellow';
+                lastRow = elem;
+                
+                 
+                  
+    
+            }
+        
+  
+  </script>
+  <apex:form id="frm">
+        
+        <apex:pagemessages id="errmsg"/>
+        <apex:actionFunction name="reportee" action="{!myGoalEdit}" rerender="editmode">
+               <apex:param name="goalId" value=""/>
+        </apex:actionFunction>
+        
+        <apex:pageBlock id="pb">
+            <h3>
+            <apex:actionstatus startText=" (Working... Please Wait)"  id="counterStatus"/>
+            </h3>
+            <apex:pageblocksection title="Filter" columns="1" id="pbs1">
+                  <apex:pageblocksectionItem >
+                  <apex:outputLabel value="NOVO Filters:"></apex:outputLabel>
+                  <apex:selectList size="1" value="{!selectListType}">
+         
+                  <apex:selectOptions value="{!EmpNovoTypeList}"></apex:selectOptions>
+                  <apex:actionSupport event="onchange"  action="{!reRunQuery}" reRender="frm" status="counterStatus"/>
+                  </apex:selectList>
+                  </apex:pageblocksectionItem>
+                  <apex:inputfield value="{!pageObj.User__c}" rendered="{!selectListType == 'Admin'}" />
+                    <apex:pageblocksectionItem rendered="{!selectListType == 'My People'}" >
+                  <apex:outputLabel value="Supplier Type:"></apex:outputLabel>
+                  <apex:selectList size="1" value="{!selectSuppType}">
+         
+                  <apex:selectOptions value="{!suppTypeList}"></apex:selectOptions>
+                  <apex:actionSupport event="onchange"  action="{!reRunQuery}" reRender="frm" status="counterStatus"/>
+                  </apex:selectList>
+                  </apex:pageblocksectionItem>
+            </apex:pageblocksection>
+            <apex:pageblockSection columns="1" title="{!title}" id="pbs2" rendered="{!selectListType != 'Admin'}">
+                <apex:pageblockSectionItem >
+                   <apex:outputLabel value="Open Goals:" for="og" style="{!if(AND(OpenGoals!=null,OpenGoals>0),'font-weight:bold;font=calibri;size=3;Color:red','color:green')}"/>
+                   <apex:commandlink value="{!OpenGoals}" action="{!oGoals}" id="og" style="font-weight:bold;font=calibri;size=3;" status="counterStatus" rerender="frm"></apex:commandLink>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                   <apex:outputLabel value="Closed Goals:" for="cg" style="{!if(closedGoals>0,'font-weight:bold;font=calibri;size=3;Color:green','color:red')}"/>
+                   <apex:commandlink value="{!closedGoals}" action="{!cGoals}" id="cg" style="font-weight:bold;font=calibri;size=3;" status="counterStatus" rerender="frm"></apex:commandLink>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                   <apex:outputLabel value="All Goals:" for="cg" style="{!if(AllGoals>0,'font-weight:bold;font=calibri;size=3;Color:blue','color:red')}"/>
+                   <apex:commandlink value="{!AllGoals}" action="{!reRunQuery}" id="cg" style="font-weight:bold;font=calibri;size=3;" status="counterStatus" rerender="frm"></apex:commandLink>
+                </apex:pageblockSectionItem>
+            </apex:pagebLocksection>
+            <apex:pageblockbuttons location="bottom">
+                <apex:commandbutton value="View As User" action="{!getPeople}" rendered="{!selectListType == 'Admin'}" /> 
+            </apex:pageblockbuttons>
+        </apex:pageBlock>
+        
+      <apex:outputPanel id="mypeople" rendered="{!OR(selectListType == 'My People', selectListType == 'Admin')}">
+          <apex:pageBlock rendered="{!selectListType != 'My Goals'}">
+          <apex:pageblockSection title="My Reportees"  columns="1" id="pbs3" rendered="{!OR(selectListType == 'My People', selectListType == 'Admin')}">
+           <apex:pageBlockTable value="{!usrWrapper}" var="u" columns="4">
+              <apex:column headerValue="User">
+              <apex:commandLink value="{!u.usr.name}" onclick="window.parent.location.replace('/apex/NovoReporteePage?mode=1&sfUser={!u.usr.id}&view={!selectListType}');return false;" rerender="pbs3">
+                <apex:param name="sfUser" value="{!u.usr.id}" />
+              </apex:commandLink>
+              </apex:column>
+             
+              <apex:column headervalue="Open Goals Count" >
+              <apex:outputText value="{!u.oGoals}" style="{!IF(u.oGoals>0,'font-weight:bold;font=calibri;size=3;color:red;','color:black;font=calibri;')}"></apex:outputText>
+              </apex:column>
+              <apex:column headervalue="Closed Goals Count" >
+              <apex:outputText value="{!u.cGoals}" ></apex:outputText>
+              </apex:column>
+              <apex:column headervalue="Supplier" >
+              <apex:outputText value="{!u.suppName}" ></apex:outputText>
+              </apex:column>
+           </apex:pageBlockTable>
+        
+         </apex:pageblockSection>
+         </apex:pageBlock>
+        </apex:outputPanel>
+          
+      <apex:outputPanel id="Results" rendered="{!AND(novoWrapperList.size>0,showLink)}">
+        <apex:pageblock id="pb2">
+         <apex:pageblockButtons location="top">
+           <!--<apex:commandButton value="New Novo Goal" action="{!newNovoRec}" status="counterStatus"/>-->
+           
+          </apex:pageblockButtons>
+         
+          <apex:pageblocksection columns="1" title="Novo Goals" rendered="{!showLink}" id="pbs4" > 
+                <apex:pageblockTable value="{!novoWrapperList}" var="goal" onRowClick="highlight(this);">
+                    <apex:column headerValue="Goal Num" >
+                     <!--<apex:commandLink value="{!goal.empNov.name}" action="{!myGoalEdit}" styleClass="accId" rerender="frm">
+                       <apex:param name="goalId" value="{!goal.empNov.id}"/> 
+                      </apex:commandLink> -->
+                     <apex:outputField value="{!goal.empNov.name}"/>
+                     <apex:inputHidden value="{!goal.empNov.id}" id="hideInput" />
+                    </apex:column>
+                    <apex:column value="{!goal.empNov.Reason__c}" />
+                    
+                    <apex:column value="{!goal.empNov.CreatedDate}"/>
+                    <apex:column value="{!goal.empNov.Goal_Target_Date__c}"/>
+                    <apex:column value="{!goal.empNov.Status__c}"/>
+                    
+                </apex:pageblockTable>
+                <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="otpNav2">  
+                 Total Found: <apex:outputText rendered="{!IF(total_size>=10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(total_size < 10000,true,false)}">{!total_size}</apex:outputText>  
+                 <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!DisablePrevious}"/>  
+                 <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!NOT(DisablePrevious)}"/>  
+                 <apex:commandLink action="{!Previous}" title="Previous Page" value="Previous Page" rendered="{!NOT(DisablePrevious)}" rerender="frm"/>&nbsp;  <!-- -->
+                 <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisablePrevious}">Previous Page</apex:outputPanel>           
+                 &nbsp;Showing Page  {!pageNumber} of {!totalPages}&nbsp;&nbsp; 
+                 <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisableNext}">Next Page</apex:outputPanel>           
+                 <apex:commandLink action="{!Next}" title="Next Page" value="Next Page" rendered="{!NOT(DisableNext)}" rerender="frm"/>&nbsp;  <!---->
+                 <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!NOT(DisableNext)}"/>  
+                 <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!DisableNext}"/>            
+                </apex:outputPanel>
+               </apex:pageblockSection>
+               
+               <apex:outputPanel id="editmode">
+                 
+                 <apex:pageblock rendered="{!gedit}">
+                  <apex:pagemessages />
+                  <apex:pageblockButtons location="bottom">
+                  <!--<apex:commandButton value="Save" action="{!save}" status="counterStatus" rerender="editmode,pbs4"/> <!--reRender="frm" onclick="check(this);return false;" oncomplete="isClickedReset()" -->
+                  <apex:commandButton value="View Pdf" onclick="viewPdf('{!myselectedGoal.empNov.id}');return false;" reRender="frm1"/> <!-- onclick="window.open('/apex/Smart_Novo?signsuccess=1&headerID={!myselectedGoal.empNov.id}&req=NG&view=My Goals&e=1','_blank','height=600,width=900')" -->
+                  <apex:commandButton value="Email Pdf" action="{!generatePdf}" reRender="frm1"/> <!-- onclick="window.open('/apex/Smart_Novo?signsuccess=1&headerID={!myselectedGoal.empNov.id}&req=NG&view=My Goals&e=1','_blank','height=600,width=900')" -->
+                  </apex:pageBlockButtons>
+                  <apex:pageblockSection columns="2" title="Goal {!myselectedGoal.empNov.name}" id="pbs5">
+                    <apex:outputField value="{!myselectedGoal.empNov.Related_Strategic_Priority__c}" />
+                    <apex:OutputField value="{!myselectedGoal.empNov.Where_Are_U_Now__c}" />
+                    <apex:outputField value="{!myselectedGoal.empNov.Reason__c}"/>
+                    <apex:OutputField value="{!myselectedGoal.empNov.How_will_you_measure_prog__c}" />
+                    <apex:OutputField value="{!myselectedGoal.empNov.Goal_Novo__c}" />
+                    <apex:OutputField value="{!myselectedGoal.empNov.Status__c}" />
+                   
+                 
+                   
+                  </apex:pageblocksection>
+                 
+                  <apex:pageblocksection columns="1">
+                    <apex:variable value="{!1}" var="rowNum"/>
+                    <apex:pageblockTable value="{!myselectedGoal.ActionList1}" var="b" >
+                     <apex:column headerValue="Activity">
+                       <apex:outputText style="color:red;font-weight:bold;" value="Action - {!rowNum}">
+                        <apex:variable value="{!rowNum + 1}" var="rowNum" />
+                        
+                       </apex:outputText>
+                     </apex:column>
+                     <apex:column >
+                         <apex:facet name="header">
+                         <apex:outputPanel >
+                        <apex:outputText value="Action"/>
+                        <apex:image value="/s.gif" styleClass="helpIcon" title="{!$ObjectType.NOVO_Activities__c.Fields.Action_activity__c.inlineHelpText}"/>
+                        </apex:outputPanel>
+                        </apex:facet>
+                        <apex:outputField value="{!b.novAct.Action_activity__c}" style="width:200px;height:50px;" />
+                     </apex:column>
+                     <apex:column >
+                        <apex:facet name="header">
+                        <apex:outputPanel >
+                        <apex:outputText value="Owner"/>
+                        <apex:image value="/s.gif" styleClass="helpIcon" title="{!$ObjectType.NOVO_Activities__c.Fields.Owner__c.inlineHelpText}"/>
+                        </apex:outputPanel>
+                        </apex:facet>
+                         <apex:outputField value="{!b.novAct.Owner__c}"/>
+                     </apex:column>
+                     
+                     <apex:column >
+                         <apex:facet name="header">
+                         <apex:outputPanel >
+                         <apex:outputText value="Action Completion Date"/>
+                         <apex:image value="/s.gif" styleClass="helpIcon" title="{!$ObjectType.NOVO_Activities__c.Fields.Action_Completion_Date__c.inlineHelpText}"/>
+                         </apex:outputPanel>
+                         </apex:facet>
+                         <apex:outputField value="{!b.novAct.Action_Completion_Date__c}"/>
+                     </apex:column>
+                     <apex:column >
+                         <apex:facet name="header">Status</apex:facet>
+                         <apex:outputField value="{!b.novAct.Status__c}"/>
+                     </apex:column>
+                     <apex:column >
+                         <apex:facet name="header">Attachments</apex:facet>
+                         <apex:commandLink value="Upload" action="{!URLFOR('/p/attach/NoteAttach?pid='+b.novAct.id+'&parentname='+b.novAct.name+'&retURL='+'%2Fapex%2FNovo_Logs_View%3Fview%3DMy%20Goals%26e%3D1%26goalId%3D'+myselectedGoal.empNov.id)}"/> <!--,'mywindow','height=600,width=900' -->
+                         &nbsp;<apex:commandLink value="[{!b.attSize}]" style="color:red;font:bold;" onclick="openAttachment('{!b.novAct.id}')" reRender="editmode" /><!-- onclick="window.open('/002?parent_id={!b.novAct.id}&id={!b.novAct.id}','mywindow','height=600,width=900')" -->
+                     </apex:column>
+                    </apex:pageblockTable>
+                    <apex:pageblockSection columns="1">
+                      <apex:outputField value="{!myselectedGoal.empNov.Note_on_Outcome__c}" style="width:400px;height:60px;"/>
+                    </apex:pageblocksection>
+                    </apex:pageblockSection>
+                     
+                   </apex:pageblock>
+               </apex:outputPanel>
+               
+              
+        </apex:pageBlock>
+        </apex:outputPanel>
+        <apex:outputPanel id="frm1">
+         
+            <apex:actionFunction name="callCont" action="{!ProcessSelected}" reRender="frm1">
+               <apex:param name="req" value=""/>
+            </apex:actionFunction>
+            <!--
+             <apex:pageblock title="Email Details" rendered="{!signSucessRender}">
+                <apex:pageblocksection >
+                  <apex:pageblocksectionItem >
+                      <apex:outputLabel value="Pick the user " for="user" />
+                      <apex:inputfield value="{!emailHeader.Owner__c}" id="user" />
+                  </apex:pageblocksectionItem>   
+                  <apex:pageblocksectionItem >
+                            <apex:outputLabel value="Enter the Email Address" for="co" />
+                            <apex:inputText value="{!email}"  id="Email"/>
+                  </apex:pageblocksectionItem>
+                </apex:pageblocksection>-->
+                 <apex:pageblock title="Email Details" rendered="{!signSucessRender}">
+                      <apex:pageMessages />
+                  <apex:pageBlockTable value="{!emailWrapList}" var="c" rendered="{!signSucessRender}" >
+                <apex:column >
+                <apex:inputCheckbox value="{!c.checked}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Name">
+                    <apex:inputfield value="{!c.emailHead.Owner__c}" id="user" />
+                </apex:column>
+                <apex:column headerValue="email">
+                 <apex:inputText value="{!c.emailWrap}" id="co" />
+                 </apex:column>
+                 
+        </apex:pageBlockTable>
+                <apex:pageblockbuttons location="bottom" >
+                        <apex:commandbutton value="Send Email" action="{!ProcessSelected}" rerender="frm1"/>
+                        <!--apex:commandbutton value="Cancel" />-->
+                        
+                </apex:pageblockbuttons>
+             </apex:pageblock>
+          </apex:outputPanel>
+        
+    </apex:form>
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:600px; top:150px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> System updating......please wait...
+            </div>
+    </div>
+    <script>
+      function checkPage(req){
+          callCont(req);
+        }
+        
+       function openAttachment(NovActId){
+          var myWindow = window.open('/002?parent_id='+NovActId+'&id='+NovActId,'mywindow','height=600,width=900');
+          myWindow.blur();
+        }
+        
+        function viewPdf(sId){
+         var myWindow1 = window.open('/apex/Smart_Novo?signsuccess=2&vPdf=1&headerId='+sId);
+        }
+    </script>
+</apex:page>

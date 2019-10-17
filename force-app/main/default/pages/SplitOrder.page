@@ -1,0 +1,124 @@
+<apex:page controller="SplitOrderController" tabStyle="Job__c" id="pg">
+
+    <apex:pageBlock id="pb">
+        <apex:form id="frm">
+            <apex:pageBlockSection title="Job Details : {!objJob.Name}" columns="2" collapsible="false">
+                <apex:outputField value="{!objJob.Customer_Name__c}" />
+                <apex:outputField value="{!objJob.Region__c}" />
+                <apex:outputField value="{!objJob.Installation_Date__c}"/>
+                <apex:outputField value="{!objJob.Delivery_Date__c}" />
+            </apex:pageBlockSection>
+            <apex:outputPanel rendered="{!ISNULL(s_ErrorMsg)}" id="op">
+                <apex:pageBlockTable width="100%" value="{!orderDetailsList}" var="orderDet" id="pbt1">
+                    <apex:column headerValue="Select" id="col1">
+                        <input type='radio' id='thisRad' name='{!$CurrentPage.parameters.jobId}' value='{!LEFT(orderDet.objOrder.Id,15)}' onclick='f_setOrderId("{!orderDet.objOrder.Id}");'/>
+
+                        <apex:inputHidden id="s_orderId" value="{!s_orderId}"/>
+
+                        <script type='text/javascript'>
+                            
+                            window.onload=function(){
+                                var jId;
+                                var regexS = "[\\?&]job=([^&#]*)";  
+                                var regex = new RegExp( regexS );  
+                                var tmpURL = window.location.href;  
+                                var results = regex.exec( tmpURL );  
+                                if( results == null )    
+                                    return "";  
+                                else    
+                                    jId = results[1];
+                                var frmId = document.forms['pg:pb:frm'].elements[jId];
+                                for(var i = 0; i < frmId.length ; i++){
+                                    alert(frmId[i].disabled+'-'+frmId[i].checked);
+                                    if(frmId[i].disabled){
+                                        alert('Yippi');
+                                        frmId[i].disabled=true;
+                                        frmId[i].checked=false;
+                                    }
+                                }
+                            };
+
+                            function f_setOrderId(ordrId){
+                                //alert('@Order ID @'+ordrId);
+                                var hiddenParamId = document.getElementById('pg:pb:frm:pbt1:0:s_orderId');
+                                hiddenParamId.value=ordrId;
+                            }
+                            function f_disableRadio(jId){
+                               // alert('sadsdasd'+jId);
+                                try{
+                                    var frmId = document.forms['pg:pb:frm'].elements[jId];
+                                    //alert('sadsdasd'+frmId.length);
+                                    for(var i = 0; i < frmId.length ; i++){
+                                       // alert(frmId[i].value+'-'+frmId[i].checked);
+                                        if(frmId[i].checked){
+                                            frmId[i].disabled=true;
+                                            frmId[i].checked=false;
+                                        }
+                                        else{
+                                            frmId[i].disabled=false;
+                                        }
+                                    }
+                                }catch(e){alert(e.message);}
+                            }
+                        </script>
+                    </apex:column>
+                    <apex:column headerValue="Order#">
+                        {!orderDet.objOrder.Name}
+                    </apex:column>
+                    <apex:column headerValue="Status">
+                        {!orderDet.objOrder.Status__c}
+                    </apex:column>
+                </apex:pageBlockTable>
+
+                <apex:commandbutton action="{!actnFetchElements}" onclick="f_disableRadio('{!$CurrentPage.parameters.jobId}');" value="Fetch Orders" reRender="pbt2" status="status">
+                </apex:commandButton>
+
+                <apex:actionStatus id="status" startText="Retrieving Data..."></apex:actionStatus>
+                <apex:pageBlockTable id="pbt2" width="100%" value="{!elementDetailsList}" var="elementDet" ><!-- rendered="{!AND((s_orderId != ''),NOT(ISNULL(elementDetailsList)))}"> -->
+                    <apex:column headerValue="Select">
+                        <apex:inputCheckbox value="{!elementDet.b_IsElementSelected}"/>
+                    </apex:column>
+                    <apex:column headerValue="Name">
+                        {!elementDet.objElement.Name}
+                    </apex:column>
+                    <apex:column headerValue="Code">
+                        {!elementDet.objElement.Code__c}
+                    </apex:column>
+                    <apex:column headerValue="Current Supplier">
+                        {!elementDet.objElement.Current_Supplier__c}
+                    </apex:column>
+                    <apex:column headerValue="# of Units">
+                        {!elementDet.objElement.Units__c}
+                    </apex:column>
+                    <apex:column headerValue="Unit Price">
+                        {!elementDet.objElement.Unit_Price__c}
+                    </apex:column>
+                    <apex:column headerValue="Description">
+                        {!elementDet.objElement.Description__c}
+                    </apex:column>
+                    <apex:column headerValue="Status">
+                        {!elementDet.objElement.Status__c}
+                    </apex:column>
+                    <apex:column headerValue="Sub Status">
+                        {!elementDet.objElement.Sub_Status__c}
+                    </apex:column>
+                    <apex:column headerValue="Type">
+                        {!elementDet.objElement.Type__c}
+                    </apex:column>
+                </apex:pageBlockTable>
+                <apex:outputPanel rendered="{!NOT(ISNULL(elementDetailsList))}">
+                    <apex:commandbutton value="Split" action="{!actnSplit}"/>
+                    <input type='button' class='btn' value='Cancel' onclick='Javascript:window.parent.location.replace("/"+"{!$CurrentPage.parameters.jobId}");'/>
+                    <input type='button' class='btn' value='Refresh' onclick='Javascript:window.parent.refresh();'/>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!NOT(ISNULL(s_ErrorMsg))}">
+                <apex:pageBlockSection title="Error Splitting Order">
+                    <font face='calibri' size='2' color='#875647'>
+                        {!s_ErrorMsg}
+                    </font>
+                </apex:pageBlockSection>    
+            </apex:outputPanel>
+        </apex:form>
+    </apex:pageBlock>
+</apex:page>

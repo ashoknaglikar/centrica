@@ -1,0 +1,86 @@
+<apex:page controller="DisplayReplanJobsController">
+    <script>
+function togglleDivAndFetchJobs(show){
+    fetchJobs();
+    document.getElementById('darkLayer').style.display = show; 
+    document.getElementById('displayMessage').style.display = 'none'; 
+}  
+function togglleDiv(show){
+    document.getElementById('darkLayer').style.display = show; 
+}  
+</script>
+    <apex:form >
+        <apex:pageblock title="Jobs to be re-planned per disctrict : ">
+            <br />
+            <apex:pageblock >
+                <br />
+                <font face='calibri' size='4'>
+                <apex:outputText value="Select District : " /> <apex:selectList value="{!areaId}"
+                    multiselect="false" size="1" id="areaDropDown">
+                    <apex:selectOptions value="{!AreaItems}" />
+                </apex:selectList>
+                
+                <apex:outputText value=" Select Region : " /> <apex:selectList value="{!regionId}"
+                    multiselect="false" size="1" id="regionDropDown">
+                    <apex:selectOptions value="{!RegionItems}" />
+                </apex:selectList>
+                
+                
+                </font>
+                <br />
+                <br />
+                <apex:image onClick="togglleDivAndFetchJobs('')" 
+                    url="{!$Resource.ButtonImage}" title="Fetch job list" />
+            </apex:pageblock>
+            <br />
+            <apex:outputPanel id="innerPanel">
+                <apex:actionFunction name="fetchJobs" action="{!fetchJobList}"
+                    rerender="innerPanel" status="myStatus"
+                    onComplete="togglleDiv('none');" />
+                <apex:actionStatus startText="Processing..." id="myStatus">
+                </apex:actionStatus>
+                <div id="displayMessage"><font face='calibri' color='#FF0000'
+                    size='5'> <apex:outputText rendered="{!renderDisplayMessage}" value="No jobs to display."> 
+                </apex:outputText> </font></div>
+                <apex:pageblock rendered="{!renderJobList}">
+                    <br />
+                    <table width='100%'>
+                        <tr>
+                            <td>
+                                <font face='calibri' size='4'color='red'><b>Click Submit Button to Refresh</b>
+                                </font>
+                            </td>
+                        </tr>
+                    </table>
+                    <br/>
+                    <apex:pageBlockTable value="{!jobList}" var="job" border="2px">
+                        <apex:column headerValue="Job">
+                            <a href="/{!job.Id}" target="_blank">{!job.Name}</a>
+                        </apex:column>
+                        <apex:column headerValue="Opportunity">
+                            <apex:outputField value="{!job.CHI_Lead__c}" />
+                        </apex:column>
+                        <apex:column headerValue="Installation Address">
+                            <apex:outputField value="{!job.CHI_Lead__r.AccountId}" />
+                        </apex:column>
+                        <apex:column headerValue="District">
+                            <apex:outputField value="{!job.District__c}" />
+                        </apex:column>
+                        <apex:column headerValue="Needs Replanning">
+                            <apex:outputField value="{!job.Needs_Re_Planing__c}" />
+                        </apex:column>
+                        <apex:column headerValue="Start Date/Time">
+                            <apex:outputField value="{!job.Previous_Start_Time__c}" />
+                        </apex:column>
+                        <apex:column headerValue="End Date/Time">
+                            <apex:outputField value="{!job.Previous_End_Time__c}" />
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:pageblock>
+            </apex:outputPanel>
+        </apex:pageblock>
+        <div id="darkLayer"
+            style="background-color: white; filter: alpha(opacity =         50); /* IE */ opacity: 0.5; /* Safari, Opera */ -moz-opacity: 0.50; /* FireFox */ z-index: 20; height: 100%; width: 100%; background-repeat: no-repeat; background-position: center; position: absolute; top: 0px; left: 0px; display: none;">
+        </div>
+    </apex:form>
+</apex:page>

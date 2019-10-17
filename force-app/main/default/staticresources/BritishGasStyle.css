@@ -1,0 +1,40 @@
+﻿ /* Remove padding and margin from 
+
+*{margin: 0; padding: 0;} */
+body 
+{
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+h2
+{
+  font:12pt Arial; margin:10px;
+}
+
+/*div container for entire page*/
+.page
+{
+    width:100%;
+    background:white src="BG_Tab_Content" repeat-x 
+ }
+.wrapper
+{
+   padding:5px;
+   background-color:white;
+   width:974px; 
+   text-align:left
+}
+
+/* Items for question tables */
+
+    .liNum{
+	margin-left:44px
+	}
+    .liNum li{
+    display:inline;
+    margin-left:13px
+	}
+
+.radio{
+	margin-left:50px
+	}

@@ -1,0 +1,701 @@
+<apex:page sidebar="false" showHeader="false" controller="cocController"  id="page" action="{!methodtest}" >
+<apex:pagemessages />
+<apex:form rendered="{!!error}">
+
+<apex:includeScript value="{!$Resource.jquerymin}"/>
+<apex:includeScript value="{!$Resource.modernizrcustom}"/>
+<apex:includeScript value="{!$Resource.sketcher}"/>
+<apex:actionfunction name="saveFormUnique" action="{!saverecord}" rerender="blk1">
+        <apex:param name="encInst" value="" />
+        <apex:param name="encCust" value="" />
+        <apex:param name="date1" value="" />
+        <apex:param name="date2" value="" />
+</apex:actionfunction>
+<apex:outputpanel id="panel" >
+<apex:outputPanel id="panel1" rendered="{!!pdf}">
+<html>
+<head>
+
+<script type="text/javascript">
+    var installerSign;
+    var customerSign;
+    $(document).ready(function(e) {
+        installerSign = new Sketcher( "install" );
+        customerSign = new Sketcher( "customer" );
+    });
+    function exportImage(){
+        
+      {
+            var encInst = installerSign.toDataURL();
+            var encCust = customerSign.toDataURL();
+            var date1 = document.getElementById("date1").value;
+            var date2 = document.getElementById("date2").value;
+            //alert("ok");
+            //alert(encCust);
+            saveFormUnique(encInst,encCust,date1,date2);
+        }
+    }
+</script>
+     
+
+<style type="text/css" media="print,screen"> 
+    
+   .p
+    {
+    font-family:"Agency FB";
+    font-size:25px;
+    font-weight:bold;
+    color:black; 
+    letter-spacing:2px;
+    } 
+     
+    .c
+    {
+     font-family:"Agency FB";
+     font-size:20px;
+     //font-weight:bold;
+     color:black;
+     //margin-left:5px;
+     letter-spacing:1px;
+    }
+    
+    .bold
+    {
+        margin-left:5px;
+        margin:1px;
+        font-family:Calibri; 
+        font-size:20px; 
+        font-weight:bold;
+        line-height:120%;
+    }
+     
+    .normal
+    {
+        margin-left:5px;
+        margin:2px;
+        font-family:Calibri; 
+        font-size:15px; 
+        font-weight:bold;
+    }
+    
+    .bgText
+    {
+        font-family:Agency FB; 
+        font-size:20px; 
+        font-weight:bold; 
+        color:#8FD8FF; 
+        letter-spacing:2px;
+        
+    }      
+    
+    
+ @media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)   
+ {
+    .container1
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    
+    background-color:#8FD8FF;
+    text-align:justify;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container2
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:9.5%;
+    right:15px;
+    background-color:#8FD8FF;
+    height:27%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container3
+    {
+    width:98%;
+    margin:2px;
+    border:1px solid gray;
+    background-color:#8FD8FF;
+    height:20%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container4
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:45%;
+    right:15px;
+    background-color:#8FD8FF;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container5
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:48%;
+    right:15px;
+    background-color:#8FD8FF;
+    height:10%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container6
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:65%;
+    right:15px;
+    background-color:#8FD8FF;
+    height:8%;
+    border-radius:10px 10px 10px 10px;
+    }
+    .gasfired
+    {
+        margin-left:23%;
+    }
+    .micro
+    {
+        margin-left:7%;
+    }
+    .trv
+    {
+        margin-left:85%;
+    }
+    .prog
+    {
+        margin-left:75%;
+    }
+    .roomtem
+    {
+        margin-left:68%;
+    }
+    .time
+    {
+        margin-left:38%;
+    }
+    .ducting
+    {
+        margin-left:84%;
+    }
+    .pipe
+    {
+        margin-left:88%;
+    }
+    .cylinder
+    {
+        margin-left:82%;
+    }
+    .solar
+    {
+        margin-left:67%;
+    }
+     .thermo
+    {
+        margin-left:33%;
+    }
+    
+
+    
+}   
+@media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape) {
+  /* For landscape layouts only */
+  
+    .container1
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    
+    background-color:#8FD8FF;
+    text-align:justify;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container2
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:18%;
+    right:15px;
+    background-color:#8FD8FF;
+    height:49%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container3
+    {
+    width:98%;
+    margin:2px;
+    border:1px solid gray;
+    background-color:#8FD8FF;
+    height:20%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container4
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:83%;
+    right:15px;
+    background-color:#8FD8FF;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container5
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:88%;
+    right:15px;
+    background-color:#8FD8FF;
+    height:17%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container6
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:120%;
+    right:15px;
+    background-color:#8FD8FF;
+    height:14%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .gasfired
+    {
+        margin-left:23%;
+    }
+    
+    .micro
+    {
+        margin-left:7%;
+    }
+    .trv
+    {
+        margin-left:85.8%;
+    }
+    .prog
+    {
+        margin-left:75.5%;
+    }
+    .roomtem
+    {
+        margin-left:68%;
+    }
+    .time
+    {
+        margin-left:38.3%;
+    }
+    .ducting
+    {
+        margin-left:84%;
+    }
+    .pipe
+    {
+        margin-left:87.6%;
+    }
+    .cylinder
+    {
+        margin-left:81.2%;
+    }
+    .solar
+    {
+        margin-left:67.5%;
+    }
+    
+     .thermo
+    {
+        margin-left:65.5%;
+    }
+}
+@media only screen and (min-device-width: 1024px) {
+.container1
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    background-color:#8FD8FF;
+    text-align:justify;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container2
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:17%;
+    right:15px;
+    background-color:#8FD8FF;
+    height:45%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container3
+    {
+    width:98%;
+    margin:2px;
+    border:1px solid gray;
+    background-color:#8FD8FF;
+    height:20%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container4
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:72%;
+    right:15px;
+    background-color:#8FD8FF;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container5
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:76.5%;
+    right:15px;
+    background-color:#8FD8FF;
+    height:17%;
+    border-radius:10px 10px 10px 10px;
+    }
+    
+    .container6
+    {
+    width:48%;
+    margin:2px;
+    border:1px solid gray;
+    position:absolute;
+    top:107%;
+    right:15px;
+    background-color:#8FD8FF;
+    height:14%;
+    border-radius:10px 10px 10px 10px;
+    }
+    .gasfired
+    {
+        margin-left:42%;
+    }
+    .micro
+    {
+        margin-left:30%;
+    }
+    .trv
+    {
+        margin-left:89%;
+    }
+    .prog
+    {
+        margin-left:81%;
+    }
+    .roomtem
+    {
+        margin-left:75%;
+    }
+    .time
+    {
+        margin-left:53%;
+    }
+    .thermo
+    {
+        margin-left:73.5%;
+    }
+    .ducting
+    {
+        margin-left:86%;
+    }
+    .pipe
+    {
+        margin-left:88%;
+    }
+    .cylinder
+    {
+        margin-left:84%;
+    }
+    .solar
+    {
+        margin-left:75%;
+    }
+
+}
+.wrapper
+{
+    margin-left:2%;
+}
+</style>
+</head>
+
+
+
+<body>
+<div class = "wrapper">
+<div class="p">
+    Claim Of Conformity:Central Heating Systems
+</div>
+
+<div class="c">
+    Customer reference number:
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:outputField value="{!jcd.CHI_Lead_Number__c}"/>
+</div>
+<!--<div class="c">
+    Green Deal Home Improvement Fund Registration Number:
+    
+    Q5EBYP 
+   
+</div>-->
+
+<div style="height:20px;"/>
+<div class="bgText">
+    For completeion by installer
+  
+</div>
+ Please tick as appropriate or provide information
+<div style ="width:40%; margin:2px; position:absolute; top:0px; right:-125px; float:right; " >
+
+    <apex:image url="/servlet/servlet.FileDownload?file=01520000000i0Ur" style="height:40%;width:40%" rendered="{!bglogo}"/>
+    <apex:image url="/servlet/servlet.FileDownload?file=01520000000i0V1" style="height:40%;width:40%" rendered="{!!bglogo}"/>
+
+</div>
+<div class="container1">
+
+<p class ="bold">Condensing Boiler</p>
+<p class ="normal">Natural gas fired and liquified petroleum gas fired:
+<apex:inputfield value="{!jcd.Gas_Fired__c}" styleclass="gasfired"/></p>
+
+</div>
+
+<!-- <div style ="height:5px;" />
+<div class="container1">
+<p class ="bold">Micro Combined heat and power (Micro-CHP)
+<apex:inputfield value="{!jcd.micro_CHP__c}" styleclass="micro"/></p>
+</div> -->
+
+<div style ="height:5px;" />
+<div class="container1">
+
+
+<p class ="bold">Heating and hot water controls:</p>
+
+<p class ="normal">TRV's
+<apex:inputfield value="{!jcd.TRV_s__c}" styleclass="trv"/></p>
+<p class ="normal">Programmers
+<apex:inputfield value="{!jcd.Programmers__c}" styleclass="prog"/></p>
+<p class ="normal">Room Thermostats
+<apex:inputfield value="{!jcd.Room_thermostats__c}" styleclass="roomtem"/></p>
+<p class ="normal">Timer and Temperature Control Devices
+<apex:inputfield value="{!jcd.TT_C_D__c}" styleclass="time"/></p>
+<p class ="normal">Cylinder Thermostat
+<apex:inputfield value="{!jcd.Cylinder_Thermostat__c}" styleclass="thermo"/></p>
+
+</div>
+<div style ="height:5px;" />
+<div class="container1">
+<p class ="bold">Heating system insulation:</p>
+
+<div>
+<p class ="normal">Ducting
+<apex:inputfield value="{!jcd.Ducting_COC__c}" styleclass="ducting"/></p>
+<p class ="normal">Pipes
+<apex:inputfield value="{!jcd.Pipes__c}" styleclass="pipe"/></p>
+<p class ="normal">Cylinders
+<apex:inputfield value="{!jcd.Cylinder__c}" styleclass="cylinder"/></p>
+</div>
+</div>
+
+<!-- <div style ="height:5px;" />
+<div class="container1">
+<p class ="bold">Solar Thermal
+<apex:inputfield value="{!jcd.Solar_thermal__c}" styleclass="solar" />
+</p>
+</div> -->
+
+<div class="container2">
+
+<p class = "bold">Notes:
+<br/>
+<apex:inputfield value="{!jcd.Notes_Coc__c}" style="width:96%; margin-left:10px;" /></p>
+
+</div>
+
+<div style ="height:5px;" />
+<div>
+<p class = "normal">
+British Gas have satisfactorily installed a central heating system using an installation process complying with
+PAS 2030:2014, including Annexes C2, C4 and C6, at the following domestic address:
+</p>
+</div>
+
+<div style ="height:5px;" />
+<div class="container3">
+
+<p class ="bold">Customer Address:
+&nbsp;
+<apex:outputtext value="{!installStreet }"  style="margin-left:30px;"/>
+
+
+</p>
+</div>
+<div style ="height:5px;" />
+<div class="container1">
+
+<p class ="bold">City:
+<apex:outputfield value="{!jcd.Job_Number__r.Install_City__c}" style="margin-left:50%;"/></p>
+
+</div>
+<div style ="height:5px;" />
+
+<div class="container4">
+
+<p class ="bold">Post Code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Job_Number__r.Install_Postcode__c}" style="margin-left:30px;"/></p>
+</div>
+
+<div style ="height:5px;" />
+
+
+<div class="container1">
+
+<p class ="bold">Date of Handover:
+<!--<apex:inputfield value="{!jcd.Date_of_handover_Ins__c}" style=" margin-left:10%;" />
+<apex:input type="date" value="{!dateofHand1}"/ >-->
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="date" value="{!dateofHand1}" id="date1" name ="dateCust"/>
+</p>
+</div>
+<div style ="height:5px;" />
+<div class="container1">
+
+<p class ="bold">Installers Name:
+<apex:inputfield value="{!jcd.Installers_Name1_Coc__c}" style="margin-left:10%; width:50%" /></p>
+
+</div>
+<div style ="height:5px;" />
+
+<div class="container1">
+
+<p class ="bold">Installers Name:
+<apex:inputfield value="{!jcd.Installer_s_name2_COC__c}" style="margin-left:10%; width:50%" /></p>
+</div>
+
+<!--<div class="container4">
+
+<p class ="bold">Post Code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<apex:outputfield value="{!jcd.Job_Number__r.Install_Postcode__c}" style="margin-left:30px;"/></p>
+</div>-->
+
+<div class="container5">
+
+<p class ="bold">Installers Signature:</p>
+<canvas id="install"  width="300" height="65" style="border: 2px solid #888888;
+                    background-color: #EEEEEE;
+                     border-radius: 2px 2px; margin-left:10px;"/>
+<button type="button" onclick="installerSign.clear();">Clear</button>
+</div>
+
+<div>
+
+<p class ="bgText">For completion by the customer</p>
+<p class = "normal"> By signing, you also confirm you are satisfied with the installation: </p>
+
+</div>
+<div style ="height:5px;" />
+<div class="container1">
+
+<p class ="bold">Date of Handover:
+<!--  <apex:inputfield value="{!jcd.Date_of_handover_Ins__c}" style="margin-left:10%;" />-->
+<!--  <apex:input type="date" value="{!dateofHand2}"/ >-->
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="date" value="{!dateofHand2}" id="date2"/></p>
+</div>
+<div style ="height:5px;" />
+<div class="container1">
+
+<p class ="bold">Customers Name:
+<apex:inputfield value="{!jcd.Customer_s_name_COC__c}" style="margin-left:10%;" /></p>
+</div>
+
+<div class="container6">
+
+<p class ="bold">Customers Signature:</p>
+<canvas id="customer" width="300" height="50" style="border: 2px solid #888888;
+                    background-color: #EEEEEE;
+                    border-radius: 2px 2px; margin-left:10px;" />
+<button type="button" onclick="customerSign.clear();">Clear</button>
+</div>
+
+</div>
+</body>
+</html>
+
+<br/>
+<br/>
+<apex:pageBlock id="blk1">
+<apex:pagemessages />   
+    <apex:pageblockButtons location="bottom">
+       <apex:commandButton onclick="exportImage();" value="Save  Generate PDF"  oncomplete="" />
+       <apex:commandButton value="Cancel" action="{!cancel}"/>
+    </apex:pageblockButtons>
+    <apex:pageBlockSection title="Status of COC Form" columns="1" id="sec1">
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Status" for="cocStatus" style="margin-left:300px; font-weight:bold"/>
+            
+                <apex:inputField value="{!jcd.GD_Claims_of_conformity__c}" id="cocStatus" required="true" />
+            
+        </apex:pageBlockSectionItem>
+        
+    </apex:pageBlockSection>
+</apex:pageblock>
+</apex:outputPanel>
+<apex:outputpanel rendered="{!pdf}">
+<apex:pageblock >
+<apex:pagemessages />  
+Claims Of Conformity has been Successfully saved. Please click the link below to access it. 
+<apex:outputlink value="https://c.{$label.Salesforce_Server}.content.force.com/servlet/servlet.FileDownload?file={!cocId}">
+click Here
+</apex:outputlink>
+<apex:pageblockbuttons >
+    <apex:commandbutton value="Back to Document" action="{!cancel}"/>
+</apex:pageblockbuttons>
+</apex:pageblock>
+
+</apex:outputpanel>
+</apex:outputpanel>
+</apex:form>
+
+</apex:page>

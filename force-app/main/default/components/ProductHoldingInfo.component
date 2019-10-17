@@ -1,0 +1,33 @@
+<apex:component >
+    <apex:attribute name="ProductHolding" type="ProductHolding__c" description="Record of Product Holding" />
+    <apex:attribute name="ProductHoldingAccounts" type="ProductHoldingAccount__c[]" description="Account Records of Product Holding" />
+    <!--<apex:pageblocksection columns="1" collapsible="false" >-->
+        <apex:pageblocksection columns="2" collapsible="false">
+            <apex:outputfield value="{!ProductHolding.ServiceCover__c}" />
+            <apex:outputfield value="{!ProductHolding.CreditRating__c}" />
+            <apex:outputfield value="{!ProductHolding.ServiceProducts__c}" />
+            <apex:outputfield value="{!ProductHolding.IsCurrentCustomerOfAnyProduct__c}" />
+        </apex:pageblocksection>
+        
+        <apex:variable var="GasAccountFound" value="{!IF(ProductHolding.GasAccount__c != null || ProductHolding.GasMonthlySpend__c != null || ProductHolding.GasPaymentMethod__c != null, true,false)}" />
+        <apex:variable var="ElectricityAccountFound" value="{!IF(ProductHolding.ElectricityAccount__c != null || ProductHolding.ElectricityMonthlySpend__c != null || ProductHolding.ElectricityPaymentMethod__c != null, true,false)}" />
+        
+        <apex:pageblocksection title="Energy" columns="1" collapsible="false" rendered="{!IF(ProductHoldingAccounts.size > 0, true, false)}"> <!--  -->
+        	<table width="100%" class="detailList" cellpadding="0" cellspacing="0" border="0">
+	        	<apex:repeat value="{!ProductHoldingAccounts}" var="phaccount" >
+	        		<tr>
+	        			<td class="labelCol first">{!phaccount.Type__c} Account</td>
+	        			<td class="dataCol first">{!phaccount.Name}</td>
+		        		
+		        		<td class="labelCol first">Monthly Spend</td>
+	        			<td class="dataCol first"><apex:outputfield value="{!phaccount.MonthlySpend__c}" /></td>
+		            	
+		            	<td class="labelCol first">Payment Method</td>
+		            	<td class="dataCol first"><apex:outputfield value="{!phaccount.PaymentMethod__c}" /></td>
+		           	</tr>
+	           	</apex:repeat>
+           	</table>
+        </apex:pageblocksection>
+        
+        <!--</apex:pageblocksection>-->
+</apex:component>

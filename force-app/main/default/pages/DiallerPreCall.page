@@ -1,0 +1,55 @@
+<apex:page controller="DiallerPreCallController">
+	<apex:form >
+		<apex:pageMessages />
+		<apex:pageblock >
+			<apex:pageblockSection title="Date Visit Booked Criteria" collapsible="false" rendered="{!!flag}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="From Date : " />
+					<apex:inputField value="{!appointment.HistrorySOAppDate__c}" required="true"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="To Date : " />
+					<apex:inputField value="{!appointment.Date_Visit_Booked__c}" required="true"/>
+				</apex:pageBlockSectionItem>
+			</apex:pageblockSection>
+			<apex:pageblockSection title="Appointment Visit Date Criteria" collapsible="false" rendered="{!!flag}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="From Date : " />
+					<apex:inputField value="{!appointment.Confirmation_Email__c}" required="true"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="To Date : " />
+					<apex:inputField value="{!appointment.NSSE_Email_Sent__c}" required="true"/>
+				</apex:pageBlockSectionItem>
+			</apex:pageblockSection>
+			<apex:pageblockSection title="Status Filter Criteria" collapsible="false" rendered="{!!flag}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Status : "/>
+					<apex:selectList value="{!status}" size="1">
+			            <apex:selectOptions value="{!StatusValues}"/>
+			        </apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageblockSection>
+			<apex:pageBlockSection title="Email Criteria" collapsible="false" rendered="{!!flag}">
+            	<apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Email : " />
+                    <apex:inputText value="{!email}" required="true"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                	<apex:outputLabel value="Fetch the records already picked by pre-call dialler" />
+                	<apex:inputCheckbox value="{!isNotPickedByDialler}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                	<apex:outputLabel value="Fetch the records with null Pre-Called values" />
+                	<apex:inputCheckbox value="{!isConsiderPreCallStatus}" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Generate Dialler File" action="{!createDiallerFile}" rendered="{!!flag}"/>
+                <apex:commandButton value="Back" action="{!back}" rendered="{!flag}"/>
+            </apex:pageBlockButtons>
+            
+		</apex:pageblock>
+	</apex:form>
+</apex:page>

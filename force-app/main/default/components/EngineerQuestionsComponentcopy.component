@@ -1,0 +1,172 @@
+<apex:component >
+<!--  controller="EngineeringQuestionsComponentController" -->
+    <apex:attribute name="EngineerQues" description="This attrribute passes the list of engineer questions" type="Opportunity[]" />
+    <apex:attribute name="gas4" description="This attrribute is used to capture Gas Council No 1st part." type="string"/>
+    <apex:attribute name="gas5" description="This attrribute is used to capture Gas Council No 2nd part" type="string"/>
+    <apex:attribute name="gas6" description="This attrribute is used to capture Gas Council No 3rd part" type="string"/>
+    <apex:attribute name="callModeVal" description="This attrribute is used to determine the call type." type="Integer"/>
+    <apex:attribute name="CallModeobj" description="This attrribute passes the CallMode." type="CallMode"/>
+    <apex:attribute name="accountobject" type="account" description="This attribute is used to get the account data" />
+    <apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" required="true"/>
+    <apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+    
+    <script>
+       
+        var cntrlEmpID, cntrlEmpName;
+        function setEmpData(empName, empID)
+        {
+            try
+            {
+                document.getElementById(cntrlEmpID).value = empName;
+                document.getElementById(cntrlEmpName).value = empID.replace('&#39;','\'');
+            }
+            catch(e){}
+        }
+                        
+    </script>
+<!-- To Display the Engineer Questions  -->   
+      
+    <apex:pageBlockSection title="Engineer Questions" rendered="{!IF(displayModeVal==DisplayModeobj.EDIT,true,false)}" columns="1" collapsible="false">                
+       <apex:pageBlockTable var="engi" value="{!EngineerQues}">
+            
+            <!--<apex:column headerValue="Age Of Boiler">
+                <apex:inputField value="{!engi.Boiler_Age__c}"/>
+            </apex:column>  -->
+            <apex:column headerValue="GC Number" width="50px"> 
+               <apex:outputpanel rendered="{!if(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST),true,false)}"> 
+               
+             <table style="width:100px">
+             <tr>
+                     <td>
+                     <apex:inputText value="{!gas4}" maxlength="2"  size="1"/> 
+                     </td>
+                     <td>-</td>
+                     <td>
+                     <apex:inputText value="{!gas5}" maxlength="3"  size="3"/> 
+                     </td>
+                     <td>-</td>
+                     <td>
+                     <apex:inputText value="{!gas6}" maxlength="2"  size="1"/>
+                     </td>
+                 </tr>
+            </table>
+            </apex:outputpanel>
+            </apex:column>
+            <apex:column headerValue="With Customer" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}" width="90px">
+                <table>
+                    <tr><td>
+                    <apex:inputField value="{!engi.WithCustomer__c}" required="true" id="withCustomer" style="width:100px"/>
+                    </td></tr>
+                    <apex:outputpanel >
+                    <tr><td>
+                            <b>Not With Customer Reasons</b>
+                    </td></tr>
+                    <tr><td>
+                         <apex:inputField value="{!engi.WithCustReasons__c}" required="{!if(engi.WithCustomer__c == 'No', true,false)}" style="width:100px"/>
+                    </td></tr>
+               </apex:outputpanel>
+                </table>
+            </apex:column> 
+             
+             <apex:column headerValue="Referral Employee" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.ENGINEERCALLEXISTCUST),true,false)}" width="50px">  <!-- ,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST -->
+                
+                <table border="0" cellspacing="0" cellpadding="0"><tr>
+                <td><apex:inputText id="txtEmpName" onchange="javascript: setEmpData('',this.value);" /></td>
+                <td>                
+                <a href="#" onclick="javascript:window.open('/apex/employeesearch','_new','width=700,height=500,menubar=no,directories=no,status=yes,location=no,toolbar=no,scrollbars=yes');" title="Referral Employee Lookup (New Window)">
+                <img src="/s.gif" alt="Referral Employee Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Referral Employee Lookup (New Window)"/>
+                </a>
+                </td></tr></table>
+                
+                
+                <apex:inputText value="{!engi.Referral_Employee__c}" id="txtEmpID" style="display:none;" required="true"/>
+                <script>
+                    cntrlEmpName = '{!$Component.txtEmpName}';
+                    cntrlEmpID = '{!$Component.txtEmpID}'; 
+                </script>
+                <!--<apex:inputField value="{!engi.Referral_Employee__c}" required="true"/>-->
+                
+            </apex:column>           
+            <apex:column headerValue="Engineer Reason" width="50px">
+              <div id="test1">
+              <apex:inputField value="{!engi.Enquiry_Reason__c}" required="true" id="ashok1"/>
+              </div>
+            </apex:column>  
+            <apex:column headerValue="Unsafe Appliance Reason" width="50px">
+                <apex:inputField value="{!engi.Unsafe_Appliance_Reason__c}" required="true" id="ashok2"/>
+            </apex:column>  
+            <apex:column headerValue="Healthy & Safety Notes" width="50px">
+                <apex:inputField value="{!accountobject.healthSafety_Notes__c}"/>
+            </apex:column>  
+            <apex:column headerValue="Asbestos" width="50px" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST),true,false)}">
+                <apex:inputField value="{!accountobject.Asbestos_found__c}"  required="true"/>
+            </apex:column>
+            <apex:column headerValue="Gas Supply At Address" width="50px" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST),true,false)}">
+            <table>
+                    <tr><td>
+                        <apex:inputField value="{!accountobject.Gas_Supply_At_Address1__c}" required="true" id="p3" />
+                     </td></tr>
+                    <apex:outputpanel >
+                    <tr><td>
+                            <b>Current Heating System</b>
+                    </td></tr>
+                    <tr><td>
+                         <apex:inputField value="{!accountobject.Current_Heating_System1__c}" required="true" id="p4" />
+                    </td></tr>
+               </apex:outputpanel>
+                </table>
+            </apex:column>
+            
+        </apex:pageBlockTable>
+       
+    </apex:pageBlockSection>   
+    
+    <apex:pageBlockSection title="Engineer Questions" columns="1" rendered="{!IF(displayModeVal==DisplayModeobj.VIEW,true,false)}" collapsible="false">                
+       <apex:pageBlockTable var="engi" value="{!EngineerQues}">
+            
+            <apex:column headerValue="GC Number">
+               <apex:outputField value="{!engi.Gas_Council_Number__c}"/>
+            </apex:column>
+            <apex:column headerValue="With Customer" >
+               <apex:outputField value="{!engi.WithCustomer__c}" id="withCustomer"/>
+             
+            </apex:column> 
+            
+            <apex:column headerValue="Not With Customer Reasons" >
+                <apex:outputField value="{!engi.WithCustReasons__c}" />
+            </apex:column>   
+             <apex:column headerValue="Referral Employee" >
+                    <apex:outputField value="{!engi.Referral_Employee__c}"/>
+             </apex:column>          
+            <apex:column headerValue="Engineer Reason" >
+              <apex:outputField value="{!engi.Enquiry_Reason__c}" />
+            </apex:column>  
+            <apex:column headerValue="Unsafe Appliance Reason" >
+                <apex:outputField value="{!engi.Unsafe_Appliance_Reason__c}" />
+            </apex:column>  
+            <apex:column headerValue="Healthy & Safety Notes">
+                <apex:outputField value="{!accountobject.healthSafety_Notes__c}"/>
+            </apex:column> 
+             <apex:column headerValue="Asbestos" width="50px" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST),true,false)}">
+                <apex:outputField value="{!accountobject.Asbestos_found__c}"/>
+            </apex:column>
+            <apex:column headerValue="Gas Supply At Address" width="50px" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST),true,false)}">
+            <table>
+                    <tr><td>
+                        <apex:outputField value="{!accountobject.Gas_Supply_At_Address1__c}" />
+                     </td></tr>
+                    <apex:outputpanel >
+                    <tr><td>
+                            <b>Current Heating System</b>
+                    </td></tr>
+                    <tr><td>
+                         <apex:outputField value="{!accountobject.Current_Heating_System1__c}" />
+                    </td></tr>
+               </apex:outputpanel>
+                </table>
+            </apex:column>             
+        </apex:pageBlockTable>
+       
+    </apex:pageBlockSection>
+    
+</apex:component>

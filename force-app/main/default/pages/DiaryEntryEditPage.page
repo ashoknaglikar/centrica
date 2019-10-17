@@ -1,0 +1,135 @@
+<apex:page id="page" StandardController="Diary_Entry__c" extensions="EditDiaryEntryController"  showHeader="true" sidebar="true"  tabStyle="Diary_Entry__c">
+<script>
+window.onload=function(){document.getElementById('page:form:pageBlock1:pageBlockSection1:pageBlockSection11:pageBlockSectionItemSubType:Sub_Type').focus();};
+</script>  
+  <apex:form id="form">
+ 
+  <apex:sectionHeader id="sectioneheader" title="Diary Entry Edit" subtitle="{!entry.Name}" />
+    <apex:pagemessages />
+    <apex:pageblock id="pageBlock1" title="Diary Entry Edit">
+        <apex:pageBlockButtons location="top" rendered="{!!removeMode}">
+            <apex:commandButton value="Save" action="{!Save}"/>
+            <apex:commandButton value="Save&New" rendered="{!IF(OR(contains($Profile.Name, 'CHI Data Management'),contains($Profile.Name, 'System Administrator')), True, False)}" action="{!Save_New}"/>
+             <apex:commandButton value="Cancel" action="{!Cancel}"/>
+        </apex:pageBlockButtons>
+        
+         <apex:pageBlockButtons location="top" rendered="{!removeMode}">
+            <apex:commandButton value="Save & Remove" action="{!Save}"/>
+            <apex:commandButton value="Cancel" action="{!Cancel}"/>
+        </apex:pageBlockButtons>
+        
+        <apex:pageBlockSection id="pageBlockSection1" title="Information" collapsible="false" columns="2" showHeader="True"> 
+        <apex:pageBlockSection id="pageBlockSection11" columns="1"> 
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Week" for="week"/>
+                <apex:outputfield value="{!entry.Week__c}" id="week" />
+            </apex:pageblocksectionitem>
+            
+            
+           
+            <apex:pageblocksectionitem id="pageBlockSectionItemSubType">
+                <apex:outputlabel value="Sub Type" for="Sub_Type"/>
+                <apex:outputfield value="{!entry.Sub_Type__c}" id="Sub_Type" />
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem rendered="{!removeMode}">
+              <apex:outputlabel value="Amendment Reason" for="R_Reason"  rendered="{!needsReason}"/>
+                <apex:inputfield value="{!entry.Amendment_Reason__c}" id="R_Reason" rendered="{!needsReason}"/>
+            </apex:pageblocksectionitem>
+            
+            
+             
+         <apex:pageblocksectionitem rendered="{!removeMode}">
+              <apex:outputlabel value="Authoriser" for="Authoriser__c"  rendered="{!NOT(needsReason)}"/>
+                <apex:inputfield value="{!entry.Authoriser__c}" id="Authoriser__c"  rendered="{!NOT(needsReason)}"/>
+            </apex:pageblocksectionitem>
+            
+             <apex:pageblocksectionitem rendered="{!removeMode}">
+              <apex:outputlabel value="Unavailability Notes" for="Unavailability_Notes__c"/>
+                <apex:inputfield value="{!entry.Unavailability_Notes__c}" id="Unavailability_Notes__c"/>
+            </apex:pageblocksectionitem>
+            
+       </apex:pageBlockSection> 
+        
+        
+        <apex:pageBlockSection id="pageBlockSection2" columns="1">   
+            <apex:pageblocksectionitem rendered="{!if(entry.Type__c == 'Availability', true,false)}">
+                <apex:outputlabel value="Start" for="start"/>
+                <apex:inputfield value="{!entry.Start__c}" id="start" />
+            </apex:pageblocksectionitem>
+            
+             <apex:pageblocksectionitem rendered="{!if(entry.Type__c != 'Availability', true,false)}">
+                <apex:outputlabel value="Start" for="start1"/>
+                <apex:outputfield value="{!entry.Start__c}" ID="start1"/>
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem rendered="{!if(entry.Type__c == 'Availability', true,false)}">
+                <apex:outputlabel value="End" for="end"/>
+                <apex:inputfield value="{!entry.End__c}" id="end" />
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem rendered="{!if(entry.Type__c != 'Availability', true,false)}">
+                <apex:outputlabel value="End" for="end1"/>
+                <apex:outputfield value="{!entry.End__c}" id="end1" rendered="{!if(entry.Type__c != 'Availability', true,false)}"/>
+            </apex:pageblocksectionitem>
+ 
+            <apex:pageblocksectionitem rendered="{!if(entry.Type__c == 'Availability', true,false)}">
+                <apex:outputlabel value="Hours" for="hours"/>
+                <apex:inputfield value="{!entry.Hours__c}" id="hours" />
+            </apex:pageblocksectionitem>
+            
+             <apex:pageblocksectionitem rendered="{!if(entry.Type__c != 'Availability', true,false)}">
+                <apex:outputlabel value="Hours" for="hours1"/>
+                <apex:outputfield value="{!entry.Hours__c}" id="hours1"/>
+            </apex:pageblocksectionitem>
+
+           
+                                              
+        </apex:pageblocksection>
+       </apex:pageBlockSection>
+       
+       
+       <apex:pageBlockSection title="Edit" collapsible="false" columns="2" showHeader="True" rendered="{!NOT(var)}"> 
+            <apex:pageBlockSection columns="2"> 
+       
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="New Start" />
+                <apex:inputfield value="{!Unavailable.Start_Date_Time__c}"/>
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="New End"/>
+                <apex:inputfield value="{!Unavailable.End_Date_Time__c}" />
+            </apex:pageblocksectionitem>
+            
+            <apex:inputfield value="{!Unavailable.Labour_Type__c}"/>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Type"/>
+                <apex:inputfield value="{!Unavailable.Type__c}" required="false"/>
+            </apex:pageblocksectionitem>
+          
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Unavailability Reason"/>
+                <apex:inputfield value="{!Unavailable.Unavailability_Reason__c}" required="false"/>
+            </apex:pageblocksectionitem>
+          
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Unavailability Notes"/>
+                <apex:inputfield value="{!entry.Unavailability_Notes__c}"/>
+            </apex:pageblocksectionitem>
+          
+           <apex:pageblocksectionitem >
+                <apex:outputlabel value="Amendment Reason"/>
+                <apex:inputfield value="{!entry.Amendment_Reason__c}"/>
+          </apex:pageblocksectionitem>
+            
+            </apex:pageblocksection>
+       </apex:pageBlockSection>
+       
+
+      
+               {!userMessage}  
+    </apex:pageblock>
+   </apex:form>
+</apex:page>

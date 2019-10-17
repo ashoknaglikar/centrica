@@ -1,0 +1,280 @@
+<apex:page StandardController="order__c" extensions="TopcallFaxExtension"  renderAs="pdf" showHeader="false" sidebar="false">
+<html>
+    <head>
+        <style type="text/css" media="print,screen">
+            @page {
+                margin:0.25in;
+                @top-left {
+                    content: " ";
+                    font-size: 8pt;
+                }
+                @top-center{
+                    content: "Installers Specification";
+                    font-size: 8pt;
+                }
+                @top-right{
+                    content: "Customer Enquiry Number: : {!order__c.Job__r.CHI_Lead__r.CHI_Lead_Id__c}";
+                    font-size: 8pt;
+                }
+            
+                @bottom-center {
+                    content: "British Gas Services Limited Registered in England No.3141243 Registered Office Millstream, Maidenhead Road, Windsor, Berkshire, SL4 5GD.";
+                    font-size: 8pt;
+                }
+            } 
+
+            th {
+                font-family:Arial;
+                color:black;
+                background-color:lightgrey;
+            }
+            thead {
+                    display:table-header-group;
+            }
+            tbody {
+                display:table-row-group;
+            } 
+            body{
+                font-family:Arial;
+                color:black;
+                font-size: 8pt;
+            }
+        </style>
+    </head>
+    <body>
+        <TABLE width="100%" border="0">
+            <TR>
+                <TD width="30%" Align="left"><B><FONT SIZE="2">Job Address</FONT></B></TD>
+                <TD width="5%"></TD>
+                <TD width="30%"><FONT SIZE="2"></FONT></TD>
+            </TR>
+            <TR>
+                <TD width="30%" Align="left"></TD>
+                <TD width="5%"></TD>
+                <TD width="30%"><FONT SIZE="2"></FONT></TD>
+            </TR>
+            <TR>
+                <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.Customer_Name__c}</FONT></TD>
+                <TD width="5%"></TD>
+                <TD width="30%"><FONT SIZE="2"></FONT></TD>
+            </TR>
+            <TR>
+                <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingStreet}</FONT></TD>
+                <TD width="5%"></TD>
+                <TD width="30%"><FONT SIZE="2"></FONT></TD>
+            </TR>
+            <TR>
+                <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingCity}</FONT></TD>
+                <TD width="5%"></TD>
+                <TD width="30%"><FONT SIZE="2"></FONT></TD>
+            </TR>
+            <TR>
+                <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingState}</FONT></TD>
+                <TD width="5%"></TD>
+                <TD width="30%"><FONT SIZE="2"></FONT></TD>
+            </TR>
+            <TR>
+                <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingPostalCode}</FONT></TD>
+                <TD width="5%"></TD>
+                <TD width="30%"><FONT SIZE="2"></FONT></TD>
+            </TR>
+            <TR>
+                <TD width="30%" Align="lseft"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingCountry}</FONT></TD>
+                <TD width="5%"></TD>
+                <TD width="30%"></TD>
+            </TR>
+        </TABLE> 
+        <TABLE width="100%" border="0">
+            <tr>
+                <th width="20%"><Font size="2">Boilers</Font></th>
+                <th width="10%"></th>
+                <th width="20%"><Font size="2">Room</Font></th>
+                <th width="10%"></th>
+                <th width="20%"><Font size="2">Position</Font></th>
+            </tr>
+            <tr>
+                <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+            </tr>
+            <apex:repeat value="{!BoilerLst}" var="objJobElement">
+                <tr>
+                    <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sDescription}</Font></td>
+                    <td width="10%"></td>
+                    <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sRoom}</Font></td>
+                    <td width="10%"></td>
+                    <td width="20%" style="word-wrap=break-word"><Font size="2"></Font></td>
+                </tr>
+                <tr>
+                    <td colspan="5">Notes : {!objJobElement.sNotes}</td>
+                </tr>
+            </apex:repeat>
+            <apex:outputPanel rendered="{!IF(ISNULL(RadiatorLst),false,true)}">
+                <tr>
+                    <th width="20%"><Font size="2">Radiators</Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                </tr>
+                <tr>
+                    <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+                </tr>
+                <apex:repeat value="{!RadiatorLst}" var="objJobElement">
+                    <tr>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sDescription}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sRoom}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2"></Font></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Notes : {!objJobElement.sNotes}</td>
+                    </tr>
+                </apex:repeat>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!IF(ISNULL(ValvesLst),false,true)}">
+                <tr>
+                    <th width="20%"><Font size="2">Valves</Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                </tr>
+                <tr>
+                    <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+                </tr>
+                <apex:repeat value="{!ValvesLst}" var="objJobElement">
+                    <tr>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sDescription}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sRoom}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2"></Font></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Notes : {!objJobElement.sNotes}</td>
+                    </tr>
+                </apex:repeat>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!IF(ISNULL(ControlsLst),false,true)}">
+                <tr>
+                    <th width="20%"><Font size="2">Controls</Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                </tr>
+                <tr>
+                    <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+                </tr>
+                <apex:repeat value="{!ControlsLst}" var="objJobElement">
+                    <tr>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sDescription}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sRoom}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2"></Font></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Notes : {!objJobElement.sNotes}</td>
+                    </tr>
+                </apex:repeat>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!IF(ISNULL(CylinderLst),false,true)}">
+                <tr>
+                    <th width="20%"><Font size="2">Cylinders</Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                </tr>
+                <tr>
+                    <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+                </tr>
+                <apex:repeat value="{!CylinderLst}" var="objJobElement">
+                    <tr>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sDescription}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sRoom}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2"></Font></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Notes : {!objJobElement.sNotes}</td>
+                    </tr>
+                </apex:repeat>
+            </apex:outputPanel>
+            <apex:repeat var="quoteprdType" value="{!quotePrdTypeList}">
+                <tr>
+                    <th width="20%"><Font size="2">{!quoteprdType.sType}</Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                    <th width="10%"></th>
+                    <th width="20%"><Font size="2"></Font></th>
+                </tr>
+                <tr>
+                    <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+                </tr>
+                <apex:repeat value="{!quoteprdType.quoteProductLst}" var="objJobElement">
+                    <tr>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sDescription}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2">{!objJobElement.sRoom}</Font></td>
+                        <td width="10%"></td>
+                        <td width="20%" style="word-wrap=break-word"><Font size="2"></Font></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">Notes : {!objJobElement.sNotes}</td>
+                    </tr>
+                </apex:repeat>
+            </apex:repeat>
+        </TABLE>
+        <br/>
+            Notes:
+                <apex:outputField value="{!order__c.Job__r.Installation_Special_Instructions__c}" />
+        <p/>
+        <apex:outputField value="{!order__c.Job__r.Installer_Notes__c}" />
+        <TABLE width="100%" border="0">
+            <tr>
+                <th colspan="3" width="90%"><Font size="2">Health and Safety Information:</Font></th>
+            </tr>
+            <tr>
+                <Td colspan="3" Height="10" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+            </tr>
+            <tr>
+                <td colspan="3" width="90%" style="word-wrap=break-word"><Font size="2">Scaffolding Required? : {!strAsbestos}</Font></td>
+            </tr>
+            <tr>
+                <td width="30%" style="word-wrap=break-word"><Font size="2">Electrical Bonding Required?  : {!strElectrical}</Font></td>
+                <td width="30%" style="word-wrap=break-word"><Font size="2">Pack : {!strElectricalProdId}</Font></td> 
+                <td width="30%" style="word-wrap=break-word"><Font size="2">{!strElectricalDesc}</Font></td>               
+            </tr>
+            <tr>
+                <td colspan="3" width="90%">
+                    <TABLE width="100%" border="0" >    
+                        <tr>
+                            <th width="40%"><Font size="2">Description</Font></th>
+                            <th width="10%"></th>
+                            <th width="40%"><Font size="2">Qty</Font></th>
+                        </tr>    
+                        <apex:repeat value="{!jobEleDisconnElemList}" var="objElec">
+                            <tr>
+                                <th width="40%"><Font size="2">{!objElec.Description__c}</Font></th>
+                                <th width="10%"></th>
+                                <th width="40%"><Font size="2">{!objElec.Units__c}</Font></th>
+                            </tr>  
+                        </apex:repeat>
+                   </TABLE>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%" style="word-wrap=break-word"><Font size="2">Has Asbestos been identified? : {!strScaffolding}</Font></td>
+                <td width="30%" style="word-wrap=break-word"><Font size="2"></Font></td> 
+                <td width="30%" style="word-wrap=break-word"><Font size="2">Has QE been contacted? : {!strScaffolding}</Font></td>                  
+            </tr>                       
+            <tr>
+                <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+            </tr>
+        </TABLE> 
+    </body>
+</html>
+</apex:page>

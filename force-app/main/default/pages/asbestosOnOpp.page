@@ -1,0 +1,18 @@
+<apex:page standardController="opportunity" >
+<apex:pageBlock >
+<apex:pageBlockSection columns="2">
+    <apex:outputField value="{!opportunity.account.Asbestos_found__c}" />
+    <apex:outputField value="{!opportunity.account.Asbestos_Found_Date_New__c}" />
+    <apex:pageBlockSectionItem >
+    <apex:outputLabel value="Link:" for="asblink">
+    </apex:outputLabel>
+    <apex:outputLink id="asblink" target="_parent" value="/{!opportunity.account.id}#001m000000DU3gE_RelatedNoteList_target">Account attachements</apex:outputLink>
+    </apex:pageBlockSectionItem>
+</apex:pageBlockSection>
+
+<apex:pageblockSection columns="1" collapsible="false" >
+    <apex:outputField value="{!opportunity.account.healthSafety_Notes__c}" />
+
+</apex:pageblockSection>
+</apex:pageBlock>
+</apex:page>

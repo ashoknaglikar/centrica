@@ -1,0 +1,124 @@
+<apex:component controller="WorkflowPageController">
+<script type="text/javascript" src="/soap/ajax/16.0/connection.js"/>
+<script type="text/javascript" src="/soap/ajax/16.0/ajax.js"/>
+<script>
+    function func(test)
+    {
+        //alert(test.value);
+        if(test.value=="No")
+        {
+            alert('HSA visit required. Not eligible for CombiSwap offer.');
+        }
+    }
+    function func2(test)
+    {
+        //alert(test.value);
+        if(test.value=="Vertical")
+        {
+            alert('HSA visit required. Not eligible for CombiSwap offer.');
+        }
+    }
+    function func3(test)
+    {
+        //alert(test.value);
+        if(test.value=="Yes")
+        {
+            alert('HSA visit required. Not eligible for CombiSwap offer.');
+        }
+    }
+    function func4(test)
+    {
+        //alert(test.value);
+        if(test.value=="Yes")
+        {
+            alert('Combi Swap product is not suitable.');
+        }
+    }
+</script>
+     <apex:attribute name="CombiSwap" description="This is CombiSwapRecord" type="CombiSwapQuestion__c" required="true" assignTo="{!combiSwap}"/>
+     <apex:outputPanel id="theTestPanel">
+     <apex:pageblock >
+        <!--  <apex:Pageblockbuttons >
+            <apex:commandbutton value="Validate" onclick="vlaidateCombiSmap()"/>
+        </apex:Pageblockbuttons>-->
+        <apex:pageblockSection columns="1">
+            <apex:facet name="header">
+               <font face='calibri' color='660033' size='4' weight='bold'>
+               <span>Please Fill in the following Details</span>
+               </font>
+            </apex:facet> <br/>
+            <apex:pageblockSectionItem dataStyleClass="oddRow">
+                <apex:outputLabel value="1) Can a new Combi boiler be fitted in the same location to meet current standards? " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_1__c}" style="float:right;font-weight:bolder;" id="Question1" onchange="func(this)"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem >
+                <apex:outputLabel value="2) What is the GC number ? (If unknown type XX)" style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.GCNumber__c}" style="float:right;font-weight:bolder;width:80px;" id="Question2" />
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem dataStyleClass="oddRow">
+                <apex:outputLabel value="3) What is the output size ? (KW 00.00)" style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.OutputSize__c}" style="float:right;font-weight:bolder;width:80px"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem >
+                <apex:outputLabel value="4) Is the gas meter outlet pipe work a minimum of 22mm copper (not lead)? " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_2__c}" style="float:right;font-weight:bolder;" onchange="func(this)"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem dataStyleClass="oddRow">
+                <apex:outputLabel value="5) Is current appliance Fanned flued ? " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_3__c}" style="float:right;font-weight:bolder;" onchange="func(this)"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem >
+                <apex:outputLabel value="6) Is current flue horizontal or vertical? " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_4__c}" style="float:right;font-weight:bolder; width:85px" onchange="func2(this)"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem dataStyleClass="oddRow">
+                <apex:outputLabel value="7) Are there any Flue access restrictions i.e. over a car port or conservatory?" style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_5__c}" style="float:right;font-weight:bolder;" onchange="func3(this)"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem >
+                <apex:outputLabel value="8) Is there a convenient position to run and internal condensate?  " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_6__c}" style="float:right;font-weight:bolder;"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem dataStyleClass="oddRow">
+                <apex:outputLabel value="9) Is there a convenient external drain? " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_7__c}" style="float:right;font-weight:bolder;" onchange="func(this)"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem >
+                <apex:outputLabel value="10) Is current boiler operational?   " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_8__c}" style="float:right;font-weight:bolder;"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem dataStyleClass="oddRow">
+                <apex:outputLabel value="11) Are the existing electrics up to current standards? Such as earthing? " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_9__c}" style="float:right;font-weight:bolder;" onchange="func(this)"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem >
+                <apex:outputLabel value="12) Does the property have independent controls on each floor? " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_10__c}" style="float:right;font-weight:bolder;" onchange="func(this)"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+            <apex:pageblockSectionItem dataStyleClass="oddRow">
+                <apex:outputLabel value="13)Has the customers’ property got more than 1 bathroom? " style="font-weight:bolder;">
+                    <apex:inputField value="{!combiSwap.Question_11__c}" style="float:right;font-weight:bolder;" onchange="func4(this)"/>
+                </apex:outputLabel>
+            </apex:pageblockSectionItem>
+        
+            <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Notes:" style="font-weight:bolder;">
+                        <apex:inputField value="{!combiSwap.Question_5_Notes__c}" style="float:right;font-weight:bolder; width= 200px;"/>
+                    </apex:outputLabel>
+            </apex:pageblockSectionItem>
+         </apex:pageblockSection>
+      </apex:pageblock>
+      </apex:outputPanel>
+</apex:component>

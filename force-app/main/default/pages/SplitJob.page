@@ -1,0 +1,195 @@
+<apex:page controller="SplitJobController" tabStyle="Job__c" id="pg">
+
+    
+    <style>
+        .hourClass{
+        color:blue;
+        }
+    </style>
+    <apex:pageBlock id="pb">
+        <apex:form id="frm">
+            <font color= 'red' color = '2.5' face = 'calibri'>
+                    <!-- {!errorMsg} -->
+                    <apex:message styleClass="error"/> 
+                </font>
+            <apex:outputPanel rendered="{!bCheckPlatform}">
+                 <font color= 'red' color = '2.5' face = 'calibri'>
+                    Action cannot be completed : The related CHI Lead and the main job has already gone down the Premiere route.
+                    <apex:commandbutton value="Cancel" action="{!actnCancel}" />
+                 </font>    
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!NOT(bCheckPlatform)}">      
+                <apex:pageBlockSection title="CHI Lead Details : {!objOpp.Name}" columns="2" collapsible="false">
+                    <apex:outputField value="{!objOpp.Account.Name}" />
+                    <apex:outputField value="{!objOpp.Account.BillingStreet}" />
+                    <apex:outputField value="{!objOpp.Account.BillingCity}"/>
+                    <apex:outputField value="{!objOpp.Account.BillingState}" />
+                    <apex:outputField value="{!objOpp.Account.BillingPostalCode}" />
+                    <apex:outputField value="{!objOpp.Account.BillingCountry}" />
+                    <apex:outputField value="{!objOpp.Amount_Settled__c}"/>
+                    <apex:outputField value="{!objOpp.Amount}"/>
+                    <apex:outputField value="{!objOpp.StageName}" />
+                    <apex:outputField value="{!objOpp.Payment_Reference_Number__c}" />
+                </apex:pageBlockSection>   
+                <p/>
+                
+                    
+                <apex:pageBlockTable width="100%" value="{!JobDetails}" var="jobDet" id="pbt1" rendered="{!NOT(ISNULL(JobDetails))}">
+                    <apex:column headerValue="Select" id="col1">
+                        <input type='radio' id='thisRad' name='{!$CurrentPage.parameters.oppId}' value='{!LEFT(jobDet.Id,15)}' onclick='f_setJobId("{!jobDet.Id}");'/>
+                        <apex:inputHidden id="s_jobId" value="{!s_jobId}"/>
+                        
+                        <script type='text/javascript'>
+                            var jId;
+                            window.onload=function(){
+                                var regexS = "[\\?&]oppId=([^&#]*)";  
+                                var regex = new RegExp( regexS );  
+                                var tmpURL = window.location.href;  
+                                var results = regex.exec( tmpURL );  
+                                if( results == null )    
+                                    return "";  
+                                else    
+                                    jId = results[1];
+                                   // alert(jId+' = jid');
+                                var frmId = document.forms['pg:pb:frm'].elements[jId];
+                                for(var i = 0; i < frmId.length ; i++){
+                                    //alert(frmId[i].disabled+'-'+frmId[i].checked);
+                                    if(frmId[i].disabled){
+                                        frmId[i].disabled=true;
+                                        frmId[i].checked=false;
+                                    }
+                                }
+                            };
+                            
+                            function f_setJobId(jobId){
+                                var hiddenParamId = document.getElementById('pg:pb:frm:pbt1:0:s_jobId');
+                                hiddenParamId.value=jobId;
+                                
+                            }
+                           
+                            function f_disableRadio(jId){
+                                try{
+                                    var frmId = document.forms['pg:pb:frm'].elements[jId];
+                                    var btnId = document.getElementById('pg:pb:frm:fetchBtn');
+                                   for(var i = 0; i < frmId.length ; i++){
+                                        if(frmId[i].checked){
+                                            frmId[i].disabled=true;
+                                            frmId[i].checked=false;
+                                             
+                                        }
+                                        else{
+                                            frmId[i].disabled=false;
+                                        }
+                                    }
+                                }catch(e){alert(e.message);}
+                            }
+                        </script>
+                    </apex:column>
+                    <apex:column headerValue="Name">
+                        <a href="/{!jobDet.id}">{!jobDet.Name}</a>
+                    </apex:column>
+                    <apex:column headerValue="Delivery Date">
+                        {!jobDet.Delivery_Date__c}
+                    </apex:column>
+                    <apex:column headerValue="Delivery Notes">
+                        {!jobDet.Delivery_Notes__c}
+                    </apex:column>
+                    <apex:column headerValue="Installation Date">
+                        {!jobDet.Installation_Date__c}
+                    </apex:column>
+                    <apex:column headerValue="Installation Sp Instructions">
+                        {!jobDet.Installation_Special_Instructions__c}
+                    </apex:column>
+                    <apex:column headerValue="Installer Notes">
+                        {!jobDet.Installer_Notes__c}
+                    </apex:column>
+                    <apex:column headerValue="District">
+                        {!jobDet.District__r.Name}
+                    </apex:column>
+                    <apex:column headerValue="Type">
+                        {!jobDet.Type__c}
+                    </apex:column>
+                    <apex:column headerValue="Total Hours">
+                        {!jobDet.Total_Job_Hours__c}
+                    </apex:column>
+                    <apex:column headerValue="Quote">
+                        {!jobDet.Quote__r.Name}
+                    </apex:column>
+                    <apex:column headerValue="Job Notes">
+                        {!jobDet.Job_Notes__c}
+                    </apex:column>
+                </apex:pageBlockTable>
+                <p/>
+                <center>
+                    <apex:commandbutton id="fetchBtn" action="{!actnFetchElements}" onclick="f_disableRadio('{!$CurrentPage.parameters.oppId}');" value="Fetch Elements" reRender="pbt2,spliBtn" status="status" rendered="{!NOT(ISNULL(JobDetails))}"/>
+                    <apex:commandbutton id="cloneBtn" oncomplete="Javascript: window.location.replace( window.parent.location);" action="{!actnCloneJOb}" onclick="f_disableRadio('{!$CurrentPage.parameters.oppId}');" value="Create New Job" reRender="pbt2" status="status"/>
+                </center>
+                
+                <font color='Green' face='calibri' size ='2.5'><apex:actionStatus id="status" startText="Retrieving Data..."></apex:actionStatus></font>
+          
+                <p/>
+                <apex:outPutPanel id="blankDIV" style="overflow-y:auto;" layout="block">
+                        <apex:outPutPanel id="hours" layout="block" style="margin:auto;" rendered="{!IF(totalHours > 0,true,false)}">
+                            <apex:pageblockSection columns="2" showHeader="false">
+                                <apex:pageblockSectionItem labelStyle="text-align:left;border:none;vertical-align:middle;" dataStyle="text-align:left;border:none;vertical-align:middle;" >
+                                    <apex:outputLabel value="Total Hours Selected : " styleClass="{!IF(totalHours > 0,'hourClass','')}"/>
+                                    <apex:outputText value="{!totalHours}" styleClass="{!IF(totalHours > 0,'hourClass','')}"/>
+                                </apex:pageblockSectionItem>
+                                <apex:pageblockSectionItem labelStyle="text-align:left;border:none;vertical-align:middle;" dataStyle="text-align:left;border:none;vertical-align:middle;">
+                                    <apex:outputText />
+                                </apex:pageblockSectionItem>    
+                         </apex:pageblockSection>
+                          <apex:pageblockSection columns="1">
+                                <apex:repeat value="{!hourList}" var="h" >
+                                    <apex:pageblockSectionItem > 
+                                         <apex:outputPanel style="text-align:left;margin-left:20px;">
+                                            <apex:outputLabel value="{!h.skill}" style="{!h.skillStyle};font-weight:bold;"/>&nbsp;
+                                            <apex:outputLabel value="{!h.hours}" style="{!h.skillStyle};margin-left:10px;"/>
+                                         </apex:outputPanel>
+                                    </apex:pageblockSectionItem>
+                                </apex:repeat>
+                            </apex:pageblockSection>     
+                        </apex:outPutPanel>
+                </apex:outPutPanel><br/>
+                <apex:pageBlockTable id="pbt2" width="100%" value="{!pckDetList}" var="elementDet">
+                    <apex:column headerValue="Select">
+                        <apex:inputCheckbox value="{!elementDet.b_IsElementSelected}" onclick="calculateHours();"/>
+                    </apex:column>
+                    <apex:column headerValue="Pack Name">
+                        {!elementDet.packElement.Name}
+                    </apex:column>
+                    <apex:column headerValue="Part Number">
+                        {!elementDet.packElement.Part_Number__c}
+                    </apex:column>
+                    <apex:column headerValue="Description">
+                        {!elementDet.packElement.Product_Description__c}
+                    </apex:column>
+                    <apex:column headerValue="Price">
+                        {!elementDet.packElement.Sales_Price__c}
+                    </apex:column>
+                    <apex:column headerValue="Quantity">
+                        {!elementDet.packElement.Quantity__c}
+                    </apex:column>
+                    <apex:column headerValue="Hours">
+                        {!elementDet.Hours}
+                    </apex:column>
+                    
+                </apex:pageBlockTable>
+                <center>
+                    <apex:commandbutton id="spliBtn" value="Split Job" action="{!SplitJOB}" oncomplete="Javascript:location.reload(true);"/> 
+                    <apex:commandbutton value="Cancel" action="{!actnCancel}" />
+                    <input type='button' class='btn' value='Refresh' onclick='Javascript:location.reload(true);'/>
+                </center>
+                
+                <apex:actionFunction action="{!calculateSelectedHours}" name="calculateHours" reRender="blankDIV"/>
+                <apex:actionstatus id="status11" onstart="togglleDiv('');"
+                        onstop="togglleDiv('none');"></apex:actionstatus>
+                
+                
+            </apex:outputPanel>
+            
+              
+            
+        </apex:form> 
+    </apex:pageBlock>
+</apex:page>

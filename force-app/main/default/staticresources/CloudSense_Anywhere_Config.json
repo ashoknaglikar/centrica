@@ -1,0 +1,1272 @@
+{
+  "workAnywhereAction": "showOfflineAppointments",
+  "adminMenu": {
+    "Baskets": "manageBaskets",
+    "Product Catalogue": "manageProducts"
+  },
+  "autosave": {
+    "interval": 180000
+  },
+  "reindexing": {
+    "enabled": true
+  },
+  "pdfDocuments": [
+    {
+      "pathAttribute": "Confirmation_Form_Path_0",
+      "signedAttribute": "Confirmation_Form_Signed_0",
+      "signatureRequired": true,
+      "templateName": "(function() { var conf = (CS.Service.config && !_.isEmpty(CS.Service.config)) ? CS.Service.config : config; return 'Customer confirmation form' + ( conf && conf.Quote_Reference_0 ? conf.Quote_Reference_0.attr['cscfga__' + 'Value__c'] : ''); }())"
+    },
+    {
+      "pathAttribute": "Pdf_Path_0",
+      "signedAttribute": "",
+      "signatureRequired": false,
+      "templateName": "(function() { var conf = (CS.Service.config && !_.isEmpty(CS.Service.config)) ? CS.Service.config : config; return 'Quote PDF' + ( conf && conf.Quote_Reference_0 ? conf.Quote_Reference_0.attr['cscfga__' + 'Value__c'] : ''); }())"
+    },
+    {
+      "pathAttribute": "Installation_Form_Path_0",
+      "signedAttribute": "Installation_Form_Signed_0",
+      "signatureRequired": false,
+      "templateName": "(function() { var conf = (CS.Service.config && !_.isEmpty(CS.Service.config)) ? CS.Service.config : config; return 'Installation notes' + ( conf && conf.Quote_Reference_0 ? conf.Quote_Reference_0.attr['cscfga__' + 'Value__c'] : ''); }())"
+    },
+    {
+      "pathAttribute": "Finance_Illustration_Path_0",
+      "signedAttribute": "",
+      "signatureRequired": false,
+      "templateName": "(function() { var config = CS.Service.config; return 'Finance Illustration' + ( config && config.Quote_Reference_0 ? config.Quote_Reference_0.attr['cscfga__' + 'Value__c'] : ''); }())"
+    }
+  ],
+  "staticResources": [
+    "CS_dbQueries",
+    "CS_partsModel",
+    "CS_partsModelSupport",
+    "CS_pricing",
+    "CS_allowances",
+    "CS_quotePdf",
+    "CS_BGUtil",
+    "PSLT2_250_250",
+    "CS_errorLog",
+    "testLogResource",
+    "CS_MultiSelectLookup",
+    "CS_styleCreator"
+  ],
+  "tables": {
+    "Product_Filter": {
+      "label": "Product_Filter",
+      "labelPlural": "Product_Filters",
+      "indexSpec": [
+        {
+          "path": "sfdc_UserId",
+          "type": "string"
+        },
+        {
+          "path": "sfdc_EmployeeId",
+          "type": "string"
+        },
+        {
+          "path": "sfdc_EmployeeGroups",
+          "type": "string"
+        }
+      ],
+      "sfdc": false,
+      "standard": false,
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "cscfga__Product_Definition__c": {
+      "filter": "Include_Offline__c = true",
+      "filterActual": "Include_Offline__c = true"
+    },
+    "cscfga__Product_Category__c": {
+      "filter": "Include_Offline__c = true",
+      "filterActual": "Include_Offline__c = true"
+    },
+    "Appointment__c": {
+      "filter": "Assigned_To__r.Salesforce_User__c = {CURRENT USER} AND Status__c != 'Cancelled' AND (Start__c = LAST_N_DAYS:29 OR Start__c = NEXT_N_DAYS:8)",
+      "filterActual": "Assigned_To__r.Salesforce_User__c = {CURRENT USER} AND Status__c != 'Cancelled' AND (Start__c = LAST_N_DAYS:29 OR Start__c = NEXT_N_DAYS:8)",
+      "label": "Appointment",
+      "labelPlural": "Appointments",
+      "sfdc": true,
+      "filteredDeleteSync": false,
+      "useFilteredDeleteSync": true,
+      "filteredDeleteSyncActual": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Opportunity__c",
+          "type": "string"
+        },
+        {
+          "path": "cs_Customer_Address__c",
+          "type": "string"
+        },
+        {
+          "path": "cs_Installation_Address__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": true,
+        "pageLayout": true,
+        "searchLayout": false
+      }
+    },
+    "Configuration": {
+      "isUGC": true,
+      "offlineFields": ["cscfga__Product_Basket__c", "Json"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "cscfga__Product_Basket__c",
+          "type": "string"
+        },
+        {
+          "path": "ThinConfigJson",
+          "type": "string"
+        }
+      ],
+      "standard": true,
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "Opportunity": {
+      "filterActual": "Id IN (SELECT Opportunity__c FROM Appointment__c WHERE Assigned_To__r.Salesforce_User__c = {CURRENT USER} AND Status__c != 'Cancelled' AND (Start__c = LAST_N_DAYS:29 OR Start__c = NEXT_N_DAYS:8))",
+      "customSync": true,
+      "label": "Opportunity",
+      "labelPlural": "Opportunities",
+      "sequence": 1,
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "AccountId",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "Account": {
+      "label": "Account",
+      "labelPlural": "Accounts",
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Primary_Contact__c",
+          "type": "string"
+        }
+      ],
+      "sfdc": false,
+      "standard": true,
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "Contact": {
+      "customSync": true,
+      "label": "Contact",
+      "labelPlural": "Contacts",
+      "sfdc": true,
+      "standard": true,
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "cs_Primary_Contact_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "MobilePhone",
+          "type": "string"
+        },
+        {
+          "path": "Email",
+          "type": "string"
+        },
+        {
+          "path": "AccountId",
+          "type": "string"
+        },
+        {
+          "path": "CS_Address__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "cscfga__Product_Basket__c": {
+      "filter": "cscfga__Opportunity__c IN ({OPPORTUNITY IDS}) AND LastModifiedDate > {LAST SYNC DATE}",
+      "filterActual": "cscfga__Opportunity__c IN ({OPPORTUNITY IDS}) AND LastModifiedDate > {LAST SYNC DATE}",
+      "customSync": true,
+      "filteredDeleteSync": false,
+      "useFilteredDeleteSync": true,
+      "filteredDeleteSyncActual": true,
+      "deleteFilter": "cscfga__Opportunity__c IN ({OPPORTUNITY IDS}) AND Appointment__c != NULL AND Appointment__c IN ({APPOINTMENT__c IDS})",
+      "deleteFilterActual": "cscfga__Opportunity__c IN ({OPPORTUNITY IDS}) AND Appointment__c != NULL AND Appointment__c IN ({APPOINTMENT__c IDS})",
+      "label": "Quote",
+      "labelPlural": "Quotes",
+      "isUGC": true,
+      "offlineFields": [
+        "cfgoffline__Account__c",
+        "Appointment__c",
+        "Uploaded",
+        "LastAccessDate",
+        "PdfUrl",
+        "UploadMessage"
+      ],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Appointment__c",
+          "type": "string"
+        },
+        {
+          "path": "cscfga__Opportunity__c",
+          "type": "string"
+        }
+      ],
+      "sfdc": true,
+      "standard": true,
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Bundle_Part_Association__c": {
+      "label": "CS Bundle Part Association",
+      "labelPlural": "CS Bundle Part Associations",
+      "sfdc": true,
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Bundle__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Active_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Exists_in_Pricebooks__c",
+          "type": "string"
+        },
+        {
+          "path": "Included_In_Regions__c",
+          "type": "string"
+        },
+        {
+          "path": "Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_Code__c",
+          "type": "string"
+        },
+        {
+          "path": "Quantity__c",
+          "type": "floating"
+        },
+        {
+          "path": "Length_Equivalent__c",
+          "type": "floating"
+        },
+        {
+          "path": "Part__c",
+          "type": "floating"
+        },
+        {
+          "path": "Plume_Managment_Part__c",
+          "type": "string"
+        },
+        {
+          "path": "Bundle_Arrangement__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_Arrangement__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_Boiler_Group__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_Record_Type_Name__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_Description__c",
+          "type": "string"
+        },
+        {
+          "path": "Bundle_Type__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": true,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Bundle_Complex_Price_Association__c": {
+      "label": "CS Bundle Complex Price Association",
+      "labelPlural": "CS Bundle Complex Price Associations",
+      "sfdc": true,
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "CS_Bundle__c",
+          "type": "string"
+        },
+        {
+          "path": "CS_Part__c",
+          "type": "string"
+        },
+        {
+          "path": "Lower_Skill_Hours_Limit__c",
+          "type": "floating"
+        },
+        {
+          "path": "Upper_Skill_Hours_Limit__c",
+          "type": "floating"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Part__c": {
+      "label": "CS Part",
+      "labelPlural": "CS Parts",
+      "sfdc": true,
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Active_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Bathroom_Zone__c",
+          "type": "string"
+        },
+        {
+          "path": "Boiler_group__c",
+          "type": "string"
+        },
+        {
+          "path": "Instances_in_LowCost_Pricebook__c",
+          "type": "floating"
+        },
+        {
+          "path": "Exists_in_Pricebooks__c",
+          "type": "string"
+        },
+        {
+          "path": "Flue_Boiler_Groups_Formula__c",
+          "type": "string"
+        },
+        {
+          "path": "Instances_in_Standard_Pricebook__c",
+          "type": "floating"
+        },
+        {
+          "path": "Installation_Pack_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Fuel_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Included_In_Regions__c",
+          "type": "string"
+        },
+        {
+          "path": "Is_Placeholder_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Loft__c",
+          "type": "string"
+        },
+        {
+          "path": "Min_Depth__c",
+          "type": "floating"
+        },
+        {
+          "path": "Min_Height__c",
+          "type": "floating"
+        },
+        {
+          "path": "Min_Width__c",
+          "type": "floating"
+        },
+        {
+          "path": "Orientation__c",
+          "type": "string"
+        },
+        {
+          "path": "Pack_C_Category__c",
+          "type": "string"
+        },
+        {
+          "path": "Plume_Kit_Required__c",
+          "type": "string"
+        },
+        {
+          "path": "Power_Lower__c",
+          "type": "floating"
+        },
+        {
+          "path": "Power_Upper__c",
+          "type": "floating"
+        },
+        {
+          "path": "Radiator_Category__c",
+          "type": "string"
+        },
+        {
+          "path": "Record_Type_Name__c",
+          "type": "string"
+        },
+        {
+          "path": "Roof_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Sequence__c",
+          "type": "string"
+        },
+        {
+          "path": "Specific_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Subcategory__c",
+          "type": "string"
+        },
+        {
+          "path": "System__c",
+          "type": "string"
+        },
+        {
+          "path": "Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Work_without_a_Boiler_Formula__c",
+          "type": "string"
+        },
+        {
+          "path": "Loft_Formula__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_Code__c",
+          "type": "string"
+        },
+        {
+          "path": "Low_Surface_Temp__c",
+          "type": "string"
+        },
+        {
+          "path": "Flue_Extra_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Arrangement__c",
+          "type": "string"
+        },
+        {
+          "path": "Filling_Loop_Available_Boilers__c",
+          "type": "string"
+        },
+        {
+          "path": "Model__c",
+          "type": "string"
+        },
+        {
+          "path": "Group__c",
+          "type": "string"
+        },
+        {
+          "path": "Output__c",
+          "type": "floating"
+        },
+        {
+          "path": "Manufacturer__c",
+          "type": "string"
+        },
+        {
+          "path": "Instances_in_SmallCommercial__c",
+          "type": "floating"
+        },
+        {
+          "path": "Project_Code__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": true,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "Postcode_Sector__c": {
+      "filter": "Type__c = 'Sales'",
+      "filterActual": "Type__c = 'Sales'",
+      "filteredDeleteSync": false,
+      "useFilteredDeleteSync": true,
+      "filteredDeleteSyncActual": true,
+      "label": "Postcode Sector",
+      "labelPlural": "Postcode Sectors",
+      "sfdc": true,
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Code__c",
+          "type": "string"
+        },
+        {
+          "path": "Type__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "ProductHolding__c": {
+      "customSync": true,
+      "label": "Product Holding",
+      "labelPlural": "Product Holdings",
+      "sfdc": true,
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Account__c",
+          "type": "string"
+        },
+        {
+          "path": "Status__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Part_Association__c": {
+      "label": "CS Part Association",
+      "labelPlural": "CS Part Associations",
+      "sfdc": true,
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Part_1__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_2__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_2_Code__c",
+          "type": "string"
+        },
+        {
+          "path": "Quantity__c",
+          "type": "floating"
+        },
+        {
+          "path": "Part_2_Description__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_2_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_2_Active_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Part_2_Exists_in_Pricebooks__c",
+          "type": "string"
+        },
+        {
+          "path": "Part_2_Included_In_Regions__c",
+          "type": "string"
+        },
+        {
+          "path": "Relationship__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": true,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Part_Price__c": {
+      "label": "CS Part Price",
+      "labelPlural": "CS Part Prices",
+      "sfdc": true,
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "CS_Pricebook_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "End_Date__c",
+          "type": "string"
+        },
+        {
+          "path": "Part__c",
+          "type": "string"
+        },
+        {
+          "path": "District__c",
+          "type": "string"
+        },
+        {
+          "path": "District_Code__c",
+          "type": "string"
+        },
+        {
+          "path": "District_Name__c",
+          "type": "string"
+        },
+        {
+          "path": "Start_Date__c",
+          "type": "string"
+        },
+        {
+          "path": "End_Date_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Start_Date_Formula__c",
+          "type": "floating"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Bundle__c": {
+      "label": "CS Bundle",
+      "labelPlural": "CS Bundles",
+      "sfdc": true,
+      "offlineFields": [],
+      "indexSpec": [
+        {
+          "path": "Colour__c",
+          "type": "string"
+        },
+        {
+          "path": "Control_Group__c",
+          "type": "string"
+        },
+        {
+          "path": "Customer_to_Arrange__c",
+          "type": "string"
+        },
+        {
+          "path": "Earth_System_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Green_Deal_Option__c",
+          "type": "string"
+        },
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Location_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Orientation__c",
+          "type": "string"
+        },
+        {
+          "path": "Plume_Required__c",
+          "type": "string"
+        },
+        {
+          "path": "Power_Input_Max__c",
+          "type": "floating"
+        },
+        {
+          "path": "Power_Input_Min__c",
+          "type": "floating"
+        },
+        {
+          "path": "Pumped__c",
+          "type": "string"
+        },
+        {
+          "path": "Raised__c",
+          "type": "string"
+        },
+        {
+          "path": "RCD__c",
+          "type": "string"
+        },
+        {
+          "path": "Roof_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Route_Location__c",
+          "type": "string"
+        },
+        {
+          "path": "Soakaway_Required__c",
+          "type": "string"
+        },
+        {
+          "path": "Socket_and_See_Result__c",
+          "type": "string"
+        },
+        {
+          "path": "System_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Termination_Location__c",
+          "type": "string"
+        },
+        {
+          "path": "Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Visible_Earth__c",
+          "type": "string"
+        },
+        {
+          "path": "System_ID__c",
+          "type": "string"
+        },
+        {
+          "path": "Working_VOELCB__c",
+          "type": "string"
+        },
+        {
+          "path": "Drained__c",
+          "type": "string"
+        },
+        {
+          "path": "Electric_Work_Type__c",
+          "type": "string"
+        },
+        {
+          "path": "Fitting_Pack__c",
+          "type": "string"
+        },
+        {
+          "path": "Arrangement__c",
+          "type": "string"
+        },
+        {
+          "path": "Configuration__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": true,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Allowance_Part_Availability__c": {
+      "label": "CS Allowance Part Availability",
+      "labelPlural": "CS Allowance Part Availabilities",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "CS_Allowance__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Allowance_Category_Availability__c": {
+      "label": "CS Allowance Category Availability",
+      "labelPlural": "CS Allowance Category Availabilities",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "CS_Allowance__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Allowance_Availability__c": {
+      "label": "CS Allowance Availability",
+      "labelPlural": "CS Allowance Availabilities",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "CS_Allowance__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Allowance_Employee_Group__c": {
+      "label": "CS Allowance Employee Group Availability",
+      "labelPlural": "CS Allowance Empl Group Availabilities",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "CS_Allowance__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Allowance_Compatibility__c": {
+      "label": "CS Allowance Compatibility",
+      "labelPlural": "CS Allowance Compatibilities",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Child_Allowance__c",
+          "type": "string"
+        },
+        {
+          "path": "Parent_Allowance__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Part_Material__c": {
+      "label": "CS Part Material",
+      "labelPlural": "CS Part Materials",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Part__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Part_Skill__c": {
+      "label": "CS Part Skill",
+      "labelPlural": "CS Part Skills",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Part__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Material__c": {
+      "label": "CS Material",
+      "labelPlural": "CS Materials",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Skill__c": {
+      "label": "CS Skill",
+      "labelPlural": "CS Skills",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_VAT_Code__c": {
+      "label": "CS VAT Code",
+      "labelPlural": "CS VAT Codes",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Allowance__c": {
+      "label": "CS Allowance",
+      "labelPlural": "CS Allowances",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Minimum_Threshold__c",
+          "type": "floating"
+        },
+        {
+          "path": "Minimum_Age__c",
+          "type": "floating"
+        },
+        {
+          "path": "Start_Date__c",
+          "type": "string"
+        },
+        {
+          "path": "End_Date__c",
+          "type": "string"
+        },
+        {
+          "path": "Expiry_Date__c",
+          "type": "string"
+        },
+        {
+          "path": "Requires_Voucher_ID_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Requires_Employee_ID_Formula__c",
+          "type": "floating"
+        },
+        {
+          "path": "Valid_Product_Types__c",
+          "type": "string"
+        },
+        {
+          "path": "Available_for_Products__c",
+          "type": "string"
+        },
+        {
+          "path": "Product_Interest__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "Employee_Group__c": {
+      "filter": "RecordTypeName__c = 'Sales'",
+      "filterActual": "RecordTypeName__c = 'Sales'",
+      "label": "Group Employee",
+      "filteredDeleteSync": false,
+      "useFilteredDeleteSync": true,
+      "filteredDeleteSyncActual": true,
+      "labelPlural": "Group Employees",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Employee__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "Employee__c": {
+      "filter": "Is_Active_Salesforce_User__c = 'true'",
+      "filterActual": "Is_Active_Salesforce_User__c = 'true'",
+      "label": "Employee",
+      "filteredDeleteSync": false,
+      "useFilteredDeleteSync": true,
+      "filteredDeleteSyncActual": true,
+      "labelPlural": "Employees",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Salesforce_User__c",
+          "type": "string"
+        },
+        {
+          "path": "Employee_Number__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    },
+    "CS_Template_Section_Header__c": {
+      "label": "CS Template Section Header",
+      "labelPlural": "CS Template Section Headers",
+      "sfdc": true,
+      "offlineFields": ["Updated"],
+      "indexSpec": [
+        {
+          "path": "Id",
+          "type": "string"
+        },
+        {
+          "path": "Sequence__c",
+          "type": "floating"
+        },
+        {
+          "path": "Show_group_totals__c",
+          "type": "string"
+        },
+        {
+          "path": "Show_item_totals__c",
+          "type": "string"
+        }
+      ],
+      "fetchMetadata": {
+        "sobject": false,
+        "pageLayout": false,
+        "searchLayout": false
+      }
+    }
+  },
+  "lookupQueries": {
+    "Lookup(AccountQuery)": "SELECT {Account:_soup} FROM {Account} WHERE {Account:Id} = '[Appointment Account Id]'",
+    "Lookup(AppointmentQuery)": "SELECT {Appointment__c:_soup} FROM {Appointment__c} WHERE {Appointment__c:Id} = '[Appointment Id]'",
+    "Lookup(BoilerCylinderPartAssociationQuery)": "SELECT {CS_Part_Association__c:_soup} FROM {CS_Part_Association__c} WHERE {CS_Part_Association__c:Part_2_Type__c} = 'CST' AND {CS_Part_Association__c:Part_1__c} = '[Boiler Part Id]' AND {CS_Part_Association__c:Part_2_Active_Formula__c} = 1 AND {CS_Part_Association__c:Part_2_Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part_Association__c:Relationship__c} = 'Has Default'",
+    "Lookup(BoilerProgrammerPartAssociationQuery)": "SELECT {CS_Part_Association__c:_soup} FROM {CS_Part_Association__c} WHERE {CS_Part_Association__c:Part_1__c} = '[Boiler Part Id]' AND {CS_Part_Association__c:Part_2_Type__c} = 'PRG' AND {CS_Part_Association__c:Part_2_Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part_Association__c:Part_2_Active_Formula__c} = 1 AND {CS_Part_Association__c:Relationship__c} = 'Has Default'",
+    "Lookup(BoilerQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Power_Upper__c} >= '[Total Heat Loss Adjusted]' AND {CS_Part__c:Power_Lower__c} <= '[Total Heat Loss Adjusted]' AND {CS_Part__c:Bathroom_Zone__c} <= '[Bathroom Zone]' AND {CS_Part__c:Fuel_Type__c} = '[Fuel Type]' AND {CS_Part__c:Record_Type_Name__c} = 'Boiler' AND {CS_Part__c:Loft_Formula__c} LIKE '%[Loft]%' AND {CS_Part__c:Min_Height__c} <= '[Height]' AND {CS_Part__c:Min_Width__c} <= '[Width]' AND {CS_Part__c:Min_Depth__c} <= '[Depth]' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region]%' AND {CS_Part__c:System__c} = '[System Type Required]'",
+    "Lookup(BoilerThermostatPartAssociationQuery)": "SELECT {CS_Part_Association__c:_soup} FROM {CS_Part_Association__c} WHERE {CS_Part_Association__c:Part_2_Active_Formula__c} = 1 AND {CS_Part_Association__c:Relationship__c} = 'Has Default' AND {CS_Part_Association__c:Part_2_Type__c} = 'RST' AND {CS_Part_Association__c:Part_1__c} = '[Boiler Part Id]' AND {CS_Part_Association__c:Part_2_Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part_Association__c:Part_2_Included_In_Regions__c} LIKE '%[Geographical Region]%'",
+    "Lookup(BundleQuery)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Location_Type__c} = '[Location Type]' AND {CS_Bundle__c:System_Type__c} = '[System Type]' AND {CS_Bundle__c:Power_Input_Max__c} > '[Total Heat Loss Adjusted]' AND {CS_Bundle__c:Power_Input_Min__c} <= '[Total Heat Loss Adjusted]'",
+    "Lookup(CondensateQuery)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Termination_Location__c} = '[Termination Point]' AND {CS_Bundle__c:Soakaway_Required__c} = '[Soakaway Required]' AND {CS_Bundle__c:Type__c} = 'Condensate' AND {CS_Bundle__c:Pumped__c} = '[Condensate Pumped]' AND {CS_Bundle__c:Colour__c} = '[Pipework Colour]'",
+    "Lookup(ContactLookupQuery)": "SELECT {Contact:_soup} FROM {Contact} WHERE {Contact:AccountId} = '[Appointment Account Id]' AND {Contact:cs_Primary_Contact_Formula__c} = 1",
+    "Lookup(ControlBundleQuery)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Control_Group__c} = '[Control Group]' AND {CS_Bundle__c:System_ID__c} = '[System Id]' AND {CS_Bundle__c:Type__c} = 'Control'",
+    "Lookup(CylinderThermostatQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Type__c} = 'CST' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographical Region]%' AND {CS_Part__c:Specific_Formula__c} = 0 AND {CS_Part__c:Record_Type_Name__c} = 'Control'",
+    "Lookup(DefaultControlBundlePartCylinderQuery)": "SELECT {CS_Bundle_Part_Association__c:_soup} FROM {CS_Bundle_Part_Association__c} WHERE {CS_Bundle_Part_Association__c:Part_Type__c} = 'CST' AND {CS_Bundle_Part_Association__c:Type__c} = 'Default' AND {CS_Bundle_Part_Association__c:Bundle__c} = '[Control Bundle Id]' AND {CS_Bundle_Part_Association__c:Active_Formula__c} = 1 AND {CS_Bundle_Part_Association__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%'",
+    "Lookup(DefaultControlBundlePartProgrammerQuery)": "SELECT {CS_Bundle_Part_Association__c:_soup} FROM {CS_Bundle_Part_Association__c} WHERE {CS_Bundle_Part_Association__c:Bundle__c} = '[Control Bundle Id]' AND {CS_Bundle_Part_Association__c:Part_Type__c} = 'PRG' AND {CS_Bundle_Part_Association__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Bundle_Part_Association__c:Included_In_Regions__c} LIKE '%[Geographical Region]%' AND {CS_Bundle_Part_Association__c:Active_Formula__c} = 1 AND {CS_Bundle_Part_Association__c:Type__c} = 'Default'",
+    "Lookup(DefaultControlBundlePartThermostatQuery)": "SELECT {CS_Bundle_Part_Association__c:_soup} FROM {CS_Bundle_Part_Association__c} WHERE {CS_Bundle_Part_Association__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Bundle_Part_Association__c:Included_In_Regions__c} LIKE '%[Geographical Region]%' AND {CS_Bundle_Part_Association__c:Type__c} = 'Default' AND {CS_Bundle_Part_Association__c:Bundle__c} = '[Control Bundle Id]' AND {CS_Bundle_Part_Association__c:Part_Type__c} = 'RST' AND {CS_Bundle_Part_Association__c:Active_Formula__c} = 1",
+    "Lookup(EarthingQuery)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Type__c} = 'Earthing' AND {CS_Bundle__c:Earth_System_Type__c} = '[Earth System Type]' AND {CS_Bundle__c:Visible_Earth__c} = '[Visible Earth]' AND {CS_Bundle__c:Socket_and_See_Result__c} = '[Socket and See Result]' AND {CS_Bundle__c:Customer_to_Arrange__c} = '[Customer to Arrange]' AND {CS_Bundle__c:Working_VOELCB__c} = '[Working VOELCB]' AND {CS_Bundle__c:RCD__c} = '[RCD]'",
+    "Lookup(EmployeeLookupQuery)": "SELECT {Employee__c:_soup} FROM {Employee__c} WHERE {Employee__c:Id} = '[Assigned To Employee]'",
+    "Lookup(FillingLoopQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Filling_Loop_Available_Boilers__c} LIKE '%[Part Code]%'",
+    "Lookup(FlueBundleQueryOLD)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Type__c} = 'Flue' AND {CS_Bundle__c:Orientation__c} = '[Orientation]' AND {CS_Bundle__c:Plume_Required__c} = '[Plume Kit Required]' AND {CS_Bundle__c:Roof_Type__c} = '[Roof Type]' AND {CS_Bundle__c:Route_Location__c} = '[Route Location]'",
+    "Lookup(FlueBundleQuery)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Configuration__c} = '[Configuration]' AND {CS_Bundle__c:Arrangement__c} = '[Arrangement]' AND {CS_Bundle__c:Type__c} = 'Flue'",
+    "Lookup(FlueBundleQueryMultiSelect)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Configuration__c} = '[Configuration]' AND {CS_Bundle__c:Arrangement__c} = '[Arrangement]' AND {CS_Bundle__c:Type__c} = 'Multiselect'",
+    "Lookup(GreenDealBundleQuery)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Type__c} = 'Green Deal' AND {CS_Bundle__c:Green_Deal_Option__c} = '[Homecare]'",
+    "Lookup(GreenDealBundleQueryNew)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Type__c} = 'Green Deal' AND {CS_Bundle__c:Green_Deal_Option__c} = '[Homecare]'",
+    "Lookup(NoAsbestosPartQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Type__c} = 'No Asbestos' AND {CS_Part__c:Active_Formula__c} = 1",
+    "Lookup(NoScaffoldingPartQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Type__c} = 'No Scaffolding' AND {CS_Part__c:Active_Formula__c} = 1",
+    "Lookup(OpportunityQuery)": "SELECT {Opportunity:_soup} FROM {Opportunity} WHERE {Opportunity:Id} = '[CHI Lead Id]'",
+    "Lookup(PackCInstallationPackQry)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Work_without_a_Boiler_Formula__c} LIKE '%[WWB]%' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Subcategory__c} = '[Pack C Subcategory]' AND {CS_Part__c:Pack_C_Category__c} = '[Pack C Category]' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographical Region]%' AND {CS_Part__c:Installation_Pack_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%'",
+    "Lookup(PacksCQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Work_without_a_Boiler_Formula__c} LIKE '%[WWB]%' AND {CS_Part__c:Installation_Pack_Formula__c} = 0 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographical Region]%' AND {CS_Part__c:Pack_C_Category__c} = '[Pack C Category]' AND {CS_Part__c:Subcategory__c} = '[Pack C Subcategory]' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%'",
+    "Lookup(PacksCAllQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Work_without_a_Boiler_Formula__c} LIKE '%[WWB]%' AND {CS_Part__c:Installation_Pack_Formula__c} = 0 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%' AND {CS_Part__c:Pack_C_Category__c} != '' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%'",
+    "Lookup(PartAsbestosQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Type__c} = 'Asbestos' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region]%' AND {CS_Part__c:Active_Formula__c} = 1",
+    "Lookup(PartEarthingQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Type__c} = 'Earthing' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region]%' AND {CS_Part__c:Active_Formula__c} = 1",
+    "Lookup(PartFlueQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Roof_Type__c} = '[Roof Type]' AND {CS_Part__c:Is_Placeholder_Formula__c} = 1 AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Record_Type_Name__c} = 'Flue' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Plume_Kit_Required__c} = '[Plume Kit Required]' AND {CS_Part__c:Orientation__c} = '[Orientation]' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographical Region]%'",
+    "Lookup(PartFlueBoilerQueryOLD)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Flue_Boiler_Groups_Formula__c} LIKE '%[Boiler Group]%' AND {CS_Part__c:Record_Type_Name__c} = 'Flue' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographical Region]%'",
+    "Lookup(PartFlueBoilerQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Flue_Boiler_Groups_Formula__c} LIKE '%[Boiler Group]%' AND {CS_Part__c:Record_Type_Name__c} = 'Flue' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographical Region]%' AND {CS_Part__c:Arrangement__c} LIKE '%[Arrangement]%' AND {CS_Part__c:Flue_Extra_Formula__c} = 1",
+    "Lookup(PartFusedSpurInstallFusedRCDQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Part_Code__c} = 'P2976'",
+    "Lookup(PartFusedSpurSupplyAndFitQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Part_Code__c} = 'P193' AND {CS_Part__c:Active_Formula__c} = 1",
+    "Lookup(PartHomecareLookupQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Part_Code__c} = '[Homecare Part Number]'",
+    "Lookup(PartPriceLookupQuery)": "SELECT {CS_Part_Price__c:_soup} FROM {CS_Part_Price__c} WHERE {CS_Part_Price__c:CS_Pricebook_Type__c} = '[Pricebook Type]' AND {CS_Part_Price__c:District_Code__c} IS NULL AND {CS_Part_Price__c:Part__c} = '[Placeholder]' AND ({CS_Part_Price__c:Start_Date_Formula__c} = 0 OR {CS_Part_Price__c:Start_Date_Formula__c} < '[Quote Creation Date]') AND ({CS_Part_Price__c:End_Date_Formula__c} = 0 OR {CS_Part_Price__c:End_Date_Formula__c} >= '[Quote Creation Date]')",
+    "Lookup(PartPropertyTypePackQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Part_Code__c} = '[Property Type Pack]' AND {CS_Part__c:Active_Formula__c} = 1",
+    "Lookup(PartRadiatorValveQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%' AND {CS_Part__c:Subcategory__c} LIKE '%Radiator%' AND {CS_Part__c:Pack_C_Category__c} = 'System Controls'",
+    "Lookup(PartScaffoldingQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%' AND {CS_Part__c:Type__c} = 'Scaffolding'",
+    "Lookup(PartSmartMeterTCconfig)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Part_Code__c} = 'SM04'",
+    "Lookup(PlaceholderRadiatorLookupQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region]%' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Record_Type_Name__c} = 'Radiator' AND {CS_Part__c:Radiator_Category__c} LIKE '%[Radiator Category]%' AND {CS_Part__c:Is_Placeholder_Formula__c} = 1 AND {CS_Part__c:Active_Formula__c} = 1",
+    "Lookup(PostcodeSectorQuery)": "SELECT {Postcode_Sector__c:_soup} FROM {Postcode_Sector__c} WHERE {Postcode_Sector__c:Code__c} = '[Postcode Sector]' AND {Postcode_Sector__c:Type__c} = 'Sales'",
+    "Lookup(ProgrammerQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographical Region]%' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Record_Type_Name__c} = 'Control' AND {CS_Part__c:Type__c} = 'PRG' AND {CS_Part__c:Specific_Formula__c} = 0",
+    "Lookup(RadiatorFittingPackQuery)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Type__c} = 'Fitting Pack' AND {CS_Bundle__c:Fitting_Pack__c} = '[Fitting Pack]'",
+    "Lookup(RadiatorLookuopQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Is_Placeholder_Formula__c} = 0 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region]%' AND {CS_Part__c:Record_Type_Name__c} = 'Radiator' AND {CS_Part__c:Radiator_Category__c} = '[Radiator Category]' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Low_Surface_Temp__c} = '[Low Surface Temp]'",
+    "Lookup(RadiatorPriceQuery)": "SELECT {CS_Part_Price__c:_soup} FROM {CS_Part_Price__c} WHERE {CS_Part_Price__c:CS_Pricebook_Type__c} = '[Pricebook Type]' AND {CS_Part_Price__c:Part__c} = '[Radiator]'",
+    "Lookup(RequiredAsbestosPartQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Type__c} = 'Required Asbestos'",
+    "Lookup(Thermostat1Query)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Specific_Formula__c} = 0 AND {CS_Part__c:Type__c} = 'RST' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographical Region]%' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Record_Type_Name__c} = 'Control' AND ({CS_Part__c:System__c} = '[System Id]' OR {CS_Part__c:System__c} = 'All')",
+    "Lookup(WWBBundleLookupQuery)": "SELECT {CS_Bundle__c:_soup} FROM {CS_Bundle__c} WHERE {CS_Bundle__c:Electric_Work_Type__c} = '[Electric Work Type]' AND {CS_Bundle__c:Drained__c} = '[System To Be Drained]' AND {CS_Bundle__c:Type__c} = 'WWB'",
+    "Lookup(PipeInBundleQuery)": "SELECT {CS_Bundle_Part_Association__c:_soup} FROM {CS_Bundle_Part_Association__c} WHERE {CS_Bundle_Part_Association__c:Bundle__c} = '[Core Bundle ID]' AND {CS_Bundle_Part_Association__c:Part_Code__c} = '[PipePackID]'",
+    "Lookup(CylinderLookupQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Type__c} = '[Cylinder Type]' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%'",
+    "Lookup(ShowerLookupQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Type__c} = '[Shower Type]' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%'",
+    "Lookup(FireLookupQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Fuel_Type__c} = '[Fire Type]' AND {CS_Part__c:Part_Code__c} LIKE '%CAPF%' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%'",
+    "Lookup(HearthLookupQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Type__c} = '[Hearth Lookup Type]' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%'",
+    "Lookup(PanelLookupQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Type__c} = '[Job Type]' AND {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%'",
+    "Lookup(RadiatorLookUpQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Is_Placeholder_Formula__c} = 0 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region]%' AND {CS_Part__c:Record_Type_Name__c} = 'Radiator' AND {CS_Part__c:Radiator_Category__c} = '[Radiator Category]' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Active_Formula__c} = 1",
+    "Lookup(ActualRadiatorLookUpQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Is_Placeholder_Formula__c} = 0 AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%' AND {CS_Part__c:Group__c} = 'RAD' AND {CS_Part__c:Model__c} LIKE '%[Model Range]%' AND {CS_Part__c:Manufacturer__c} LIKE '%[Manufacturer]%' AND {CS_Part__c:Output__c} <= '[PowerUpper]' AND {CS_Part__c:Output__c} >= '[PowerLower]' AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Active_Formula__c} = 1",
+    "Lookup(AvailableFluePartsQuery)": "SELECT {CS_Bundle_Part_Association__c:_soup} FROM {CS_Bundle_Part_Association__c} WHERE {CS_Bundle_Part_Association__c:Bundle_Type__c} = 'Multiselect' AND {CS_Bundle_Part_Association__c:Bundle_Arrangement__c} = '[Arrangement]' AND {CS_Bundle_Part_Association__c:Active_Formula__c} = 1 AND {CS_Bundle_Part_Association__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Bundle_Part_Association__c:Part_Boiler_Group__c} LIKE '%[Boiler Group]%' AND {CS_Bundle_Part_Association__c:Included_In_Regions__c} LIKE '%[Geographical Region]%' AND {CS_Bundle_Part_Association__c:Part_Record_Type_Name__c} = 'Flue'",
+    "Lookup(suspectMaterialRemovalPackQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%' AND {CS_Part__c:Type__c} = 'Asbestos' AND {CS_Part__c:Part_Code__c} NOT IN ('P1972','P1973','PP26','PP27','PP28','PP29')",
+    "Lookup(AdditionalHivePartQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE ({CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Type__c} = '[Product Category]' AND {CS_Part__c:Project_Code__c} IN ([Included Projects])) OR ({CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%' AND {CS_Part__c:Type__c} = '[Product Category]')",
+    "Lookup(ManualRadiatorValveQuery)": "SELECT {CS_Part__c:_soup} FROM {CS_Part__c} WHERE {CS_Part__c:Active_Formula__c} = 1 AND {CS_Part__c:Exists_in_Pricebooks__c} LIKE '%[Pricebook Type]%' AND {CS_Part__c:Included_In_Regions__c} LIKE '%[Geographic Region Shadow]%' AND {CS_Part__c:Subcategory__c} = 'Standard Radiator Valves'",
+    "Lookup(OptionalPartsQuery)": "SELECT {CS_Part_Association__c:_soup} FROM {CS_Part_Association__c} WHERE {CS_Part_Association__c:Relationship__c} = 'Optional' AND {CS_Part_Association__c:Part_1__c} = '[Boiler Id]'"
+  }
+}

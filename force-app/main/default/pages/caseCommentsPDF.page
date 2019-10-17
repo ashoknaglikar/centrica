@@ -1,0 +1,69 @@
+<apex:page standardController="case" extensions="casecommentscontroller" sidebar="false" showHeader="false" id="page" renderAs="PDF">
+<html>
+
+        <!-- Change request CHI CR-001422
+        This page was created to be opened from the case page as a PDF to allow priting 
+        or emailing to customer rather than copying and pasting from the standard page.
+        Writter 28/06/2015 -->
+
+<apex:form >
+
+    <p align="right">
+    <apex:image value="{!$Label.Logo_BG_header}" alt="Company Logo" height="auto" width="187"/>
+    </p>
+
+    <apex:pageBlock title="Case Details: {!case.CaseNumber}">
+    
+        <!-- Header section holding small number of case details -->    
+        <Table width="100%" align="center">
+            <tr>
+                <td width="50%">
+                    <apex:outputlabel Value="Case: " style="font-weight:bold" /> 
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <apex:outputField value="{!case.CaseNumber}" />
+                </td>
+
+                <td width="50%">
+                    <apex:outputlabel value="Contact: " style="font-weight:bold" />
+                    &nbsp;&nbsp;
+                    <apex:outputField value="{!case.contact.name}" />
+                </td>
+            </tr>
+            
+            <tr>
+                <td width="50%">
+                    <apex:outputlabel value="Status: " style="font-weight:bold" />
+                    &nbsp;&nbsp;
+                    <apex:outputField value="{!case.status}" />
+                </td>
+                <td width="50%">
+                    <apex:outputlabel Value="Account: " style="font-weight:bold" /> 
+                    &nbsp;&nbsp;
+                    <apex:outputField value="{!case.account.name}" />
+                </td>
+            </tr>
+        </Table>
+            
+            <hr></hr>
+    </apex:pageBlock>
+    
+    <apex:pageBlock title="Case Comments:" >
+        
+        <!-- List of all case comments linked to this case --> 
+        <apex:repeat value="{!comments_list}" var="c">
+            <apex:outputfield title="Comment" value="{!c.commentbody}" id="body"/><br/>
+            <p><b>Created By: </b>
+            <apex:outputText value="{!c.createdBy.name}" id="name"/>
+              -  
+            <apex:outputText value="{0,date,dd MMMM yyyy}">
+                <apex:param value="{!c.createddate}" id="date" /> 
+            </apex:outputText></p>
+            <hr></hr>
+        </apex:repeat>
+
+    </apex:pageBlock>
+
+</apex:form>
+
+</html>
+</apex:page>

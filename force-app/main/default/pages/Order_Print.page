@@ -1,0 +1,165 @@
+<apex:page standardController="order__c" renderAs="PDF">
+    <html>
+        <head>
+            <style type="text/css" media="print,screen">
+                @page {
+                    margin:0.25in;
+                    font-face:Arial;
+                    @top-left {content: "Supplier: {!order__c.Supplier__r.Name}";font-size: 8pt;}
+                    @top-center{content: "Order Number: {!order__c.SAP_Number__c} / {!order__c.Amendment_Number_Txt__c}";font-size: 8pt;}
+                    @top-right{content: "Enquiry Number : {!order__c.Job__r.CHI_Lead__r.CHI_Lead_Id__c}";font-size: 8pt;}
+                    @bottom-center {
+                        content: "British Gas Services Limited Registered in England No.3141243 Registered Office Millstream, Maidenhead Road, Windsor, Berkshire, SL4 5GD.";
+                        font-size: 8pt;
+                    }
+                    @bottom-right {
+                        content: "Page " counter(page) "/" counter(pages);
+                        font-size: 8pt;
+                    }
+                } 
+                body{
+                    font-family:Arial;
+                    color:black;
+                    font-size: 8pt;
+                }
+                Table.Sample {
+                    
+                }
+                Table.Sample Td {
+                    Color: Black;
+                }
+                Table.Sample Tr.D0 Td {
+                    Background-color: black;
+                }
+    
+                Table.Sample Tr.D1 Th {
+                    Background-color: #fcf6cf;
+                    
+                }
+            </style>
+        </head>
+        <body>
+
+            <Table Class="Sample" Width="100%" Border="0">
+                <Tr Class="PO">
+                   <Td Width="25%" Align="Center"><B><Font Size="24">Purchase Order</Font></B></Td>
+                </Tr>
+                <HR/>
+                <Tr Class="D0">
+                   <Td Height="10" Colspan="4" Align="Left"><B><U>Order Details</U></B></Td>
+                </Tr>
+                <Tr>
+                    <Td Width="15%" ><B><Font Size="2" ><apex:outputLabel value="Supplier: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Supplier__r.Name}" /></Font></Td>
+                    <Td Width="15%" ><B><Font Size="2" ><apex:outputLabel value="Order Date: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Order_Date__c}" /></Font></Td>
+                </Tr>
+                <Tr>
+                    <Td Width="15%"><B><Font Size="2" ><apex:outputLabel value="Supplier Number: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Supplier__r.Supplier_Num__c}" /></Font></Td>  
+                    <Td Width="15%"><B><Font Size="2" ><apex:outputLabel value="Order Value: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Order_Value_Text__c}" /></Font></Td> 
+                </Tr>
+                <Tr Class="D0">
+                   <Td Height="10" Colspan="4" Align="Left"><B><U>Job Details</U></B></Td>
+                </Tr>
+                <Tr>
+                    <Td Width="15%" ><B><Font Size="2" ><apex:outputLabel value="Customer Name: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Job__r.Customer_Name__c}" /></Font></Td>
+                    <Td Width="15%"><B><Font Size="2" ><apex:outputLabel value="Job Number: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Job__r.CHI_Lead__r.CHI_Lead_Id__c}" /></Font></Td>  
+                </Tr>
+                <Tr>
+                    <Td Width="15%" ><B><Font Size="2" ><apex:outputLabel value="Installation Address: "/></Font></B></Td>
+                    <Td style="word-wrap=break-word" width="35%"><Font Size="2" >{!order__c.Job__r.CHI_Lead__r.Account.BillingStreet} {!order__c.Job__r.CHI_Lead__r.Account.BillingCity} {!order__c.Job__r.CHI_Lead__r.Account.BillingState} {!order__c.Job__r.CHI_Lead__r.Account.BillingCountry} {!order__c.Job__r.CHI_Lead__r.Account.BillingPostalCode} </Font></Td>
+                    <Td Width="15%"><B><Font Size="2" ><apex:outputLabel value="Installation Date: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Job__r.Installation_Date__c}" /></Font></Td>    
+                </Tr>
+                <Tr>
+                    <Td Width="15%" ><B><Font Size="2" ><apex:outputLabel value="Home Phone: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Job__r.CHI_Lead__r.Account.Primary_Contact__r.HomePhone}" /></Font></Td>
+                    <Td Width="15%"><B><Font Size="2" ><apex:outputLabel value="Work Phone: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Job__r.CHI_Lead__r.Account.Primary_Contact__r.OtherPhone}" /></Font></Td>   
+                </Tr>
+                <Tr>
+                    <Td Width="15%" ><B><Font Size="2" ><apex:outputLabel value="Delivery Date: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Job_Delivery_Date__c}" /></Font></Td>
+                    <Td Width="15%"><B><Font Size="2" ><apex:outputLabel value="Delivery Slot: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Delivery_Slot__c}" /></Font></Td>   
+                </Tr>
+                <Tr>
+                    <Td Width="15%" ><B><Font Size="2" ><apex:outputLabel value="Planner Name: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Job__r.PlannerName__c}" /></Font></Td>
+                    <Td Width="15%"><B><Font Size="2" ><apex:outputLabel value="Planner Email: "/></Font></B></Td>
+                    <Td><Font Size="2" ><apex:outputField value="{!order__c.Job__r.Planner_Email_Address__c}" /></Font></Td>   
+                </Tr>
+                
+                <apex:outputPanel rendered="{!if(order__c.Type__c == 'Material', true, false)}">
+                    <Tr Class="D0">
+                        <Td Width="15%"><B>Delivery Notes:</B></Td>
+                        <Td Height="10" Colspan="3" Align="Left" style="word-wrap=break-word">
+                            <apex:outputField value="{!order__c.Job__r.Delivery_Notes__c}" />
+                        </Td>
+                    </Tr>
+                </apex:outputPanel>
+                
+                <apex:outputPanel rendered="{!if(order__c.Type__c == 'Work', true, false)}">
+                    <Tr Class="D0">
+                        <Td Width="15%"><B>Installer Notes:</B></Td>
+                        <Td Height="10" Colspan="3" Align="Left" style="word-wrap=break-word">
+                            <apex:outputField value="{!order__c.Job__r.Installer_Notes__c}" />
+                        </Td>
+                    </Tr>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!if(order__c.Type__c == 'Work', true, false)}">
+                    <Tr Class="D0">
+                        <Td Width="15%"><B>Installation Special Instructions:</B></Td>
+                        <Td Height="10" Colspan="3" Align="Left" style="word-wrap=break-word">
+                            <apex:outputField value="{!order__c.Job__r.Installation_Special_Instructions__c}" />
+                        </Td>
+                    </Tr>
+                </apex:outputPanel>
+                
+            </Table>
+            <HR/>
+           <TABLE WIDTH="100%" BORDER="0">
+            <TR>
+            <TH width="20%" style="word-wrap=break-word"><FONT SIZE="2">Item Num</FONT></TH>
+            <TH width="30%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>Description</CENTER></FONT></TH>
+            <TH width="12%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>Qty Ordered</CENTER></FONT></TH>
+            <TH width="12%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>Unit Price</CENTER></FONT></TH>
+            <TH width="12%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>Total Price</CENTER></FONT></TH>
+            <TH width="12%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>Status</CENTER></FONT></TH>
+            
+        </TR>
+        <TR >
+            <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+        </TR>
+        <apex:repeat value="{!order__c.Order_Line_Items__r}" var="objorderline">
+            <TR>
+                <TD width="20%"><FONT SIZE="2">{!objorderline.Actual_Code__c}</FONT></TD>
+                <TD width="30%" style="word-wrap=break-word"><FONT SIZE="2">{!objorderline.Description__c}</FONT></TD>
+                <TD width="12%" Align="Center"><FONT SIZE="2"><apex:outputField value="{!objorderline.Units__c}" rendered="{!if(order__c.Type__c == 'Material', true, false)}"/><apex:outputField value="{!objorderline.Work_code_Units__c}" rendered="{!if(order__c.Type__c == 'Work', true, false)}"/></FONT></TD>
+                <TD width="12%" Align="Center"><FONT SIZE="2"><apex:outputField value="{!objorderline.P5_Unit_Price_c__c}" /></FONT></TD>
+                <TD width="12%" Align="Center"><FONT SIZE="2">£ <apex:outputField value="{!objorderline.Total_Amount__c}" /></FONT></TD>
+                <TD width="12%" Align="Center"><FONT SIZE="2">{!objorderline.P5_Status_c__c}</FONT></TD>
+            </TR>
+        </apex:repeat>
+        <TR >
+            <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+        </TR>
+        <TR>
+                <TD width="20%"><FONT SIZE="2"></FONT></TD>
+                <TD width="30%" style="word-wrap=break-word"><FONT SIZE="2"></FONT></TD>
+                <TD width="12%" Align="Center"><FONT SIZE="2"></FONT></TD>
+                <TD width="12%" Align="Center"><FONT SIZE="2"><apex:outputLabel value="Total Order Value: "/></FONT></TD>
+                <TD width="12%" Align="Center"><FONT SIZE="2"><apex:outputField value="{!order__c.Order_Value_Text__c}" /></FONT></TD>
+                <TD width="12%" Align="Center"><FONT SIZE="2"></FONT></TD>
+            </TR>
+    </TABLE>
+    
+    
+  </body>
+  </html>  
+
+</apex:page>

@@ -1,0 +1,3 @@
+<apex:page controller="GasSafeConroller"  cache="true" sidebar="false" contenttype="text/csv#GasSafeReport.csv ">
+{!ReportData}
+</apex:page>

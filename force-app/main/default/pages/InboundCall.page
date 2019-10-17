@@ -1,0 +1,38 @@
+<apex:page controller="InboundCallController">
+    <apex:form >
+    <apex:pagemessages />
+    
+        <style>
+            .controldiv{float:left; padding:4px;}
+        </style>
+        <!--<apex:messages />-->
+        <apex:pageblock >
+            <apex:pageblockbuttons >
+                <apex:Commandbutton value="Customer Call" action="{!InvokeCustomerCall}"/>
+                <apex:Commandbutton value="Engineer Call" action="{!InvokeEngineerCall}"/>
+                <apex:Commandbutton value="Employee Call" action="{!InvokeEmployeeCall}"/>
+                <apex:Commandbutton value="HSA Call" action="{!InvokeHSACall}"/>
+                <!--<apex:Commandbutton value="Waste Call" action="{!InvokeWasteCall}"/>-->
+            </apex:pageblockbuttons>
+           
+            <div style="width:49%;float:left">
+                <c:AddressLookup AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+                StreetLabel="Street" StreetField="{!accountSearch.BillingStreet}" 
+                CityLabel="City" CityField="{!accountSearch.BillingCity}" StateLabel="State" 
+                StateField="{!accountSearch.BillingState}" PostalCodeLabel="Postcode" 
+                PostalCodeField="{!accountSearch.BillingPostalcode}" CountryLabel="Country" 
+                CountryField="{!accountSearch.BillingCountry}"
+                BuildingNumber="{!houseNumber}"
+                BuildingName="{!houseName}"
+                POBoxNumber="{!poBoxNumber}"/>
+                <!--  <div class="controldiv">Confirm Account Address</div>
+                <apex:inputCheckbox value="{!ConfirmAccountAddress}"/>-->
+            </div>
+            <div style="width:49%; float:left">
+                <div class="controldiv">Lead Number</div>
+                <div class="controldiv"><apex:inputText value="{!LeadNumber}" maxlength="10" /></div> 
+            </div>
+            <div style="clear:both;"></div>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

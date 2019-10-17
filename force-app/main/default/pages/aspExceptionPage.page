@@ -1,0 +1,40 @@
+<apex:page controller="aspAcknowledgmentsCont" tabstyle="ASP__c" sidebar="false">
+ <apex:form >
+ 	    <apex:pageBlock id="pb">
+        <apex:pagemessages />
+        <apex:actionfunction action="{!reRunQuery}" name="reRunQuery" rerender="pb" status="counterStatus"/>
+        <apex:actionfunction action="{!changeview}" name="changeview" rerender="pb" status="counterStatus"/>
+        <h3>
+        <apex:actionstatus startText=" (Working... Please Wait)"  id="counterStatus"/>
+        </h3>
+        <apex:pageblocksection title="Filter">
+        	<apex:inputfield value="{!aspExceptionObj.VfStatus__c}" onchange="reRunQuery();" />
+        	<apex:inputfield value="{!aspExceptionObj.viewMode__c}"  onchange="changeview();" />
+        </apex:pageblocksection>
+        
+        <apex:pageblocksection columns="1" title="ASP Exceptions">
+        
+            <apex:pageBlockTable value="{!displayList}" var="a">
+                <apex:column value="{!a.Exception_User__c}" headervalue="Approver" />
+                <apex:column value="{!a.ASP__c}"/>
+                <apex:column value="{!a.Status__c}"/>
+                <apex:column value="{!a.Description__c}"/>
+                <apex:column value="{!a.CreatedDate}" />
+                <apex:column value="{!a.Accept_Reject__c}" rendered="{!showLink}"/>
+            </apex:pageBlockTable>
+            </apex:pageblocksection>  
+            <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="otpNav2">  
+                 Total Found: <apex:outputText rendered="{!IF(total_size>=10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(total_size < 10000,true,false)}">{!total_size}</apex:outputText>  
+                 <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!DisablePrevious}"/>  
+                 <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!NOT(DisablePrevious)}"/>  
+                 <apex:commandLink action="{!Previous}" title="Previous Page" value="Previous Page" rendered="{!NOT(DisablePrevious)}"  rerender="pb"/>&nbsp;  
+                 <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisablePrevious}">Previous Page</apex:outputPanel>           
+                 &nbsp;Showing Page  {!pageNumber} of {!totalPages}&nbsp;&nbsp; 
+                 <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisableNext}">Next Page</apex:outputPanel>           
+                 <apex:commandLink action="{!Next}" title="Next Page" value="Next Page" rendered="{!NOT(DisableNext)}" rerender="pb"/>&nbsp;  
+                 <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!NOT(DisableNext)}"/>  
+                 <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!DisableNext}"/>            
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

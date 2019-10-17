@@ -1,0 +1,41 @@
+<apex:page controller="SubOrdinatesLocationsController">
+<apex:form >
+<div style="padding:8px; mapping:8px;padding-top:0; margin-top:0;">
+    <div class="lookupTab  LookupSearchFrame">
+        <input id="tempControl" style="width:1px; height;1px; position:absolute;"/>
+        <div class="bPageTitle">
+            <div class="ptBody secondaryPalette">
+                <div class="content">
+                    <img src="/s.gif" alt=""  class="pageTitleIcon" title=""/>
+                    <h1>View Team's Location</h1>
+                </div>
+            </div>
+        </div>&nbsp;&nbsp;&nbsp;
+        <apex:pageblock title="View Team's Locations">
+        <apex:pageblockbuttons >
+            <apex:commandbutton value="Display Locations" action="{!displayLocation}" />
+        </apex:pageblockbuttons>
+        Select a date below and click on "Display Locations" button to view the locations of your Team's.<br/> 
+        Select date &nbsp;&nbsp;<apex:inputfield value="{!SearchEvent.ActivityDate}" />
+        </apex:pageblock>
+
+		
+        <apex:iframe src="/apex/GMAPLocations?y={!dateTimeY}&m={!dateTimeM}&d={!dateTimeD}" scrolling="false" id="mapFrame" height="600px" width="800px" />
+        
+        <script>
+        	document.getElementById("mapFrame").style.width = (screen.width * 0.95) + 'px';
+        </script>
+        
+        <script>
+            
+            window.onload = function() {
+            document.getElementById('tempControl').focus(); 
+            document.getElementById('tempControl').style.display = 'none'; 
+            }
+            //document.getElementById('tempControl').style.display= 'none';
+        </script>
+    </div>
+</div>
+
+</apex:form>
+</apex:page>

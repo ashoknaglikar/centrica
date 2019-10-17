@@ -1,0 +1,11 @@
+<!--
+Type Name: NPSFeedbackError
+Author: Cognizant
+Created Date: 20/04/2010
+Modified Date: 07/05/2010
+Reason:Display error message if user clicks on the link for already submitted survey
+-->
+<apex:page showHeader="false" sidebar="false">
+    <h1>Feedback Error!</h1>
+    <p>Your Feedback has already been sent.</p>
+</apex:page>

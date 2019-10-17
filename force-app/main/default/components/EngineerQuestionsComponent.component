@@ -1,0 +1,23 @@
+<apex:component >
+<!--  controller="EngineeringQuestionsComponentController" -->
+    <apex:attribute name="EngineerQues" description="This attrribute passes the list of engineer questions" type="Opportunity[]" />
+    
+<!-- To Display the Engineer Questions  -->   
+       
+    <apex:pageBlockSection title="Engineer Questions" columns="1" collapsible="false">                
+       <apex:pageBlockTable var="engi" value="{!EngineerQues}">
+            <apex:column headerValue="Engineer Reason" >
+                <apex:inputField value="{!engi.Enquiry_Reason__c}" required="true"/>
+            </apex:column>  
+            <apex:column headerValue="Unsafe Appliance Reason" >
+                <apex:inputField value="{!engi.Unsafe_Appliance_Reason__c}" />
+            </apex:column>                 
+            <apex:column headerValue="Age Of Boiler">
+                <apex:inputField value="{!engi.Boiler_Age__c}"/>
+            </apex:column>                   
+            <apex:column headerValue="Customer agreed to appointment">
+                <apex:inputField value="{!engi.Customer_agreed_to_appointment__c}" required="true"/>
+            </apex:column>                    
+        </apex:pageBlockTable> 
+    </apex:pageBlockSection>    
+</apex:component>

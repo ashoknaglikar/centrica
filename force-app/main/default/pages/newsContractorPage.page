@@ -1,0 +1,94 @@
+<apex:page sidebar="false" showHeader="false" >
+
+<html>
+
+<head>
+<title>New Page</title>
+
+<style type="text/css">
+*{margin:0;padding:0}
+ 
+.page{
+font-family:Arial;
+width:100%;    
+}
+.content{
+    max-width:980px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:5px;
+    clear:both;
+}
+ 
+/*----Navigation Menu----*/
+.menu{
+    width:100%; 
+    height:30px; 
+    text-align:left;
+    border-bottom:1px solid;
+    }
+   
+.menu ul li
+{
+    display:inline;
+    float:left;
+    width:20%;
+    font-size:2.0em
+}
+ 
+.menu ul li a {text-decoration:none;padding-left:5px}
+.menu ul li a:link    {color:#0270b9;}
+.menu ul li a:visited {color:#0264a5;}
+.menu ul li a:hover   {color:green;}
+.menu ul li a:active  {color:gray;font-weight:bold}
+ 
+#li_safety a{color:red}
+/*----End of Navigation Menu----*/
+ 
+.news_wrapper{
+    margin-bottom:7px;
+    margin-top:5px;
+}
+ 
+.news_wrapper h2{
+    color:blue;
+    font-size:1.2em;
+}
+.news_wrapper p{
+    color:black;
+}
+ 
+</style>
+
+</head>
+<body>
+<div class="page">
+<div class="content">
+
+<div class="navigation">
+    <div class="menu">
+        <ul class="tabs">
+        <li id='li_safety'>  <a href="https://eu13.salesforce.com/sfc/#workspaceView?selectedWorkspaceId=058200000000Ad4" target="_blank">Safety bulletin</a></li>
+        <li id='li_tehnical'> <a href="https://eu13.salesforce.com/sfc/#workspaceView?selectedWorkspaceId=058200000000Adx" target="_blank">Technical</a></li>
+        </ul>
+    </div>
+</div>
+
+<!--End of Navigation-->
+
+    <div class="main_content">
+       
+
+       <div class="news_wrapper">
+           <h2>Safety Bulletin</h2>
+           <p>For the latest information on No Electrical Earth please read Safety Bulletin 56</p>
+       </div>
+       
+    </div> <!--End of main content-->
+</div> <!--End of content-->
+</div> <!--End of page-->
+
+</body>
+</html>
+
+</apex:page>

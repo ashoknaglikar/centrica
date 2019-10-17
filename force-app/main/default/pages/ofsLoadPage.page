@@ -1,0 +1,73 @@
+<apex:page standardcontroller="OFS_Load__c" extensions="OFSLoadController" sidebar="false">
+<script>
+     window.onload=function() {
+      document.getElementById('focusDistraction').focus();
+      }
+      
+</script>
+<apex:form >
+<apex:pageblock id="block1">
+    <apex:pagemessages />
+    <apex:outputpanel id="pollerPanel">
+    <apex:actionPoller action="{!loadAppointmentCount}" reRender="block1" interval="5" rendered="{!loadPoller}"   timeout="180000" status="counterStatus"/>
+    
+    </apex:outputpanel>
+    <apex:pageblocksection title="OFS Load Wizard" rendered="{!buttonBlock}">
+        <apex:inputfield value="{!ofsLoad.Request_Date__c}" required="true"/>
+    </apex:pageblocksection>
+    
+    <apex:pageblocksection title="OFS Load Record" rendered="{!!buttonBlock}">
+        <apex:outputfield value="{!ofsLoad.Name}" />
+        <apex:pageblocksectionitem />
+        <apex:outputfield value="{!ofsLoad.Request_Date__c}" />
+        <apex:outputfield value="{!ofsLoad.Status__c}" />
+        <apex:outputfield value="{!ofsLoad.CreatedById}" />
+        <apex:outputfield value="{!ofsLoad.CreatedDate}" />
+    </apex:pageblocksection>
+    
+    <apex:pageblockbuttons location="bottom" ><!-- rendered="{!buttonBlock}" -->
+        <apex:commandbutton value="Query Salesforce Details" action="{!querySalesforce}" disabled="{!!queryFromBtn}"/>
+        <apex:commandbutton value="Load From OFS" action="{!invokeBatch}" disabled="{!!ofsButton}" rerender="block1"/> 
+        <apex:commandbutton value="Abort Load" action="{!abortBatch}" disabled="{!!abortButton}"/>
+        <apex:commandbutton value="Go Back" action="{!backBtn}" />
+    </apex:pageblockbuttons>
+    
+    
+    <!--  <apex:pageblockbuttons location="bottom" rendered="{!abortButton}">
+        <apex:commandbutton value="{!loadfromOFS}" action="{!invokeBathch}" disabled="{!!ofsButton}" rerender="block1"/> 
+        <apex:commandbutton value="{!abortLoad}" action="{!abortBatch}"/>
+    </apex:pageblockbuttons>-->
+    
+    <apex:pageblocksection title="Appointment Details"  columns="1" id="appointmentSec">
+        <apex:actionStatus startText="Done" stopText="(Please wait...Updating...)" id="counterStatus" rendered="{!loadPoller}" />
+        <apex:pageblocktable var="app" value="{!1}" >
+            <apex:column headervalue="Total Appointments" value="{!appointmentNumbers[0]}"/>
+            <apex:column headervalue="Total Appointments Assigned To Bucket" value="{!appointmentNumbers[1]}"/>
+            <apex:column headervalue="Total Appointments Assigned To HSA" value="{!appointmentNumbers[2]}"/>
+        </apex:pageblocktable>
+    </apex:pageblocksection>
+    
+    <apex:pageblocksection title="Confirm.."  columns="2" id="confirmSec" rendered="{!ofsButton}">
+        Please confirm that you want to load the Appointments for {!ofsLoad.Request_Date__c} : 
+        <apex:inputcheckbox value="{!checkBox}" />
+    </apex:pageblocksection>    
+
+</apex:pageblock>
+
+<apex:pageblock title="Previous 5 Runs...">
+    <apex:pageblocksection columns="1">
+        <apex:pageblocktable var="run" value="{!previousRuns}">
+            <apex:column value="{!run.Name}"/>
+            <apex:column value="{!run.Request_Date__c}"/>
+            <apex:column value="{!run.CreatedById}"/>
+            <apex:column value="{!run.Load_Finish_Time__c}"/>
+            <apex:column value="{!run.Total_Appts__c}"/>
+            <apex:column value="{!run.Duration__c}"/>
+            <apex:column value="{!run.Status__c}"/>
+        </apex:pageblocktable>
+    </apex:pageblocksection>
+</apex:pageblock>
+
+</apex:form>    
+
+</apex:page>

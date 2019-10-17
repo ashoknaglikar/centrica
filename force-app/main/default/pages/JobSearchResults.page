@@ -1,0 +1,238 @@
+<apex:page controller="SearchResultsController" action="{!runSearch}" tabStyle="Job__c">
+<style>
+.candidates 
+{
+    font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+    font-size: 12px;
+    margin: 10px;
+    width: 950px;
+    text-align: center;
+    border-collapse: collapse;
+    
+    
+}
+table.candidates
+{
+  font-size: 13px;
+    font-weight: normal;
+    padding: 8px;
+    
+    ground: #dddddd;
+    border-top: 4px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+    color: #039;
+    
+}
+td.candidates
+{
+    padding: 8px;
+    background: #dddddd; 
+    border-bottom: 1px solid #dddddd;
+    color: #669;
+    border-top: 1px solid transparent;
+    
+}
+.candidates tr:hover td
+{
+    background: #d0dafd;
+    color: #339;
+}
+.header 
+{
+    font-size:8pt;
+    font-weight: bold; 
+    text-align: center;  
+}
+.optiongroup
+{
+    background-color: #FAFAFA;
+}
+.groupcelltop
+{
+    border-top-color : black;
+    border-top-width : thin;
+    border-top-style : solid;
+    padding-right : 8px;
+}
+th.results
+{
+    padding-right : 8px;
+}
+td.secondaryResourceName
+{
+    padding-left : 8px;
+}
+</style>
+
+<!-- Added for Priority Installations CR start -->
+<script type="text/javascript" src="/soap/ajax/15.0/connection.js"></script>
+<script type="text/javascript" src="/soap/ajax/15.0/apex.js"></script>
+<script type="text/javascript" src="/js/functions.js"></script>
+<script>
+function check() {
+        var includeNew= '{!include_priority_install}';
+        var custCategory = '{!customerCategoryMessage}';
+        if(includeNew == 'true' && custCategory == 'true'){
+            if(confirm('{!$Label.Customer_category_pop_up_message_install}'+ "\n" + "\n" + '{!$Label.Customer_category_pop_up_message_install2}' + "\n" + '{!$Label.Customer_category_pop_up_message_install3}' + "\n" + '{!$Label.Customer_category_pop_up_message_install4}')){
+                return true; 
+            }else{
+                return false;
+            }
+        }
+}
+
+
+</script>
+<!-- Added for Priority Installations CR end -->
+<apex:form >
+<apex:outputPanel rendered="{!!DummyFlag}">
+    &nbsp;<apex:outputLink value="/{!jobId}" id="jobLink">Back to Job</apex:outputLink>
+    <p></p>
+</apex:outputPanel>
+<!-- Added for Priority Installations CR start -->
+<table>
+    <tr>
+        <td><b> Customer Category Indicator : </b></td>
+        <td>
+            <apex:outputField value="{!job.Latest_customer_category_indicator__c}" rendered="{!include_priority_install}"></apex:outputField>
+        </td>
+    </tr>
+</table>
+<!-- Added for Priority Installations CR end -->
+<br/><br/>
+
+            <apex:outputPanel >
+             <apex:outputText value="Please keep in mind this is a heavy appliance job, and the system will bring in a 2 man team only." style="font-size:15px;font-weight:bold;" rendered="{!job.Heavy_Appliance__c &&!job.Override_Heavy_Appliance__c &&resourcesRender == true && errorRender == false && $Label.Heavy_Appliance_Job=='on'}"></apex:outputText>
+             <br/>
+             </apex:outputPanel>
+             <br/>
+<apex:pageBlock title="Plan Job - Search Results">
+    <apex:pageBlockSection title="Business Best" collapsible="false" rendered="{!bestResourceRender}">
+        <tr>
+            <th class="results">Resource Option</th>
+            <th class="results">Type</th>
+            <th class="results">Geography</th>
+            <th class="results">Job Skills</th>
+            <th class="results">Hours to Resource(s)</th>
+            <th class="results">Gap Hours</th>
+            <th class="results">Remaining Hours</th>
+            <th class="results">Start</th>
+            <th class="results">Day</th>
+            <th class="results">Distance</th>
+            <th class="results">Travel Time</th>
+        <!--    <th class="results">Travel Time @ 8am</th> -->
+            <th></th>
+        </tr>
+        <apex:repeat id="BusinessBestCandidates" value="{!BusinessBest}"  var="b" >
+        <tbody class="optiongroup">
+            <tr>
+                  <td class="groupcelltop">{!b.PrimaryNames}</td>
+                  <td class="groupcelltop">{!b.PrimaryType}</td>
+                  <td class="groupcelltop" style="color:{!if(b.PrimaryGeography=='Off Patch','red','black')}">{!b.PrimaryGeography}</td>
+                  <td class="groupcelltop">{!b.PrimaryJobSkills}</td>
+                  <td class="groupcelltop">{!b.PrimaryNumberOfHoursSatisfied}</td>
+                  <td class="groupcelltop">{!b.PrimaryGapHours}</td>
+                  <td class="groupcelltop">{!b.PrimaryRemainingHours}</td>
+                  <td class="groupcelltop">{!b.PrimaryStart}</td>
+                  <td class="groupcelltop">{!b.Day}</td>
+                  <td class="groupcelltop">{!b.primaryResourceDistanceFromJob}</td>
+                  <td class="groupcelltop">{!b.primaryResourceTrafficTravelTimeFromJob}</td>
+               <!--   <td class="groupcelltop">{!b.primaryResourceTrafficTravelTimeFromJob}</td> -->
+                  <td class="groupcelltop" ><a href="BookJobOption?optionID={!b.OptionID}&jobId={!jobId}&dist={!b.primaryResourceDistanceFromJob}&time={!b.primaryResourceTrafficTravelTimeFromJob}&date={!b.PrimaryStart}&gapname={!b.PrimaryNames}&gaphours={!b.PrimaryGapHours}" onclick="return check();">Book</a></td>     
+            </tr>
+            <tr>
+                  <td class="secondaryResourceName">{!b.SecondaryNames}</td>
+                  <td>{!b.SecondaryType}</td>
+                  <td>{!b.SecondaryGeography}</td>
+                  <td>{!b.SecondaryJobSkills}</td>
+                  <td>{!b.SecondaryNumberOfHoursSatisfied}</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+            </tr>            
+        </tbody>
+        </apex:repeat>
+    </apex:pageBlockSection>
+    <!--in case there is no business best to render-->
+    <apex:pageBlockSection collapsible="false" title="No business best resources were returned" rendered="{!bestResourceRender == false && errorRender == false}">   
+    </apex:pageBlockSection>    
+    
+    <apex:pageBlockSection title="Customer Preferred" collapsible="false" rendered="{!resourcesRender}">
+        <tr>
+            <th class="results">Resource Option</th>
+            <th class="results">Type</th>
+            <th class="results">Geography</th>
+            <th class="results">Job Skills</th>
+            <th class="results">Hours to Resource(s)</th>
+            <th class="results">Gap Hours</th>
+            <th class="results">Remaining Hours</th>
+            <th class="results">Front Gap</th>
+            <th class="results">Back Gap</th>
+            <th class="results">Start</th>
+            <th class="results">Day</th>  
+             <th class="results">Distance</th>
+            <th class="results">Travel Time</th>
+           <!-- <th class="results">Travel Time @ 8am</th> -->
+            <th></th>
+        </tr>
+        <apex:repeat id="CustomerPreferredCandidates"  value="{!Candidates}"  var="p" >
+        
+        <tbody class="optiongroup">
+            <tr>
+                  <td class="groupcelltop">{!p.PrimaryNames}</td>
+                  <td class="groupcelltop">{!p.PrimaryType}</td>
+                  <td class="groupcelltop" style="color:{!if(p.PrimaryGeography=='Off Patch','red','black')}">{!p.PrimaryGeography}</td>
+                  <td class="groupcelltop">{!p.PrimaryJobSkills}</td>
+                  <td class="groupcelltop">{!p.PrimaryNumberOfHoursSatisfied}</td>
+                  <td class="groupcelltop">{!p.PrimaryGapHours}</td>
+                  <td class="groupcelltop">{!p.PrimaryRemainingHours}</td>
+                  <td class="groupcelltop">{!p.PrimaryFrontHours}</td>
+                  <td class="groupcelltop">{!p.PrimaryBackHours}</td>
+                  <td class="groupcelltop">{!p.PrimaryStart}</td>
+                  <td class="groupcelltop">{!p.Day}</td>
+                  <td class="groupcelltop">{!p.primaryResourceDistanceFromJob}</td>
+                  <td class="groupcelltop">{!p.primaryResourceTrafficTravelTimeFromJob}</td>
+              <!--  <td class="groupcelltop">{!p.primaryResourceTrafficTravelTimeFromJob}</td> -->
+                  <td class="groupcelltop"><a href="BookJobOption?optionID={!p.OptionID}&jobId={!jobId}&dist={!p.primaryResourceDistanceFromJob}&time={!p.primaryResourceTrafficTravelTimeFromJob}&date={!p.PrimaryStart}&gapname={!p.PrimaryNames}&gaphours={!p.PrimaryGapHours}" onclick="return check();">Book</a></td>     
+            </tr>
+            <tr>
+                  <td class="secondaryResourceName">{!p.SecondaryNames}</td>
+                  <td>{!p.SecondaryType}</td>
+                  <td>{!p.SecondaryGeography}</td>
+                  <td>{!p.SecondaryJobSkills}</td>
+                  <td>{!p.SecondaryNumberOfHoursSatisfied}</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+            </tr>            
+        </tbody>
+        <tr><td  colspan="9">&nbsp;</td></tr>
+        </apex:repeat>    
+    </apex:pageBlockSection>
+    <!-- In case no Customer Preferred results are returned -->
+    <apex:pageBlockSection collapsible="false" title="No customer preferred resources were returned" rendered="{!resourcesRender == false && errorRender == false}">   
+    </apex:pageBlockSection>
+        <!-- Added for Next 7 days employee search change start -->
+    <apex:pageBlockButtons location="bottom">                                                                                                       
+        <apex:commandButton action="{!previous7Days}" value="Previous 7 days" />
+        <apex:commandButton action="{!next7Days}" value="Next 7 days" /> 
+    </apex:pageBlockButtons>
+    <!-- Added for Next 7 days employee search change end -->
+</apex:pageBlock>
+
+<apex:pageBlock title="Error" rendered="{!errorRender}" id="pgError">
+            <apex:pageBlockButtons location="bottom">                                                                                                       
+                <apex:commandButton action="{!returnToJob}" value="Back"/> 
+                
+            </apex:pageBlockButtons> 
+                {!errorMsg}
+       </apex:pageBlock>
+
+</apex:form>
+
+Statements used: <apex:outputText value="{!statements}"/>
+Customer options returned: <apex:outputText value="{!NumberOfCustomerOptions}"/>
+
+</apex:page>

@@ -1,0 +1,462 @@
+<apex:page controller="GreenDealReconcillation" tabStyle="Green_Deal_Reconsilliation__c" id="page"  action="{!updatenewvalues}" sidebar="false">
+
+ <script type="text/javascript">
+ 
+ function epcFuncJs()
+ {
+     var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec3.EPC_Lodge}").value;
+     //alert(txtVal1);
+     epcFunc(txtVal1);
+ }
+ 
+ function incReqFuncJs()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec3.incReq}").value;
+    //alert(txtVal1);
+    incReqFunc(txtVal1);
+ }
+ 
+ 
+  function dateVoucherReqJs()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec3.Date_of_Vou}").value;
+    //alert(txtVal1);
+    dateVoucherReq(txtVal1);
+ }
+ 
+  function secEpcFuncJs()
+ {
+     var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec4.X2nd_EPC}").value;
+     //alert(txtVal1);
+     secEpcFunc(txtVal1);
+ }
+ 
+ function dblCashBkJS()
+ {
+     var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec5.GDF_Offer}").value;
+    // alert(txtVal1);
+     dblCashBk(txtVal1);
+ }
+ 
+ function refferJs()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec5.Finance_appl}").value;
+    //alert(txtVal1);
+    reffer(txtVal1);
+ }
+ 
+ function popCoolDatesJs()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec5.Plan_upload}").value;
+    //alert(txtVal1);
+    popCoolDates(txtVal1);
+ }
+ 
+   function vibrantJs()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.sec2.vibrant}").value;
+    //alert(txtVal1);
+    vibrantaf(txtVal1);
+ }
+ 
+ 
+ function popQuoteExJs()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.sec12.dat_req}").value;
+    //alert(txtVal1);
+    popQuoteEx(txtVal1);
+ }
+ 
+ function popEarlyPayJs()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.sec12.earlyRep}").value;
+    //alert(txtVal1);
+    popEarlyPay(txtVal1);
+ }
+ 
+ function popCCreqJS()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec8.CC}").value;
+    //alert(txtVal1);
+    popCCreq(txtVal1);
+ }
+ 
+ function popCDreqJS()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec9.CD}").value;
+    //alert(txtVal1);
+    popCDreq(txtVal1);
+ }
+ 
+ function popfinanJS()
+ {
+    var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.blk1sec5.finDate}").value;
+    //alert(txtVal1);
+    popfinan(txtVal1);
+ }
+ 
+ </script>
+  
+  
+<apex:form id="frm">
+
+
+<apex:actionfunction name="popfinan" action="{!popfinan}" rerender="blk1sec5" immediate="true">
+        <apex:param name="fina" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="popCCreq" action="{!popCCreq}" rerender="blk1sec8" immediate="true">
+        <apex:param name="CC" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="popCDreq" action="{!popCDreq}" rerender="blk1sec9" immediate="true">
+        <apex:param name="CD" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="popEarlyPay" action="{!popEarlyPay}" rerender="sec12" immediate="true">
+        <apex:param name="EarlyPay" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="popQuoteEx" action="{!popQuoteEx}" rerender="sec12" immediate="true">
+        <apex:param name="Date_Req" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="popCoolDates" action="{!popCoolDates}" rerender="blk1sec5" immediate="true">
+        <apex:param name="PortalDate" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="vibrantaf" action="{!vibrant}" rerender="sec2">
+        <apex:param name="vibrant" value="" />
+</apex:actionfunction>
+
+<apex:pageBlock id="blk1" title="Green Deal - {!greendeal.Name}"> 
+
+<apex:pageBlockButtons >
+                <apex:commandbutton id="Save" value="Save" action="{!saveRecord}"/>
+                <apex:commandButton id="Exit"  value="Exit" action="{!exitcancel}"/>
+                <apex:commandButton id="Qualification"  value="Pre-Qualification Ques" action="{!Qualification}"/>
+                
+  </apex:pageBlockButtons>
+                
+<apex:pageBlockSection title="Customer Details: " columns="2" collapsible="false" id="blk1sec1">
+
+<apex:inputField value="{!greendeal.LU_Customer_Name__c}"/>
+<apex:inputField value="{!greendeal.Install_Street__c}"/>
+<apex:inputField value="{!greendeal.Install_City__c}"/>
+<apex:inputField value="{!greendeal.LU_Post_Code__c}"/>
+<apex:inputField value="{!greendeal.Installation_County__c}"/>
+<apex:inputField value="{!greendeal.Installation_address__c}"/>
+<apex:inputField value="{!greendeal.Home_Phone__c}"/>
+<apex:inputField value="{!greendeal.Customer_Mobile_Phone__c}"/>
+<apex:inputField value="{!greendeal.Work_Phone__c}"/>
+<apex:inputField value="{!greendeal.Contact_Type__c}"/>
+<apex:outputField value="{!greendeal.Record_Type__c}"/>
+<apex:outputField value="{!greendeal.Customer_Email__c}"/>
+<!-- <apex:inputCheckbox value="{!greendeal.Greendealcheck__c}"/>-->
+
+
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Job Details: " columns="2" collapsible="false" id="sec2">
+
+<apex:inputField value="{!greendeal.Opportunity__c}"/>
+<apex:outputField value="{!greendeal.Job__c}"/>
+
+<apex:outputField value="{!greendeal.BigMachine_Quote__c}"/>
+<apex:inputField value="{!greendeal.ECO_GD_AW_field__c}"/>
+
+
+<apex:inputField value="{!greendeal.LU_District__c}"/>
+<apex:inputField value="{!greendeal.Region__c}"/>
+
+<apex:inputField value="{!greendeal.Status__c}"/>
+<apex:inputField value="{!greendeal.Sub_Status__c}"/>
+
+<apex:inputField value="{!greendeal.LU_Installation_Date__c}"/>
+<apex:pageblocksectionitem />
+
+
+
+<apex:outputField value="{!greendeal.Sales_Appointment__c}"/>
+<apex:pageblocksectionitem />
+<apex:inputField value="{!greendeal.HSA_Name__c}"/>
+ <apex:pageblocksectionitem >
+    <apex:outputlabel value="Sales Visit Date"/>
+    <apex:outputField value="{!greendeal.Sales_Appointment__r.Visit_Date__c}"/>
+</apex:pageblocksectionitem>
+   
+<apex:pageblocksectionitem />
+<apex:pageblocksectionitem />
+<apex:outputField value="{!greendeal.Green_Deal_Appointment__c}"/>
+<apex:inputField value="{!greendeal.GDA_Name__c}"/>
+<apex:inputField value="{!greendeal.GDA_Date__c}"/>
+<apex:pageblocksectionitem />
+
+<apex:inputField value="{!greendeal.CAM_name__c}"/>
+<apex:inputField value="{!greendeal.Installation_special_instructions__c}"/>
+
+<apex:outputField value="{!greendeal.GD_Make_of_boiler_installed__c}"/>
+<apex:inputfield value="{!greendeal.GD_Midas_Ref_Number__c}"/>
+<apex:outputfield value="{!greendeal.Boiler_Description__c}"/>
+<apex:inputField value="{!greendeal.Vibrant__c}" onchange="vibrantJs();" id="vibrant"/>
+
+<!--  <apex:pageBlockSection id="gda_date">-->
+    <apex:inputField value="{!greendeal.GDA_Date__c}" rendered="{!gdadate}" id="GDAVisitDate"/>
+<!--  </apex:pageBlockSection>-->
+
+</apex:pageBlockSection>
+<apex:actionfunction name="epcFunc" action="{!epcReqFunc}" rerender="blk1sec3" immediate="true">
+        <apex:param name="epcDate" value="" />
+</apex:actionfunction>
+
+<!--  <apex:actionfunction name="incReqFunc" action="{!insulationDateReq}" rerender="blk1sec3" immediate="true">
+        <apex:param name="incReq" value="" />
+</apex:actionfunction>-->
+
+<apex:actionfunction name="dateVoucherReq" action="{!dateVoucherReq}" rerender="blk1sec3" immediate="true">
+        <apex:param name="dVocReq" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="secEpcFunc" action="{!secEpcFunc}" rerender="blk1sec4" immediate="true">
+        <apex:param name="secEpc" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="dblCashBk"  rerender="blk1sec5" action="{!dblCashBk}" immediate="true"><!--  -->
+        <apex:param name="GdfOffer" value="" />
+</apex:actionfunction>
+
+<apex:actionfunction name="reffer" action="{!reffer}" rerender="blk1sec5" immediate="true">
+        <apex:param name="reffer" value="" />
+</apex:actionfunction>
+
+<!--  <apex:actionfunction name="popChedcedBy" action="{!popChedcedBy}" rerender="blk1sec5" immediate="true"/>-->
+
+<apex:pageBlockSection title="Green Deal Cashback: Pre Installation " columns="2" collapsible="false" id="blk1sec3">
+
+<apex:inputField value="{!greendeal.Quote_Sold_Date_AP__c}"/> 
+<apex:inputField value="{!greendeal.EPC_Lodge_Date__c}" id="EPC_Lodge" onchange="epcFuncJs();" />
+ <apex:inputField value="{!greendeal.EPC_Number__c}" required="{!epcNumberReq}"/>
+<apex:inputField value="{!greendeal.EPC_Checked__c}"/>
+<apex:inputField value="{!greendeal.Insulation_Required__c}"  Id="incReq"/> <!-- onchange="incReqFuncJs();" -->
+<apex:pageblocksectionitem />
+<!--<apex:inputField value="{!greendeal.Insulation_Installation_Date__c}" id="Insulation" required="{!incDaterReq}">
+    <script>document.getElementById('{!$Component.Insulation}').disabled = {!!incDaterReq}; </script>
+</apex:inputField>-->
+<apex:inputField value="{!greendeal.OA_Reference_Number__c}"/>
+<apex:inputField value="{!greendeal.Date_of_Voucher_Requested__c}" onchange="dateVoucherReqJs();" id="Date_of_Vou" />
+<apex:inputField value="{!greendeal.GDCB_Voucher_reference__c}" id="GDCB" required="{!GDCBReq}"/>
+
+<apex:inputField value="{!greendeal.Voucher_Expiry__c}"/>
+
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Insulation Details:" columns="2" collapsible="true"  id="sec2_1">
+
+<apex:inputField value="{!greendeal.Survey_Date_Ins__c}"/>
+<apex:inputField value="{!greendeal.Loft_Date__c}"/>
+<apex:inputField value="{!greendeal.Cavity_Date__c}"/>
+<apex:inputField value="{!greendeal.All_InsulComplete__c}"/>
+<apex:inputField value="{!greendeal.InsulationType__c}"/>
+<apex:inputField value="{!greendeal.InsulationDepth__c}"/>
+<apex:inputField value="{!greendeal.Total_Insulation__c}"/>
+<apex:inputField value="{!greendeal.COC_Rec_Ins__c}"/>
+
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Green Deal Cashback: Post Installation " columns="2" collapsible="false" id="blk1sec4" ><!--  rendered="{!postInst}">-->
+
+<apex:inputField value="{!greendeal.X2nd_EPC_assigned_date__c}" />
+<apex:inputField value="{!greendeal.Date_2nd_EPC_received__c}" onchange="secEpcFuncJs();" id="X2nd_EPC"/>
+<apex:inputField value="{!greendeal.X2nd_EPC_Number__c}" required="{!secEpcReq}"/>
+<apex:inputField value="{!greendeal.X2nd_EPC_checked__c}"/>
+<apex:inputField value="{!greendeal.X2nd_EPC_Issue__c}"/>
+<apex:inputField value="{!greendeal.COC_Received_All_measures__c}"/>
+<apex:inputField value="{!greendeal.Redemption_Request_Date__c}"/>
+<apex:inputField value="{!greendeal.Redemption_Status__c}"/>
+<apex:inputField value="{!greendeal.Comments__c}"/>
+<apex:inputField value="{!greendeal.X2nd_EPC_letter_sent__c}"/>
+</apex:pageBlockSection>
+
+<!-- Section added for soft credit check CR-001220 by Phil Dennison  09/05/2014 -->
+<apex:pageBlockSection title="Credit Check Details:" columns="2" collapsible="false" rendered="{!financerecordtype}" id="blk1sec101">
+
+<apex:inputField value="{!greendeal.CC_Soft_Credit_Check__c}"/>
+<apex:inputField value="{!greendeal.CC_Credit_Score__c}"/>
+
+<apex:outputtext value=""/>
+<apex:outputField value="{!greendeal.CC_Minimum_Score__c}"/>
+
+<apex:outputfield value="{!greendeal.CC_Credit_Check_Updated__c}"/>
+<apex:outputField value="{!greendeal.CC_Credit_Check_Updated_By__c}"/>
+
+
+ 
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Underwriting Comments" columns="1" collapsible="false" showHeader="false" rendered="{!financerecordtype}" id="blk1sec102">
+<!--    <apex:inputTextarea cols="113" label="Underwriting Comments" rows="3" value="{!greendeal.CC_Underwriting_Comments__c}"/>
+-->
+</apex:pageBlockSection>
+
+
+<!-- End section CR-001220 -->
+
+<apex:pageBlockSection title="Green Deal Finance:"  columns="2" collapsible="false" rendered="{!financerecordtype}" id="blk1sec5">
+
+<apex:inputField value="{!greendeal.Bill_Payer_Title__c}"/>
+<apex:pageblockSectionitem />
+<apex:inputField value="{!greendeal.Bill_Payer_Name__c}"/>
+<apex:inputField value="{!greendeal.Bill_Payer_Surname__c}"/>
+
+<apex:inputField value="{!greendeal.Red_Items_Value__c}"/>
+<apex:inputField value="{!greendeal.Green_Items_Value__c}"/> 
+<apex:inputField value="{!greendeal.Total_Value__c}"/>
+<apex:inputField value="{!greendeal.Offer_Controller__c}" id="Offer_Co">
+    <script>document.getElementById('{!$Component.Offer_Co}').disabled = true; </script>
+</apex:inputField>
+<apex:inputField value="{!greendeal.Electricity_Supplier__c}"/>
+
+<apex:outputfield value="{!greendeal.GDF_Offer__c}"  id="GDF_Offer" /><!--  onchange="dblCashBkJS();"/>-->
+<apex:inputField value="{!greendeal.Double_Cashback_Issued__c}" id="Double_Cash"><!-- required="{!!dblCashDate}">-->
+    <script>document.getElementById('{!$Component.Double_Cash}').disabled = {!dblCashDate}; </script>
+</apex:inputField>
+<apex:inputField value="{!greendeal.Portal_Last_Checked_Date__c}"/>
+<apex:inputField value="{!greendeal.Finance_application_status__c}" onchange="refferJs();" id="Finance_appl"/>
+<apex:inputField value="{!greendeal.If_referred__c}" required="{!ifReff}"  id="If_referred">
+    <script>document.getElementById('{!$Component.If_referred}').disabled = {!!ifReff}}; </script>
+</apex:inputField>
+<apex:inputField value="{!greendeal.Finance_application_Accepted_Declined_Da__c}" onchange="popfinanJS();" id="finDate"/>
+
+<apex:inputField value="{!greendeal.Green_Deal_Plan_ID__c}" required="{!planIdReq}" id="Green_Deal"/>
+<!--<script>document.getElementById('{!$Component.Green_Deal}').disabled = {!!planIdReq}}; </script>-->
+
+<apex:inputField value="{!greendeal.Declined_letter_sent__c}"/>
+<apex:inputField value="{!greendeal.Green_Deal_Plan_Created__c}"/>
+<!--<apex:pageblocksectionitem >
+GD Plan Checked:
+<apex:inputcheckbox id="chkbx" onchange="popChedcedBy();"/>
+</apex:pageblocksectionitem>-->
+<apex:outputfield value="{!greendeal.Required_plan_return_Date__c}"/>
+<!--<apex:outputField value="{!greendeal.GD_Plan_CheckBy__c}"/>-->
+<apex:inputField value="{!greendeal.User__c}"/>
+
+<apex:inputField value="{!greendeal.Green_Deal_Plan_sent_to_customer__c}"/>
+<apex:inputField value="{!greendeal.Signed_plan_returned__c}"/>
+<apex:inputField value="{!greendeal.Plan_uploaded_to_GDFC_Portal__c}" onchange="popCoolDatesJs();" id="Plan_upload"/>
+<apex:inputField value="{!greendeal.Signed_Plan_Returned_to_Customer__c}"/>
+
+<apex:outputfield value="{!greendeal.Cool_Off_Start_Date_del__c}"/>
+<apex:outputfield value="{!greendeal.Cool_Off_End_Date_del__c}"/>
+<apex:inputField value="{!greendeal.Scheduel_of_Works_Letter_Sent__c}"/>
+<apex:inputField value="{!greendeal.Cool_of_Waived__c}"/>
+</apex:pageBlockSection>
+
+
+<apex:pageBlockSection title="Eco Funding Details">
+<apex:inputfield value="{!greendeal.Eco_Funding__c}"/>
+
+<apex:inputField value="{!greendeal.ECO_Payment__c}"/>
+<apex:inputField value="{!greendeal.ECO_Payout__c}"/>
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="GreenDeal Finance Reconciliation:" columns="2" collapsible="false" rendered="{!financerecordtype}" id="blk1sec6">
+
+<apex:outputField value="{!greendeal.Opportunity__c}"/>
+<apex:inputField value="{!greendeal.LU_Billed__c}"/>
+<apex:inputField value="{!greendeal.LU_Amount_on_NBU1__c}"/>
+<apex:inputField value="{!greendeal.LU_Amount_Payable__c}"/>
+<apex:inputField value="{!greendeal.Warning__c}"/>
+<apex:outPutfield value="{!greendeal.Name}"/>
+
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Related ASP Details:" columns="2" collapsible="false" id="blk1sec7">
+
+<apex:inputField value="{!greendeal.ASP_Additions__c}"/>
+<apex:inputField value="{!greendeal.ASP_Removal__c}"/>
+<apex:inputField value="{!greendeal.ASP_Discounts__c}"/>
+<apex:inputField value="{!greendeal.ASP_Outcome__c}"/>
+
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Customer Contribution:" columns="2" collapsible="false" rendered="{!financerecordtype}" id="blk1sec8">
+
+<apex:inputField value="{!greendeal.CC_Amount__c}"/>
+<apex:inputField value="{!greendeal.CC_Date_Received__c}"/>
+<apex:inputField value="{!greendeal.S_W_I_CC__c}"/>
+<apex:inputField value="{!greendeal.CC_Payment_Type__c}" onchange="popCCreqJS();" id="CC"/>
+<apex:inputField value="{!greendeal.CC_EPDQ_Reference__c}" required="{!CCReq}"/>
+
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Customer Deposit:" columns="2" collapsible="false" rendered="{!financerecordtype}" id="blk1sec9">
+
+<apex:inputField value="{!greendeal.CD_Amount__c}"/>
+<apex:inputField value="{!greendeal.CD_Date_Received__c}"/>
+<apex:inputField value="{!greendeal.CD_Payment_Type__c}" onchange="popCDreqJS();" id="CD"/>
+<apex:inputField value="{!greendeal.CD_EPDQ_Reference__c}" required="{!CDReq}"/>
+
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Green Deal Finance:" columns="2" collapsible="false" rendered="{!financerecordtype}" id="blk1sec10">
+
+<apex:inputField value="{!greendeal.GDF_Amount__c}"/>
+<!-- <apex:inputField value="{!greendeal.GDF_Plan_ID_Number__c}"/> -->
+<apex:inputField value="{!greendeal.GDF_Payout_Received_Date__c}"/>
+<apex:inputField value="{!greendeal.GDF_Payment_Requested_Date__c}"/>
+
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Barclay's Detail:" columns="2" collapsible="false" rendered="{!financerecordtype}" id="blk1sec11">
+
+<apex:inputField value="{!greendeal.Barclays_Amount__c}"/>
+<apex:inputField value="{!greendeal.Barclays_Acceptance_Number__c}"/>
+<apex:inputField value="{!greendeal.Barclays_Payment_Requested_Date__c}"/>
+<apex:inputField value="{!greendeal.Barclays_Payout_Received_Date__c}"/>
+
+</apex:pageBlockSection>
+
+
+
+<apex:pageBlockSection title="Early Repayments(Finance):" columns="2" collapsible="false" rendered="{!financerecordtype}" id="sec12">
+
+<apex:inputField value="{!greendeal.Date_Requested__c}" onchange="popQuoteExJs();" id="dat_req"/>
+<apex:inputField value="{!greendeal.Web_portal_Status__c}"/>
+<apex:inputField value="{!greendeal.Quotation_requested__c}"/>
+<apex:inputField value="{!greendeal.Charge_to_customer__c}"/>
+<apex:outputField value="{!greendeal.ASP_raised__c}"/>
+<apex:inputField value="{!greendeal.Formal_Quotation_Sent_to_Customer__c}"/>
+<apex:inputField value="{!greendeal.Quotation_Expiry__c}"/>
+<apex:inputField value="{!greendeal.Formal_Quotation_Accepted__c}"/>
+<apex:inputField value="{!greendeal.Early_Repayment_Amount_Taken__c}" onchange="popEarlyPayJs();" id="earlyRep"/>
+<apex:inputField value="{!greendeal.Date_Early_Repayment_Taken__c}"/>
+
+
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="5th Page Details:" columns="2" collapsible="false"  id="sec5th" rendered="{!financerecordtype}">
+
+<apex:inputField value="{!greendeal.X5th_Page_Complete__c}"/>
+<apex:inputField value="{!greendeal.GDIP_Amendment__c}"/>
+<apex:inputField value="{!greendeal.GDIP_Amendment_Complete__c}"/>
+<apex:inputField value="{!greendeal.PlanSaleNoticeGDFC__c}"/>
+<apex:inputField value="{!greendeal.Plan_Sale_Notice_Complete__c}"/>
+<apex:inputField value="{!greendeal.COCUpload5thPage__c}"/>
+<apex:inputField value="{!greendeal.GDFC_Status__c}"/>
+<apex:inputField value="{!greendeal.Comments5thPag__c}"/>
+
+</apex:pageBlockSection>
+
+
+
+
+
+
+
+
+
+
+</apex:pageblock>
+</apex:form>
+
+</apex:page>

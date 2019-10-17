@@ -1,0 +1,175 @@
+<apex:page controller="NBBSInterfaceController" action="{!InsertData}"  showHeader="false" sidebar="false" title="Contingency Billing Screen">
+<style type="text/css">
+ .newLink { color: #FF6600; font-weight: bold;}
+ .newbold {font-weight: bold;}
+</style>
+
+<style type="text/css">
+ .newLink1 { color: #00C000; font-weight: bold;}
+ .newbold1 {font-weight: bold;}
+</style>
+<apex:form >
+<apex:pageblock rendered="{!!IsError}" title="Contingency Billing Screen">
+    <!-- Billing Details section -->
+    <apex:pageblocksection Title="Billing Details">
+                                   
+        <apex:pageblocksectionItem >
+        CHI Lead #             :   <apex:outputText value=" {!newInstallationBilling.CHI_Lead_Number__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Dist/Sect/ASC          :   <apex:outputText value=" {!newInstallationBilling.Area_Identifier__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Account Address Line 1 :   <apex:outputText value=" {!newInstallationBilling.Account_Address_Line1__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        LOCN                   :   <apex:outputText value=" {!QuoteNIASCode.CostCode}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Account Address Line 2 :   <apex:outputText value=" {!newInstallationBilling.Account_Address_Line_2__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Activity               :   <apex:outputText value=" {!QuoteNIASCode.INCOMECode}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Account Address Line 3 :   <apex:outputText value=" {!newInstallationBilling.Account_Address_Line_3__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Cust Category          :   <apex:outputText value="DM"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Account Address Line 4 :   <apex:outputText value=" {!newInstallationBilling.Account_Address_Line_4__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Job Type               :   <apex:outputText value="B"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Post Code              :   <apex:outputText value=" {!newInstallationBilling.Post_Code__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Deposit Number         :   <apex:outputText value=" {!newInstallationBilling.BGS_Payment_Reference_Number__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Job Address Line 1     :   <apex:outputText value=" {!newInstallationBilling.Job_Address_Line_1__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Job Request Date       :  <apex:outputField value=" {!newInstallationBilling.Job_Request_Date__c}"></apex:outputfield>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Job Address Line 2     :   <apex:outputText value=" {!newInstallationBilling.Job_Address_Line_2__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Job Completion date    :   <apex:outputField value=" {!newInstallationBilling.Job_Completion_Date__c}"></apex:outputField>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Job Address Line 3     :   <apex:outputText value=" {!newInstallationBilling.Job_Address_Line_3__c}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Manual Bill            :   <apex:outputText value="{!BillType}"></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Job Post Code          :   <apex:outputText value="{!newInstallationBilling.Account_Post_code__c} "></apex:outputText>
+        </apex:pageblocksectionItem>
+        <apex:pageblocksectionItem >
+        Payment Method         :   <apex:outputText value=" {!QuoteNIASCode.PaymentCode}"></apex:outputText>
+        </apex:pageblocksectionItem>
+    </apex:pageblocksection>
+    
+    
+     <apex:repeat value="{!ServiceLineInformation}" var="JB" > 
+        <apex:pageblocksection Title="SERVICE LINE" columns="2"> 
+            <apex:outputText style="labelCol  first " value="SVC Type              :   " rendered="{!NOT(ISNULL(JB.JobDescriptionBlock.Service_Type__c))}"/>
+            <apex:outputText value="{!JB.JobDescriptionBlock.Service_Type__c}" rendered="{!NOT(ISNULL(JB.JobDescriptionBlock.Service_Type__c))}">
+            </apex:outputText>                          
+            <apex:outputText style="labelCol  first " value="App Type               :   " rendered="{!NOT(ISNULL(JB.JobDescriptionBlock.Appliance_Type__c))}" />
+            <apex:outputText value="{!JB.JobDescriptionBlock.Appliance_Type__c}" rendered="{!NOT(ISNULL(JB.JobDescriptionBlock.Appliance_Type__c))}">
+            </apex:outputText>                     
+            <apex:outputLabel value="Sub Total :  " for="First_Value__c"/>
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="First_Value__c">
+                <apex:param value="{!JB.SubTotal}"/>
+            </apex:outputText>
+            <apex:outputLabel value="Discounts   : " for="DiscountDisp" rendered="{!IF((JB.DiscountDisp>0.00),true,false)}" />
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="DiscountDisp" rendered="{!IF((JB.DiscountDisp>0.00),true,false)}">
+                <apex:param value="{!JB.DiscountDisp}" />
+            </apex:outputText>
+            <apex:outputLabel value="VAT Amount  :  " for="VatAmount" />
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="VatAmount">
+                <apex:param value="{!JB.VatAmount}"/>
+            </apex:outputText>                                  
+            <apex:outputText value="VAT Rate               :   " />
+            <apex:outputText value="{!JB.VatRate}{!IF(JB.VatRate > 0, '%','')}" >
+            </apex:outputText>
+            <apex:outputLabel styleClass="newLink1" value="Billing VAT" rendered="{!NOT(ISNULL(JB.JobDescriptionBlock.Appliance_Type__c))}"/>
+            <apex:image value="{!$Resource.GreenTick}" title="Billing VAT" rendered="{!NOT(ISNULL(JB.JobDescriptionBlock.Appliance_Type__c))}"/>
+          <apex:pageBlockSectionItem >&nbsp;</apex:pageBlockSectionItem>
+        </apex:pageblocksection>
+    </apex:repeat>
+    <hr>
+    <apex:pageblocksection >
+        <apex:pageBlockSectionItem >
+             <apex:outputLabel value="Bill Period : " />
+             <apex:outputText styleClass="newLink" value="Before 04/01/2011" />
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+             <apex:outputLabel value="Bill Period : " />
+             <apex:outputText styleClass="newLink" value="After 04/01/2011" />
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Sub Total : " for="SubTotalDisp"/>
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="SubTotalDisp">
+                <apex:param value="{!SubTotalDisp}"/>
+            </apex:outputText>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Sub Total : " for="SubnewTotalDisp"/>
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="SubnewTotalDisp">
+                <apex:param value="{!SubnewTotalDisp}"/>
+            </apex:outputText>
+        </apex:pageBlockSectionItem>         
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Discount  :  " for="SumDiscount"/>
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="SumDiscount">
+                <apex:param value="{!SumDiscount}"/>
+            </apex:outputText>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Discount  :  " for="SumnewDiscount"/>
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="SumnewDiscount">
+                <apex:param value="{!SumnewDiscount}"/>
+            </apex:outputText>
+        </apex:pageBlockSectionItem>          
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="VAT Amount  : " for="SumVatAmount"/>
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="SumVatAmount">
+                <apex:param value="{!SumVatAmount}"/>
+            </apex:outputText>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="VAT Amount  : " for="SumnewVATAmount"/>
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="SumnewVATAmount">
+                <apex:param value="{!SumnewVATAmount}"/>
+            </apex:outputText>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Bill Total :" for="BillTotal"/>
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="BillTotal">
+                <apex:param value="{!BillTotal}"/>
+            </apex:outputText>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Bill Total :" for="NewBillTotalshow"/>
+            <apex:outputText value="{0,number,'£ '###,###,###.00}" id="NewBillTotalshow">
+                <apex:param value="{!NewBillTotalshow}"/>
+            </apex:outputText>
+        </apex:pageBlockSectionItem>
+
+    </apex:pageblocksection>
+    
+</apex:pageblock>
+
+<apex:pageblock rendered="{!IsError}">
+    <apex:image url="{!$Resource.ErrorImage}" width="50" height="50" />
+    <h2>{!DisplayMessage}</h2> 
+</apex:pageblock>
+</apex:form>
+</apex:page>

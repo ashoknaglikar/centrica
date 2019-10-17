@@ -1,0 +1,70 @@
+<apex:page controller="SendConsumablesCont">
+    <apex:pagemessages />
+    <apex:form >
+        <apex:pageblock >
+            <apex:pageblockbuttons >
+            <apex:commandbutton action="{!fetchRequests}" value="Fetch Consumable Requests"/>
+            <apex:commandbutton action="{!updateConsumables}" value="Uncheck Sent" rendered="{!conr}"/>
+            <apex:commandbutton action="{!EmailConsumables}" value="Email Additional Requests" />
+            </apex:pageblockbuttons>
+            <apex:pageBlockSection id="section1"  title="Please select Criteria for Searching:" collapsible="false" columns="1" >
+            <apex:pageblocksectionitem >
+                <apex:outputLabel value="Criteria" />
+                <apex:selectlist value="{!FieldType}" size="1" id="picklist">
+                     <apex:selectoptions value="{!FieldTypeOptions}"/>
+                     <apex:actionsupport event="onchange" rerender="Panel,section4" status="pleasewait"/>
+                </apex:selectlist>
+                </apex:pageblocksectionitem>  
+            </apex:pageBlockSection>
+            <apex:outputPanel id="Panel">
+                <apex:pageblocksection title="Fetch Consumables Request Between" collapsible="false" rendered="{!FieldType == 'Created Date'}">
+                    <apex:pageblocksectionItem id="thesection1">
+                            <apex:outputLabel value="Requests From:" for="startDate"></apex:outputLabel>
+                            <apex:inputfield value="{!cReq1.Submitted_DateTime__c}"/>
+                    </apex:pageblocksectionItem>
+                    <apex:pageblocksectionItem id="thesection2">
+                            <apex:outputLabel value="Requests To:" for="endDate"></apex:outputLabel>
+                            <apex:inputfield value="{!cReq2.Submitted_DateTime__c}"/>
+                    </apex:pageblocksectionItem>
+                </apex:pageblocksection>
+                <apex:pageblocksection title="Fetch Consumables Request Between" collapsible="false" rendered="{!FieldType == 'File Name'}">
+                    <apex:pageblocksectionItem id="thesection1">
+                            <apex:outputLabel value="File Name" ></apex:outputLabel>
+                            <apex:inputfield value="{!cReq1.File_Name__c}"/>
+                    </apex:pageblocksectionItem>
+                </apex:pageblocksection>
+                <p/>
+                <apex:outputPanel rendered="{!conr}">
+                    <table width='100%'>
+                        <tr>
+                            <td>
+                                <apex:inputCheckbox value="{!selectAll}" onchange="selectAll()" /><font face='calibri' color='#880000' size='2'><b> Select All Consumable Requests. </b></font>
+                            </td>
+                        </tr>
+                    </table>
+                </apex:outputPanel>
+                <p/>
+                <apex:outputPanel id="innerPanel" >
+                    <apex:actionFunction name="selectAll" action="{!selectAll}" rerender="innerPanel" status="myStatus"/>
+                    <apex:actionStatus startText="Processing..." id="myStatus"/>
+                    <apex:pageblocksection title="Consumables Requests" columns="1" rendered="{!conr}" collapsible="false" id="section4">
+                        <apex:pageblocktable value="{!cReqInnrList}" var="req" >
+                            <apex:column headerValue="Select">
+                                <apex:inputCheckbox selected="{!req.isSelected}" id="select"/>
+                            </apex:column>   
+                            <apex:column headerValue="Name">
+                                <apex:outputField value="{!req.cReqIn.Name}"/>
+                            </apex:column>
+                            <apex:column headerValue="Employee">
+                                <apex:outputField value="{!req.cReqIn.Employee__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Sent">
+                                <apex:outputField value="{!req.cReqIn.Picked_Up_by_Email__c}"/>
+                            </apex:column>
+                        </apex:pageblocktable>
+                    </apex:pageblocksection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

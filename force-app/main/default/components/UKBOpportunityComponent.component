@@ -1,0 +1,135 @@
+<apex:component controller="UKBOpportunityComponentController">
+<apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer"/> 
+<apex:attribute name="opportunityObject" description="This attrribute passes the Opportunity object to the AccountEditViewComponent type: Edit or View." type="Opportunity" assignTo="{!oppRecord}" />
+<apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+
+
+<apex:pageblock id="blk">
+<apex:outputpanel rendered="{!pageMessages}">
+<apex:pagemessages />
+</apex:outputpanel>
+
+<apex:pageblocksection title="Lead Details" rendered="{!if(displayModeVal==DisplayModeobj.VIEW, true, false)}">
+<apex:outputfield value="{!opportunityObject.CHI_Lead_Id__c}" />
+<apex:pageblocksectionitem />
+<apex:outputfield value="{!opportunityObject.Product_Interest__c}" />
+<apex:outputfield value="{!opportunityObject.Commercial_Indicator__c}" />
+<apex:outputfield value="{!opportunityObject.Job_Type__c}" />
+<apex:outputfield value="{!opportunityObject.Type_of_Boiler__c}" />
+
+<apex:pageblocksectionitem > 
+<apex:outputLabel value="Loss of heating" />
+<apex:outputfield value="{!opportunityObject.Is_the_customer_s_boiler_working__c}" /> 
+</apex:pageblocksectionitem> 
+
+<apex:outputfield value="{!opportunityObject.Fuel_Type__c}" /> 
+
+<apex:pageblocksectionitem >
+<apex:outputLabel value="Loss of hot water" />
+<apex:outputfield value="{!opportunityObject.Does_the_customer_have_hot_water__c}" /> 
+</apex:pageblocksectionitem>
+
+<apex:outputfield value="{!opportunityObject.Boiler_Make__c}" /> 
+
+<apex:pageblocksectionitem >
+<apex:outputLabel value="Vulnerable People living on site" />
+<apex:outputfield value="{!opportunityObject.Is_the_customer_vulnerable__c}" /> 
+</apex:pageblocksectionitem>
+
+<apex:outputfield value="{!opportunityObject.Boiler_Model__c}" /> 
+<apex:outputfield value="{!opportunityObject.High_Priority__c}" /> 
+<apex:outputfield value="{!opportunityObject.Boiler_Size__c}" /> 
+
+<apex:outputfield value="{!opportunityObject.Total_number_of_boilers_onsite__c}" /> 	
+<apex:outputfield value="{!opportunityObject.Number_Of_Radiators__c}" /> 	
+<apex:outputfield value="{!opportunityObject.Number_of_boilers_in_scope_to_replace__c}" /> 	
+<apex:outputfield value="{!opportunityObject.Type_of_Heater__c}" /> 	
+<apex:outputfield value="{!opportunityObject.Description_of_Work_Required__c}" /> 	
+<apex:outputfield value="{!opportunityObject.Number_of_Additional_Appliances__c}" /> 	
+</apex:pageblocksection>
+
+<apex:actionfunction name="validateOpp" action="{!checkOpp}" rerender="blk" />
+<apex:pageblocksection title="Lead Details" rendered="{!if(displayModeVal==DisplayModeobj.Edit, true, false)}">
+
+<apex:inputfield value="{!opportunityObject.Fuel_Type__c}" onchange="validateOpp();"/> 
+
+<apex:inputfield value="{!opportunityObject.Type_of_Heater__c}" onchange="validateOpp();"/>  
+
+
+
+
+<apex:pageblocksectionitem >
+
+<apex:outputLabel value="Job Type" />
+<apex:outputPanel styleClass="requiredInput" layout="block">
+<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+<apex:inputfield value="{!opportunityObject.Job_Type__c}"/>
+</apex:outputPanel>
+</apex:pageblocksectionitem>
+
+
+<apex:inputfield value="{!opportunityObject.Type_of_Boiler__c}"/> 
+
+<apex:pageblocksectionitem >
+
+<apex:outputLabel value="Loss of heating" />
+<apex:inputfield value="{!opportunityObject.Is_the_customer_s_boiler_working__c}" /> 
+
+</apex:pageblocksectionitem>
+
+<apex:pageblocksectionitem />
+
+<apex:pageblocksectionitem >
+<apex:outputLabel value="Loss of hot water" />
+<apex:inputfield value="{!opportunityObject.Does_the_customer_have_hot_water__c}" /> 
+</apex:pageblocksectionitem>
+	
+<apex:inputfield value="{!opportunityObject.Boiler_Make__c}"/> 
+
+<apex:pageblocksectionitem >
+<apex:outputLabel value="Vulnerable People living on site" />
+<apex:inputfield value="{!opportunityObject.Is_the_customer_vulnerable__c}" /> 
+</apex:pageblocksectionitem>
+
+<apex:inputfield value="{!opportunityObject.Boiler_Model__c}"/>  
+<apex:inputfield value="{!opportunityObject.High_Priority__c}"/> 
+<apex:inputfield value="{!opportunityObject.Boiler_Size__c}" onchange="validateOpp();"/>  
+
+<apex:pageblocksectionitem >
+<apex:outputLabel value="Total number of boilers onsite" />
+<apex:outputPanel styleClass="requiredInput" layout="block">
+<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+<apex:inputfield value="{!opportunityObject.Total_number_of_boilers_onsite__c}" onchange="validateOpp();"/> 
+</apex:outputPanel>
+</apex:pageblocksectionitem>
+
+ 	
+<apex:inputfield value="{!opportunityObject.Number_Of_Radiators__c}"  onchange="validateOpp();"/>  	
+
+<apex:pageblocksectionitem >
+<apex:outputLabel value="Number of boilers in scope to replace" />
+<apex:outputPanel styleClass="requiredInput" layout="block">
+<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+<apex:inputfield value="{!opportunityObject.Number_of_boilers_in_scope_to_replace__c}"  onchange="validateOpp();"/> 
+</apex:outputPanel>
+</apex:pageblocksectionitem>
+
+<apex:inputfield value="{!opportunityObject.Number_of_Additional_Appliances__c}"  onchange="validateOpp();" />  	
+ 	
+<apex:pageblocksectionitem >
+<apex:outputLabel value="Description of work required" />
+<apex:outputPanel styleClass="requiredInput" layout="block">
+<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+<apex:inputfield value="{!opportunityObject.Description_of_Work_Required__c}"/>  
+</apex:outputPanel>
+</apex:pageblocksectionitem>
+	
+
+</apex:pageblocksection>
+
+
+</apex:pageblock>
+ 
+ 
+ 
+</apex:component>

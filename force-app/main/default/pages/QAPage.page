@@ -1,0 +1,237 @@
+<apex:page sidebar="true" standardController="QA_Header__c" extensions="QAController" tabStyle="account" docType="html-5.0"  >
+<chatter:feedWithFollowers entityId="{!CHILeadID}" showHeader="true" rendered="{!showCustomer}"/>    
+
+<Script type="text/javascript">
+function callJavascript(id){
+    cashOrFinance(document.getElementById(id).value);
+}
+</Script>
+
+<style>
+    .align_class{float:left}     
+</style>
+
+<apex:form id="frm">
+    <apex:pageMessages />
+    <apex:pageBlock >
+    <div align="Center">
+        <h1>Quality Assurance</h1>
+    </div>
+    </apex:pageBlock>
+    
+    <apex:pageBlock title="Search" rendered="{!showSearch}">
+        <apex:outputText value="CHI Lead Number " />
+        <apex:input value="{!searchString}"  />
+        <apex:commandButton value="SEARCH" action="{!search}"/>
+    </apex:pageBlock>
+    
+     <!-- Job & Customer details -->
+    <apex:pageBlock rendered="{!showCustomer}">
+        
+    <apex:pageBlockSection title="Customer Information" columns="2" showHeader="True" collapsible="false" rendered="{!showCustomer}" >
+
+        
+        <apex:outputField value="{!CHILeadDetails.Customer_Name__c}"/>  <!-- Customer Name -->        
+        <apex:outputField label="Category" value="{!CHILeadDetails.Latest_customer_category_indicator__c}" />  <!-- Category -->
+        
+        <apex:outputField value="{!CHILeadDetails.Install_Address_Street__c}"/> <!-- street -->
+        <apex:outputField value="{!CHILeadDetails.CHI_Lead_Id__c}"/> <!-- street -->
+      
+        <apex:outputField value="{!CHILeadDetails.Install_Postcode__c}"/>  <!-- postcode --> 
+        <apex:outputField value="{!CHILeadDetails.name}"/> <!-- chi lead link -->
+
+        <apex:outputField value="{!CHILeadDetails.Install_Address_City__c}"/>  <!-- city -->     
+        <apex:outputField value="{!quoteDetails.name}"/>  <!-- Quote link--> 
+            
+        <apex:outputField value="{!CHILeadDetails.Install_Address_County__c}"/>  <!-- country-->
+        <apex:outputField value="{!jobDetails.Installation_Date__c}"/>  <!-- installation date-->
+                
+        <apex:outputField label="Customer Mobile Number" value="{!CHILeadDetails.Mobile_Phone__c}"/>  <!-- Customer mobile number-->
+        <apex:outputField label="Customer Home Number" value="{!CHILeadDetails.Home_Phone__c}"/>  <!-- Customer phone number-->
+        
+        <apex:outputField label="Customer Email Number" value="{!CHILeadDetails.Customer_Email__c}"/>  <!-- Customer Email number-->
+        <apex:outputField label="HSA Name" value="{!jobDetails.HSA_Name__c}"/>  <!-- HSA Name-->
+        
+        <apex:outputField label="Payment Method" value="{!jobDetails.Payment_Method__c}"/>  <!-- Payment Method-->
+        <apex:outputField label="Quote sell date" value="{!quoteDetails.closeDate__c}"/>  <!-- Payment Method-->
+        
+        <apex:outputField label="Completed Surveys" value="{!CHILeadDetails.Surveys_taken__c}"/>
+        
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Notes Link" for="noteslink" style="font-weight:bold"/>
+            <apex:outputLink title="CHI Lead Note Link" id="noteslink" value="/apex/AmalgamateNotes?OppId={!jobDetails.CHI_Lead__c}" target="_blank">CHI Lead Notes</apex:outputLink>             
+        </apex:pageBlockSectionItem>
+        
+        <apex:inputField value="{!newQA.Call_Compliant__c}"/>
+        <apex:inputField value="{!newQA.Hand_off_to_CAT__c}"/>
+                
+        <apex:outputField value="{!CHILeadDetails.Account.Primary_Contact__r.bm_fAcceptanceNumber__c}"/> 
+        <apex:inputField value="{!newQA.Different_Name_on_Finance__c}"/>
+        
+        <apex:inputField value="{!newQA.Term__c}"/> 
+        <apex:inputField value="{!newQA.General_Comments__c}"/>
+        
+        <apex:inputField value="{!newQA.Vulnerability_Identified__c}"/> 
+        <apex:inputField value="{!newQA.Outcome_Required__c}"/> 
+         
+        <apex:outputField value="{!newQA.Locked__c}"/> 
+        <apex:outputField value="{!newQA.Locked_Indicator__c}" rendered="{!locked}"/>
+        
+        <apex:outputField value="{!newQA.Status__c}"/>    
+    </apex:pageBlockSection>
+    </apex:pageBlock>
+    
+    <apex:pageBlock rendered="{!showQuestions}" id="questionBlock">
+        
+    <!-- General Question block -->  
+    <!-- <apex:actionFunction name="cashOrFinance" action="{!cashOrFinance}" reRender="questionBlock" status="wait">
+                    <apex:param name="cashOrFinance" value="" />
+    </apex:actionFunction>  
+    <apex:actionStatus id="wait" startText=" (wait...)" stopText=""/> -->
+
+    <apex:pageBlockSection columns="1" title="General Question Section" collapsible="false" id="generalBlock">    
+    <div align="center">
+        <apex:pageBlockTable columns="4" width="100%" align="center" value="{!GQuestionsClass}" var="sq">
+            <apex:column width="20%" headerValue="Question Code" value="{!sq.question.Question_Code__c}" />
+            <apex:column width="60%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            
+            <apex:column width="20%" style="text-align: left;"  headerValue="Answer">
+                                                            
+                <apex:selectRadio id="General" required="false"  value="{!sq.answer}" rendered="{!AND(NOT(sq.ifAnsIsNumber),NOT(sq.ifAnsIsText))}">
+                    <apex:selectOptions value="{!sq.options}"/> 
+                </apex:selectRadio>        
+                  
+
+                <apex:selectList id="General1" required="false" value="{!sq.answer}" size="1" rendered="{!sq.ifAnsIsNumber}" style="margin-left: 20px"> 
+                    <apex:selectOptions value="{!sq.numberOptions}"/>
+                </apex:selectList>  
+                 
+                <apex:selectList id="General2" required="false" value="{!sq.answer}" size="1" rendered="{!sq.ifAnsIsText}" style="margin-left: 20px">
+                    <apex:actionSupport event="onchange" action="{!cashOrFinance}" reRender="frm" status="wait">
+                    <apex:param name="cashOrFinance" value="{!sq.answer}" />
+                    </apex:actionSupport>  
+                    <apex:actionStatus id="wait" startText=" (wait...)" stopText=""/>
+                    <apex:selectOptions value="{!sq.paymentOptions}" id="cashOrFinance"/>
+                     
+                </apex:selectList> 
+                
+                <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.General}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>
+                                                 
+            </apex:column>
+            <apex:column width="20%" headerValue="Poor Outcome" >
+                <apex:inputCheckbox value="{!sq.poorOutcome}"/>
+            </apex:column>   
+            
+            <apex:column width="20%" headerValue="Notes" >
+                <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column>   
+        </apex:pageBlockTable>
+     </div>       
+    </apex:pageBlockSection> 
+        
+    <!-- Finance Question block -->  
+    <apex:pageBlockSection columns="1" title="Finance Question Section" collapsible="false" id="FinanceBlock" rendered="{!Finance}">    
+    <div align="center">
+        <apex:pageBlockTable columns="4" width="100%" align="center" value="{!FQuestionsClass}" var="sq">
+            <apex:column width="20%" headerValue="Question Code" value="{!sq.question.Question_Code__c}" />
+            <apex:column width="40%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="{text-align: left}"  headerValue="Answer">
+                
+                <apex:selectRadio id="Finance" required="false" value="{!sq.answer}" rendered="{!AND(NOT(sq.ifAnsIsNumber),NOT(sq.ifAnsIsText))}" >
+                    <apex:selectOptions value="{!sq.options}"/>
+                </apex:selectRadio> 
+                
+
+                <apex:selectList id="Finance1" required="false" value="{!sq.answer}" size="1" rendered="{!sq.ifAnsIsNumber}" style="margin-left: 20px">
+                    <apex:selectOptions value="{!sq.numberOptions}"/>
+                </apex:selectList> 
+                 
+               
+               <apex:selectList id="Finance2" required="false" value="{!sq.answer}" size="1" rendered="{!sq.ifAnsIsText}" style="padding-left: 20px">
+                    <apex:selectOptions value="{!sq.paymentOptions}"/>
+                </apex:selectList> 
+                
+                
+                <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.Finance}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>
+                               
+            </apex:column>
+            <apex:column width="20%" headerValue="Poor Outcome" >
+                <apex:inputCheckbox value="{!sq.poorOutcome}"/>
+            </apex:column>             
+            <apex:column width="30%" headerValue="Notes" >
+               <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column> 
+        </apex:pageBlockTable>
+     </div> 
+     </apex:pageBlockSection>  
+     <!-- End of question block -->
+     
+        <!-- Other Question block -->  
+    <apex:pageBlockSection columns="1" title="Other Question Section" collapsible="false" id="OtherBlock">    
+    <div align="center">
+        <apex:pageBlockTable columns="4" width="100%" align="center" value="{!OQuestionsClass}" var="sq">
+            <apex:column width="20%" headerValue="Question Code" value="{!sq.question.Question_Code__c}" />
+            <apex:column width="40%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="{text-align: left}"  headerValue="Answer">
+                
+                <apex:selectRadio id="Other" required="false" value="{!sq.answer}" rendered="{!AND(NOT(sq.ifAnsIsNumber),NOT(sq.ifAnsIsText))}" >
+                    <apex:selectOptions value="{!sq.options}"/>
+                </apex:selectRadio> 
+                
+
+                <apex:selectList id="Other1" required="false" value="{!sq.answer}" size="1" rendered="{!sq.ifAnsIsNumber}" style="margin-left: 20px">
+                    <apex:selectOptions value="{!sq.numberOptions}"/>
+                </apex:selectList> 
+                 
+               
+               <apex:selectList id="Other2" required="false" value="{!sq.answer}" size="1" rendered="{!sq.ifAnsIsText}" style="padding-left: 20px">
+                    <apex:selectOptions value="{!sq.paymentOptions}"/>
+                </apex:selectList> 
+                
+                
+                <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.Other}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>
+                               
+            </apex:column>
+            <apex:column width="20%" headerValue="Poor Outcome" >
+                <apex:inputCheckbox value="{!sq.poorOutcome}"/>
+            </apex:column>             
+            <apex:column width="30%" headerValue="Notes" >
+               <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column> 
+        </apex:pageBlockTable>
+     </div> 
+     </apex:pageBlockSection>  
+     <!-- End of question block -->
+         
+     <apex:pageBlockButtons >    
+        <apex:commandButton value="SAVE" action="{!save}" />
+        <apex:commandButton value="CANCEL" action="{!cancel}" immediate="true" />
+    </apex:pageBlockButtons>
+    
+    </apex:pageBlock>
+
+
+    
+</apex:form>
+</apex:page>

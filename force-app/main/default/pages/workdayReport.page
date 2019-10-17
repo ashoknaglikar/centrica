@@ -1,0 +1,214 @@
+<apex:page controller="WorkdayReportHelper" tabStyle="WorkdayReport__c" id="pg">
+ <style>
+  .headerStyle {
+        background-color: yellow;
+        text-align:center;
+     }
+ 
+   .ct{
+      text-align:center;
+    }
+    
+   
+   table {
+    border-collapse: separate;
+    border-spacing: 0.5px;
+    border-color:#fff;
+    
+   }
+   
+   tr.veralign td{
+     text-align:center;
+     vertical-align:middle;
+     font-family:Arial,Helvetica,sans-serif;
+     font-size:1em;
+   }
+   
+   tr.Total td{
+     text-align:center;
+     vertical-align:middle;
+     font-family:Arial,Helvetica,sans-serif;
+     font-weight:bold;
+   }
+   
+   th{
+     height:50px;
+     //width :14%;
+   } 
+ </style>
+ <script>
+   function Callmefunc()
+   {
+    
+   var type = document.getElementById("pg:frm:selectdata:Second:thesection:thesection3:inst_lkid").value;
+   check(type); 
+   
+    
+   
+   }
+   window.onload=function() {
+      document.getElementById('focusDistraction').focus();
+      }
+      
+ </script>
+ <apex:form id="frm">
+ <apex:actionFunction name="check" action="{!PopulateData}" reRender="frm">
+                    <apex:param name="Installer" value="" />
+ </apex:actionFunction>
+  <apex:pageMessages ></apex:pageMessages>
+  <apex:pageblock title="Select Date" id="selectdata">
+            <apex:pageBlock id="Second">
+                <apex:pageblocksection id="thesection">
+                    <apex:pageblocksectionItem id="thesection1">
+                        <apex:outputLabel value="Week Commencing:" for="startDate"></apex:outputLabel>
+                        <apex:inputfield value="{!obj_Job1.Job_Notification_Date__c }" id="startDate"/>                        
+                    </apex:pageblocksectionItem> 
+                    <!--<apex:pageblocksectionItem id="thesection2">
+                        <apex:outputLabel value="End Date:" for="endDate"></apex:outputLabel>
+                        <apex:inputfield value="{!obj_workday2.Date__c}" id="startDate"/>  
+                    </apex:pageblocksectionItem> -->
+                    <apex:pageblocksectionItem id="thesection3" rendered="{!IF(OR(contains($Profile.Name,'System Administrator'), contains($Profile.Name,'CHI Installation - AHM'),contains($Profile.Name,'CHI Installation - DHM'),contains($Profile.Name,'CHI Installation - Operations Manager')   ),true,false)}">
+                        <apex:outputLabel value="Installer" for="inst"></apex:outputLabel>
+                        <apex:inputfield value="{!Week.Employee__c}" id="inst"/>  
+                    </apex:pageblocksectionItem>
+                   
+                  </apex:pageblocksection>
+                  <apex:pageBlockButtons location="bottom">
+                  <apex:commandbutton value="Main Menu" action="{!retrunMainMenu}" />
+                    <apex:commandButton value="Run Report" action="{!PopulateData}" rerender="frm"/> <!-- action="{!PopulateData}" -->
+                  </apex:pageBlockButtons>  
+              </apex:pageblock>
+    </apex:pageBlock> 
+    
+    <apex:outputPanel rendered="{!renderReport}" id="panel">
+      <!-- <apex:pageblock title="Work Day Report {!obj_workday1.Date__c} - {!obj_workday2.Date__c}">
+        
+         <apex:pageblockTable value="{!JobHoursList}" var="w">
+         
+           <apex:column headerValue="Date" styleClass="headerStyle" headerClass="ct">
+             <apex:outputField value="{!w.Workdayrep.Date__c}"/>
+           </apex:column>
+          
+           <apex:column headerValue="Day" styleClass="headerStyle" headerClass="ct">
+            <apex:outputField value="{!w.Workdayrep.Day__c}"/>
+           </apex:column>
+           
+           <apex:column headerValue="Job Hours" headerClass="ct">
+           <apex:pageBlockTable value="{!w.jHours}" var="jhr">
+              <apex:column headerValue="Job Number" headerClass="ct">
+                 <apex:outputField value="{!jhr.name}"/>
+              </apex:column>
+            
+             <apex:column headerValue="Premier Time" headerClass="ct">
+                 <apex:outputField value="{!jhr.Premier_Hours__c}"/>
+              </apex:column>
+              
+              <apex:column headerValue="Over booked" headerClass="ct">
+                 <apex:outputField value="{!jhr.Overbooked_Hours__c}"/>
+              </apex:column>
+                           
+           </apex:PageBlockTable>
+              
+          </apex:column>
+          
+          <apex:column headerValue="Unavailability" headerClass="ct" style="text-align:center;">
+            <apex:outputField value="{!w.Workdayrep.Unavailability_Hours__c}"/>
+          </apex:column>
+          
+          <apex:column headerValue="NWD" headerClass="ct" style="text-align:center;">
+            <apex:outputField value="{!w.Workdayrep.NWD__c}"/>
+          </apex:column>
+          
+         </apex:pageblockTable>
+      
+      </apex:pageblock> -->
+      <apex:pageBlock title="Workday Report for {!StartDate}" >
+      <div align="center" draggable="false">
+      <apex:outputpanel >
+          <apex:commandlink value="<<Previous Week" action="{!previousWeek}" rerender="panel"/>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <apex:commandlink value = "Next Week>>" action="{!nextWeek}" rerender="panel"/>
+      </apex:outputpanel> 
+      </div>
+      <br/> 
+      <table width="100%" border="1" cellspacing="0" cellpadding="0" > <!-- bgcolor="#08D0AA" --> 
+         <tr bgcolor="#08D0AA" height="50">   <!-- a466d2-->
+           <th colspan="1" style="text-align:center" width="10%">Date</th>
+           <th colspan="1" style="text-align:center" width="10%">Day</th>
+           <th colspan="1" style="text-align:center" width="35%">
+                <table width="100%" border="1">
+                  <tr >
+                    <th style="text-align:center" width="10%">Job Number</th>
+                    <th style="text-align:center" width="10%">Premier Time</th>
+                    <th style="text-align:center" width="10%">Over Booked</th>
+                    
+                  </tr>
+                </table> 
+                   
+           </th>
+           <th colspan="1" style="text-align:center" width="10%">In-Day Travel Time</th>
+           <th colspan="1" style="text-align:center" width="10%">Availability</th>
+           <th colspan="1" style="text-align:center" width="10%">Unavailablity</th>
+           <th colspan="1" style="text-align:center" width="10%">NWD</th>
+          </tr>
+                  
+          <apex:repeat value="{!JobHoursList}" var="w" >
+          
+          <tr border="0" height="35" class="veralign">
+            
+             <td bgcolor="#FFFF33" ><apex:outputText value=" {!w.Workdayrep.Date__c}"/></td>  
+             <td bgcolor="#FFFF33" ><apex:outputText value="{!w.Workdayrep.Day__c}"/></td> 
+             <td>
+             <apex:outputpanel rendered="{!w.jHours.size > 0}">  
+              <table border="0" cellpadding="0" cellspacing="0" class="list">
+                
+                 <apex:repeat value="{!w.jHours}" var="jhr">
+                 <tr>
+                   
+                      <td colspan="1" class="ct" width="10%" bgcolor="white"><apex:outputText value="{!jhr.Job_Number__c}"/></td>
+                      <td colspan="1" class="ct" width="10%" bgcolor="{!IF(AND(NOT(ISNULL(jhr.Premier_Hours__c)),jhr.Premier_Hours__c>0),'white','#ededed')}"><apex:outputText value="{!jhr.Premier_Hours__c}"/></td>
+                      <td colspan="1" class="ct" width="10%" bgcolor="{!IF(AND(NOT(ISNULL(jhr.Overbooked_Hours__c)),jhr.Overbooked_Hours__c>0),'white','#ededed')}"><apex:outputText value="{0, number, 0.00}">
+                                         <apex:param value="{!jhr.Overbooked_Hours__c}" />
+                                         </apex:outputText><!--<apex:outputText value="{!jhr.Overbooked_Hours__c}"/>-->
+                                         </td>
+                    
+                </tr> 
+                </apex:repeat>
+               </table>
+             </apex:outputpanel> 
+             </td>
+             <td bgcolor="{!IF(w.Workdayrep.Total_Travel_Time__c>0,'white','')}"><apex:outputText value="{!w.Workdayrep.Total_Travel_Time__c}"/></td>
+             <td bgcolor="{!IF(w.Workdayrep.Available_Hours__c>0,'white','')}"><apex:outputText value="{!w.Workdayrep.Available_Hours__c}"/></td>
+             <td bgcolor="{!IF(w.Workdayrep.Unavailability_Hours__c>0,'white','')}"><apex:outputText value="{!w.Workdayrep.Unavailability_Hours__c}"/></td>
+             <td bgcolor="{!IF(w.Workdayrep.NWD__c>0,'white','')}"><apex:outputText value="{!w.Workdayrep.NWD_Text__c}"/></td>
+            </tr>  
+            </apex:repeat>  
+            
+            <tr class="Total">
+              <td colspan="2"></td>
+              <td>
+                  <table border="0" cellpadding="0" cellspacing="0" class="list" border-collapse="collapse">
+                    <colgroup span="3"></colgroup>
+                    <thead class="">
+                     <tr bgcolor="#FFA57D">
+                       <TH colspan="1" class="ct" width="10%">Totals</TH>
+                       <TH colspan="1" class="ct" width="10%">{!calTotHours.Tot_Premier_Hours}</TH>
+                       <TH colspan="1" class="ct" width="10%">{!calTotHours.Tot_OB_Hours}</TH>
+                     </tr>
+                    </thead>
+                  </table>
+              </td>
+              <td bgcolor="#FFA57D"><apex:outputText value="{!calTotHours.Tot_Travel_Time}"/></td>
+              <td bgcolor="#FFA57D"><apex:outputText value="{!calTotHours.Tot_Available_Hours}"/></td>
+              <td bgcolor="#FFA57D"><apex:outputText value="{!calTotHours.Tot_Unavailability_Hours}"/></td>
+              <td bgcolor="#FFA57D"><apex:outputText value="{!calTotHours.Tot_NWD_Hours}"/></td>
+              
+            </tr>
+            
+       </table> 
+       </apex:pageBlock>
+    </apex:outputPanel>
+                   
+ </apex:form>  
+ 
+</apex:page>

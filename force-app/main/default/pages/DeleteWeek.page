@@ -1,0 +1,16 @@
+<apex:page action="{!deleteWeek}" StandardController="Week__c" extensions="DeleteWeekController">
+
+<apex:form >
+<apex:inputHidden value="{!Week__c.Employee__c}" />
+
+<apex:sectionHeader title="Week Delete" subtitle="{!Week__c.Name}" />
+
+<apex:pageBlock >
+	<apex:pageBlockButtons >
+		<apex:commandButton action="{!cancel}" value="Back" />
+	</apex:pageBlockButtons>
+	{!userMessage}
+</apex:pageBlock>
+</apex:form>
+
+</apex:page>

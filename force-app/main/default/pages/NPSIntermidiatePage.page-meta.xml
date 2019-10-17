@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>18.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>CTS_PH5: This page is used as an intermidiate page for calling action method to populate Account and CHI Lead for NPS.</description>
+    <label>NPSIntermidiatePage</label>
+</ApexPage>

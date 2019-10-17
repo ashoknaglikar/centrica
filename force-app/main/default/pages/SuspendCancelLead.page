@@ -1,0 +1,178 @@
+<apex:page standardController="Opportunity" extensions="SuspendCancelJob" showHeader="false" sidebar="false">
+
+    <!-- Added block for PTS CR -->
+    <script>
+    var jsCheckInterval;
+    function openNewPTSWindow(jobid , deliveryDate)
+     {
+        jsPopPTSWindow = window.open('/apex/PTSForm?id='+jobid+'&dt='+deliveryDate, + "_blank","controls=no,height=705,width=1020,scrollbars=1");
+        //alert(jobid);
+        //alert(deliveryDate);
+     }
+     function validatePTS()
+     {
+        callServer();
+     }
+     
+     function openPTSScrren(jobid)
+     {
+        jsPopPTSWindow = window.open('/apex/CancelSlotInPTS?jobId='+jobid+'&slot=C');
+        //jsCheckInterval = setInterval(checkNewPTSWindowClosed, 300);
+     }
+     
+    </script>
+    <!-- Added block for PTS CR -->
+    
+    <apex:form >
+        
+    <apex:pageMessages ></apex:pageMessages>    
+        <apex:pageBlock >
+            <font face='calibri' color = 'red' size ='2'> {!s_msg} </font>      
+            <apex:outputPanel rendered="{!IF($CurrentPage.parameters.showdet != 'false',true,false)}">
+                <apex:outputPanel rendered="{!IF($CurrentPage.parameters.action = 'suspend',true,false)}">
+                    <p/>
+                        <hr/>
+                        <font face='calibri' color = '#787878' size ='2'>
+                            <b>Suspending a CHI Lead will automatically suspend all the related Jobs, Job Elements and (optionally) Orders and Order Lines.</b>
+                        </font>
+                        <hr/>
+                    <p/>
+                </apex:outputPanel> 
+                
+                <apex:outputPanel rendered="{!IF($CurrentPage.parameters.action ='cancel',true,false)}">
+                    <p/>
+                        <hr/>
+                        <font face='calibri' color = '#787878' size ='2'>
+                            <b>Cancelling a CHI Lead will automatically Cancel all the related Jobs, Job Elements, Orders and Order Lines.</b>
+                        </font>
+                        <hr/>
+                    <p/>
+                </apex:outputPanel>
+                
+                
+                
+                <apex:pageBlockSection title="CHI Lead - {!Opportunity.Name}" collapsible="false">  
+                        
+                    <apex:pageBlockSectionItem helpText="Customer Full Name" labelTitle="Customer Name">
+                        <apex:outputLabel value="Customer Name" for="CustomerName"/>
+                        <apex:outputText value="{!Opportunity.Customer_Name__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem helpText="Charge payable by the customer" labelTitle="Amount charged to the customer">
+                        <apex:outputLabel value="Amount Payable" for="Amount"/>
+                        <apex:outputText value="{!Opportunity.Amount}"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem helpText="Deposit made by the customer" labelTitle="Deposit Amount">
+                        <apex:outputLabel value="Deposit Amount" for="DepositAmount"/>
+                        <apex:outputText value="{!Opportunity.Sum_of_Deposits__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem helpText="Finance Amount agreed by the customer" labelTitle="Finance Amount">
+                        <apex:outputLabel value="Finance Amount" for="FinanceAmount"/>
+                        <apex:outputText value="{!Opportunity.Finance_Amount__c}"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem helpText="Compensation agreed to the customer" labelTitle="Compensation Amount">
+                        <apex:outputLabel value="Compensation Amount" for="CompensationAmount"/>
+                        <apex:outputText value="{!Opportunity.Compensation_Amount__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem helpText="Compensation agreed to the customer" labelTitle="Compensation Amount">
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem helpText="how did the customer paid the balance amount(Total - Deposit)" labelTitle="Balance Amount Paid By">
+                        <apex:outputLabel value="Balance Amount Paid By" for="BalPayMthd"/>
+                        <apex:outputText value="{!Opportunity.Balance_Payment_Method__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ><hr/></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ><hr/></apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem helpText="Please select an appropriate job suspension reason" labelTitle="Job suspension reason" rendered="{!IF($CurrentPage.parameters.action = 'suspend',true,false)}">
+                        <apex:outputLabel value="Reason for Job Suspension" for="Suspension_Reason__c"/>
+                        <apex:inputField required="true" value="{!Opportunity.Suspension_Reason__c}"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem helpText="Indicate whether to cancel work/material/all orders" labelTitle="Cancel Orders"  rendered="{!IF($CurrentPage.parameters.action ='suspend',true,false)}">
+                        <apex:outputLabel value="Cancel Orders" for="Cancel Orders"/>
+                        <apex:selectRadio value="{!orderChoice}" onchange="validatePTS();">
+                            <apex:selectOptions value="{!choices}"/>
+                        </apex:selectradio>
+                    </apex:pageBlockSectionItem> 
+                    
+                        
+                     <apex:pageBlockSectionItem helpText="Please select an appropriate job cancellation reason" labelTitle="Job cancellation reason" rendered="{!IF($CurrentPage.parameters.action = 'cancel',true,false)}">
+                        <apex:outputLabel value="Reason for Job Cancellation" for="Opportunity_Cancellation_Reason_For_Job__c"/>
+                        <apex:inputField required="true" value="{!Opportunity.Opportunity_Cancellation_Reason_For_Job__c}"/>
+                    </apex:pageBlockSectionItem>
+                    
+                     <apex:pageBlockSectionItem helpText="Please select an appropriate stage reason for closed lost" labelTitle="Stage reason for closed lost" rendered="{!IF($CurrentPage.parameters.action = 'cancel',true,false)}">
+                        <apex:outputLabel value="Stage reason for closed lost" for="Stage_Reason_CHICR__c"/>
+                        <apex:inputField required="true" value="{!Opportunity.Stage_Reason_CHICR__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <!-- CR -12310-->
+                    <apex:pageBlockSectionItem helpText="Please Select an appropriate Deposite Outcome Value" labelTitle="Deposite Outcome">
+                        <apex:outputLabel value="Deposit Outcome" for="Deposit_outcome__c"/>
+                        <apex:inputField required="true" value="{!Opportunity.Deposit_outcome__c}" id="Deposit_outcome__c"/>
+                    </apex:pageBlockSectionItem>
+                    <!-- End -->   
+                    <apex:outputPanel rendered="{!IF($CurrentPage.parameters.action ='suspend',true,false)}" >
+                        <apex:pageBlockSectionItem ><hr/></apex:pageBlockSectionItem>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!IF($CurrentPage.parameters.action ='suspend',true,false)}" >
+                        <apex:pageBlockSectionItem ><hr/></apex:pageBlockSectionItem>       
+                    </apex:outputPanel> 
+                </apex:pageBlockSection> 
+                <!-- Added block for PTS CR -->
+                <apex:outputPanel id="PTSSection" rendered="{!IF(suspendJobList.size > 0 ,true,false)}">
+                    <apex:PageblockSection title="Cancellation of PTS Slot" rendered="{!isPTSEnabled}" id="PTSSection1" columns="1" collapsible="false">
+                        <apex:outputPanel >
+                        <b>Note: You have to cancel the slot in PTS system to proceed further.</b><br/>
+                        </apex:outputPanel>
+                        <apex:pageBlockTable value="{!suspendJobList}" var="job">
+                            <apex:column value="{!job.name}"/>
+                            <apex:column headerValue="PTS Website">
+                                 <apex:outputLink value="" onclick="openNewPTSWindow('{!job.Id}','{!job.Formatted_Delivery_Date__c}'); return false;">Cancel Slot</apex:outputLink> 
+                                <!--<apex:outputLink value="" onclick="openPTSScrren('{!job.Id}'); return false;">Cancel Slot</apex:outputLink>-->
+                            </apex:column> 
+                        </apex:pageBlockTable>
+                    </apex:PageblockSection>
+                </apex:outputPanel>
+                <!-- Added block for PTS CR -->   
+                <center>
+                    <apex:commandButton value="Suspend Lead" action="{!suspendLead}" rendered="{!IF($CurrentPage.parameters.action = 'suspend',true,false)}" />
+                    <apex:commandButton value="Cancel Lead" action="{!cancelLead}" rendered="{!IF($CurrentPage.parameters.action = 'cancel',true,false)}"/>
+                    <!-- <input type='button' value='Close' onclick='Javascript:window.parent.close();'/> -->
+                    <apex:commandButton value="Close" onclick="Javascript:window.parent.close();"/>
+                </center>
+            </apex:outputPanel>
+            
+            <apex:outputPanel rendered="{!IF($CurrentPage.parameters.showdet = 'false',true,false)}">
+                <hr/>
+                    <font face='calibri' color = '#787878' size ='3'>
+                        <p>
+                        <b><center>
+                            {!s_msg}
+                            Action was performed successfully.
+                        </center></b>
+                        </p>
+                    </font>
+                <hr/>
+                <p/>
+                <hr/>
+                <center><input type='button' value='Close' onclick='Javascript:closeAndRefresh();'/></center>
+                <hr/>
+            </apex:outputPanel>
+            <apex:actionFunction action="{!redirectToPTS}" name="callServer" rerender="PTSSection"></apex:actionFunction>
+            
+            
+        </apex:pageBlock>
+    </apex:form>
+    <script type='text/Javascript'>
+        function closeAndRefresh(){
+            
+            window.close();
+            if (window.opener && !window.opener.closed) {
+                window.opener.location.reload();
+            } 
+        }
+    </script>
+</apex:page>

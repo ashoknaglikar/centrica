@@ -1,0 +1,6 @@
+<apex:page standardController="Event">
+<script>
+<!-- window.location.href = '/a0B/e?&ent=01IR0000000Cqqj&nooverride=0'; -->
+window.location.href = "{! URLFOR($Action.Appointment__c.New , null, [retURL="/home/home.jsp"], true)}";
+</script>
+</apex:page>

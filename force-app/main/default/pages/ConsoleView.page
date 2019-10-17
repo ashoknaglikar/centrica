@@ -1,0 +1,540 @@
+<!-- 
+    Harry Dhanoa(Westbrook) 1st June 2015
+    This page uses the controller class consoleViewExtension.
+    It displays the CHI Lead object in the middle when loaded along with 
+    other related fields.
+    The CHI Lead Id is a mandatory parameter in the URL 
+    ie. https://<sf instance>/apex/ConsoleView?id=<CHI Lead Id>
+-->
+<apex:page standardStylesheets="false" standardController="Opportunity" extensions="consoleViewExtension" sidebar="false" showHeader="false">
+    <apex:pageMessages id="showmsg"></apex:pageMessages>       
+    <apex:form rendered="{!NOT(hasError)}">
+        <apex:includeScript value="{!URLFOR($Resource.progressBarResources, 'progressBarResources/scripts/jquery-2.0.2.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.progressBarResources, 'progressBarResources/scripts/jquery-ui.min.js')}"  />
+        <script>
+            j$ = jQuery.noConflict();
+            // The iframe properties which has the CHI Lead Iframe in it.
+            var theIframeDiv;
+            var iframeHeight;
+            var iframeWidth;
+            var iframeLeft;
+            var iframeTop;
+            var timeDelay = 1500; // The delay in ms
+           
+            j$(document).ready(function() {
+               var j$ = jQuery.noConflict();
+               theIframeDiv = j$('span.leadJobBox');
+               calculateDimensionOfIframe();
+               
+               j$('#expandTopRightPlus').attr("onclick","return null;");
+               j$('#expandTopRightMinus').attr("onclick","collapseAll();"); 
+               
+                //Setting the image to scale to the size of div available with 80% of height and 100% width
+                var progressBarDivHeight = j$('#progressBar').height();
+                var progressBarDivWidth = j$('#progressBar').width();
+                j$('[id$="pBar"]').height(progressBarDivHeight);
+                j$('[id$="pBar"]').width(progressBarDivWidth*.75);
+                if(progressBarDivHeight*.75 > progressBarDivWidth*.05) {
+                    j$('[id$="happy"]').height(progressBarDivWidth*.05);
+                    j$('[id$="happy"]').width(progressBarDivWidth*.05);
+                    j$('[id$="angry"]').height(progressBarDivWidth*.05);
+                    j$('[id$="angry"]').width(progressBarDivWidth*.05);
+                } else {
+                    j$('[id$="happy"]').height(progressBarDivHeight*.75);
+                    j$('[id$="happy"]').width(progressBarDivHeight*.75);
+                    j$('[id$="angry"]').height(progressBarDivHeight*.75);
+                    j$('[id$="angry"]').width(progressBarDivHeight*.75);                                        
+                }                
+                
+
+            });
+                
+            function collapse(allignDirection,divName){
+                j$('#'+divName).toggle('slide', { direction: allignDirection } , timeDelay);
+            }
+            
+            // loading the iframe properties to be used in resizing the page
+            function calculateDimensionOfIframe(){            
+               iframeHeight = theIframeDiv.css('height');
+               iframeWidth = theIframeDiv.css('width');
+               iframeLeft = theIframeDiv.css("left");
+               iframeTop =  theIframeDiv.css("top");
+            }               
+            
+            function tileMovement() {
+                j$('#BGLogo').toggle('slide', { direction: 'up' } , timeDelay);
+                j$('#progressBar').toggle('slide', { direction: 'up' } , timeDelay);
+                
+                j$('#knowledge').toggle('slide', { direction: 'right' } , timeDelay);
+                j$('#homeVisitDetail').toggle('slide', { direction: 'right' } , timeDelay);
+                j$('#quoteAccepted').toggle('slide', { direction: 'right' } , timeDelay);
+                j$('#installation').toggle('slide', { direction: 'right' } , timeDelay);
+                
+                j$('#custDetails').toggle('slide', { direction: 'left' } , timeDelay);
+                j$('#contacts').toggle('slide', { direction: 'left' } , timeDelay);
+                j$('#numbers').toggle('slide', { direction: 'left' } , timeDelay);
+                
+                j$('#recentItems').toggle('slide', { direction: 'down' } , timeDelay);
+                j$('#custNotes').toggle('slide', { direction: 'down' } , timeDelay);
+            }
+            
+            function collapseAll(){
+                theIframeDiv = j$('span.leadJobBox');
+                calculateDimensionOfIframe();
+                tileMovement();
+                expandIframe();
+                j$('#expandTopRightPlus').attr("onclick","expandAll();");                
+                j$('#expandTopRightMinus').attr("onclick","return null;");
+            }
+            
+            function expandIframe() {  
+                //alert('In expandIframe'+
+                  //      'iframeLeft>>'+iframeLeft+
+                    //    'iframeTop>>'+iframeTop+
+                      //  'iframeWidth>>'+iframeWidth+
+                        //'iframeHeight>>'+iframeHeight);             
+                theIframeDiv.animate({
+                    left: "0",
+                    top: "0",
+                    width: "100%",
+                    height: "100%",
+                  }, timeDelay );    
+            }
+            function expandAll(){
+                theIframeDiv = j$('span.leadJobBox');
+                //calculateDimensionOfIframe();
+                j$('#expandTopRightPlus').attr("onclick","return null;");                
+                j$('#expandTopRightMinus').attr("onclick","collapseAll();");            
+                tileMovement();
+                collapseIframe();
+            }
+            
+            function collapseIframe() {  
+                //alert('In collapseIframe'+
+                  //      'iframeLeft>>'+iframeLeft+
+                    //    'iframeTop>>'+iframeTop+
+                      //  'iframeWidth>>'+iframeWidth+
+                        //'iframeHeight>>'+iframeHeight);            
+                theIframeDiv.animate({
+                    left: iframeLeft,
+                    top: iframeTop,
+                    width: iframeWidth,
+                    height: iframeHeight,
+                  }, timeDelay );                              
+            }
+        </script>
+       
+        <apex:stylesheet value="{!URLFOR($Resource.progressBarResources, 'progressBarResources/css/ui.css')}" />
+        
+        <body>
+            <div id="BGLogo" class="wrap BGLogoBox"> 
+                <div class ="progressBarGreetingBox">      
+                    Hello <b> {!$User.FirstName} {!$User.LastName} </b><br/>
+                    <apex:outputText value="{0,date,EEEE, d MMM yyyy}" styleClass="progressBarDateBox">
+                        <apex:param value="{!NOW()}" />
+                    </apex:outputText>
+                </div>               
+            </div>
+                            
+            <div id="progressBar" class="wrap progressBarBox"> 
+                <table style="width:100%; height:100%;">
+                    <tr>  
+                        <td width="5%" style="text-align: center;">
+                            <apex:image id="happy" url="{!URLFOR($Resource.progressBarResources, 'progressBarResources/images/Happy-Smiley-Face.png')}" rendered="{!cases.size=0}" />                    
+                            <apex:image id="angry" url="{!URLFOR($Resource.progressBarResources, 'progressBarResources/images/Angry-Smiley-Face.png')}" rendered="{!cases.size>0}" styleClass="hoverLink" onclick="readCell('{!cases[0].Id}'+'?isdtp=vw');"/>                    
+                        </td>                            
+                        <td width="95%" style="text-align: center;">
+                            <apex:image id="pBar" url="{!URLFOR($Resource.progressBarResources, 'progressBarResources/images/'+progressBarStatusPicName)}" />        
+                        </td>
+                    </tr>
+                </table>
+            </div>
+           
+            <div id="knowledge" class="wrap wrapCommon knowledgeBox">        
+                <div class="titleBox">
+                    <table>
+                      <tr>
+                        <td>
+                          KNOWLEDGE
+                        </td>
+                        <td id='knowledgeCollapse' onclick="collapse('right','knowledge');" style="text-align: right;padding-right: 5px;cursor: pointer;display: none; ">
+                        ( - )  
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+                <table>
+                  <tr>
+                    <td>
+                      <apex:inputTextarea value="{!knowledgeSearchString}" html-placeholder="Search is disabled" style="width:100%"/>
+                    </td>
+                    <td> </td>
+                    <td>
+                      <apex:commandButton value="Search>" disabled="true" action="{!knowledgeSearch}" styleclass="customBut" style=""/>
+                    </td>  
+                  </tr>
+                </table>
+            </div>
+            
+            <div id="custDetails" class="wrap wrapCommon custDetailsBox">        
+                <div class="titleBox">
+                    <table>
+                      <tr>
+                        <td>
+                          CUSTOMER DETAILS
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+                <div class="custDetailsContentBox" >
+                    <apex:outputPanel onclick="readCell('{!opp.Id}'+'?isdtp=vw');" style="cursor: pointer;">
+                        <table style="width:100%">
+                          <tr>
+                            <td width="40%">
+                                <b><apex:outputText value="{!opp.Account.Primary_Contact__r.Salutation} 
+                                                        {!opp.Account.Primary_Contact__r.Name}"/></b>             <br/><br/>
+                                <apex:outputText value="{!opp.Account.Primary_Contact__r.MailingStreet} "/>   <br/>
+                                <apex:outputText value="{!opp.Account.Primary_Contact__r.MailingCity}"/>      <br/>
+                                <apex:outputText value="{!opp.Account.Primary_Contact__r.MailingState}"/>    
+                                <apex:outputText value="{!opp.Account.Primary_Contact__r.MailingPostalCode}"/><br/>
+                                <apex:outputText value="{!opp.Account.Primary_Contact__r.MailingCountry}"/> 
+                            </td>
+                            <td width="60%">
+                                <br/><br/><br/>
+                                <b><apex:outputText value="Home:"/></b><apex:outputText value="{!opp.Account.Primary_Contact__r.HomePhone} "/>   <br/>
+                                <b><apex:outputText value="Mobile:"/></b><apex:outputText value="{!opp.Account.Primary_Contact__r.MobilePhone}"/>      <br/>
+                                <apex:outputText value="<b>Email:</b>{!opp.Account.Primary_Contact__r.Email} <br/>" escape="false"/>    
+                                <apex:outputText value="<b>NPS:</b> {!NPSScore} <br/>" escape="false"/>      
+                                <apex:outputText value="<b>Pref Comm:</b> {!opp.Account.Primary_Contact_Pref_Contact_Method__c}" escape="false"/> 
+                            </td>
+                            <!--
+                            <td width="20%">
+                              <b><apex:outputText value="Satisfied:"/></b><br/> <br/>
+                              
+                              <apex:image url="{!URLFOR($Resource.progressBarResources, 'progressBarResources/images/Happy-Smiley-Face.png')}" width="40%" height="auto" rendered="{!cases.size=0}"/>                    
+                              <apex:image url="{!URLFOR($Resource.progressBarResources, 'progressBarResources/images/Angry-Smiley-Face.png')}" width="40%" height="auto" rendered="{!cases.size>0}"/>                    
+                              
+                            </td>
+                            -->
+                          </tr>
+                        </table>   
+                    </apex:outputPanel>    
+                </div>    
+                <div class="custDetailsBoxFooterBar">
+                    <table>
+                      <tr> 
+                        <td width="33%">
+                          <apex:commandButton action="{!openLead}" value="HOME>" styleclass="customBut"/>
+                        </td>                          
+                        <td width="33%">
+                          <apex:commandButton action="{!openAccount}" value="Account>" styleclass="customBut"/>
+                        </td>
+                        <td width="33%">
+                          <apex:commandButton action="{!openNewCase}" value="New Case>" styleclass="customBut"/>
+                        </td>
+                      </tr>
+                    </table>                  
+                </div>
+            </div>
+            
+            <div id="custNotes" class="wrap wrapCommon custNotesBox">        
+                <div class="titleBox">
+                <apex:outputPanel onclick="readCell('apex/AmalgamateNotes?OppId={!opp.Id}');" style="cursor: pointer;">
+                    <table>
+                      <tr>
+                        <td>
+                          CUSTOMER NOTES (VIEW ALL)
+                        </td>
+                      </tr>
+                    </table>
+                </apex:outputPanel>   
+                </div> 
+                
+                <div class="custNotesContentBox">
+                    <table style="width: 100%;height: 100%;" >
+                      <tr valign="middle" >
+                        <td width="100%" height="33%">
+                            <apex:outputText value="{!notes[0].Body}" rendered="{!notes.size>0}"/>
+                            <apex:outputLink onclick="readCell('{!notes[0].Id}'+'?isdtp=vw');return false;" rendered="{!notes.size>0}">... See More></apex:outputLink>
+                        </td>
+                      </tr>
+                      <tr valign="middle" class="odd-row" >  
+                        <td  width="100%" height="33%">
+                            <apex:outputText value="{!notes[1].Body}" rendered="{!notes.size>1}"/>
+                            <apex:outputLink onclick="readCell('{!notes[1].Id}'+'?isdtp=vw');return false;" rendered="{!notes.size>1}">... See More></apex:outputLink>
+                            <apex:commandButton onclick="newNote();return false;" action="{!updateIframeId}" value="New Note>" style="float: right;" styleclass="customBut"/>
+                        </td>                                
+                      </tr>
+                      <tr valign="middle">  
+                        <td  width="100%" height="33%">
+                            <apex:outputText value="{!notes[2].Body}" rendered="{!notes.size>2}"/>
+                            <apex:outputLink onclick="readCell('{!notes[2].Id}'+'?isdtp=vw');return false;" rendered="{!notes.size>2}">... See More></apex:outputLink>
+                        </td>                                
+                      </tr>
+                    </table>  
+                </div>
+            </div>
+            
+            <div id="contacts" class="wrap wrapCommon contactsBox">        
+                <div class="titleBox">
+                    <table>
+                      <tr>
+                        <td>
+                          CONTACTS
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+                
+                <apex:actionFunction name="readCell" action="{!updateIframeId}" reRender="iframeDiv" >
+                    <apex:param name="P1" value="" assignTo="{!iframeId}"/>
+                </apex:actionFunction>
+                
+                <apex:actionFunction name="newNote" action="{!updateIframeId}" reRender="iframeDiv" >
+                    <apex:param name="P1" value="002/e?parent_id={!LEFT(opp.Id,15)}&retURL=%2F{!LEFT(opp.Id,15)}%3Fisdtp%3Dvw&isdtp=vw" assignTo="{!iframeId}"/>
+                </apex:actionFunction>
+                
+                <div class="contactsContentBox">
+                    <apex:dataTable value="{!ocrList}" var="ocr" cellpadding="10" rowClasses="even-row, odd-row">
+                        <apex:column onclick="readCell('{!ocr.Contact.Id}'+'?isdtp=vw');" onmouseover="" >
+                            <apex:outputText value="{!UPPER(ocr.Contact.Name)}" styleClass="hoverLink"/>
+                        </apex:column>    
+                        <apex:column onclick="readCell('{!ocr.Contact.Id}'+'?isdtp=vw');" onmouseover="" >
+                            <apex:outputText value="{!UPPER(ocr.Contact.Contact_Type__c)}" styleClass="hoverLink"/>            
+                        </apex:column>
+                    </apex:dataTable>
+                </div> 
+            </div>
+            
+            <apex:outputPanel styleClass="wrap wrapCommon leadJobBox" id="iframeDiv">
+                <!--<apex:outputText value="/{!iframeId}"/>-->
+                <div id="expandTopRight" class="expandTopRight">  
+                    <table>
+                        <tr>
+                            <td id="expandTopRightPlus">     
+                                <apex:image id="minIcon" url="{!URLFOR($Resource.progressBarResources, 'progressBarResources/images/window_minimize.png')}" width="25" height="25" />                                                
+                            </td>
+                            <td id="expandTopRightMinus">
+                                <apex:image id="maxIcon" url="{!URLFOR($Resource.progressBarResources, 'progressBarResources/images/window_maximize.png')}" width="25" height="25" />            
+                            </td>
+                        </tr>
+                    </table>                                                
+                </div>
+                <apex:iframe src="/{!iframeId}" scrolling="true" height="100%"/>
+            </apex:outputPanel>           
+                        
+            <div id="recentItems" class="wrap wrapCommon recentItemsBox">        
+                <div class="titleBox">
+                    <table>
+                      <tr>
+                        <td>
+                          RECENT CHI LEADS
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+                
+                <div class="recentItemsContentBox">
+                    <apex:dataTable value="{!recentlyViewedList}" var="rV"  rowClasses="even-row, odd-row">
+                        <!--<apex:column onclick="readCell('{!rV.Id}'+'?isdtp=vw');" >-->
+                        <apex:column >
+                            <apex:outputLink value="/apex/{!$CurrentPage.Name}?id={!rV.Id}" style="color:black">
+                                {!UPPER(rV.Name)}
+                            </apex:outputLink>                               
+                            <!--<apex:outputText value="{!UPPER(rV.Name)}" styleClass="hoverLink"/>-->
+                        </apex:column> 
+                    </apex:dataTable>
+                </div>
+            </div> 
+                                   
+            <div id="installation" class="wrap wrapCommon installationBox">        
+                <div class="titleBox">
+                    <table>
+                      <tr>
+                        <td>
+                          INSTALLATION
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+                
+                <apex:outputPanel styleClass="installationContentBox" onclick="readCell('{!jobsWithDiaryEntry[0].Id}'+'?isdtp=vw');" style="cursor: pointer;">
+                    <div class="oneThirdVertical1">
+                        <table style="width: 100%;height: 100%; table-layout: fixed;" >
+                          <tr valign="middle">
+                            <td width="50%">
+                              <apex:outputText value="<b> Delivery Date :</b>" escape="false"/>  
+                              <apex:outputText value="{!jobsWithDiaryEntry[0].Delivery_Date__c} " rendered="{!jobsWithDiaryEntry!=null}" escape="false"/>  <br/>          
+                              
+                              <apex:outputText value="<b>Delivery Slot :</b>" escape="false"/>
+                              <apex:outputText value="{!jobsWithDiaryEntry[0].Delivery_Slot__c} " rendered="{!jobsWithDiaryEntry!=null>0}" escape="false"/>                                        
+                            </td>
+                            <td  width="50%">
+                              <apex:outputText value="<b>DHM Name : </b>" escape="false"/>
+                              <apex:outputText value="{!jobsWithDiaryEntry[0].DHM_Name__c} " rendered="{!jobsWithDiaryEntry!=null}" escape="false"/>   <br/>         
+                              
+                              <apex:outputText value="<b>DHM Phone :</b>" escape="false"/>
+                              <apex:outputText value="{!jobsWithDiaryEntry[0].DHM_Phone__c} " rendered="{!jobsWithDiaryEntry!=null}" escape="false"/>            
+                            </td> 
+                          </tr>
+                        </table>  
+                    </div>
+                    <div class="oneThirdVertical2">
+                        <table style="width: 100%;height: 100%; table-layout: fixed;" >
+                          <tr valign="middle" class="odd-row" >  
+                            <td width="70%">
+                                <apex:outputText value="<b>Installer1 :</b>" escape="false"/>
+                                <apex:outputText value="{!installers[0]} " rendered="{!installers.size>0}" /> <br/>           
+                                <apex:outputText value="<b>Installer2 :</b>" escape="false"/>
+                                <apex:outputText value="{!installers[1]} " rendered="{!installers.size>1}" /> <br/>
+                                <apex:outputText value="<b>Installer3 :</b> {!installers[2]} <br/>" rendered="{!installers.size>2}" escape="false"/>             
+                                <apex:outputText value="<b>Electrician :</b>" escape="false"/>                                
+                                <apex:outputText value="{!electricians[0] }" rendered="{!electricians.size>0}" escape="false"/> <br/>
+                                <apex:outputText value="<b>Scaffolding Required :</b> {!jobsWithDiaryEntry[0].Scaffolding_Required__c} <br/>" rendered="{!jobsWithDiaryEntry!=null}" escape="false"/>            
+                            </td>                               
+                            <td width="30%">
+                                <div class="boxed" style="right:10%; background-color: #E5E3DA;">
+                                    <apex:outputText value="{!daysToIntallation} " escape="false"/>
+                                </div>   
+                            </td>
+                          </tr>
+                        </table> 
+                    </div>
+                    <div class="oneThirdVertical3">
+                        <table style="width: 100%;height: 100%; table-layout: fixed;" >
+                          <tr valign="middle"> 
+                            <td width="100%"> 
+                              <apex:outputText value="<b>Installation Date :</b> Not Available  <br/>" rendered="{!jobsWithDiaryEntry==null}" escape="false"/> 
+                              <apex:outputText value="<b>Installation Date :</b> {!jobsWithDiaryEntry[0].Start_Data_Time__c} <br/>" rendered="{!jobsWithDiaryEntry!=null}" escape="false"/> 
+                              
+                              <apex:outputText value="<b>Installer Notes : </b>{!bMQWithQuoteProduct[0].Quote_Products__r[0].installationNotes__c}" rendered="{!bMQWithQuoteProduct[0].Quote_Products__r.size>0}" escape="false"/> 
+                              <apex:outputText value="<b>Installer Notes : </b>Not Available " rendered="{!bMQWithQuoteProduct[0].Quote_Products__r.size=0}" escape="false"/> <br/>
+        
+                              <apex:outputText value="<b>Special Instructions :</b>{!bMQWithQuoteProduct[0].Installation_Special_Instructions__c} " rendered="{!bMQWithQuoteProduct[0]!=null}" escape="false"/> 
+                              <apex:outputText value="<b>Special Instructions : </b>Not Available  " rendered="{!bMQWithQuoteProduct[0]==null}" escape="false"/> 
+                            </td>                          
+                          </tr>
+                        </table> 
+                    </div>
+                </apex:outputPanel>
+            </div>            
+
+            <div id="quoteAccepted" class="wrap wrapCommon quoteAcceptedBox">        
+                <div class="titleBox">
+                    <table>
+                      <tr>
+                        <td>
+                          QUOTE - ACCEPTED
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+                <apex:outputPanel styleClass="quoteAcceptedContentBox" onclick="readCell('{!bMQWithQuoteProduct[0].Id}'+'?isdtp=vw');" style="cursor: pointer;">
+                    <table style="width: 100%;height: 100%;" >
+                      <tr valign="middle">
+                        <td width="100%">
+                            <b><apex:outputText value="System Type:"/></b>
+                            <apex:outputText value="{!bMQWithQuoteProduct[0].Job_Type_Description__c} <br/>" rendered="{!bMQWithQuoteProduct.size>0}" escape="false"/> 
+                            <apex:outputText value="Not Available  <br/>" rendered="{!bMQWithQuoteProduct.size=0}" escape="false"/> 
+                            <b><apex:outputText value="Boiler Model:"/></b>
+                            <apex:outputText value="{!bMQWithQuoteProduct[0].Quote_Products__r[0].Product_Description__c} <br/>" rendered="{!bMQWithQuoteProduct[0].Quote_Products__r.size>0}" escape="false"/> 
+                            <apex:outputText value="Not Available  <br/>" rendered="{!bMQWithQuoteProduct[0].Quote_Products__r.size=0}" escape="false"/>                         
+                        </td>
+                      </tr>
+                      <tr valign="middle" class="odd-row" >  
+                        <td  width="100%">
+                            <apex:outputText value="<b>Home Care: </b>{!homeCare}<br/>"  escape="false"/> 
+                            <b><apex:outputText value="Total Entitlements:"/></b>
+                            <apex:outputText value="{!opp.discountsTotalOnPricing__c} <br/>" escape="false"/> 
+                        </td>                                
+                      </tr>
+                      <tr valign="middle">  
+                        <td  width="100%" >
+                            <apex:outputText value="<b> Total Price: </b>{!opp.Original_Quote_Value__c} <br/>" escape="false"/> 
+                            <!--<apex:outputText value="<b> Total Entitlements:</b>{!opp.discountsTotalOnPricing__c} <br/>" escape="false"/> -->
+                            <apex:outputText value="<b> Total Amount Payable: </b>{!opp.Amount} <br/>" escape="false"/> 
+                            <apex:outputText value="<b> Deposit:</b>{!opp.Sum_of_Deposits__c} <br/>" escape="false"/> 
+                            <apex:outputText value="<b> Balance Outstanding: </b>{!opp.Balance_Outstanding__c} <br/>" escape="false"/> 
+
+                            <b><apex:outputText value="Payment Method:"/></b>
+                            <apex:outputText value="{!bMQWithQuoteProduct[0].POC_Payment_Method__c} <br/>" rendered="{!bMQWithQuoteProduct.size>0}" escape="false"/> 
+                        </td>                                
+                      </tr>
+                    </table>  
+                </apex:outputPanel>                    
+            </div> 
+                       
+            <div id="numbers" class="wrap wrapCommon numbersBox">        
+                <div class="titleBox">
+                    <table>
+                      <tr>
+                        <td>
+                          NUMBERS
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+                <div class="numbersContentBox">
+                    <apex:dataTable value="{!numbersBoxList}" var="leftColumnVal" cellpadding="10" rowClasses="even-row, odd-row">
+                        <apex:column >            
+                            <apex:outputText value="{!leftColumnVal}" />            
+                        </apex:column>
+                        
+                        <apex:column >
+                            <div class="boxed">
+                                <apex:outputText value="{!numbersBoxMap[leftColumnVal]}"/>             
+                            </div>    
+                        </apex:column>
+                    </apex:dataTable>
+                </div>                
+            </div>
+            
+            <div id="homeVisitDetail" class="wrap wrapCommon homeVisitDetailBox">        
+                <div class="titleBox">
+                    <table>
+                      <tr>
+                        <td>
+                          SALES APPOINTMENT
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+                <apex:outputPanel styleClass="homeVisitDetailContentBox" onclick="readCell('{!salesApp.Id}'+'?isdtp=vw');" style="cursor: pointer;">
+                    <table style="width: 100%;height: 100%;" >
+                      <tr valign="middle">
+                        <td width="100%">
+                            <apex:outputText value="<b>Date:</b>{0,date,dd'/'MMM'/'yyyy}" escape="false">
+                                <apex:param value="{!salesApp.Start__c}"/>                            
+                            </apex:outputText>
+                            <br/>    
+                            <!--<apex:outputText value="<b>Start - End:</b>{0,date,HH':'mm }" escape="false">
+                                <apex:param value="{!salesApp.Start__c}"/>                            
+                            </apex:outputText>
+                            <apex:outputText value="- {0,date,HH':'mm }">
+                                <apex:param value="{!salesApp.End__c}"/>                            
+                            </apex:outputText>
+                            <br/>
+                            --> 
+                            <apex:outputText value="<b>Start - End:</b>{!salesApp.Broken_Appointment_Details__c} <br/>" escape="false"/>
+                        </td>
+                      </tr>
+                      <tr valign="middle" class="odd-row" >  
+                        <td  width="100%">
+                            <b><apex:outputText value="HSA:"/></b>
+                            <apex:outputText value="{!salesApp.Assigned_To__r.Name} <br/>" escape="false"/>
+                            <b><apex:outputText value="Status:"/></b>
+                            <apex:outputText value="Status : {!salesApp.Status__c} <br/>" escape="false"/>        
+                        </td>                                
+                      </tr>
+                      <tr valign="middle">  
+                        <td  width="100%">
+                            <b><apex:outputText value="Attempts:"/></b>
+                            <apex:outputText value="{!opp.Number_of_Sales_Appointments__c} <br/>" escape="false"/>        
+                        </td>                                
+                      </tr>
+                    </table> 
+                </apex:outputPanel>                     
+            </div>  
+        </body>
+    </apex:form>
+</apex:page>

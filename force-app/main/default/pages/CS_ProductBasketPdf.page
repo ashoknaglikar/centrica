@@ -1,0 +1,227 @@
+<apex:page standardController="cscfga__Product_Basket__c" extensions="CS_ProductBasketPdfController" showHeader="false" sidebar="false">
+    <div>
+        <apex:form >
+            <script type="text/javascript" src="{!URLFOR($Resource.jquery_1_8_3)}"></script>
+            <script type="text/javascript" src="{!URLFOR($Resource.underscorejs_1_5_2)}"></script>
+            <apex:stylesheet value="{!$Resource.CS_pdfStyle}"></apex:stylesheet>
+           
+            <apex:actionFunction name="send" action="{!displayPDF}" rerender="">
+                <apex:param name="p1" assignto="{!pageContent}" value=""/>
+            </apex:actionFunction>
+       
+        </apex:form>
+        
+        <!-- a script which divides the text into sections and creates the pdf layout -->
+        <script>
+            jQuery(function() {
+                var $ = jQuery;
+                var maxHeight = 300,
+                    pageCounter = 1,
+                    lineItemMap = {};
+                
+                var currentHeight = 0;
+                $('.unique-lineitem-container').children().each(function () {
+                    
+                    if((currentHeight + $(this).outerHeight()) >= maxHeight) {
+                        pageCounter++;
+                        if(!lineItemMap[pageCounter-1]) lineItemMap[pageCounter-1] = [];
+                        lineItemMap[pageCounter-1].push($(this));
+                        currentHeight = 0;
+                    } else {
+                        currentHeight += $(this).outerHeight();
+                        if(!lineItemMap[pageCounter-1]) lineItemMap[pageCounter-1] = [];
+                        lineItemMap[pageCounter-1].push($(this));
+                    }
+                });
+                
+                var count = _.keys(lineItemMap).length;
+                for(var i=0; i<count; i++) {
+                    var quotePage = $(".unique-page").clone();
+                    for(var j=0; j< lineItemMap[i].length; j++) {
+                        quotePage.find('.line-item-holder').append(lineItemMap[i][j]);
+                    }
+                    quotePage.removeClass("unique-page");
+                    quotePage.css("display", "block");
+                    if(count-1 != i) {
+                        quotePage.append("<div style='page-break-after:always;'/>");
+                    }
+                    $(".final-pages-container").append(quotePage);
+                }
+                
+                var stringToBeSent = $('.final-pages-container').html();
+                send(stringToBeSent);
+            });
+        </script>
+
+        <!-- hidden div used to display all of the items -->
+        <div class="unique-lineitem-container" style="border: 1px solid white; width: 450px; padding: 10px; display:block;">
+            <apex:outputPanel layout="block" style="border-bottom: 1px solid #41ABE9; padding-bottom: 5px;">
+                <apex:outputPanel styleClass="bold-text">Customer reason for quotation:</apex:outputPanel>
+                <apex:outputPanel >{!reasonForQuotation}</apex:outputPanel>
+            </apex:outputPanel>
+            
+            <apex:repeat var="section" value="{!quoteItems}">
+                <apex:outputPanel layout="block" styleClass="section-level-1">
+                    {!section.Name}
+                    <apex:outputPanel rendered="{!section.Name == 'Total Discounts:' || section.Name == 'Total Net Price (inc. VAT):'}" style="float: right;">
+                        £{!section.Totals}
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                
+                <apex:repeat var="lineItem" value="{!section.lineItems}">
+                    <apex:outputPanel layout="block" styleClass="section-lineitem">
+                        {!lineItem.Description}
+                        <apex:outputPanel rendered="{!lineItem.Description != 'The price quoted is a special offer and cannot be used in conjunction with any other British Gas boiler offer.'}" styleClass="section-lineitem-total">
+                            £{!lineItem.Total}
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </apex:repeat>    
+                
+                <apex:repeat var="level2section" value="{!section.sections}">
+                    <apex:outputPanel layout="block" styleClass="section-level-2">
+                        {!level2section.Name}
+                        <apex:outputPanel rendered="{!level2section.Name == 'Total Discounts:' || level2section.Name == 'Total Net Price (inc. VAT):'}" style="float: right;">
+                            £{!level2section.Totals}
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    
+                    <apex:repeat var="lineItemLevel2" value="{!level2section.lineItems}">               
+                        <apex:outputPanel layout="block" styleClass="section-lineitem">
+                            <apex:outputPanel styleClass="section-lineitem-description">{!lineItemLevel2.Description}</apex:outputPanel>
+                            <apex:outputPanel styleClass="section-lineitem-total">£{!lineItemLevel2.Total}</apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:repeat>
+                </apex:repeat>  
+            </apex:repeat>
+        </div>
+        
+        <!-- hidden page template -->
+        <div class="unique-page" style="display: none;">
+            <div style="width:700px;">
+                <apex:outputPanel layout="block" styleClass="title">Your British Gas Quotation</apex:outputPanel>
+                <apex:image value="{!$Resource.BGLogo}" height="80" style="float: right;margin-top: -65px;"/>
+                <apex:outputPanel layout="block" style="margin-top: 50px; font-size: 12px;">{!assignedToHsa}</apex:outputPanel>
+            </div>
+            <apex:panelGrid width="100%" cellpadding="0" cellspacing="0" columns="4" style="position: relative; font-size: 14px; padding-bottom:140px;">
+                <apex:panelGrid columns="1" style="top: 0; width: 180px; position:absolute; top:0;">
+                    <apex:outputPanel layout="block" styleClass="header-item bold-text">Installation address:</apex:outputPanel>
+                    <apex:repeat var="item" value="{!installationAddress}">
+                        <apex:outputPanel layout="block" styleClass="header-item">{!item}</apex:outputPanel>
+                    </apex:repeat>
+                </apex:panelGrid>
+            
+                <apex:panelGrid columns="1" style="top: 0; width: 180px; position:absolute; top:0; left: 180px;">
+                <apex:outputPanel layout="block" styleClass="header-item bold-text">Billing address:</apex:outputPanel>
+                    <apex:repeat var="item" value="{!billingAddress}">
+                        <apex:outputPanel layout="block" styleClass="header-item">{!item}</apex:outputPanel>
+                    </apex:repeat>
+                </apex:panelGrid>
+            
+                <apex:panelGrid columns="1" style="top: 0; width: 180px; position:absolute; top:0; left: 360px;">
+                    <apex:outputPanel layout="block" styleClass="header-item bold-text">Payment:</apex:outputPanel>
+                    <apex:outputPanel layout="block" styleClass="header-item">Total cash price payable: £{!paymentData.TotalPayable}</apex:outputPanel>
+                    <apex:outputPanel layout="block" styleClass="header-item">Deposit: £{!paymentData.Deposit}</apex:outputPanel>
+                    <apex:outputPanel layout="block" styleClass="header-item">Deposit reference: {!paymentData.DepositReference}</apex:outputPanel>
+                    <apex:outputPanel layout="block" styleClass="header-item">Deposit paid by: {!paymentData.DepositPaidBy}</apex:outputPanel>
+                    <apex:outputPanel layout="block" styleClass="header-item">Balance: £{!paymentData.Balance}</apex:outputPanel>
+                    <apex:outputPanel layout="block" styleClass="header-item">Balance to be paid by: {!paymentData.BalanceToBePaidBy}</apex:outputPanel>
+                </apex:panelGrid>
+            
+                <apex:panelGrid columns="1" style="top: 0; width: 180px; position:absolute; top:0; left: 540px;">
+                    <apex:outputPanel layout="block" style="font-size: 12px; font-weight: bold;">Quote details:</apex:outputPanel>
+                    <apex:outputPanel layout="block" styleClass="header-item">Quote date: {!quoteDetails.QuoteDate}</apex:outputPanel>
+                    <apex:outputPanel layout="block" styleClass="header-item">Quote number: {!quoteDetails.QuoteNumber}</apex:outputPanel>
+                    <apex:outputPanel layout="block" styleClass="header-item">Transaction ID: {!quoteDetails.TransactionId}</apex:outputPanel>
+                </apex:panelGrid>
+            </apex:panelGrid>
+            
+            <apex:outputPanel layout="block">
+                <!-- line items start here  -->
+                <div class="line-item-holder" style="display: inline-block;border: 1px solid #41ABE9; width: 450px; padding: 10px; height: 330px;">
+                   
+                </div>
+                
+                <!-- right text starts here -->
+                <div style="display:inline-block; vertical-align: top; padding-left: 10px; width: 215px; font-size:12px;">
+                    <div class="right-static-text-box">
+                        <div class="right-static-text-title">Value for money</div>
+                        <div class="right-static-text-content">We will install a premium quality system that will serve you for many years to come</div>
+                    </div>
+                    <div class="right-static-text-box">
+                        <div class="right-static-text-title">Peace of mind</div>
+                        <div class="right-static-text-content">All our new boilers come with aftercare - so if you need us we’ll be there</div>
+                    </div>
+                    <div class="right-static-text-box">
+                        <div class="right-static-text-title">Quality installation</div>
+                        <div class="right-static-text-content">We will install your new system to the highest finish and ensure compliance with your local authority building regulations</div>
+                    </div>
+                    <div class="right-static-text-box">
+                        <div class="right-static-text-title">No nasty surprises</div>
+                        <div class="right-static-text-content">This is a fixed price quotation, with no hidden extras</div>
+                    </div>
+                    <div class="right-static-text-box">
+                        <div class="right-static-text-title">Respect your home</div>
+                        <div class="right-static-text-content">Our engineers will always minimise disruption to your home</div>
+                    </div>
+                    <div class="right-static-text-box">
+                        <div class="right-static-text-title">Expert staff</div>
+                        <div class="right-static-text-content">All of this will be provided by pleasant, helpful experts you can rely on!</div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            
+            <!-- bottom text starts here -->
+            <apex:outputPanel >
+                <div class="title-guaranteed-price">
+                    The price we quote you is the price you’ll pay… Guaranteed
+                </div>
+                <div style="padding: 7px 0; font-size: 12px;">
+                    Here’s your quote for the installation detailed above. We’ll carry out the work for this price, and that’s a promise
+                </div>
+                <div style="color: #09255A; font-size: 16px; font-weight: bold;">
+                    Acceptance of Your Central Heating Installation Quotation
+                </div>
+                <div style="padding: 3px 0; font-size: 12px; width: 700px;">
+                    I confirm that I am the owner of the property or that I have secured the necessary permission from the homeowner. 
+                    I agree to pay the amount quoted above. I’m aware that I can cancel up to 14 days after the day the goods are 
+                    delivered (the “cooling off period”). I give permission for the installation to start during the cooling off period. I’m 
+                    aware that if I cancel I’ll have to pay for any work carried out or goods installed before I cancel. I also confirm that I have 
+                    read and accept the Central Heating Installation Quotation Terms &amp; Conditions which have been given to me by the 
+                    Heating Sales Adviser.
+                </div>
+                <div style="font-size: 10px; margin-top: 10px; margin-bottom:10px;">If you would like to receive this information in another format such as large print, Braille or audio, please call <span class="bold-text">{!$Label.PhoneNumber_CustomerRelations}</span>.</div>
+            </apex:outputPanel>
+            
+            <!-- signatures start here  -->
+            <apex:outputPanel >
+                <div style="margin-top: 5px;">
+                    <div class="signature-box">
+                        <div class="signature-box-text">Signature</div>
+                    </div>
+                    <div class="signature-box margin-left-5px">
+                        <div class="signature-box-text">Print name</div>
+                    </div>
+                    <div class="signature-box margin-left-5px">
+                        <div class="signature-box-text">Date</div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            
+            <!-- footer starts here -->
+            <apex:outputPanel >
+                <div style="font-size: 10px; width:700px;">
+                    <div>{!cscfga__Product_Basket__c.appointment__r.Trading_Name__c} 
+                        <apex:outputLabel value="{!$Label.Footer_for_Email_NonFSA}"/>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            
+        </div>
+    </div>
+    
+    <!-- container to host the final pdf layout -->
+    <div class="final-pages-container">
+        
+    </div>
+    
+</apex:page>

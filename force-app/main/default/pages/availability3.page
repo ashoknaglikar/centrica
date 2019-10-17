@@ -1,0 +1,37 @@
+<apex:page standardController="Appointment__c" extensions="AvailabilityP3Controller" tabstyle="Appointment__c" showheader="{!isSF}" sidebar="{!isSF}">
+    <apex:sectionHeader title="Appointment Booking Confirmation"/>
+        <apex:form >
+            <apex:pageBlock title="" rendered="{!showSuccess}">
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{!onClickReturnCHILead}" value="Return to CHI Lead" rendered="{!showButton}"/>                             
+                    <!-- IntegratedScript changes -->
+                    <apex:commandButton action="{!onClickReturnFF}" value="Finished" rendered="{!showButton2}"/>
+                    <!-- end IntegratedScript changes -->
+                </apex:pageBlockButtons> 
+                <apex:outputText rendered="{!showCancelled1}" value="The existing appointment has been cancelled. "/>
+                A new appointment has been successfully booked for:<br></br> <br></br>
+                New Lead Number: <b><apex:outputfield value="{!Appointment__c.Opportunity__c}"/></b><br/>
+                Date: <b>{!date}</b><br></br>
+                Time: <b>{!period} {!Appointment__c.Start_Time__c} - {!Appointment__c.End_Time__c} </b><br></br>  
+                
+                <apex:outputText rendered="{!showCancelled2}" value="ERROR: The existing appointment has not been cancelled, an error was encountered. Please contact support to cancel this appointment."/><br/>
+            </apex:pageBlock>
+            <!-- CR MC014 -->           
+            <apex:pageBlock title="" rendered="{!showCancelled3}">
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{!onClickReturnCHILead}" value="Return to CHI Lead" rendered="{!showButton}"/>                             
+                </apex:pageBlockButtons>            
+                <apex:outputText rendered="{!showCancelled4}" value="The customer's existing Appointment was cancelled."/><br/>
+                <apex:outputText rendered="{!showFailure5}" value="ERROR: The existing appointment has not been cancelled, an error was encountered. Please contact support to cancel this appointment."/><br/>
+            </apex:pageBlock>           
+            <!-- End CR MC014 -->
+            <apex:pageBlock title="" rendered="{!showFailure1}">
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{!onClickReturnCHILead}" value="Return to New CHI Lead" rendered="{!showButton}"/>                             
+                </apex:pageBlockButtons>
+                    <apex:outputText rendered="{!showFailure2}" value="ERROR: An appointment has not been booked, an error was encountered."/><br/>
+                    <apex:outputText rendered="{!showFailure3}" value="ERROR: A new appointment has not been booked, and the existing appointment has not been cancelled, an error was encountered."/><br/>
+                    <apex:outputText rendered="{!showFailure4}" value="ERROR: An unexpected error was encountered. Contact your administrator"/><br/>
+                </apex:pageBlock>
+        </apex:form>
+</apex:page>

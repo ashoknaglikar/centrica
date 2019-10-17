@@ -1,0 +1,120 @@
+<apex:page StandardController="order__c" extensions="TopcallFaxExtension" renderAs="pdf" showHeader="false" sidebar="false">
+    <HTML>
+        <HEAD>
+            <style type="text/css" media="print,screen">
+                @page {
+                    margin:0.25in;
+                    @top-left {
+                        content: "Material Confirmation/Return Document ";
+                        font-size: 8pt;
+                    }
+                    @top-right{
+                        content: "Enquiry Number : {!order__c.Enquiry_Number__c}";
+                        font-size: 8pt;
+                    }   
+                    @bottom-center {
+                        content: "British Gas Services Limited Registered in England No.3141243 Registered Office Millstream, Maidenhead Road, Windsor, Berkshire, SL4 5GD.";
+                        font-size: 8pt;
+                    }
+                }   
+                th {
+                    font-family:Arial;
+                    color:black;
+                    background-color:lightgrey;
+                }
+                thead {
+                    display:table-header-group;
+                }
+                tbody {
+                    display:table-row-group;
+                } 
+                body{   
+                    font-family:Arial;
+                    color:black;
+                    font-size: 8pt;
+                }
+            </style>
+        </HEAD>
+        <BODY>
+            <Caption><CENTER><FONT SIZE="2">Merchant Copy: {!sReturnDate}</FONT></CENTER></Caption>
+            <TABLE width="100%" border="0">
+                <TR>
+                    <TD width="30%" Align="left"><B><FONT SIZE="2">Job Address</FONT></B></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%"><FONT SIZE="2">No Returns/Items Returned/</FONT></TD>
+                </TR>
+                <TR>
+                    <TD width="30%" Align="left">{!order__c.Job__r.Customer_Name__c}</TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%"><FONT SIZE="2">Requested Collection*</FONT></TD>
+                </TR>
+                <TR>
+                    <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingStreet}</FONT></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%"><FONT SIZE="2">Date Returned/Requested*</FONT></TD>
+                </TR>
+                <TR>
+                    <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingCity}</FONT></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%"><FONT SIZE="2">Agreed Collection Date</FONT></TD>
+                </TR>
+                <TR>
+                    <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingState}</FONT></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%"><FONT SIZE="2">Agreed Time: Any Time/AM/PM*</FONT></TD>
+                </TR>
+                <TR>
+                    <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingCountry}</FONT></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%"><FONT SIZE="2">Returns Note Num:</FONT></TD>
+                </TR>
+                <TR>
+                    <TD width="30%" Align="left"><FONT SIZE="2">{!order__c.Job__r.CHI_Lead__r.Account.BillingPostalCode}</FONT></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%"><FONT SIZE="2">Delivery Note Num:</FONT></TD>
+                </TR>
+                <TR >
+                    <TD colspan="3" Align="left"><FONT SIZE="2">Location of Materials:</FONT></TD>
+                </TR>
+                <TR>
+                    <TD width="30%" Align="left"></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%" Align="Right"><FONT SIZE="2">*Delete as Applicable</FONT></TD>
+                </TR>
+            </TABLE>    
+            <Caption><CENTER><FONT SIZE="2">Material Checklist</FONT></CENTER></Caption>
+            <P/><HR/><P/>
+            <TABLE WIDTH="100%" BORDER="0">
+                <TR>
+                    <TH width="20%" style="word-wrap=break-word"><FONT SIZE="2">Item Num</FONT></TH>
+                    <TH width="30%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>Description</CENTER></FONT></TH>
+                    <TH width="12%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>Qty Ordered</CENTER></FONT></TH>
+                    <TH width="12%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>No. Rc'd if incorrect</CENTER></FONT></TH>
+                    <TH width="12%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>Add Mats (Vanstock)</CENTER></FONT></TH>
+                    <TH width="12%" style="word-wrap=break-word"><FONT SIZE="2"><CENTER>Qty Mats Returned</CENTER></FONT></TH>
+                </TR>
+                <TR >
+                    <Td Height="10" Colspan="6" Align="Left"><Font Size="2" ><hr width="100%" color="black" ></hr></Font></Td>
+                </TR>
+                <apex:repeat value="{!materialItemLst}" var="objJob">
+                    <TR>
+                        <TD width="20%"><FONT SIZE="2">{!objJob.sCode}</FONT></TD>
+                        <TD width="30%" style="word-wrap=break-word"><FONT SIZE="2">{!objJob.sDescription}</FONT></TD>
+                        <TD width="12%" Align="Right"><FONT SIZE="2">{!objJob.iQty}</FONT></TD>
+                        <TD width="12%"><FONT SIZE="2"></FONT></TD>
+                        <TD width="12%"><FONT SIZE="2"></FONT></TD>
+                        <TD width="12%"><FONT SIZE="2"></FONT></TD>
+                    </TR>
+                </apex:repeat>
+            </TABLE>
+            <P/><HR/><P/>
+            <TABLE width="100%" border="0">
+                <TR>
+                    <TD width="30%" Align="left"><FONT SIZE="2">Installer Signature</FONT></TD>
+                    <TD width="5%"></TD>
+                    <TD width="30%"><FONT SIZE="2">Print Name</FONT></TD>
+                </TR>
+            </TABLE>    
+        </BODY>
+    </HTML>
+</apex:page>

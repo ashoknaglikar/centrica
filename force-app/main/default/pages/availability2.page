@@ -1,0 +1,196 @@
+<!-- Page: -->
+<!-- IntegratedScript changes -->
+<apex:page controller="AvailabilityP2Controller" tabstyle="Appointment__c" showheader="{!isSF}" sidebar="{!isSF}">
+<script type="text/javascript" src="/soap/ajax/15.0/connection.js"></script>
+<script type="text/javascript" src="/soap/ajax/15.0/apex.js"></script>
+<script type="text/javascript" src="/js/functions.js"></script>
+
+<script>
+ 
+var isClicked = false;
+ window.onload = function(){
+     if({!hideStdValue}==true){
+                 var inputStatus=document.querySelectorAll('[id$="stageId"]')[0];
+                 for (var i=0; i<inputStatus.length; i++){
+                     if (inputStatus.options[i].value =='Within Standard')
+                         {
+                          inputStatus.remove(i);
+                         }
+                }
+                
+     }
+if({!hideStdValue}==false){ 
+        var temp = 'Within Standard';
+        var mySelect = document.querySelectorAll('[id$="stageId"]')[0];
+        var reasonSelect = document.querySelectorAll('[id$="reasonId"]')[0];
+        for(var i, j = 0; i = mySelect.options[j]; j++) {
+           if(i.value == temp) {
+            mySelect.selectedIndex = j;
+            break;
+           }
+        }
+        reasonSelect.disabled = false;
+      
+        var option = document.createElement('option');
+        option.text = option.value ='Within Standard';
+        reasonSelect.add(option, 0);
+        for(var i, j = 0; i = reasonSelect.options[j]; j++) {
+           if(i.value == temp) {
+            reasonSelect.selectedIndex = j;
+            break;
+           }
+        }
+    }    
+ }
+
+
+function check(obj) {
+  if(isClicked) {
+        //alert('Button can only be pressed once');
+        return false;
+    } else {
+        isClicked = true;
+        obj.className = 'btnDisabled';
+        togglleDiv('');
+        
+    }
+}
+
+function isClickedReset(){
+      isClicked = false;
+      togglleDiv('none');
+}
+
+function togglleDiv(show){
+    document.getElementById('darkLayer').style.display = show; 
+    document.getElementById('LoadingDiv').style.display = show;      
+}  
+</script>
+
+<!-- end IntegratedScript changes -->
+<apex:sectionHeader title="Availability for {!postCode}:" subtitle="{!day} - {!time} - {!date} "/>              
+<apex:form id="frm">
+<apex:pageMessages />
+    <apex:pageBlock title="">
+      <apex:pageBlockButtons >
+          <apex:commandButton action="{!onClickBack}" value="Back" immediate="true"/>                             
+      </apex:pageBlockButtons>
+      <apex:pageblocksection columns="1" title="When can this happen:">
+          <apex:dataTable value="{!detailedAvailability}" var="ava" styleClass="list" rules="rows">
+                <apex:column headerValue="Resource">                        
+                        <apex:outputText style="{!If(ava.IsBestResource,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!ava.empName}"/>
+                </apex:column>
+                <apex:column headerValue="Status" rendered="{!if(gDeal=='3', false, true)}">                        
+                        <apex:outputText style="{!If(ava.IsBestResource,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!ava.empStatus}"/>                       
+                </apex:column>
+                <apex:column value="{!ava.Slot}" headerValue="Slot" rendered="{!if(gDeal=='3', true, false)||opp.Product_Interest__c=='Guided Sale'}"/>  
+                <!-- Currently not required 
+                <apex:column headerValue="Sales Efficiency" rendered="{!Visit_Type=='Sales'}">                        
+                        <apex:outputText style="{!If(ava.IsBestResource,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!ava.SalesEfficiency}"/>                       
+                </apex:column>
+                 <apex:column headerValue="Technical Ability" rendered="{!Visit_Type=='Sales'}">                        
+                        <apex:outputText style="{!If(ava.IsBestResource,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!ava.TechnicalAbility}"/>                      
+                </apex:column> 
+                -->
+                <!--<apex:column value="{!ava.duration}" headerValue="Total Appointment Count" />  -->
+                <apex:column value="{!ava.appointmentCount}" headerValue="Appointment Count" rendered="{!$Label.Guided_Sale=='on'}"/>  
+                <apex:column headerValue="HSA Employment Type" rendered="{!if(gDeal=='3', false, true)}">                        
+                        <apex:outputText style="{!If(ava.IsBestResource,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!ava.hsaEmployeeType}"/>                       
+                </apex:column>
+                <apex:column headerValue="Option">                                                                                                                     
+                    <apex:commandLink action="{!onClickBook}" style="{!If(ava.IsBestResource,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="Book Now" id="theButton" onclick="check(this);" oncomplete="isClickedReset()" reRender="frm" >     
+                         <apex:param name="selectedAppId" value="{!ava.appointmentId}"/>
+                         <apex:param name="selectedEmpId" value="{!ava.empId}"/>                             
+                    </apex:commandLink>                                                
+               </apex:column>                 
+            </apex:dataTable>
+        </apex:pageblocksection>
+            
+        <apex:pageblocksection columns="2" title="Who will be there:" rendered="{!(if(gDeal=='3', false, true))&&!isHSA}">
+            <apex:pageblocksectionitem >
+                <apex:outputLabel value="Appointment Attendee" />
+                <apex:selectlist value="{!apptAttendee}" size="1" id="picklist">
+                     <apex:selectoptions value="{!ApptAttendeOptions}"/>
+                     <apex:actionsupport event="onchange" rerender="Panel" status="pleasewait"/>
+                </apex:selectlist>
+            </apex:pageblocksectionitem>  
+            <apex:inputfield value="{!appInst.Time_Band__c }" id="timeBand" rendered="{!useOFS}">
+                <script>
+                document.getElementById('{!$Component.timeBand}').disabled=true;
+                </script>
+            </apex:inputfield>
+              
+            <apex:pageBlockSectionItem />
+            <apex:inputfield value="{!appInst.Shorter_Time_Bands__c}" rendered="{!useOFS}"/>
+            <apex:pageBlockSectionItem />
+            <apex:inputfield value="{!appInst.Time_Band_Reason__c}" required="true" rendered="{!useOFS}"/>
+        </apex:pageblocksection>
+        
+        <!-- Added below section for Appointment Cancellation Reason CR--> 
+        <apex:pageblocksection columns="2" title="Appointment Cancellation Reason" rendered="{!Cancellation}">
+            
+            
+           <apex:PageBlockSectionItem rendered="{!cancellation}">
+                <apex:outputLabel value="Primary Cancellation Reason"/>
+                <apex:outputPanel styleClass="requiredInput" layout="block">
+                <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                <apex:inputField value="{!appInst.Primary_Cancellation_Reason__c}"></apex:inputField>
+                </apex:outputpanel>
+                
+            </apex:PageBlockSectionItem> 
+           
+            <apex:inputField id="scr" value="{!appInst.Secondary_Cancellation_Reason__c}" label="Secondary cancellation Reason"></apex:inputField>
+              
+            
+         </apex:pageblocksection>
+         <!-- Added below section for Appointment Cancellation Reason CR-->
+        
+        <!-- Added below section for Priority Installations CR --> 
+        <apex:pageblocksection columns="2" title="Sales Appointment Information" rendered="{!include_priority_install&&!isHSA}">
+            <apex:PageBlockSectionItem >
+                <apex:outputLabel value="Service Level"/>
+                <apex:outputPanel styleClass="requiredInput" layout="block">
+                <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                <apex:inputField value="{!opp.Timeline_Options__c}" id="stageId"></apex:inputField>
+                </apex:outputpanel>
+            </apex:PageBlockSectionItem>
+            
+            <apex:inputField value="{!opp.Timeline_Reason__c}" label="Service Level Reason" id="reasonId"></apex:inputField>
+            
+            
+            <apex:outputField value="{!opp.Latest_customer_category__c}" label="Customer Category"></apex:outputField>
+            <apex:outputField value="{!opp.Latest_customer_category_indicator__c}" label="Customer Category Indicator"></apex:outputField>
+            <apex:inputfield value="{!appInst.Follow_Up__c}" rendered="{!followUp}"/>
+            
+         </apex:pageblocksection>
+        <!-- Added below section for Priority Installations CR -->
+        
+         <apex:pageblocksection columns="2" title="Customer Details" rendered="{!opp.Product_Interest__c=='Guided Sale'&& $Label.Guided_Sale=='on'}">
+            <apex:inputField value="{!opp.Social_Contact_Type__c}" required="true" ></apex:inputField>
+            <apex:inputField value="{!opp.Social_Contact_Details__c}"  required="true"></apex:inputField>
+         </apex:pageblocksection>
+                
+          
+    </apex:pageBlock>
+  </apex:form> 
+<div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:360px; top:320px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Appointment Booking is under progress...please wait...
+            </div>
+</div>
+
+<div id="darkLayer" style ="background-color: white; 
+                            filter:alpha(opacity=50); /* IE */ 
+                            opacity: 0.5; /* Safari, Opera */ 
+                            -moz-opacity:0.50; /* FireFox */ 
+                            z-index: 20; 
+                            height: 100%; 
+                            width: 100%; 
+                            background-repeat:no-repeat; 
+                            background-position:center; 
+                            position:absolute; 
+                            top: 0px; 
+                            left: 0px; 
+                            display:none;">
+</div> 
+</apex:page>

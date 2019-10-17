@@ -1,0 +1,20 @@
+<apex:page standardController="Job__c" extensions="PurchaseOrderInitialize" action="{!init}">
+    <apex:sectionHeader title="Purchase Order" subtitle="{!Job__c.Name}"/>
+    <apex:form >
+        <apex:pageBlock title="Orders for Job: {!Job__c.Name}">
+            <apex:pagemessages />
+            <apex:inputHidden value="{!Job__c.Status__c}"/>
+            <apex:inputHidden value="{!Job__c.CHI_Lead__r.Platform__c}"/>
+            <!--<apex:pageMessage summary="Order cannot be generated. To generate Order, Job needs to be planned." severity="error" strength="3" rendered="{!IF(OR(blError,blNoDiaryEntry),true,false)}"> -->
+            <apex:pageMessage summary="Order cannot be generated as it has gone down to Premier route." severity="error" strength="3" rendered="{!IF(blError,true,false)}">
+            </apex:pageMessage>
+            <apex:pageMessage summary="Order cannot be generated. To generate Order, Job needs to be planned." severity="error" strength="3" rendered="{!IF(OR(blNoDiaryEntry,blPlanned),true,false)}">
+            </apex:pageMessage>
+            <apex:pageMessage summary="Order cannot be generated. Job is already Installed." severity="error" strength="3" rendered="{!IF(blInstalled,true,false)}">
+            </apex:pageMessage>
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Return to Job" action="{!returnBack}" rendered="{!IF(OR(blError,blNoDiaryEntry,blInstalled,blPlanned ),true,false)}"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

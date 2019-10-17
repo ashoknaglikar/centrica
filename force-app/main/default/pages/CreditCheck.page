@@ -1,0 +1,116 @@
+<apex:page controller="CreditCheckControler" tabstyle="Opportunity">
+  
+  <script>
+    var experianLaunched='false';
+    function launchExperian() {
+    if (experianLaunched=='false')
+    {
+    	experianLaunched='true';
+        window.open("https://secure.uat.e-series.uk.experian.com/cfbl/92_FSRequestDefault.html","Experian",
+        "height=400, width=300, resizable=1");
+    }
+    else
+        experianLaunched='true';
+    }
+    
+    function changeVisibility(input,text1,text2) {
+        
+        if(input.checked)
+        {
+         document.getElementById(text1).disabled=false;    
+         document.getElementById(text2).disabled=false;   
+        }
+        else
+        {
+         document.getElementById(text1).disabled=true;    
+         document.getElementById(text2).disabled=true;
+        }
+    }
+       
+   </script>
+
+  <apex:form >
+  
+      <apex:pageblock id="creditCheckBlock" title="Credit Check" mode="edit">
+      
+      <apex:pageblockSection id="infoBlock" title="Credit Check Results">
+      
+      <apex:inputField id="locatedAtCheckBox" value="{!oCreditCheck.Located_At_Address__c}"  required="true"/>
+      
+      <apex:inputField id="bankruptcyStatus" value="{!oCreditCheck.Bankcruptcy_Status__c}" /> 
+      
+      <apex:inputField id="numOfSearchesInput" value="{!oCreditCheck.Number_of_Searches__c}" required="true" />
+      
+      <apex:inputField id="bankruptcyCheckbox" value="{!oCreditCheck.Bankrupt__c}" required="true" />
+      
+      <apex:inputField id="experianRef" value="{!oCreditCheck.URN__c}" required="true" />
+      
+      <p>
+      <apex:outputText id="depositErrText" styleClass="labelCol" value="{!depositErrText}" title="Error"/>
+      </p>
+      </apex:pageblockSection>
+       
+      <p/>
+            
+      <apex:pageblockSection id="addressBlock" title="Primary Contact Details">
+           
+      <apex:inputField id="titleSearched" value="{!oCreditCheck.Title_Searched__c}"/>
+                 
+      <apex:inputField id="fNameSearched" value="{!oCreditCheck.First_Name_Searched__c}"/>
+                  
+      <apex:inputField id="lNameSearched" value="{!oCreditCheck.Last_Name_Searched__c}"/>
+      
+      <apex:inputField id="birthDate" value="{!opp.Account.Primary_Contact__r.Birthdate}"/>
+                  
+      <apex:inputField id="genderSearched" value="{!oCreditCheck.Gender__c}"/>
+                 
+      <apex:inputField id="streetSearched" value="{!oCreditCheck.Street_Searched__c}"/>
+          
+      <apex:inputField id="citySearched" value="{!oCreditCheck.City_Searched__c}"/>
+            
+      <apex:inputField id="countySearched" value="{!oCreditCheck.County_Searched__c}"/>
+                      
+      <apex:inputField id="postCodeSearched" value="{!oCreditCheck.Postcode_Searched__c}"/>
+      
+      <apex:inputField id="countrySearched" value="{!oCreditCheck.Country_Searched__c}"/>
+      
+      </apex:pageblockSection>
+      
+                  
+      <p/>
+      
+      <apex:pageblockSection title="Deposit Details" id="depositSection" rendered="{!renderDepositSection}">
+      
+      
+      <table>
+      <tr>
+      <td><label for="depositOverride" class="labelCol">Deposit Override</label></td>
+      <td><apex:inputCheckBox id="depositOverride"  value="{!oCreditCheck.Override__c}" 
+      disabled="{!oCreditCheck.Override__c}" /></td>
+      <!--onClick="changeVisibility(this,'{!$Component.depositPercent}','{!$Component.depositAmt}')"-->
+      </tr><p/>
+             
+      <tr>
+      <td><label for="depositPercent" class="labelCol">Deposit Percent Required</label></td>
+      <td><apex:inputText id="depositPercent" value="{!oCreditCheck.Deposit_Percent_Reqd__c}" maxlength="6" size="6" 
+      required="true"/></td>
+      </tr><p/>
+      <tr>
+      <td><label for="depositAmt" class="labelCol">Deposit Amount Required</label></td>
+      <td><apex:inputText id="depositAmt" value="{!oCreditCheck.Deposit_Required__c}" maxlength="6" size="6" 
+      required="true"/></td>
+      </tr>
+      
+      </table>
+              <!--disabled="{!!oCreditCheck.Override__c}"/  -->
+       </apex:pageblockSection>
+       
+      <apex:pageBlockButtons location="bottom" >
+      <apex:commandButton action="{!deposit}" value="Compute Deposit" rerender="creditCheckBlock" />
+      <apex:commandButton action="{!submit}" value="Submit" rendered="{!renderDepositSection}"/>
+      
+      </apex:pageBlockButtons>
+       </apex:pageBlock>
+  </apex:form>
+  
+</apex:page>

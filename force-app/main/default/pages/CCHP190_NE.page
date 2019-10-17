@@ -1,0 +1,157 @@
+<apex:page StandardController="order__c" extensions="CCHP190Extension"  renderAs="pdf" showHeader="false" sidebar="false">
+<HTML>
+    <HEAD>
+        <style type="text/css" media="print,screen">
+            @page {
+                @bottom-center {
+                    content: "British Gas Services Limited Registered in England No.3141243 Registered Office Millstream, Maidenhead Road, Windsor, Berkshire, SL4 5GD.";
+                    font-size: 8pt;
+                }
+                @top-center{
+                    content: "Re-plan Notice";
+                    font-size: 8pt;
+                }
+            } 
+            th {
+                font-family:Arial;
+                color:black;
+                background-color:lightgrey;
+            }
+            thead {
+                display:table-header-group;
+            }
+            tbody {
+                display:table-row-group;
+            } 
+            body{
+                font-family:Arial;
+                color:black;
+                font-size: 8pt;
+            }
+        </style>
+    </HEAD>
+
+    <BODY>
+        <table width="100%" border="0">
+            <tr>
+                <TD width="30%">Customer Enquiry Number:{!order__c.Job__r.CHI_Lead__r.CHI_Lead_Id__c} </TD>
+                <TD width="30%"></TD>
+                <TD width="10%"></TD>
+                <TD width="30%">{!order__c.Job__r.Customer_Name__c}</TD>
+            </tr>
+            <tr>
+                <TD width="30%">SAP Order Number:{!order__c.SAP_Number__c} </TD>
+                <TD width="30%"></TD>
+                <TD width="10%"></TD>
+                <TD width="30%" style="word-wrap=break-word">{!order__c.Job__r.CHI_Lead__r.Account.BillingStreet}</TD>
+            </tr>
+            <tr>
+                <TD width="30%">Total Order Value:{!order__c.Order_Value__c}</TD>
+                <TD width="30%"></TD>
+                <TD width="10%"></TD>
+                <TD width="30%">{!order__c.Job__r.CHI_Lead__r.Account.BillingCity}</TD>
+            </tr>
+            <tr>
+                <TD width="30%"></TD>
+                <TD width="30%"></TD>
+                <TD width="10%"></TD>
+                <TD width="30%">{!order__c.Job__r.CHI_Lead__r.Account.BillingState}</TD>
+            </tr>
+            <tr>
+                <TD width="30%"></TD>
+                <TD width="30%"></TD>
+                <TD width="10%"></TD>
+                <TD width="30%">{!order__c.Job__r.CHI_Lead__r.Account.BillingCountry}</TD>
+            </tr>
+            <tr>
+                <TD width="30%"></TD>
+                <TD width="30%"></TD>
+                <TD width="10%"></TD>
+                <TD width="30%">{!order__c.Job__r.CHI_Lead__r.Account.BillingPostalCode}</TD>
+            </tr>
+        </table>
+        <BR/>
+        
+        <table WIDTH="100%" BORDER="0">
+                <TR>
+                    <TH width="20%" style="word-wrap=break-word">Event</TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Date</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Responsible</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Contact No.</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Event Text</CENTER></TH>
+                </TR>
+                <apex:repeat value="{!eventDetailsLst}" var="eventdetails" >
+                    <TR>
+                        <TD width="20%" style="word-wrap=break-word">{!eventdetails.sEvent}</TD>
+                        <TD width="20%" ><Center>{!eventdetails.sEventDt}</Center></TD>
+                        <TD width="20%" ><Center>{!eventdetails.sResponsible}</Center></TD>
+                        <TD width="20%"><Center>{!eventdetails.sContactNo}</Center></TD>
+                        <TD width="20%"><center>{!eventdetails.sEventText}</center></TD>
+                    </TR>
+                </apex:repeat>
+                <TR >
+                    <Td Height="10" Colspan="5" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                </TR>
+            </table>
+            <center>Order History</center>
+            <TABLE WIDTH="100%" BORDER="0">
+                <TR>
+                    <TH width="10%" style="word-wrap=break-word">Code</TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Description</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Order Enquiries</CENTER></TH>
+                    <TH width="10%" style="word-wrap=break-word"><CENTER>Value</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Order Date</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Delivery Date</CENTER></TH>
+                </TR>
+                <apex:repeat value="{!ASPList}" var="ASPdetails" >
+                    <TR>
+                        <TD width="20%" >{!ASPdetails.sCode}</TD>
+                        <TD width="20%" ><CENTER>{!ASPdetails.sDescription}</CENTER></TD>
+                        <TD width="20%" ><CENTER>{!ASPdetails.sEnquiries}</CENTER></TD>
+                        <TD width="10%" ><CENTER>{!ASPdetails.sValue}</CENTER></TD>
+                        <TD width="20%" ><CENTER>{!ASPdetails.sOrderDate}</CENTER></TD>
+                        <TD width="20%" ><CENTER>{!ASPdetails.sDeliveryDate}</CENTER></TD>
+                </TR>
+                </apex:repeat>
+             </table>
+             <TABLE WIDTH="100%" BORDER="0">
+                <TR>
+                    <TH width="10%" style="word-wrap=break-word">Code</TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Description</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Order Enquiries</CENTER></TH>
+                    <TH width="10%" style="word-wrap=break-word"><CENTER>Value</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Order Date</CENTER></TH>
+                    <TH width="20%" style="word-wrap=break-word"><CENTER>Delivery Date</CENTER></TH>
+                </TR>
+                <apex:repeat value="{!NoAspList}" var="NoASPdetails" >
+                    <TR>
+                        <TD width="20%" >{!NoASPdetails.sCode}</TD>
+                        <TD width="20%" ><CENTER>{!NoASPdetails.sDescription}</CENTER></TD>
+                        <TD width="20%" ><CENTER>{!NoASPdetails.sEnquiries}</CENTER></TD>
+                        <TD width="10%" ><CENTER>{!NoASPdetails.sValue}</CENTER></TD>
+                        <TD width="20%" ><CENTER>{!NoASPdetails.sOrderDate}</CENTER></TD>
+                        <TD width="20%" ><CENTER>{!NoASPdetails.sDeliveryDate}</CENTER></TD>
+                </TR>
+                </apex:repeat>
+             </table>
+            <TABLE WIDTH="100%" BORDER="0">
+            <TR>
+                <TH width="100%" style="word-wrap=break-word">This order is subject to British Gas Services Conditions of Contract for 
+ the Supply of Goods and/or Services:GS/FEB/98, Unless stated otherwise.</TH>
+            </TR>
+            <TR >
+                    <Td Height="10" Colspan="5" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                </TR>
+            </table>
+            <TABLE WIDTH="100%" BORDER="0">
+            <TR>
+                <TH width="100%" style="word-wrap=break-word">Please note that the event date for this order has been amended to
+ {!dtdeliverydate}.Please ensure that your records are updated accordingly.</TH>
+            </TR>
+            <TR >
+                    <Td Height="10" Colspan="5" Align="Left"><hr width="100%" color="black" ></hr></Td>
+                </TR>
+            </table>
+      </BODY>
+</HTML>
+</apex:page>

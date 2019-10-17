@@ -1,0 +1,21 @@
+<apex:page controller="UserUpdateController" tabstyle="user" title="User Page">
+
+    <apex:form >
+              <apex:pageBlock title="User Details">
+              <apex:pageBlockSection title="User Information" collapsible="false">
+                  <apex:outputField value="{!userSelected.name}" /> 
+                  <apex:outputField value="{!userSelected.EmployeeNumber}"/>
+                  <apex:inputField value="{!userSelected.Pool_User__c}" />
+                   <apex:outputField value="{!userSelected.isactive}" />  
+              </apex:pageBlockSection>
+              <apex:pageblocksection title="Patch Information" collapsible="false">                 
+                  <apex:inputfield value="{!userSelected.Sales_District__c}"/>       
+                  <apex:inputfield value="{!userSelected.Survey_District__c}" />
+              </apex:pageblocksection>
+              <apex:pageblockbuttons >
+                  <apex:commandButton action="{!save}" value="Save"/>
+                  <apex:commandButton action="{!cancel}" value="Cancel"/>
+              </apex:pageblockbuttons>
+              </apex:pageblock>
+    </apex:form>
+</apex:page>

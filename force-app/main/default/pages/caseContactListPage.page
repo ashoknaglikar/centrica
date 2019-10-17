@@ -1,0 +1,15 @@
+<apex:page standardController="case" extensions="caseContactListController" showHeader="false" sidebar="false" tabStyle="contact" >
+
+    <apex:pageBlock >
+        <apex:pageblockTable value="{!contactDetail}" var="contact">
+           <apex:column headerValue="Name" value="{!contact.salutation} {!contact.name}"/>
+           <apex:column headerValue="Home Phone" value="{!contact.homePhone}"/>
+           <apex:column headerValue="Mobile Phone" value="{!contact.mobilePhone}"/>
+           <apex:column headerValue="Work Phone" value="{!contact.otherPhone}"/>
+           <apex:column headerValue="Email" value="{!contact.Email__c}"/>
+           <apex:column headerValue="Type" value="{!contact.Contact_Type__c}"/>
+           <apex:column headerValue="Primary" value="{!contact.Primary_Contact__c}"/>
+        </apex:pageblockTable>
+    </apex:pageBlock>
+
+</apex:page>

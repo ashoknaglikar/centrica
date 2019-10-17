@@ -1,0 +1,559 @@
+<style type="text/css">
+            body {
+              margin: 0;
+              padding: 0;
+              font-family: Calibri;
+              background-color: #C0C0C0; 
+              overflow:hidden;
+            }
+                .wrap {
+                  overflow:hidden;
+                  margin: 2px;
+                  height: 100%;
+                  width: 100%;
+                  position: relative;
+                }
+                .wrapCommon {
+                  
+                  border-radius: 2px 2px 2px 2px;   
+                  background: rgba(237, 237, 237, 0.74);//rgb(221, 221, 223);
+                  margin-top: 20px;
+                  margin-left: auto;
+                  margin-right: auto;
+                   
+                } 
+                .custNotesContentBox:hover, .highLightBlock:hover, .custDetailsBox:hover {
+                  background-color: #F2F5D0;//rgb(173,216,230);
+                  -webkit-box-shadow: 0px 1px 2px 0px #000000;;
+                  -moz-box-shadow: 0px 1px 2px 0px #000000;;
+                  box-shadow: 0px 1px 2px 0px #000000;; 
+                } 
+                    .BGLogoBox {
+                      width: 100%;
+                      height: 5%;
+                      //min-width:200px;
+                      //min-height:30px;
+                      left : .5%;  
+                      position: absolute;
+                      background: transparent;
+                    }
+                        .progressBarGreetingBox {
+                          width: 99%;
+                          height: 100%;
+                          font: 15px 'Calibri'; 
+                          color: black; 
+                          position: absolute;
+                          background: transparent;
+                          //text-align: right;
+                         
+                        }
+                        .progressBarDateBox {
+                          font: 10px 'Calibri'; 
+                          color: white;
+                        }
+                        
+                        .knowledgeclass{
+				             border: 1px solid #ccc;
+				            -moz-border-radius: 10px;
+						    -webkit-border-radius: 10px;
+						    border-radius: 10px;
+						    -moz-box-shadow: 2px 2px 3px #666;
+						    -webkit-box-shadow: 2px 2px 3px #666;
+						    box-shadow: 2px 2px 3px #666;
+						    font-size: 10px;
+						    padding: 4px 7px;
+						    outline: 0;
+						    -webkit-appearance: none;
+						    width:15%;
+				
+			            }
+            
+                        .hc {
+                          //width: 10%;
+                          height: 20%;
+                          left:50%;
+                          //position: absolute;
+                          background: transparent;  
+                          font-family: Calibri,sans-serif;
+                          color: rgb(38, 184, 218);//#129adb;
+                          font-size: 2em;
+                          letter-spacing: -1px;
+                        }         
+                    .progressBarBox {
+                      width: 58%;
+                      height: 10%;
+                      //min-width:500px;
+                      //min-height:60px;
+                      left: 21%;
+                      position: absolute;
+                      background: transparent;
+                    }
+                    .knowledgeBox {
+                      width: 19%;
+                      height: 8%;
+                      left:80.1%;
+                      position: absolute;
+                    }
+                        .knowledgeBox table{ width: 105%; height: 65%;}
+                        .knowledgeBox table tr td { vertical-align: middle; text-align: left; color: white;font: 14px 'Calibri'; } 
+                        .customBut {
+                          font-family: 'Calibri',sans-serif;
+                          color: white ;
+                          background-color : #888888;
+                          background-image : none; 
+                          width: 99%;
+                          align : center;
+                          margin:2px;
+                          
+                        }
+                        .customButNote
+                        {
+                          font-family: 'Calibri',sans-serif;
+                          color: white ;
+                          background-color : #888888;
+                          background-image : none; 
+                          width:50%;
+                          align : right;
+                          float: right;
+                        }
+                                    
+                    .custDetailsBox {
+                      width: 99%;
+                      left: .5%;
+                      border : 1px solid White;
+                      display:block;
+                      clear:both;
+                      
+                      margin-bottom:3px;
+                      -moz-border-radius: 10px;
+				      -webkit-border-radius: 10px;
+				      border-radius: 10px;
+				      /*-webkit-transition: background-color 2s ease-out;
+                      -moz-transition: background-color 2s ease-out;
+                      -o-transition: background-color 2s ease-out;
+                      transition: background-color 2s ease-out;*/
+                      
+                    }
+                        .custDetailsContentBox {
+                          /* Firefox */
+                          height: -moz-calc(90% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(90% - 25px);
+                          /* Opera */
+                          height: -o-calc(90% - 25px);
+                          /* Standard */
+                          height: calc(90% - 25px);
+                          //white-space: nowrap;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          position: absolute;
+                        }            
+                  
+                            .custDetailsContentBox table{ width: 100%; height: 100%; font: 12px 'Calibri';table-layout: fixed; }
+                            .custDetailsContentBox table tr td { vertical-align: top; text-align: left;height:30%; } //border:2px solid black;
+                        
+                        .custDetailsBoxFooterBar {
+                          width: 100%;
+                          height: 10%;
+                          //left: 70%;
+                          top: 88%;
+                          position: absolute;
+                          //background: yellow;
+                        }
+                            .custDetailsBoxFooterBar table{ width: 105%; height: 65%;table-layout: fixed}
+                            .custDetailsBoxFooterBar table tr td { vertical-align: top; text-align: left; }
+                    .custNotesBox {
+                      width: 36.3%;
+                      height: 23%;
+                      top: 73.4%;
+                      left:.5%;
+                      position: absolute;
+                      border:1px solid white;
+                    }
+                        .custNotesContentBox {
+                          //left : .5%;  
+                          width: 98%;
+                          height: 100%;
+                          /* Firefox */
+                          height: -moz-calc(100% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(100% - 25px);
+                          /* Opera */
+                          height: -o-calc(100% - 25px);
+                          /* Standard */
+                          height: calc(100% - 25px);
+                          font: 12px 'Calibri'; 
+                          position: absolute;
+                          //overflow: auto;
+                          white-space: nowrap;
+                          text-overflow: ellipsis;
+                          vertical-align: middle; text-align: left; font: 12px 'Calibri';
+                          overflow-x:hidden ; 
+                          overflow-y: scroll;
+                        }  
+                
+                        .oneThirdVertical1 {
+                          padding-left: 1%;
+                          width: 100%;
+                          height: 33%;
+                          //top:20%;
+                          //left: 0;
+                          position: absolute;
+                          //background: green;
+                          display: table-cell;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          vertical-align: middle;
+                        }
+                        .oneThirdVertical2 {
+                          padding-left: 1%;
+                          width: 100%;
+                          height: 50%;
+                          top:33%;
+                          //left: 0;
+                          position: absolute;
+                          //background-color: #D1C7C7;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          //background: yellow;
+                        }
+                        .oneThirdVertical3 {
+                          padding-left: 1%;
+                          width: 100%;
+                          height: 33%;
+                          top:68%;
+                          //left: 0;
+                          position: absolute;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                          //background: blue;
+                        }
+                    .numbersBox {
+                      left : .5%;  
+                      width: 19.9%;
+                      height: 20%;
+                      top:40.7%;
+                      position: absolute;
+                      border : 1px solid White;
+                    }
+                        .numbersContentBox {
+                          width: 100%;
+                          /* Firefox */
+                          height: -moz-calc(100% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(100% - 25px);
+                          /* Opera */
+                          height: -o-calc(100% - 25px);
+                          /* Standard */
+                          height: calc(100% - 25px);
+                  
+                          position: absolute;
+                        } 
+                            .numbersContentBox table{ width: 100%; height: 100%; }                   
+                            .numbersContentBox table tr td {  text-align: left; font: 12px 'Calibri'; } 
+                            .even-row {
+                               background-color: #fcefa1;
+                            }
+                            .odd-row {
+                               background-color: #D1C7C7;
+                            }
+                    
+                            .boxed {
+                              //border: 1px solid green ;
+                              text-align: center;
+                              font: 12px 'Calibri';
+                              background-color: #EDC10E;//#75DE4B;
+                               border: 1px solid #ccc;
+    				           -moz-border-radius: 10px;
+    						   -webkit-border-radius: 10px;
+    						    border-radius: 15px;
+    						    -moz-box-shadow: 2px 2px 3px #666;
+    						    -webkit-box-shadow: 2px 2px 3px #666;
+    						    box-shadow: 2px 2px 3px #666;
+    						    padding: 1px 5px;
+    						    outline: 0;
+    						    -webkit-appearance: none;
+    						    width:2%;
+                            } 
+                            
+                            .days {
+                              
+                              width:50px;height:50px; 
+                             -moz-border-radius: 50px;
+    						 -webkit-border-radius: 50px;
+                              background-color:#F7FE2E; 
+                              border-radius:50%;
+                              text-align:center;
+                              color:black;
+                              line-height:50px; 
+                            }   
+                    .quoteAcceptedBox {
+                      width: 95%;
+                      height: 38.5%;
+                      top:20.4%;
+                      left:2.1%;
+                      position: absolute;
+                      border: 1px solid;
+                      -moz-border-radius: 10px;
+				      -webkit-border-radius: 10px;
+				      border-radius: 10px;
+                      
+                    }
+                
+                        .quoteAcceptedContentBox {
+                         
+                         font: 12px 'Calibri' sans-serif;
+                         
+                        }
+                        
+                        //.quoteAcceptedContentBox table white-space: nowrap; table-layout: fixed; width: 100%; height: 100%}                //;   
+                        //.quoteAcceptedContentBox table tr td {  text-align: left; font: 12px 'Calibri' sans-serif; } 
+                        
+                    .leadJobBox {
+                      width: 63%;
+                      height: 92%;
+                      top:5%;
+                      left:37%;
+                      position: absolute;
+                      background-color:white;
+                      overflow-y:scroll;
+                    }
+                    .homeVisitDetailBox {
+                      width: 18%;
+                      height:67.5%;
+                      top:5%;
+                      left:18.6%;
+                      position: absolute;
+                      padding: 1px;
+                      border: 1px solid white;
+                    }
+                    
+                    .salesAppointment {
+                      width: initial;
+                      //height: 17%;
+                      //top : 2.5%;
+                      left:2.1%;    
+                      //position: relative;
+                      border: 1px black ;
+                      -moz-border-radius: 10px;
+				      -webkit-border-radius: 10px;
+				      border-radius: 10px;
+				      clear:both;
+				      display: block;
+				      margin:3px;
+                      
+                    }
+                        .homeVisitDetailContentBox {
+                         
+                         font: 12px 'Calibri' sans-serif;
+                        }
+                        .homeVisitDetailContentBox table{  white-space: nowrap; text-overflow: ellipsis; table-layout: fixed; }                //width: 100%; height: 100%;   
+                        .homeVisitDetailContentBox table tr td {  text-align: left; font: 12px 'Calibri' sans-serif; padding:3em;} 
+                
+                    .openCasesBox {
+                      width: 60%;
+                      height: 15%;
+                      left: 20.1%;
+                      top:85.1%;
+                      position: absolute;
+                    }
+           .recentItemsBox {
+              left : .5%;  
+              width: 19.9%;
+              height: 20%;
+              top:61.5%;
+              left : .5%;  
+              position: absolute;
+              border: 1px solid white;
+            }
+                .recentItemsContentBox {
+                  left : .5%;  
+                  width: 100%;
+                  height: 100%;  
+                  /* Firefox */
+                  height: -moz-calc(100% - 25px);
+                  /* WebKit */
+                  height: -webkit-calc(100% - 25px);
+                  /* Opera */
+                  height: -o-calc(100% - 25px);
+                  /* Standard */
+                  height: calc(100% - 25px);
+                 
+                  position: absolute;
+                  
+                }
+                    .recentItemsContentBox table{ width: 100%; height: 100%; white-space: nowrap; text-overflow: ellipsis; table-layout: fixed; }                   
+                    .recentItemsContentBox table tr td { vertical-align: middle; text-align: left; font: 11px 'Calibri'; } 
+                    .even-row {
+                       //background-color: #fcefa1;
+                    }
+                    .odd-row {
+                       //background-color: #D1C7C7;
+                    }
+                               
+                    .installationBox {
+                      width: 95%;
+                      height: 37%;
+                      top:59.5%;
+                      left:2.1%;
+                      position: absolute;
+                      border: 1px solid ;
+                      -moz-border-radius: 10px;
+				      -webkit-border-radius: 10px;
+				      border-radius: 10px;
+                    }
+                        .installationContentBox {
+                          font: 12px 'Calibri';
+                        }
+                
+                    .contactsBox {
+                      left : .5%;  
+                      width: 20%;
+                      height: 20%;
+                      top:35.2%;
+                      //left:77%;
+                      position: absolute;
+                    }
+                        .contactsContentBox {
+                          left : .5%;  
+                          width: 100%;
+                          /* Firefox */
+                          height: -moz-calc(100% - 25px);
+                          /* WebKit */
+                          height: -webkit-calc(100% - 25px);
+                          /* Opera */
+                          height: -o-calc(100% - 25px);
+                          /* Standard */
+                          height: calc(100% - 25px);
+                          //height: 80%;
+                          //top:40.2%;
+                          //left:77%;
+                          position: absolute;
+                          white-space: nowrap;
+                          //overflow-x: scroll;
+                          //overflow-y: scroll;
+                        }
+                            .contactsContentBox table{ width: 100%; height: 100%; table-layout: fixed; }                   
+                            .contactsContentBox table tr:first-child td { font-weight: bold; }
+                            .contactsContentBox table tr td { height:33%; vertical-align: middle; text-align: left; font: 12px 'Calibri'; } 
+                            .even-row {
+                               //background-color: #fcefa1;
+                            }
+                            .odd-row {
+                               height:33%; 
+                               background-color: #D1C7C7;
+                            }
+                    
+                    
+                        .titleBox {
+                          padding-left: 2px;   
+                          width: 100%;
+                          height: 25px;
+                          background:  #D0D0D0 ;
+                          color: black;
+                          -moz-border-radius: 10px;
+    				      -webkit-border-radius: 10px;
+    				      border-radius: 10px;
+    				      font-weight:bold;
+    				      color:black;
+                	      font-family:calibri;
+                          
+                        }
+                            .titleBox table{ width: 100%; height: 100%;table-layout: fixed}
+                            .titleBox table tr td { vertical-align: middle; text-align: left; color: Black;font: 14px 'Calibri';font-weight:bold; }                    
+                
+                .hoverLink {
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+           .expandTopRight {
+              position:absolute;
+              top:0;
+              right:0; 
+              z-index: 99;
+              font: 16px 'Calibri';
+              cursor: pointer; 
+              background: rgb(38, 184, 218);
+              display: none; 
+            }
+            
+            
+            .leftbox{
+                  width: 18%;
+                  height: inherit;
+                  left: .5%;
+                  top:5.1%;
+                  position: absolute;
+                  display:block;
+                  clear: both;
+                  -moz-border-radius: 10px;
+			      -webkit-border-radius: 10px;
+			      border-radius: 10px;
+            }
+            
+            .highLightBlock {
+                      width: initial;
+                      //height: 17%;
+                      //top : 2.5%;
+                      left:2.1%;    
+                      //position: relative;
+                      border: 1px black;
+                      -moz-border-radius: 10px;
+				      -webkit-border-radius: 10px;
+				      border-radius: 10px;
+				      clear:both;
+				      display: block;
+				      margin:3px;
+				      background-color:#FFFFFF;
+                      
+                    }
+        .highlightTable{
+          
+          padding-left: 2px;   
+          width: 100%;
+          height: 25px;
+          background:  #58D3F7 ;
+          color: black;
+          -moz-border-radius: 10px;
+	      -webkit-border-radius: 10px;
+	      border-radius: inherit;
+	      //border: 1px solid;
+	      font-weight:bold;
+	      color:white;
+	      font-family:calibri;
+            
+        } 
+        .highlightCompletedTable{
+          
+          padding-left: 2px;   
+          width: 100%;
+          height: 25px;
+          background:  #74DF00 ;
+          color: black;
+          -moz-border-radius: 10px;
+	      -webkit-border-radius: 10px;
+	      border-radius: inherit;
+	      //border: 1px solid;
+	      font-weight:bold;
+	      color:white;
+	      font-family:calibri;
+            
+        }
+        .calibri{
+            font: 12px 'Calibri';
+            margin:4px;
+            line-height: 20px;
+        }
+        
+        
+        .recentlyviewed:hover
+        {
+        	background-color: yellow;
+        	font-weight:bold;
+        	
+        }
+                    
+                    
+            
+                          
+</style>

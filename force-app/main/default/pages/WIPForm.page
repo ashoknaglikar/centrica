@@ -1,0 +1,525 @@
+<apex:page sidebar="false" standardController="WIP_Header__c" extensions="WIPController" action="{!methodtest}" tabStyle="Job__c" docType="html-5.0"  >
+
+<script type="text/javascript">
+    
+    function togglleDiv(show)
+     {
+         document.getElementById('darkLayer').style.display = show; 
+         document.getElementById('LoadingDiv').style.display = show;      
+     }
+       
+</script> 
+
+<apex:form id="frm">
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+    </div>
+    <div id="darkLayer" style ="background-color: white; 
+             filter:alpha(opacity=50); /* IE */ 
+             opacity: 0.5; /* Safari, Opera */ 
+             -moz-opacity:0.50; /* FireFox */ 
+             z-index: 20; 
+             height: 100%; 
+             width: 100%; 
+             background-repeat:no-repeat; 
+             background-position:center; 
+             position:absolute; 
+             top: 0px; 
+             left: 0px; 
+             display:none;">
+    </div>  
+  
+  
+  <apex:outputPanel id="panel" >
+   
+    <apex:pageMessages />
+    <apex:outputPanel id="panel1"> 
+    <!--<apex:pageMessages />-->
+
+    <apex:pageBlock >
+    <div align="Center">
+        <h1>WIP Form</h1>
+    </div>
+    </apex:pageBlock>
+    
+    <apex:pageBlock id="headerBlock" title="WIP Form Details" >   
+    <apex:pageBlockSection columns="2" showHeader="True" collapsible="false">
+    
+    <apex:outputField value="{!header.Job__c}"/>
+    <!--<apex:InputField required="true" value="{!header.Assigned_To__c}" onchange="changeEmp();"/>-->
+    <apex:outputField value="{!header.Reason_For_Visit__c}" rendered="{!IF(header.id==NULL,false,true)}"/>
+    <apex:inputField value="{!header.Reason_For_Visit__c}" rendered="{!IF(header.id==NULL,true,false)}" required="true"/>
+        
+       
+    <apex:outputField value="{!job.Installation_Address__c}"/>
+    <apex:outputField value="{!header.WIP_Type__c}" rendered="{!IF(header.id==NULL,false,true)}"/>
+    <apex:inputField value="{!header.WIP_Type__c}" required="true" rendered="{!IF(header.id==NULL,true,false)}">
+    <apex:actionSupport event="onchange" action="{!displayQuestions}" reRender="panel" status="waitt"/>
+    <apex:actionStatus id="waitt" startText=" (wait...)" stopText=""/>
+    </apex:inputField> 
+        
+    
+    <apex:outputField value="{!job.CHI_Lead_Name__c}"/>
+    
+    <apex:outputField value="{!job.Quote__c}"/>
+    <apex:outputField value="{!header.Status__c}"/>
+    
+    <apex:image id="img" title="Status Indicator:" style="margin-left:200px;" height="20" width="40" url="{!IF(header.Status__c=='InProgress','/img/samples/light_red.gif','/img/samples/light_green.gif')}" />
+    <apex:inputField value="{!header.Notes__c}"/>
+    
+    <apex:outputField value="{!job.District_Name__c}"/>
+    <apex:pageBlockSectionItem />
+    <apex:outputField value="{!job.Region__c}"/>
+    
+    <apex:outputField value="{!job.Latest_customer_category__c}"/>
+    <apex:outputField value="{!job.Latest_customer_category_indicator__c}"/>
+    
+    <apex:outputField value="{!job.Installation_Date__c}"/>
+    
+    <apex:outputField value="{!job.Delivery_Date__c}"/>
+    <apex:outputField value="{!job.Delivery_Notes__c}"/>
+    
+    <apex:outputField label="Completed surveys" value="{!job.CHI_Lead__r.Surveys_taken__c}"/>
+    <apex:outputField value="{!job.Status__c}"/>
+    <apex:pageBlockSectionItem />
+    <apex:outputField value="{!job.Sub_Status__c}"/>
+    </apex:pageblocksection>
+    
+     </apex:pageblock>
+    </apex:outputPanel>
+    
+    
+    <apex:outputPanel id="panel2" rendered="{!displayQuestions}">
+    
+    <apex:pageBlock id="questionBlock"> 
+    <apex:outputPanel id="section9" rendered="{!size9}">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;
+    <apex:pageBlockSection columns="1" title="Customer Avalablity Check" collapsible="true">    
+        <div align="center">
+    <apex:datatable columns="4"  width="100%" align="center" value="{!section9QuestionClass}" var="sq">
+           <apex:column width="60%" headerValue="Question" value="{!sq.header2}" />
+            <apex:column width="20%" style="text-align: left;"  headerValue="Answer">
+            <apex:selectRadio id="section5Radio" required="false"  value="{!sq.answer}" >
+                        <apex:selectOptions value="{!sq.options}" /> 
+                        <apex:actionSupport action="{!mandatoryCheck}" event="onclick" status="wait5" rerender="panel2"/>
+                        <apex:actionStatus id="wait5" startText=" (wait...)" stopText=""/>
+            </apex:selectRadio>
+           </apex:column>
+           <apex:column width="20%" headerValue="Notes" >
+               <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column>
+         </apex:datatable>
+         </div>       
+    </apex:pageBlockSection>
+     </apex:outputPanel>
+    
+    <apex:outputPanel id="section1" rendered="{!size1}"> 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:image height="20" width="20" url="{!$Resource.GreenDot}" rendered="{!!missedSection1Item}" /> 
+    <apex:image height="30" width="30" url="{!$Resource.RedDot}" rendered="{!missedSection1Item}"/> 
+    <apex:pageBlockSection columns="1" title="{!section1}" collapsible="true">    
+        <div align="center">
+        <apex:pageBlockTable columns="4" width="100%" align="center" value="{!section1QuestionClass}" var="sq">
+         
+            <apex:column width="60%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="text-align: left;"  headerValue="Answer">
+            <apex:selectRadio id="section1Radio" required="false"  value="{!sq.answer}" >
+                    <apex:selectOptions value="{!sq.options}" /> 
+                   <!-- <apex:actionSupport action="{!mandatoryCheck}" event="onclick" status="wait1" rerender="section1"/>
+                    <apex:actionStatus id="wait1" startText=" (wait...)" stopText=""/>-->
+            </apex:selectRadio> 
+            <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.section1Radio}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>                                  
+            </apex:column>
+            <apex:column width="20%" headerValue="Notes" >
+                <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column>   
+        </apex:pageBlockTable>
+        </div>       
+    </apex:pageBlockSection> 
+    </apex:outputPanel>
+
+    <apex:outputPanel id="section2" rendered="{!size2}"> 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:image height="20" width="20" url="{!$Resource.GreenDot}" rendered="{!!missedSection2Item}" /> 
+    <apex:image height="30" width="30" url="{!$Resource.RedDot}" rendered="{!missedSection2Item}"/> 
+    <apex:pageBlockSection columns="1" title="{!section2}" collapsible="true">    
+        <div align="center">
+        <apex:pageBlockTable columns="4" width="100%" align="center" value="{!section2QuestionClass}" var="sq">
+          
+            <apex:column width="60%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="text-align: left;"  headerValue="Answer">
+            <apex:selectRadio id="section2Radio" required="false"  value="{!sq.answer}" >
+                    <apex:selectOptions value="{!sq.options}" /> 
+                    <!--<apex:actionSupport action="{!mandatoryCheck}" event="onclick" status="wait2" rerender="section2"/>
+                    <apex:actionStatus id="wait2" startText=" (wait...)" stopText=""/>-->
+            </apex:selectRadio> 
+            <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.section2Radio}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>                                  
+            </apex:column>
+            <apex:column width="20%" headerValue="Notes" >
+                <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column>   
+        </apex:pageBlockTable>
+        </div>       
+    </apex:pageBlockSection> 
+    </apex:outputPanel>
+    
+    <apex:outputPanel id="section3">
+    <apex:outputPanel rendered="{!size3}"> 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:image height="20" width="20" url="{!$Resource.GreenDot}" rendered="{!!missedSection3Item}" /> 
+    <apex:image height="30" width="30" url="{!$Resource.RedDot}" rendered="{!missedSection3Item}"/> 
+    <apex:pageBlockSection columns="1" title="{!section3}" collapsible="true">    
+        <div align="center">
+          
+          <apex:pageblockTable columns="4" width="100%" align="center" value="{!section3QuestionClass}" var="sq">
+ 
+            <apex:column width="60%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="text-align: left;"  headerValue="Answer">
+            <apex:selectRadio id="section3Radio" required="false"  value="{!sq.answer}" >
+                    <apex:selectOptions value="{!sq.options}" /> 
+                    <!-- <apex:actionSupport action="{!mandatoryCheck}" event="onclick" status="wait3" rerender="section3"/>
+                    <apex:actionStatus id="wait3" startText=" (wait...)" stopText=""/>-->
+            </apex:selectRadio> 
+            <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.section3Radio}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>                                  
+            </apex:column>
+            <apex:column width="20%" headerValue="Notes" >
+                <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column>   
+        </apex:pageblockTable>
+       
+        </div>       
+    </apex:pageBlockSection> 
+    </apex:outputPanel>
+    </apex:outputPanel>
+    
+      <apex:outputPanel id="section4" rendered="{!size4}"> 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:image height="20" width="20" url="{!$Resource.GreenDot}" rendered="{!!missedSection4Item}" /> 
+    <apex:image height="30" width="30" url="{!$Resource.RedDot}" rendered="{!missedSection4Item}"/> 
+    <apex:pageBlockSection columns="1" title="{!section4}" collapsible="true">    
+        <div align="center">
+        <apex:pageBlockTable columns="4" width="100%" align="center" value="{!section4QuestionClass}" var="sq">
+          
+            <apex:column width="60%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="text-align: left;"  headerValue="Answer">
+            <apex:selectRadio id="section4Radio" required="false"  value="{!sq.answer}" >
+                    <apex:selectOptions value="{!sq.options}" /> 
+                   <!-- <apex:actionSupport action="{!mandatoryCheck}" event="onclick" status="wait4" rerender="section4"/>
+                    <apex:actionStatus id="wait4" startText=" (wait...)" stopText=""/>-->
+            </apex:selectRadio> 
+            <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.section4Radio}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>                                  
+            </apex:column>
+            <apex:column width="20%" headerValue="Notes" >
+                <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column>   
+        </apex:pageBlockTable>
+        </div>       
+    </apex:pageBlockSection> 
+    </apex:outputPanel>
+    
+    <apex:outputPanel id="section5" >
+    <apex:outputPanel rendered="{!size5}"> 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:image height="20" width="20" url="{!$Resource.GreenDot}" rendered="{!!missedSection5Item}" /> 
+    <apex:image height="30" width="30" url="{!$Resource.RedDot}" rendered="{!missedSection5Item}"/> 
+    
+    <apex:pageBlocksection columns="1" title="{!section5}" collapsible="true">    
+        <div align="center">
+        
+         
+        <apex:PageBlocktable columns="4" width="100%" align="center" value="{!section5QuestionClass}" var="sq">
+            
+            <apex:column width="60%" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="text-align: left;">
+            <apex:selectRadio id="section5Radio" required="false"  value="{!sq.answer}" >
+                    <apex:selectOptions value="{!sq.options}" /> 
+                   <!-- <apex:actionSupport action="{!mandatoryCheck}" event="onclick" status="wait5" rerender="section5"/>
+                    <apex:actionStatus id="wait5" startText=" (wait...)" stopText=""/>-->
+            </apex:selectRadio> 
+            <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.section5Radio}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>                                  
+            </apex:column>
+            <apex:column width="20%">
+                <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column>  
+          </apex:PageBlocktable>
+        </div>       
+     </apex:pageBlockSection>
+    </apex:outputPanel>
+    </apex:outputpanel>
+    
+     <apex:outputPanel id="section6" rendered="{!size6}"> 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:image height="20" width="20" url="{!$Resource.GreenDot}" rendered="{!!missedSection6Item}" /> 
+    <apex:image height="30" width="30" url="{!$Resource.RedDot}" rendered="{!missedSection6Item}"/> 
+    <apex:pageBlockSection columns="1" title="{!section6}" collapsible="true">    
+        <div align="center">
+        <apex:pageBlockTable columns="4" width="100%" align="center" value="{!section6QuestionClass}" var="sq">
+         
+            <apex:column width="60%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="text-align: left;"  headerValue="Answer">
+            <apex:selectRadio id="section6Radio" required="false"  value="{!sq.answer}" >
+                    <apex:selectOptions value="{!sq.options}" /> 
+                   <!-- <apex:actionSupport action="{!mandatoryCheck}" event="onclick" status="wait6" rerender="section6"/>
+                    <apex:actionStatus id="wait6" startText=" (wait...)" stopText=""/>-->
+            </apex:selectRadio> 
+            <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.section6Radio}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>                                  
+            </apex:column>
+            <apex:column width="20%" headerValue="Notes" >
+                <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column>   
+        </apex:pageBlockTable>
+        </div>       
+    </apex:pageBlockSection> 
+    </apex:outputPanel>
+    
+     <apex:outputPanel id="section7" rendered="{!size7}"> 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:image height="20" width="20" url="{!$Resource.GreenDot}" rendered="{!!missedSection7Item}" /> 
+    <apex:image height="30" width="30" url="{!$Resource.RedDot}" rendered="{!missedSection7Item}"/> 
+    <apex:pageBlockSection columns="1" title="{!section7}" collapsible="true">    
+        <div align="center">
+        <apex:pageBlockTable columns="4" width="100%" align="center" value="{!section7QuestionClass}" var="sq">
+         
+            <apex:column width="60%" headerValue="Question" value="{!sq.question.Question_Text__c}"/>
+            <apex:column width="20%" style="text-align: left;"  headerValue="Answer">
+            <apex:selectRadio id="section7Radio" required="false"  value="{!sq.answer}" >
+                    <apex:selectOptions value="{!sq.options}" /> 
+                   <!-- <apex:actionSupport action="{!mandatoryCheck}" event="onclick" status="wait7" rerender="section7"/>
+                    <apex:actionStatus id="wait7" startText=" (wait...)" stopText=""/>-->
+            </apex:selectRadio> 
+            <script>
+                    var selectRadioBtn = document.getElementById('{!$Component.section7Radio}');
+                    var cells = selectRadioBtn.getElementsByTagName('td');
+                
+                    for (var i=0,len=cells.length; i<len; i++){
+                        cells[i].style.border = 'none' ;
+                    }
+                </script>                                  
+            </apex:column>
+            <apex:column width="20%" headerValue="Notes" >
+                <apex:inputTextarea cols="60" value="{!sq.notes}" rows="3"/>
+            </apex:column>   
+        </apex:pageBlockTable>
+        </div>       
+    </apex:pageBlockSection> 
+    </apex:outputPanel>
+    
+    <apex:pageBlockButtons >    
+        <apex:commandButton value="SAVE" action="{!save}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" reRender="panel"/> 
+        <apex:commandButton value="CANCEL" action="{!cancel}" immediate="true" />
+    </apex:pageBlockButtons>
+    
+   </apex:pageBlock>
+   </apex:outputPanel>  
+   </apex:outputPanel>
+   
+</apex:form> 
+
+<apex:form id="frm1" >
+   
+   <apex:pageBlock title="Upload attachment" >
+      
+      <apex:pageBlockSection collapsible="true" showHeader="true" columns="3" id="block1">
+ 
+        <apex:pageBlockSectionItem >
+              <apex:outputLabel value="File" for="file"/>
+              <apex:inputFile value="{!attachment.body}" filename="{!attachment.name}" id="file"/>
+         </apex:pageBlockSectionItem>
+        
+        <apex:pageBlockSectionItem >
+          <apex:outputLabel value="Title" for="name"/>
+          <apex:inputTextarea value="{!fileName}"/>
+        </apex:pageBlockSectionItem>
+ 
+        <apex:pageBlockSectionItem >
+          <apex:outputLabel value="Description" for="description"/>
+          <apex:inputTextarea value="{!attachment.description}" id="description"/>
+        </apex:pageBlockSectionItem>
+ 
+      </apex:pageBlockSection>
+     
+      <apex:pageBlockButtons >
+            <apex:commandButton action="{!upload}" value="Upload" />
+      </apex:pageBlockButtons>
+      
+    </apex:pageBlock>
+    
+</apex:form>
+
+</apex:page>

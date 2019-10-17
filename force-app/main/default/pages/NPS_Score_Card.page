@@ -1,0 +1,198 @@
+<apex:page controller="NPSScoreCardController" showHeader="false" sidebar="false" title="British Gas NPS Survey">
+
+<script>
+
+ window.onload = function applyStyle(){
+ if(history.length>0)
+ history.go(+1);
+ window.moveTo(0,0);
+ window.resizeTo(1096,1096);
+ if(document.getElementById('oPanelForStyling') == null){
+ return;
+ }else{
+ var output_panel = document.getElementById('oPanelForStyling').getElementsByTagName('td'); 
+ var i=0;
+ for (i=1;i<=58;i++){
+    if(i != 11 && i != 22 && i != 24 && i != 35 && i != 46 && i != 48)
+    output_panel[i].style.paddingLeft = "0.35in";
+   }
+ }
+ }; 
+
+function applyStyleAfterSubmit(){
+ if(document.getElementById('oPanelForStyling') == null){
+ return;
+ }
+ var output_panel_submit = document.getElementById('oPanelForStyling').getElementsByTagName('td'); 
+ var j=0;
+ for (j=1;j<=58;j++){
+    if(j != 11 && j != 22 && j != 24 && j != 35 && j != 46 && j != 48)
+    output_panel_submit[j].style.paddingLeft = "0.35in";
+   }
+ }
+
+function closeAndRefresh(){
+window.opener='x';
+window.close(); 
+}
+
+</script>
+
+<!-- --------------------- Main form starts ----------------------------------------------------->
+  <apex:form >
+
+<apex:outputpanel rendered="{!NOT(npsInfo.renderSurvey)}">
+    <div id="content1"
+        style="border: 3px #00CCFF solid; background-color: #D4F1FF">
+    <div style="margin: 0.25in">
+    <p>Thanks for your feedback but our records indicate that you’ve already completed this survey. 
+    <br/><br/>If you are experiencing problems with your British Gas central heating installation why not contact us at: 
+installationcomplaints@britishgas.co.uk or telephone us on {!$Label.PhoneNumber_CustomerRelations}. <br/><br/>
+We will be pleased to help you.
+<center><apex:image onClick="Javascript:closeAndRefresh();"
+            url="{!$Resource.Close_Button}" title="Close this window"/></center>
+    </p>
+    </div>
+    </div>
+</apex:outputpanel>
+
+        <apex:outputpanel id="innerPanel" rendered="{!npsInfo.renderSurvey}">
+
+<!-- --------------------- Main image starts ---------------------------------------------------->    
+    <apex:image value="{!$Resource.Main_NPS_Image}"/><br/>
+<!-- --------------------- Main image ends ------------------------------------------------------>
+
+
+
+        <apex:actionFunction name="submitNPSForm" action="{!submitNPSForm}" rerender="innerPanel" status="myStatus" oncomplete="applyStyleAfterSubmit();"/>
+        <apex:actionStatus startText="Processing...Please wait..." id="myStatus">
+        </apex:actionStatus>
+
+        <br/><apex:outputpanel rendered="{!IF(npsInfo.showMessage == 1,true,false)}"><div id="contentError" style="border: 3px #DC143C solid; background-color: #D4F1FF"><br/><apex:pagemessages /><br/></div></apex:outputpanel><br/>
+        <apex:image onclick="submitNPSForm();" url="{!$Resource.ButtonImage}" title="Submit NPS Form" style="margin-left: 4.1in"/>
+            
+            <br/><br/>
+
+<div id="oPanelForStyling">
+
+        <!-- --------------------- First main div starts ------------------------------------------------>
+        <div id="content1" style="border: 3px #00CCFF solid; background-color: #D4F1FF">
+          <div style="margin: 0.25in">
+            <p><b>Customer reference : </b><apex:outputText value="{!npsInfo.chiLeadNumber}"/></p>
+          </div>
+        </div>
+<!-- --------------------- First main div ends -------------------------------------------------->
+
+        <br/>
+        
+<!-- --------------------- Second main div starts ----------------------------------------------->
+        <div id="content2" style="border: 3px #00CCFF solid; background-color: #D4F1FF"><br/>
+          <div style="margin: 0.25in">
+           <p><b>1. On a scale of 0-10 how likely is it that you would
+        recommend British Gas to a friend or a relative for a new boiler or
+        central heating system?</b></p>
+        <div style="margin: 0.25in">
+            <apex:image value="{!$Resource.Progress_2}" /><br/>
+            <apex:selectRadio value="{!npsInfo.scoreQ1}">
+            <apex:selectOptions value="{!npsInfo.optionsQ1}"/>
+            </apex:selectRadio>
+        <br/>
+        <br/>
+        </div>
+        <p><b>Please give reasons for the score you gave</b></p>
+        <apex:inputtextarea value="{!npsInfo.nps.Step1_Comments__c}" cols="100" rows="5"/>
+        <br/>
+        </div>
+        </div>
+<!-- --------------------- Second main div ends ------------------------------------------------>
+
+        <br/>
+        
+<!-- --------------------- Third main div starts ------------------------------------------------------>        
+        <div id="content3" style="border: 3px #00CCFF solid; background-color: #D4F1FF"><br/>
+        <div style="margin: 0.25in">
+        
+        <p><b>2. On the same scale, how would you rate the
+        advice you were given by our Heating Sales Adviser (this is the person
+        who gave you your quote)?</b></p>
+        <div style="margin: 0.25in">
+            <apex:image value="{!$Resource.Progress_3}" /><br/>
+           <apex:selectRadio value="{!npsInfo.scoreQ2}">
+           <apex:selectOptions value="{!npsInfo.optionsQ2}"/>
+           </apex:selectRadio>
+        <br/>
+        <br/>
+        </div>
+        
+        
+        <p><b>3. Did you get the Installation date you
+        wanted?</b></p>
+        <div style="margin: 0.25in">
+        <apex:selectRadio value="{!npsInfo.scoreQ3}">
+        <apex:selectOptions value="{!npsInfo.optionsQ3}"/>
+        </apex:selectRadio>
+        <br/>
+        <br/>
+        </div>
+        
+        
+        <p><b>4. On a scale of 0-10 how would you rate the
+        quality of the installation work?</b></p>
+        <div style="margin: 0.25in">
+        <apex:image value="{!$Resource.Progress_3}"/><br/>
+        <apex:selectRadio value="{!npsInfo.scoreQ4}">
+        <apex:selectOptions value="{!npsInfo.optionsQ4}"/>
+        </apex:selectRadio><br/>
+        <br/>
+        <br/>
+        </div>
+        
+        
+        <p><b>5. On the same scale, how would you rate the
+        way your Customer Account Manager took care of you?</b></p>
+        <div style="margin: 0.25in">
+        <apex:image value="{!$Resource.Progress_3}" alt="Test" /><br/>
+        <apex:selectRadio value="{!npsInfo.scoreQ5}">
+        <apex:selectOptions value="{!npsInfo.optionsQ5}"/>
+        </apex:selectRadio><br/>
+        <br/>
+        <br/>
+        </div>
+        
+        
+        <p><b>6. Did the engineer contact you by phone
+        after your installation was complete?</b></p>
+        <div style="margin: 0.25in">
+        <apex:selectRadio value="{!npsInfo.scoreQ6}">
+        <apex:selectOptions value="{!npsInfo.optionsQ6}"/>
+        </apex:selectRadio>
+        <br/>
+        <br/>
+        </div>
+        
+        <p><b>7. On a scale of 0-10, how easy were we to
+        deal with?</b></p>
+        <div style="margin: 0.25in">
+        <apex:image value="{!$Resource.Progress_1}"/><br/>
+        <apex:selectRadio value="{!npsInfo.scoreQ7}">
+        <apex:selectOptions value="{!npsInfo.optionsQ7}"/>
+        </apex:selectRadio><br/><br/>
+        </div>
+        
+        <p><b>8. Have you had any problems with your boiler since installation? If so please tell us in the box below : </b></p>
+        <apex:inputtextarea value="{!npsInfo.nps.Q8_Score__c}" cols="100" rows="5"/>
+        <br/>
+        
+        
+        </div>
+        </div>
+<!-- --------------------- Third main div ends ------------------------------------------------------>        
+
+</div>
+
+</apex:outputpanel>
+      
+    </apex:form>
+<!-- --------------------- Main form ends ------------------------------------------------------>
+
+</apex:page>

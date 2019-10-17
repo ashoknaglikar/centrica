@@ -1,0 +1,1249 @@
+<apex:page standardcontroller="Green_Deal_Questions__c" extensions="GreenDealQuestionnaireCont" id="page" >
+      <script type="text/javascript">
+        function checkPicCapJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec2.pgsec2Itm2.AYHTP}").value;
+            //alert(txtVal1);
+            checkPicCap(txtVal1);
+        }
+        
+        function showlandlordQuesJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec2.pgsec2Itm1.WHBPATV}").value;
+            //alert(txtVal1);
+            showlandlordQues(txtVal1);
+        }
+        
+        function checkconsent1JS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec3.pgSec3item1.WCFTOL}").value;
+            //alert(txtVal1);
+            checkconsent1(txtVal1);
+        }
+        
+        function checkconsent2JS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec3.pgSec3item2.WCFTOL_1}").value;
+            //alert(txtVal1);
+            checkconsent2(txtVal1);
+            
+        }
+        
+        function disableBenefitSection1JS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec4.pgSec4itm1.IBPRAB}").value;
+            //alert(txtVal1);
+            disableBenefitSection1(txtVal1);
+        }
+        
+        function disableBenefitSection2JS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec4.pgSec4itm2.CTCOSPC}").value;
+            //alert(txtVal1);
+            disableBenefitSection2(txtVal1);
+        }
+        
+        function disableBenefitSection3JS()
+        {
+       	 	togglleDiv('');    
+        	
+            var A = false;
+            var B = false;
+            var C = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm2.Benefit_1A_1}").value;
+            //alert(C);
+            var D = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm4.Benefit_1A_2}").value;
+            //alert(D);
+            var E = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm6.Benefit_1A_3}").value;
+            //alert(E);
+            var F = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm8.Benefit_1B_1}").value;
+            //alert(F);
+            var G = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm10.Benefit_1B_2}").value;
+            //alert(G);
+            var H = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm12.Benefit_1B_3}").value;
+            //alert(H);
+            var I = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm14.Benefit_1B_4}").value;
+            //alert(I);
+            //alert(C);
+            if(C== 'Yes' || D== 'Yes' || E== 'Yes')
+            {
+            	A=true;
+            }
+            
+            if(F== 'Yes' || G== 'Yes' || H== 'Yes' || I== 'Yes')	
+            {
+            	B=true;
+            }
+            
+            //alert(A);
+            //alert(B);
+             
+            disableBenefitSection3(A,B);
+            
+            
+        }
+        
+        function togglleDiv(show){
+		    document.getElementById('darkLayer').style.display = show; 
+		    document.getElementById('LoadingDiv').style.display = show;      
+		} 
+        
+        function awRouteJS()
+        {
+        	document.getElementById('darkLayer').style.display = ''; 
+    		document.getElementById('LoadingDiv').style.display = '';    
+        	
+            var A = false;
+            var B = false;
+          
+            
+            var C = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm21.Benefit_2A_1}").value;
+            //alert(C);
+            var D = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm24.Benefit_2B_1}").value;
+            //alert(D);
+            var E = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm26.Benefit_2B_2}").value;
+            //alert(E);
+            var F = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec5.pgSec5itm28.Benefit_2B_3}").value;
+            //alert(F);
+          
+            if(C== 'Yes')
+            {
+            	A=true;
+            }
+            
+            if(D== 'Yes' || E== 'Yes' || F== 'Yes' )	
+            {
+            	B=true;
+            }
+            
+            awRoute(A,B);
+            document.getElementById('darkLayer').style.display = 'none'; 
+    		document.getElementById('LoadingDiv').style.display = 'none';  
+            
+        }
+        
+        function disableP_ConJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec6.pgSec6itm3.Any_Constraints}").value;
+            //alert(txtVal1);
+            disableP_Con(txtVal1);
+        }
+        
+        function showGDStringJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec7.pgSec7itm1.Electric_Supplier}").value;
+            //alert(txtVal1);
+            showGDString(txtVal1);
+        }
+        
+        function epcfunctionJS()
+        {
+            //alert('ok');
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec9.pgSec9itm3.Energy_Performance_Certificate}").value;
+            //alert(txtVal1);
+            epcfunction(txtVal1);
+        }
+        
+        function improveJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec9.pgSec9itm4.improvements_due_to_EPC}").value
+            //alert(txtVal1);
+            improve(txtVal1);
+        }
+        
+        function PHGDVFuncJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec11.pgSec11Itm1.PHGDV}").value;
+            //alert(txtVal1);
+            PHGDVFunc(txtVal1);
+        }
+        
+        function AHGDARFuncJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec11.pgSec11Itm2.AHGDAR}").value;
+            //alert(txtVal1);
+            AHGDARFunc(txtVal1);
+        }
+        
+        function PHAWGDPFuncJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec11.pgSec11Itm4.PHAWGDP}").value;
+            //alert(txtVal1);
+            PHAWGDPFunc(txtVal1);
+        }
+        
+        function CGDAAAPOPFuncJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.pageBlk1.pgSec13.pgSec13Itm1.CGDAAAPOP}").value;
+            //alert(txtVal1);
+            CGDAAAPOPFunc(txtVal1);
+        }
+    </script>
+    <apex:form id="frm" >
+        <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:360px; top:320px;display:none;">
+            <div style="margin-left:25px; margin-top:50%;">
+            <img src="/img/loading.gif" /> please wait...
+            </div>
+		</div>
+		
+		<div id="darkLayer" style ="background-color: white; 
+		                            filter:alpha(opacity=50); /* IE */ 
+		                            opacity: 0.5; /* Safari, Opera */ 
+		                            -moz-opacity:0.50; /* FireFox */ 
+		                            z-index: 20; 
+		                            height: 100%; 
+		                            width: 100%; 
+		                            background-repeat:no-repeat; 
+		                            background-position:center; 
+		                            position:absolute; 
+		                            top: 0px; 
+		                            left: 0px; 
+		                            display:none;">
+		</div>
+        <apex:pageblock title="{!greenDealTitle}"  id="pageBlk1" rendered="{!editMode}">
+        
+            <apex:pageblockbuttons id="pageBtn1">
+                <apex:commandbutton value="Save" action="{!save}" id="btn1"/>
+                <apex:commandbutton value="Cancel" action="{!cancel}" id="btn2"/>
+            </apex:pageblockbuttons>
+            
+            <apex:pagemessages id="Errors"/>
+            
+            
+            
+            <apex:pageblocksection title="Section:1 Customer Details" id="pgSec1">
+            
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Customer Name" for="cName"/>
+                    <apex:outputText value="{!custName}" id="cName"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Type" for="conType"/>
+                    <apex:outputText value="{!cType}" id="conType"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value=" Install Street" for="inStr"/>
+                    <apex:outputText value="{!street}" id="inStr"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Phone" for="Phon"/>
+                    <apex:outputText value="{!phone}" id="Phon"/>
+                </apex:pageblocksectionitem>
+                
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value=" Install City" for="inCity"/>
+                    <apex:outputText value="{!city}" id="inCity"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Mobile" for="mob"/>
+                    <apex:outputText value="{!mobile}" id="mob"/>
+                </apex:pageblocksectionitem>                
+                
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Install County" for="inCounty"/>
+                    <apex:outputText value="{!county}" id="inCounty"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Email" for="email"/>
+                    <apex:outputText value="{!email}" id="email"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Post Code" for="postCode"/>
+                    <apex:outputText value="{!postcode}" id="postCode"/>
+                </apex:pageblocksectionitem>
+                
+                 <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Job" for="jobName"/>
+                    <apex:outputfield value="{!Job.Name}" id="jobName"/>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Scetion 2: General Questions" id="pgSec2">
+                
+                <apex:pageblocksectionitem id="pgsec2Itm1">
+                    <!--  <apex:outputlabel value="{!$Label.WHBPATV}" for="WHBPATV"/>-->
+                	Who will be present
+                	<br/>at the visit?
+                    <apex:inputField value="{!greenDealQues.WHBPATV__c}" id="WHBPATV" onchange="showlandlordQuesJS();" required="true">
+                        <apex:actionfunction action="{!showlandlordQues}" name="showlandlordQues" rerender="frm" immediate="true">
+                            <apex:param name="WHBPATV" value="" assignTo="{!WHBPATV}"/>
+                        </apex:actionfunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="pgsec2Itm2">
+                    <!--  <apex:outputlabel value="{!$Label.AYHTP}" for="AYHTP"/>-->
+                    And are you also happy 
+                    <br/>for us to take 
+                    <br/>pictures at the visit?
+                    <apex:inputField value="{!greenDealQues.AYHTP__c}" id="AYHTP" onchange="checkPicCapJS();" required="true">
+                        <apex:actionFunction name="checkPicCap" action="{!checkPicCap}" rerender="frm" immediate="true">
+                            <apex:param name="checkpicString" value="" assignTo="{!checkpicString}"/>
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgsec2Itm3">
+                    <apex:outputlabel value="Others" for="Others"/>
+                    <apex:inputField value="{!greenDealQues.Others__c}" id="Others" required="{!!Others}">
+                        <script>document.getElementById('{!$Component.Others}').disabled = {!Others}; </script> 
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection rendered="{!if(renderdInt>0, true, false)}" id="pgSec3"> 
+                <apex:pageblocksectionitem id="pgSec3item1">
+                   <!-- <apex:outputlabel value="Will you be able to provide written consent from the tenant(s) and/or landlord for us to access and survey the property?" for="WCFTOL"/>-->
+                   Will you be able to provide written consent from the tenant(s) and/or landlord for us to access and survey the property?
+                    <apex:inputField value="{!greenDealQues.WCFS__c}" id="WCFTOL" onchange="checkconsent1JS();" required="{!!landTenQuest}">
+                    <script>document.getElementById('{!$Component.WCFTOL}').disabled = {!landTenQuest}; </script>
+                        <apex:actionFunction name="checkconsent1" action="{!checkconsent1}" rerender="frm" immediate="true">
+                            <apex:param name="WCFS" value="" assignTo="{!WCFS}"/>
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="pgSec3item2">
+                    <!--<apex:outputlabel value="{!$Label.WCFTOL_1}" for="WCFTOL_1"/>-->
+                        Will you be able to provide written consent from the tenant(s) and/or landlord for us to install any Green Deal recommended improvements at the property if required?
+                    <apex:inputField value="{!greenDealQues.WCFTOL__c}" id="WCFTOL_1" onchange="checkconsent2JS();" required="{!!landTenQuest}">
+                        <script>document.getElementById('{!$Component.WCFTOL_1}').disabled = {!landTenQuest}; </script>
+                        <apex:actionFunction name="checkconsent2" action="{!checkconsent2}" rerender="frm" immediate="true">
+                            <apex:param name="WCFTOL" value="" assignTo="{!WCFTOL}"/>
+                        </apex:actionFunction>
+                    </apex:inputField>  
+                </apex:pageblocksectionitem>
+                
+                
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Scetion 3: Benefits" rendered="{!if(renderdInt>2, true, false)}" id="pgSec4" >
+
+                <apex:pageblocksectionitem id="pgSec4itm1">
+                    <apex:outputlabel value="{!$Label.IBPRAB}" for="IBPRAB"/>
+                    <apex:inputField value="{!greenDealQues.IBPRAB__c}" id="IBPRAB" onchange="disableBenefitSection1JS();" required="true">
+                        <apex:actionFunction name="disableBenefitSection1" action="{!disableBenefitSection1}" rerender="frm" immediate="true">
+                            <apex:param name="IBPRAB" value="" assignTo="{!IBPRAB}"/>
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="pgSec4itm2">
+                    <!--<apex:outputlabel value="{!$Label.CTCOSPC}" for="CTCOSPC"/>-->
+                     Does the bill payer receive child tax credit <br/>
+                     with an income below £15,860 or state pension credit?
+                    <apex:inputField value="{!greenDealQues.CTCOSPC__c}" id="CTCOSPC" onchange="disableBenefitSection2JS();" required="{!!disableBenefit1}">
+                        <script>document.getElementById('{!$Component.CTCOSPC}').disabled = {!disableBenefit1}; </script>
+                        <apex:actionFunction name="disableBenefitSection2" action="{!disableBenefitSection2}" rerender="frm" immediate="true">
+                            <apex:param name="CTCOSPC" value="" assignTo="{!CTCOSPC}"/>
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+                
+                
+
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection columns="2" rendered="{!if((renderdInt>2 && (!disableBenefit1 && !disableBenefit2)), true, false)}" id="pgSec5" >
+            
+                
+                <apex:outputlabel value="{!$Label.Benefit_List_1A}" style="font-weight:bold; color:blue;" id="pgSec5Pan1"/>
+                
+                
+                <apex:actionFunction name="disableBenefitSection3" action="{!disableBenefitSection3}" rerender="pgSec5,panmain1" immediate="true" oncomplete="togglleDiv('none');">
+                    <apex:param name="blnA" value="" assignTo="{!A}"/>
+                    <apex:param name="blnB" value="" assignTo="{!B}"/>
+                </apex:actionFunction>
+                <!-- <apex:outputpanel id="pgSec5Pan2"> -->
+                 <apex:pageblocksectionitem > 
+                    <apex:outputlabel value="Section A:" style="font-weight:bold;"/>
+                 </apex:pageblocksectionitem>   
+                 
+                 <apex:pageblocksectionitem > 
+                    
+                 </apex:pageblocksectionitem> 
+                    
+                    <!--  <apex:inputField value="{!greenDealQues.Benefit_List_1A__c}" id="Benefit_List_1A"/>
+                    <apex:datatable value="{!Benefit_List_1A}" var="b1" id="pgSec5Pan1Tab1">
+                        <apex:column >
+                            <apex:inputcheckbox value="{!b1.isSelected}" onchange="disableBenefitSection3JS();" id="Benefit_List_1A" required="true">
+                            </apex:inputcheckbox>
+                        </apex:column>
+                        <apex:column value="{!b1.pickList}"/>
+                        
+                    </apex:datatable>-->
+                     <apex:pageblocksectionitem id="pgSec5itm1">
+                     	 <apex:outputlabel value="Income related employment and support allowance (including a work-related activity or component)" for="Benefit_1A_1" />
+	                 </apex:pageblocksectionitem>
+	                 
+	                 <apex:pageblocksectionitem id="pgSec5itm2">
+                     	 <apex:inputField value="{!greenDealQues.Benefit_1A_1__c}"  onchange="disableBenefitSection3JS();"  id="Benefit_1A_1" />
+	                 </apex:pageblocksectionitem>
+	                 
+                	<apex:pageblocksectionitem id="pgSec5itm3">
+                     	 <apex:outputlabel value="Income-based job seeker’s allowance" for="Benefit_1A_2"/>
+	                </apex:pageblocksectionitem>     
+	                
+                     <apex:pageblocksectionitem id="pgSec5itm4">
+                     	 <apex:inputField value="{!greenDealQues.Benefit_1A_2__c}" id="Benefit_1A_2" onchange="disableBenefitSection3JS();" >
+	                     </apex:inputField>
+                	</apex:pageblocksectionitem>
+                	
+                	<apex:pageblocksectionitem id="pgSec5itm5">
+                     	 <apex:outputlabel value="Income support" for="Benefit_1A_3"/>
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem id="pgSec5itm6">
+                     	 <apex:inputField value="{!greenDealQues.Benefit_1A_3__c}" id="Benefit_1A_3" onchange="disableBenefitSection3JS();" >
+	                     </apex:inputField>
+                	</apex:pageblocksectionitem>
+                	
+               <!--  </apex:outputpanel> -->
+                
+             
+               <!--   <apex:outputpanel id="pgSec5Pan3" >-->
+                    <apex:pageblocksectionitem >
+                    	<apex:outputlabel value="Section B:" style="font-weight:bold;"/>
+                    </apex:pageblocksectionitem>
+                    <apex:pageblocksectionitem >
+                    	
+                    </apex:pageblocksectionitem>
+                   
+                    <!--  <apex:datatable value="{!Benefit_List_1B}" var="b1" id="pgSec5Pan3Tab1">
+                        <apex:column id="pgSec5Pan3Tab1Col1">
+                            <apex:inputcheckbox value="{!b1.isSelected}" onchange="disableBenefitSection3JS();" id="Benefit_List_1B" />
+                        </apex:column>
+                        <apex:column value="{!b1.pickList}"/>
+                    </apex:datatable>-->
+               		<apex:pageblocksectionitem id="pgSec5itm7">
+                     	 Has parental responsibility for a child who lives with you and is under 16, or is 16 or under 20 years old and in full-time education (other than higher education)
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem id="pgSec5itm8">
+                     	 <apex:inputField value="{!greenDealQues.Benefit_1B_1__c}" id="Benefit_1B_1" onchange="disableBenefitSection3JS();" >
+	                     </apex:inputField>
+                	</apex:pageblocksectionitem>
+                	
+                	<apex:pageblocksectionitem id="pgSec5itm9">
+                     	 A child tax credit which includes a disability or severe disability element
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem id="pgSec5itm10">
+                     	 <apex:inputField value="{!greenDealQues.Benefit_1B_2__c}" id="Benefit_1B_2" onchange="disableBenefitSection3JS();" >
+	                     </apex:inputField>
+                	</apex:pageblocksectionitem>
+                	
+                	<apex:pageblocksectionitem id="pgSec5itm11">
+                     	 A disabled child premium
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem id="pgSec5itm12">
+                     	 <apex:inputField value="{!greenDealQues.Benefit_1B_3__c}" id="Benefit_1B_3" onchange="disableBenefitSection3JS();" >
+	                     </apex:inputField>
+                	</apex:pageblocksectionitem>
+                	
+                	<apex:pageblocksectionitem id="pgSec5itm13">
+                     	 A pensioner premium, higher pensioner premium or enhanced pensioner premium
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem id="pgSec5itm14">
+                     	 <apex:inputField value="{!greenDealQues.Benefit_1B_4__c}" id="Benefit_1B_4" onchange="disableBenefitSection3JS();" >
+	                     </apex:inputField>
+                	</apex:pageblocksectionitem>
+                
+                <!--  </apex:outputpanel>-->
+                <apex:pageblocksectionitem id="pgSec5itm15"/>
+                <apex:pageblocksectionitem id="pgSec5itm16"/>
+                <apex:pageblocksectionitem id="pgSec5itm17">
+                	<apex:outputlabel value="{!$Label.Benefit_List_2A}" style="font-weight:bold; color:blue;" id="pgSec5Pan4"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem id="pgSec5itm18">
+                
+                <apex:actionFunction name="awRoute" action="{!awRoute}" rerender="panmain1" immediate="true">
+                    <apex:param name="blnA" value="" assignTo="{!A}"/>
+                    <apex:param name="blnB" value="" assignTo="{!B}"/>
+                </apex:actionFunction>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem id="pgSec5itm19">
+                	<!--  <apex:outputpanel id="pgSec5Pan5"/>-->
+                	<apex:outputlabel value="Section A:" style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                 <apex:pageblocksectionitem />  
+                  <apex:pageblocksectionitem id="pgSec5itm20">
+                  		Working tax credit and have an income of £15, 860 or less
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem id="pgSec5itm21">
+                  	<apex:inputField value="{!greenDealQues.Benefit_2A_1__c}" id="Benefit_2A_1" onchange="awRouteJS();" >
+                  	<script>document.getElementById('{!$Component.Benefit_2A_1}').disabled = {!disableBenefit3}; </script>
+                    </apex:inputField>
+                  </apex:pageblocksectionitem> 
+                  
+                    <!-- <apex:inputField value="{!greenDealQues.Benefit_List_2A__c}" id="Benefit_List_2A"/> 
+                    <apex:datatable value="{!Benefit_List_2A}" var="b1" id="pgSec5Pan5Tab1">
+                        <apex:column Id="pgSec5Pan5Tab1Col1" >
+                            <apex:inputcheckbox value="{!b1.isSelected}" id="Benefit_List_2ACb" onchange="awRouteJS();">
+                                <script>document.getElementById('{!$Component.Benefit_List_2ACb}').disabled = {!disableBenefit3}; </script>
+                            </apex:inputcheckbox>
+                        </apex:column>
+                        <apex:column value="{!b1.pickList}"/>
+                    </apex:datatable>
+                </apex:outputpanel>-->
+                
+            	 <apex:pageblocksectionitem id="pgSec5itm22">
+                 <apex:outputlabel value="Section B:" style="font-weight:bold;"/>
+                 </apex:pageblocksectionitem>
+                 
+                 <apex:pageblocksectionitem />
+                 
+                 <apex:pageblocksectionitem id="pgSec5itm23">
+                 	Has parental responsibility for a child who lives with you and is under 16 or is 16 or under 20 years old and in full-time education (other than higher education)
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem id="pgSec5itm24">
+                  	<apex:inputField value="{!greenDealQues.Benefit_2B_1__c}" id="Benefit_2B_1" onchange="awRouteJS();" >
+                  	<script>document.getElementById('{!$Component.Benefit_2B_1}').disabled = {!disableBenefit3}; </script>
+                    </apex:inputField>
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem id="pgSec5itm25">
+                  	 Is in receipt of a disabled worker element or severe disability element
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem id="pgSec5itm26">
+                  	<apex:inputField value="{!greenDealQues.Benefit_2B_2__c}" id="Benefit_2B_2" onchange="awRouteJS();" >
+                  	<script>document.getElementById('{!$Component.Benefit_2B_2}').disabled = {!disableBenefit3}; </script>
+                    </apex:inputField>
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem id="pgSec5itm27">
+                  	Is aged 60 or over
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem id="pgSec5itm28">
+                  	<apex:inputField value="{!greenDealQues.Benefit_2B_3__c}" id="Benefit_2B_3" onchange="awRouteJS();" >
+                  	<script>document.getElementById('{!$Component.Benefit_2B_3}').disabled = {!disableBenefit3}; </script>
+                    </apex:inputField>
+                  </apex:pageblocksectionitem> 
+                 
+                <!-- <apex:outputpanel id="pgSec5Pan6">
+                    <apex:outputlabel value="Section B:" style="font-weight:bold;"/>
+                    <!--  <apex:inputField value="{!greenDealQues.Benefit_List_2B__c}" id="Benefit_List_2B"/>
+                    <apex:datatable value="{!Benefit_List_2B}" var="b1" id="pgSec5Pan6Tab1">
+                        <apex:column >
+                            <apex:inputcheckbox value="{!b1.isSelected}" id="Benefit_List_2BCb" onchange="awRouteJS();">
+                                <script>document.getElementById('{!$Component.Benefit_List_2BCb}').disabled = {!disableBenefit3}; </script>
+                            </apex:inputcheckbox>
+                        </apex:column>
+                        <apex:column value="{!b1.pickList}"/>
+                    </apex:datatable>
+                     
+                </apex:outputpanel>-->
+                
+            </apex:pageblocksection>
+            
+            <apex:outputpanel id="panmain1">
+            
+             <apex:pageblocksection id="pgSec5_1" title="Affordable Warmth Details:" rendered="{!AWroute}" columns="1">
+             	 <apex:pageblocksectionitem >
+             	 	<apex:outputlabel value="Inform Customer that they are Eligible for Affordable Warmth. Please Capture Affordable Warmth advisory outcome below:" style="font-weight:bold;color:red;" rendered="{!AWroute}"/>
+             	 </apex:pageblocksectionitem>
+	           	 <apex:pageblocksectionitem id="pgSec5_1itm1" >
+	                	Affordable Warmth advisory outcome
+	                	<apex:inputfield value="{!greenDealQues.A_W_outcome__c}" required="{!AWroute}"/>
+	                </apex:pageblocksectionitem>
+	            </apex:pageblocksection>
+            
+            </apex:outputpanel>
+            <apex:pageblocksection title="Scetion 4: Property Details" rendered="{!if(renderdInt>2, true, false)}" id="pgSec6">
+
+                <apex:pageblocksectionitem id="pgSec6Itm1">
+                    <apex:outputlabel value="{!$Label.Building_Type}" for="Building_Type" />
+                    <apex:inputField value="{!greenDealQues.Building_Type__c}" id="Building_Type" required="true"/>
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="pgSec6Itm2">
+                    <apex:outputlabel value="{!$Label.Property_Age}" for="Property_Age"/>
+                    <apex:inputField value="{!greenDealQues.Property_Age__c}" id="Property_Age" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgSec6Itm3">
+                    <!---<apex:outputlabel value="{!$Label.Any_Constraints}" for="Any_Constraints"/>-->
+                    Is your property listed or in a conservation area, <br/>
+                    or are there any other known constraints associated <br/>
+                    with planning?
+                    <apex:inputField value="{!greenDealQues.Any_Constraints__c}" id="Any_Constraints" onchange="disableP_ConJS();" required="true">
+                        <apex:actionFunction name="disableP_Con" action="{!disableP_Con}" rerender="pgSec6" immediate="true">
+                            <apex:param name="Any_Constraints" value="" assignTo="{!Any_Constraints}"/> 
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgSec6Itm4">
+                    <apex:outputlabel value="{!$Label.Property_Constaints}" for="Property_Constaints"/>
+                    <apex:inputField value="{!greenDealQues.Property_Constaints__c}" id="Property_Constaints" required="{!!disableP_Constaints}">
+                    <script>document.getElementById('{!$Component.Property_Constaints}').disabled = {!disableP_Constaints}; </script>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+                
+
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Scetion 5: Energy Details" rendered="{!if(renderdInt>2, true, false)}" id="pgSec7">
+
+                <apex:pageblocksectionitem id="pgSec7itm1">
+                    <apex:outputlabel value="" for="Electric_Supplier">
+                    Please can you advise which company
+                    <br/> supplies electricity to the property? 
+                        <br/>
+                        <apex:outputlabel value="Supplier is currently not part of Green Deal Finance." rendered="{!nonGD}" style="font-weight:bold;color:red;"/>
+                    </apex:outputlabel>
+                    <apex:inputField value="{!greenDealQues.Electric_Supplier__c}" id="Electric_Supplier" onchange="showGDStringJS();" required="true">
+                        <apex:actionFunction name="showGDString" action="{!showGDString}" rerender="pgSec7" immediate="true">
+                            <apex:param name="elecSuppl" value="" assignTo="{!elecSuppl}"/> 
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="pgSec7itm2">
+                    <apex:outputlabel value="{!$Label.Primary_Heating}" for="Primary_Heating"/>
+                    <apex:inputField value="{!greenDealQues.Primary_Heating__c}" id="Primary_Heating" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgSec7itm3">
+                    <apex:outputlabel value="{!$Label.Secondary_Heating}" for="Secondary_Heating"/>
+                    <apex:inputField value="{!greenDealQues.Secondary_Heating__c}" id="Secondary_Heating" required="true"/>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            <br/>
+            <apex:pageblocksection rendered="{!if(renderdInt>2, true, false)}" columns="1" id="pgSec8">
+            
+                <apex:pageblocksectionitem id="pgSec8itm1">
+                    <apex:outputlabel value="{!$Label.energy_efficient_measures}" for="energy_efficient_measures" style="font-weight:bold;" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgSec8itm2">
+                    <apex:inputField value="{!greenDealQues.energy_efficient_measures__c}" id="energy_efficient_measures" required="true"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>    
+            
+            <apex:pageblocksection rendered="{!if(renderdInt>2, true, false)}" id="pgSec9">
+                <apex:pageblocksectionitem id="pgSec9itm1">
+                    <apex:outputlabel value="{!$Label.Meter_Type}" for="Meter_Type"/>
+                    <apex:inputField value="{!greenDealQues.Meter_Type__c}" id="Meter_Type" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgSec9itm2">
+                    <apex:outputlabel value="{!$Label.MPAN}" for="MPAN"/>
+                    <apex:inputField value="{!greenDealQues.MPAN__c}" id="MPAN" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgSec9itm3">
+                    <apex:outputlabel value="{!$Label.Energy_Performance_Certificate}" for="Energy_Performance_Certificate"/>
+                    <apex:inputField value="{!greenDealQues.Energy_Performance_Certificate__c}" id="Energy_Performance_Certificate" onchange="epcfunctionJS();" required="true">
+                        <apex:actionFunction name="epcfunction" action="{!epcfunction}" rerender="pageBlk1" immediate="true">
+                            <apex:param name="epc" value="" assignTo="{!epc}"/> 
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+            
+                <apex:pageblocksectionitem id="pgSec9itm4">
+                    <!--<apex:outputlabel value="{!$Label.improvements_due_to_EPC}" for="improvements_due_to_EPC"/>-->
+                        Were any improvements carried out on the property 
+                        <br/>as a result of the recommendations on the EPC?
+                    <apex:inputField value="{!greenDealQues.improvements_due_to_EPC__c}" id="improvements_due_to_EPC" onchange="improveJS();" required="{!!Hideepc}">
+                        <script>document.getElementById('{!$Component.improvements_due_to_EPC}').disabled = {!Hideepc}; </script>
+                        <apex:actionFunction name="improve" action="{!improve}" rerender="pageBlk1" immediate="true">
+                            <apex:param name="impEPC" value="" assignTo="{!impEPC}"/> 
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+            
+            </apex:pageblocksection>
+            <br/>
+            <apex:pageblocksection rendered="{!if(renderdInt>4, true, false)}" columns="1" id="pgSec10">
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.specify_improvements}" for="specify_improvements" style="font-weight:bold;" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:inputField value="{!greenDealQues.specify_improvements__c}" id="specify_improvements" required="true"/>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection rendered="{!if(renderdInt>3, true, false)}" id="pgSec11">    
+                <apex:pageblocksectionitem id="pgSec11Itm1">
+                    <apex:outputlabel value="{!$Label.PHGDV}" for="PHGDV"/>
+                    <apex:inputField value="{!greenDealQues.PHGDV__c}" id="PHGDV" onchange="PHGDVFuncJS();" required="true">
+                        <apex:actionFunction name="PHGDVFunc" action="{!PHGDVFunc}" rerender="pageBlk1" immediate="true">
+                            <apex:param name="PHGDV" value="" assignTo="{!PHGDV}"/> 
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgSec11Itm2">
+                    <apex:outputlabel value="{!$Label.AHGDAR}" for="AHGDAR"/>
+                    <apex:inputField value="{!greenDealQues.AHGDAR__c}" id="AHGDAR" onchange="AHGDARFuncJS();" required="{!!disPHGDV}">
+                        <script>document.getElementById('{!$Component.AHGDAR}').disabled = {!disPHGDV}; </script>
+                        <apex:actionFunction name="AHGDARFunc" action="{!AHGDARFunc}" rerender="pageBlk1" immediate="true">
+                            <apex:param name="AHGDAR" value="" assignTo="{!AHGDAR}"/> 
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgSec11Itm3">
+                    <apex:outputlabel value="{!$Label.GDARRN}" for="GDARRN"/>
+                    <apex:inputField value="{!greenDealQues.GDARRN__c}" id="GDARRN" required="{!!disAHGDAR}">
+                        <script>document.getElementById('{!$Component.GDARRN}').disabled = {!disAHGDAR}; </script>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="pgSec11Itm4">
+                    <apex:outputlabel value="{!$Label.PHAWGDP}" for="PHAWGDP"/>
+                    <apex:inputField value="{!greenDealQues.PHAWGDP__c}" id="PHAWGDP" onchange="PHAWGDPFuncJS();" required="{!!disAHGDAR}">
+                        <script>document.getElementById('{!$Component.PHAWGDP}').disabled = {!disAHGDAR}; </script>
+                        <apex:actionFunction name="PHAWGDPFunc" action="{!PHAWGDPFunc}" rerender="pageBlk1" immediate="true">
+                            <apex:param name="PHAWGDP" value="" assignTo="{!PHAWGDP}"/> 
+                        </apex:actionFunction>
+                    </apex:inputField>  
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.SOEGDP}" for="SOEGDP"/>
+                    <apex:inputField value="{!greenDealQues.SOEGDP__c}" id="SOEGDP" required="{!!disPHAWGDP}">
+                        <script>document.getElementById('{!$Component.SOEGDP}').disabled = {!disPHAWGDP}; </script>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection rendered="{!!disPHAWGDP}" columns="1" id="pgSec12" >
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.GDPIIEP}" for="GDPIIEP" style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:inputField value="{!greenDealQues.GDPIIEP__c}" id="GDPIIEP" required="true"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>
+            
+            
+            
+            <apex:pageblocksection rendered="{!if(renderdInt>2, true, false)}" id="pgSec13" >       
+                <apex:pageblocksectionitem id="pgSec13Itm1">
+                    <!--  <apex:outputlabel value="{!$Label.CGDAAAPOP}" for="CGDAAAPOP"/>-->
+                    Will the Green Deal Advisor be able to access all parts 
+                   of the property (e.g. the loft) during the visit?
+                    <apex:inputField value="{!greenDealQues.CGDAAAPOP__c}" id="CGDAAAPOP" onchange="CGDAAAPOPFuncJS();" required="true">
+                        <apex:actionFunction name="CGDAAAPOPFunc" action="{!CGDAAAPOPFunc}" rerender="pageBlk1" immediate="true">
+                            <apex:param name="CGDAAAPOP" value="" assignTo="{!CGDAAAPOP}"/> 
+                        </apex:actionFunction>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.Acess_Restictions}" for="Acess_Restictions"/>
+                    <apex:inputField value="{!greenDealQues.Acess_Restictions__c}" id="Acess_Restictions" required="{!!disCGDAAAPOP}">
+                        <script>document.getElementById('{!$Component.Acess_Restictions}').disabled = {!disCGDAAAPOP}; </script>
+                    </apex:inputField>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Section 6: Declaration" columns="1" rendered="{!if(renderdInt>2, true, false)}">  
+            
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.Objection_Sentence}" for="GDPIIEP" style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:inputField value="{!greenDealQues.Yes__c}" id="Yes"/>
+                    <apex:outputlabel value="{!$Label.Yes}" for="Yes"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:inputField value="{!greenDealQues.No__c}" id="No"/>
+                    <apex:outputlabel value="{!$Label.No}" for="No"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection columns="2" rendered="{!if(renderdInt>2, true, false)}">
+                <apex:pageblocksectionitem >
+                  <!--  <apex:outputlabel value="{!$Label.GDA_Discussion}" for="GDA_Discussion"/>-->
+                    Following the completion of a Green Deal Advice 
+                    <br/>Report, are you happy for the Green Deal Advisor
+                    <br/> to discuss how British Gas can help you install
+                    <br/> the recommendations, including Green Deal finance?
+                    <apex:inputField value="{!greenDealQues.GDA_Discussion__c}" id="GDA_Discussion" required="true"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <!--  <apex:outputlabel value="{!$Label.Years_Energy_Bill}" for="Blk2Years_Energy_Bill"/>-->
+                    Confirm that you have advised the customer
+                    <br/> a years worth of energy bills or as manay
+                    <br/>  as possible will be required at the visit
+                    
+                    <apex:inputField value="{!greenDealQues.Years_Energy_Bill__c}" id="Years_Energy_Bill" required="true"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>    
+            
+
+            
+            
+            
+        </apex:pageblock>
+   
+        
+    <apex:pageblock title="{!greenDealTitle}"  id="pageBlk2" rendered="{!!editMode}">
+        
+            <apex:pageblockbuttons id="Blk2pageBtn1">
+            	<apex:commandbutton value="Create New"  action="{!newCreate}" id="Blk2btn2" rendered="{!createNew}"/>
+                <apex:commandbutton value="Edit"  action="{!edit}" id="Blk2btn1" rendered="{!!createNew}"/>
+            </apex:pageblockbuttons>
+            <apex:pagemessages /> 
+            <apex:pageblocksection title="Section:1 Customer Details" >
+            
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Customer Name" for="Blk2cName"/>
+                    <apex:outputfield value="{!Job.Customer_Name__c}" id="Blk2cName"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Type" for="Blk2conType"/>
+                    <apex:outputfield value="{!Job.CHI_Lead__r.Account.Primary_Contact__r.Contact_Type__c}" id="Blk2conType"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value=" Install Street" for="Blk2inStr"/>
+                    <apex:outputfield value="{!Job.Install_Street__c}" id="Blk2inStr"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Phone" for="Blk2Phon"/>
+                    <apex:outputfield value="{!Job.Home_Phone__c}" id="Blk2Phon"/>
+                </apex:pageblocksectionitem>
+                
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value=" Install City" for="Blk2inCity"/>
+                    <apex:outputfield value="{!Job.Install_City__c}" id="Blk2inCity"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Mobile" for="Blk2mob"/>
+                    <apex:outputfield value="{!Job.Best_Phone_Number__c}" id="Blk2mob"/>
+                </apex:pageblocksectionitem>                
+                
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Install County" for="Blk2inCounty"/>
+                    <apex:outputfield value="{!Job.Installation_County__c}" id="Blk2inCounty"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Email" for="Blk2email"/>
+                    <apex:outputfield value="{!Job.Customer_Email_Address__c}" id="Blk2email"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Post Code" for="Blk2postCode"/>
+                    <apex:outputfield value="{!Job.Install_Postcode__c}" id="Blk2postCode"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Job" for="Blk2jobName"/>
+                    <apex:outputfield value="{!greenDealQues.Job__c}" id="Blk2jobName"/>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Scetion 2: General Questions" id="Blk2pgSec2">
+                
+                <apex:pageblocksectionitem id="Blk2pgsec2Itm1">
+                    <apex:outputlabel value="{!$Label.WHBPATV}" for="Blk2WHBPATV"/>
+                    <apex:outputField value="{!greenDealQues.WHBPATV__c}" id="Blk2WHBPATV" />
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="Blk2pgsec2Itm2">
+                    <apex:outputlabel value="{!$Label.AYHTP}" for="Blk2AYHTP"/>
+                    <apex:outputField value="{!greenDealQues.AYHTP__c}" id="Blk2AYHTP"  />
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection rendered="{!if(renderdInt>0, true, false)}" id="Blk2pgSec3"> 
+                <apex:pageblocksectionitem id="Blk2pgSec3item1">
+                    <apex:outputlabel value="{!$Label.WCFTOL}" for="Blk2WCFTOL"/>
+                    <apex:outputField value="{!greenDealQues.WCFS__c}" id="Blk2WCFTOL" />
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="Blk2pgSec3item2">
+                    <apex:outputlabel value="{!$Label.WCFTOL_1}" for="Blk2WCFTOL_1"/>
+                    <apex:outputField value="{!greenDealQues.WCFTOL__c}" id="Blk2WCFTOL_1" />
+                </apex:pageblocksectionitem>
+                
+                
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Scetion 3: Benefits" id="Blk2pgSec4" >
+
+                <apex:pageblocksectionitem id="Blk2pgSec4itm1">
+                    <apex:outputlabel value="{!$Label.IBPRAB}" for="Blk2IBPRAB"/>
+                    <apex:outputField value="{!greenDealQues.IBPRAB__c}" id="Blk2IBPRAB" />
+                    
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="Blk2pgSec4itm2">
+                   <!-- <apex:outputlabel value="{!$Label.CTCOSPC}" for="Blk2CTCOSPC"/>-->
+                    Does the bill payer receive child tax credit <br/>
+                    with an income below £15,860 or state pension credit?
+                    <apex:outputField value="{!greenDealQues.CTCOSPC__c}" id="Blk2CTCOSPC" />
+                </apex:pageblocksectionitem>
+                
+
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection id="Blk2pgSec5" columns="2" title="Benefits:">
+            
+               
+        		<apex:outputlabel value="{!$Label.Benefit_List_1A}" style="font-weight:bold; color:blue;"/>
+        		<apex:pageblocksectionitem />
+        		<apex:pageblocksectionitem > 
+                    <apex:outputlabel value="Section A:" style="font-weight:bold;"/>
+                 </apex:pageblocksectionitem>   
+                 
+                 <apex:pageblocksectionitem > 
+                    
+                 </apex:pageblocksectionitem> 
+                    
+               
+                     <apex:pageblocksectionitem >
+                     	 <apex:outputlabel value="Income related employment and support allowance (including a work-related activity or component)" for="Benefit_1A_1" />
+	                 </apex:pageblocksectionitem>
+	                 
+	                 <apex:pageblocksectionitem >
+                     	 <apex:outputfield value="{!greenDealQues.Benefit_1A_1__c}"  />
+	                 </apex:pageblocksectionitem>
+	                 
+                	<apex:pageblocksectionitem >
+                     	 <apex:outputlabel value="Income-based job seeker’s allowance" />
+	                </apex:pageblocksectionitem>     
+	                
+                     <apex:pageblocksectionitem >
+                     	 <apex:outputField value="{!greenDealQues.Benefit_1A_2__c}" / >
+	                 
+                	</apex:pageblocksectionitem>
+                	
+                	<apex:pageblocksectionitem >
+                     	 <apex:outputlabel value="Income support" />
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem >
+                     	 <apex:outputField value="{!greenDealQues.Benefit_1A_3__c}"  />
+	                  
+                	</apex:pageblocksectionitem>
+                	
+               
+                    <apex:pageblocksectionitem >
+                    	<apex:outputlabel value="Section B:" style="font-weight:bold;"/>
+                    </apex:pageblocksectionitem>
+                    <apex:pageblocksectionitem >
+                    	
+                    </apex:pageblocksectionitem>
+            
+               		<apex:pageblocksectionitem >
+                     	 Has parental responsibility for a child who lives with you and is under 16, or is 16 or under 20 years old and in full-time education (other than higher education)
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem >
+                     	 <apex:outputField value="{!greenDealQues.Benefit_1B_1__c}"  />
+	                    
+                	</apex:pageblocksectionitem>
+                	
+                	<apex:pageblocksectionitem >
+                     	 A child tax credit which includes a disability or severe disability element
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem >
+                     	 <apex:outputField value="{!greenDealQues.Benefit_1B_2__c}" />
+	                 
+                	</apex:pageblocksectionitem>
+                	
+                	<apex:pageblocksectionitem >
+                     	 A disabled child premium
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem >
+                     	 <apex:outputField value="{!greenDealQues.Benefit_1B_3__c}"  />
+	                  
+                	</apex:pageblocksectionitem>
+                	
+                	<apex:pageblocksectionitem >
+                     	 A pensioner premium, higher pensioner premium or enhanced pensioner premium
+	                </apex:pageblocksectionitem>
+	                
+                	<apex:pageblocksectionitem >
+                     	 <apex:outputField value="{!greenDealQues.Benefit_1B_4__c}"  />
+	                 
+                	</apex:pageblocksectionitem>
+                
+                <!--  </apex:outputpanel>-->
+                <apex:pageblocksectionitem />
+                <apex:pageblocksectionitem />
+                <apex:pageblocksectionitem >
+                	<apex:outputlabel value="{!$Label.Benefit_List_2A}" style="font-weight:bold; color:blue;" />
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                
+               
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                	
+                	<apex:outputlabel value="Section A:" style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                 <apex:pageblocksectionitem />  
+                  <apex:pageblocksectionitem >
+                  		Working tax credit and have an income of £15, 860 or less
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem >
+                  	<apex:outputField value="{!greenDealQues.Benefit_2A_1__c}"  />
+                 
+                   
+                  </apex:pageblocksectionitem> 
+                  
+                    
+                
+            	 <apex:pageblocksectionitem >
+                 <apex:outputlabel value="Section B:" style="font-weight:bold;"/>
+                 </apex:pageblocksectionitem>
+                 
+                 <apex:pageblocksectionitem />
+                 
+                 <apex:pageblocksectionitem >
+                 	Has parental responsibility for a child who lives with you and is under 16 or is 16 or under 20 years old and in full-time education (other than higher education)
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem >
+                  	<apex:outputField value="{!greenDealQues.Benefit_2B_1__c}" />
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem >
+                  	 Is in receipt of a disabled worker element or severe disability element
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem >
+                  	<apex:outputField value="{!greenDealQues.Benefit_2B_2__c}"/>
+                  	
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem >
+                  	Is aged 60 or over
+                  </apex:pageblocksectionitem> 
+                  
+                  <apex:pageblocksectionitem >
+                  	<apex:outputField value="{!greenDealQues.Benefit_2B_3__c}"  />
+                  	
+                  </apex:pageblocksectionitem> 
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Scetion 4: Property Details" id="Blk2pgSec6">
+
+                <apex:pageblocksectionitem id="Blk2pgSec6Itm1">
+                    <apex:outputlabel value="{!$Label.Building_Type}" for="Blk2Building_Type"/>
+                    <apex:outputField value="{!greenDealQues.Building_Type__c}" id="Blk2Building_Type"/>
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="Blk2pgSec6Itm2">
+                    <apex:outputlabel value="{!$Label.Property_Age}" for="Blk2Property_Age"/>
+                    <apex:outputField value="{!greenDealQues.Property_Age__c}" id="Blk2Property_Age"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="Blk2pgSec6Itm3">
+                    <apex:outputlabel value="{!$Label.Any_Constraints}" for="Blk2Any_Constraints"/>
+                    <apex:outputField value="{!greenDealQues.Any_Constraints__c}" id="Blk2Any_Constraints" />
+                        
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="Blk2pgSec6Itm4">
+                    <apex:outputlabel value="{!$Label.Property_Constaints}" for="Blk2Property_Constaints"/>
+                    <apex:outputField value="{!greenDealQues.Property_Constaints__c}" id="Property_Constaints"/>
+                </apex:pageblocksectionitem>
+                
+
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Scetion 5: Energy Details" id="Blk2pgSec7">
+
+                <apex:pageblocksectionitem id="Blk2pgSec7itm1">
+                    <apex:outputlabel value="{!$Label.Electric_Supplier} " for="Blk2Electric_Supplier"/>
+                    <apex:outputField value="{!greenDealQues.Electric_Supplier__c}" id="Blk2Electric_Supplier"/>
+                </apex:pageblocksectionitem>
+
+                <apex:pageblocksectionitem id="Blk2pgSec7itm2">
+                    <apex:outputlabel value="{!$Label.Primary_Heating}" for="Blk2Primary_Heating"/>
+                    <apex:outputField value="{!greenDealQues.Primary_Heating__c}" id="Blk2Primary_Heating"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="Blk2pgSec7itm3">
+                    <apex:outputlabel value="{!$Label.Secondary_Heating}" for="Blk2Secondary_Heating"/>
+                    <apex:outputField value="{!greenDealQues.Secondary_Heating__c}" id="Blk2Secondary_Heating"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>
+        
+            <apex:pageblocksection columns="2" id="Blk2pgSec8">
+            
+                <apex:pageblocksectionitem id="Blk2pgSec8itm1">
+                    <apex:outputlabel value="{!$Label.energy_efficient_measures}" for="Blk2energy_efficient_measures" style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="Blk2pgSec8itm2">
+                    <apex:outputField value="{!greenDealQues.energy_efficient_measures__c}" id="Blk2energy_efficient_measures"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>    
+            
+            <apex:pageblocksection rendered="{!if(renderdInt>2, true, false)}" id="Blk2pgSec9">
+            
+                <apex:pageblocksectionitem id="Blk2pgSec9itm1">
+                    <apex:outputlabel value="{!$Label.Meter_Type}" for="Blk2Meter_Type"/>
+                    <apex:outputField value="{!greenDealQues.Meter_Type__c}" id="Blk2Meter_Type"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="Blk2pgSec9itm2">
+                    <apex:outputlabel value="{!$Label.MPAN}" for="Blk2MPAN"/>
+                    <apex:outputField value="{!greenDealQues.MPAN__c}" id="Blk2MPAN"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="Blk2pgSec9itm3">
+                    <apex:outputlabel value="{!$Label.Energy_Performance_Certificate}" for="Blk2Energy_Performance_Certificate"/>
+                    <apex:outputField value="{!greenDealQues.Energy_Performance_Certificate__c}" id="Blk2Energy_Performance_Certificate" />
+                </apex:pageblocksectionitem>
+            
+                <apex:pageblocksectionitem id="Blk2pgSec9itm4">
+                    <!--<apex:outputlabel value="{!$Label.improvements_due_to_EPC}" for="Blk2improvements_due_to_EPC"/>-->
+                        Were any improvements carried out on the property<br/> as a result of the recommendations on the EPC?
+                    <apex:outputField value="{!greenDealQues.improvements_due_to_EPC__c}" id="Blk2improvements_due_to_EPC"/>
+                </apex:pageblocksectionitem>
+            
+            </apex:pageblocksection>
+        
+            <apex:pageblocksection columns="2" id="Blk2pgSec10">
+            
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.specify_improvements}" for="Blk2specify_improvements" style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputField value="{!greenDealQues.specify_improvements__c}" id="Blk2specify_improvements"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection id="Blk2pgSec11">
+                
+                <apex:pageblocksectionitem id="Blk2pgSec11Itm1">
+                    <apex:outputlabel value="{!$Label.PHGDV}" for="Blk2PHGDV"/>
+                    <apex:outputField value="{!greenDealQues.PHGDV__c}" id="Blk2PHGDV" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="Blk2pgSec11Itm2">
+                    <apex:outputlabel value="{!$Label.AHGDAR}" for="Blk2AHGDAR"/>
+                    <apex:outputField value="{!greenDealQues.AHGDAR__c}" id="Blk2AHGDAR" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="Blk2pgSec11Itm3">
+                    <apex:outputlabel value="{!$Label.GDARRN}" for="Blk2GDARRN"/>
+                    <apex:outputField value="{!greenDealQues.GDARRN__c}" id="Blk2GDARRN"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem id="Blk2pgSec11Itm4">
+                    <apex:outputlabel value="{!$Label.PHAWGDP}" for="Blk2PHAWGDP"/>
+                    <apex:outputField value="{!greenDealQues.PHAWGDP__c}" id="Blk2PHAWGDP" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.SOEGDP}" for="Blk2SOEGDP"/>
+                    <apex:outputField value="{!greenDealQues.SOEGDP__c}" id="Blk2SOEGDP"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection columns="2" id="Blk2pgSec12">
+            
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.GDPIIEP}" for="Blk2GDPIIEP" style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputField value="{!greenDealQues.GDPIIEP__c}" id="Blk2GDPIIEP"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection id="Blk2pgSec13" >       
+                <apex:pageblocksectionitem id="Blk2pgSec13Itm1">
+                    <apex:outputlabel value="{!$Label.CGDAAAPOP}" for="Blk2CGDAAAPOP"/>
+                    <apex:outputField value="{!greenDealQues.CGDAAAPOP__c}" id="Blk2CGDAAAPOP" />
+                        
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.Acess_Restictions}" for="Blk2Acess_Restictions"/>
+                    <apex:outputField value="{!greenDealQues.Acess_Restictions__c}" id="Blk2Acess_Restictions"/>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Section 6: Declaration" columns="1" > 
+            
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$Label.Objection_Sentence}" for="Blk2GDPIIEP" style="font-weight:bold;"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputField value="{!greenDealQues.Yes__c}" id="Blk2Yes"/>
+                    <apex:outputlabel value="{!$Label.Yes}" for="Blk2Yes"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <apex:outputField value="{!greenDealQues.No__c}" id="Blk2No"/>
+                    <apex:outputlabel value="{!$Label.No}" for="Blk2No"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection columns="2" >
+                <apex:pageblocksectionitem >
+                    <!--  <apex:outputlabel value="{!$Label.GDA_Discussion}" for="Blk2GDA_Discussion"/>-->
+                    Following the completion of a Green Deal Advice 
+                    <br/>Report, are you happy for the Green Deal Advisor
+                    <br/> to discuss how British Gas can help you install
+                    <br/> the recommendations, including Green Deal finance?
+                    
+                    <apex:outputField value="{!greenDealQues.GDA_Discussion__c}" id="Blk2GDA_Discussion"/>
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem >
+                    <!--  <apex:outputlabel value="{!$Label.Years_Energy_Bill}" for="Blk2Years_Energy_Bill"/>-->
+                    Confirm that you have advised the customer
+                    <br/> a years worth of energy bills or
+                    <br/> as manay as possible will be 
+                    <br/>required at the visit
+                    
+                    <apex:outputField value="{!greenDealQues.Years_Energy_Bill__c}" id="Blk2Years_Energy_Bill"/>
+                </apex:pageblocksectionitem>
+                
+            </apex:pageblocksection>    
+            
+        </apex:pageblock>
+     </apex:form>
+</apex:page>

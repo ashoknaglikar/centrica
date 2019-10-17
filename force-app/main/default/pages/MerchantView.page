@@ -1,0 +1,154 @@
+<apex:page controller="MerchantViewController" sidebar="false" showHeader="true" >
+    <script>
+        function openNotes(){
+            window.open('/apex/AmalgamateNotes?OppId={!OppID}');
+            <!--,'','fullscreen=yes'); -->
+        }
+    </script>
+    <apex:pageBlock >       
+      <div align="right">  
+      <!-- <apex:image url="{!$Resource.Web_Banner_BG}" width="974px" rendered="true"/> -->
+      
+      
+      <apex:image url="{!$Label.Logo_BG_header}" height="auto" width="187"/>
+      
+      
+      
+     </div>
+  </apex:pageBlock>
+    <apex:form >
+    <apex:pageMessages />
+    <apex:pageblock title="Search">    
+         <apex:outputText value="SAP Number / JOB Number / Lead Number" />
+         <apex:outputText value=" " />
+         <apex:inputText value="{!PONumber}"/>
+         <apex:outputText value="   " />
+         <apex:Commandbutton value="Search" action="{!Search}" /> 
+    </apex:pageblock>  
+    <apex:pageblock rendered="{!showDetail}" id="DetailBlock">
+        
+        <apex:pageblocksection columns="1">
+            <apex:commandButton value="Show Notes" onclick="openNotes()"/>
+        </apex:pageblocksection>
+        
+        <apex:pageBlocksection title="Order Info" showHeader="True" columns="1" rendered="{!SelectingOrder}" id="OrderBlock">
+          <apex:pageblockTable value="{!PODetails}" var="order" columns="5">
+            <apex:column headerValue="Order Number">
+               <apex:commandLink value="{!order.name}" action="{!Search}" reRender="DetailBlock">
+                 <apex:param name="PONumber" value="{!order.SAP_Number__c}" assignTo="{!PONumber}" />
+               </apex:commandLink>
+            </apex:column>
+            <apex:column value="{!order.SAP_Number__c}" />
+            <apex:column value="{!order.Status__c}" />
+            <apex:column value="{!order.Order_Value__c}" />
+            <apex:column value="{!order.Order_Date__c}" />
+            
+          </apex:pageblockTable>
+    
+    </apex:pageBlocksection>
+        <apex:pageBlockSection title="Customer Info" columns="2" showHeader="True" rendered="{!showtrue1}">
+            <apex:pageBlockSection columns="1">
+            <apex:outputfield value="{!ContactDetails.Name}" id="CName"  />
+            <apex:pageblocksectionitem >
+                <apex:outputLabel value="Address" for="street"/>
+                <apex:outputField value="{!PODetails[0].Job__r.CHI_Lead__r.Account.BillingStreet}" id="street"/>
+            </apex:pageblocksectionitem>
+            <apex:pageblocksectionitem >
+                <apex:outputLabel value="" for="BCity"/>
+                <apex:outputField value="{!PODetails[0].Job__r.CHI_Lead__r.Account.BillingCity}" id="BCity"/>  
+            </apex:pageblocksectionitem>
+            <apex:pageblocksectionitem >  
+                <apex:outputLabel value="" for="Test"/>
+                <apex:outputField value="{!PODetails[0].Job__r.CHI_Lead__r.Account.BillingState}" title="Test"/>   
+            </apex:pageblocksectionitem>
+            <apex:pageblocksectionitem >  
+                <apex:outputLabel value="" for="Test"/>
+                <apex:outputField value="{!PODetails[0].Job__r.CHI_Lead__r.Account.BillingPostalCode}"/>   
+            </apex:pageblocksectionitem>
+            <apex:outputfield value="{!ContactDetails.homephone}" />
+            <apex:outputfield value="{!ContactDetails.otherphone}" />
+            <apex:outputfield value="{!ContactDetails.phone}" />
+            <apex:outputfield value="{!ContactDetails.mobilephone}" />
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Email Address" for="Email"/>
+                <apex:outputfield value="{!ContactDetails.Email__c}" id="Email" />
+            </apex:pageBlockSectionItem>
+            
+            
+        </apex:pageBlockSection> 
+        <apex:pageBlockSection columns="1" rendered="{!showtrue1}">
+        
+            <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Category" for="Category" />
+            <apex:outputfield value="{!PODetails[0].Job__r.Latest_customer_category_indicator__c}" id="Category" />             
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+            <apex:outputLabel value="CHI Lead" for="Lead" />
+            <apex:outputfield value="{!PODetails[0].Job__r.CHI_Lead__r.name}" id="Lead" /> 
+            </apex:pageBlockSectionItem> 
+            <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Job Number" for="Job"/>            
+            <apex:outputfield value="{!PODetails[0].Job__c}" id="Job"/>
+            </apex:pageBlockSectionItem>            
+            <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Job Status" for="JStatus"/>            
+            <apex:outputfield value="{!PODetails[0].Job__r.Status__c}" id="JStatus"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+            <apex:outputLabel value="SAP Number" for="SAP"/>
+            <apex:outputfield value="{!PODetails[0].SAP_Number__c}" id="SAP"/>   
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >                      
+            <apex:outputlabel value="SAP Status" for="SAPStatus" />
+            <apex:outputfield value="{!PODetails[0].Status__c}" id="SAPStatus" />
+            </apex:pageBlockSectionItem> 
+            <apex:pageBlockSectionItem >
+            <apex:outputlabel value="Order Value" for="OValue" />
+            <apex:outputfield value="{!PODetails[0].Order_Value__c}" id="OValue" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+            <apex:outputlabel value="Delivery Date" for="DDate" />
+            <apex:outputfield value="{!PODetails[0].Job_Delivery_Date__c}" id="DDate" /> 
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+            <apex:outputlabel value="Delivery Slot" for="Slot" />
+            <apex:outputfield value="{!PODetails[0].Delivery_Slot__c}" id="Slot" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+            <apex:outputlabel value="Delivery Note" for="Note" />
+            <apex:outputfield value="{!PODetails[0].Job__r.Delivery_Notes__c}" id="Note" />
+            </apex:pageBlockSectionItem>
+
+        </apex:pageBlockSection>  
+        </apex:pageBlockSection>     
+        <apex:pageblockSection title="Geography Details" columns="2"  rendered="{!showtrue1}">
+            <apex:outputfield value="{!PODetails[0].Job__r.District__c}" /> 
+            <apex:outputfield value="{!PODetails[0].Job__r.Region__c}" /> 
+            <apex:outputfield value="{!PODetails[0].Job__r.DHM_Name__c}" />
+            <apex:outputfield value="{!PODetails[0].Job__r.DHM_Phone__c}" />       
+        </apex:pageblockSection> 
+        <apex:pageBlockSection title="Installer Details" columns="1" rendered="{!showtrue1}">        
+        <apex:pageBlockTable value="{!DiaryDetails}" var="DE" columns="6" >
+            <apex:column value="{!DE.Week__r.Employee__r.First_Name__c}" />
+            <apex:column value="{!DE.Week__r.Employee__r.Last_Name__c}" />
+            <apex:column value="{!DE.Week__r.Employee__r.Supplier__c}" />
+            <apex:column value="{!DE.Sub_Type__c}" />
+            <apex:column value="{!DE.Week__r.Employee__r.Phone_No__c}" />
+            <apex:column value="{!DE.Start_Date__c}" />
+        </apex:pageBlockTable>
+    </apex:pageBlockSection>
+    
+        <apex:pageBlockSection title="Order Details" collapsible="true" columns="1" rendered="{!showtrue1}">
+        <apex:pageBlockTable value="{!PODetails[0].Order_Line_Items__r}" var="Order" columns="6" >
+            <apex:column value="{!Order.Code__c}" />
+            <apex:column value="{!Order.Description__c}" />
+            <apex:column value="{!Order.P5_Unit_Price_c__c}" />
+            <apex:column value="{!Order.Units__c}" />
+            <apex:column value="{!Order.Total_Amount__c}" />
+            <apex:column value="{!Order.P5_Status_c__c}" />
+        </apex:pageBlockTable>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    </apex:form>
+</apex:page>

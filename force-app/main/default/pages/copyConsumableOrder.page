@@ -1,0 +1,96 @@
+<apex:page controller="copyConsumableOrder" >
+    <style>
+    .colHeadStyle{
+       color:#c00 !important;
+ } 
+    </style>
+<apex:form >
+<apex:pageBlock id="block2" rendered="{!preExist}">
+    <apex:pagemessages id="messages1"/>
+    <apex:pageblockbuttons id="btn2">
+        <apex:commandbutton value="Continue" action="{!continue_Btn}"/>
+        <apex:commandbutton value="Discard" action="{!Discard}"/>
+    </apex:pageblockbuttons>
+    <apex:pageblocksection >
+        <apex:pageblocksectionitem >
+            <apex:outputfield value="{!conReq.Name}"/>
+        </apex:pageblocksectionitem>
+    </apex:pageblocksection>
+</apex:pageBlock>
+ <apex:actionFunction name="recalculatePrice" action="{!recalculatePrice}" rerender="block1,messages2,c1,c2,c4"/>
+<apex:pageBlock id="block1" rendered="{!!preExist}">
+    <apex:pagemessages id="messages2"/>
+    <apex:pageblockbuttons id="btn1">
+        <apex:commandButton value="Submit" action="{!Submit}" rerender="block1" rendered="{!!submitted}"/>
+        <apex:CommandButton value="Empty basket" action="{!confirmDelete}" rendered="{!!submitted}"  />
+        <apex:commandButton value="Continue Shopping" action="{!goToShpngBasket}" rendered="{!!submitted}"/>
+        <apex:Commandbutton value="Remove Selected Items" action="{!RemoveItems}" rendered="{!!submitted}" rerender="block1"/>
+        <apex:Commandbutton value="Confirm Delete" action="{!Discard}" rendered="{!cnfDel}" rerender="block1" />
+        <apex:Commandbutton value="Cancel" action="{!cancel}" rendered="{!(cnfDel && submitted)}" rerender="block1"/>
+        <apex:Commandbutton value="Go to Consumable Requests" action="{!homePage}" rendered="{!submitted}" rerender="block1"/>
+    </apex:pageblockbuttons>
+    
+    <apex:pageBlockSection columns="1" id="section1">
+        <apex:outputText value="Your order was sucessfully copied, can now be edited or submitted." style="color:blue;font-family:arial;font-weight:bold" rendered="{!(!submitted && !shpngBasket)}" /> 
+        <apex:outputText value="Your order was sucessfully Submitted." style="color:blue;font-family:arial;font-weight:bold" rendered="{!(submitted && !cnfDel)}"/> 
+        <apex:outputText value=" Please submit this Order." style="color:blue;font-family:arial;font-weight:bold" rendered="{!(!submitted && shpngBasket)}" /> 
+        
+    </apex:pageBlockSection>
+    
+    <apex:pageblocksection title="Order Details">
+        <apex:outputlabel value="Name this Order?" for="ordrName" style="font-weight:bold" >
+        &nbsp;&nbsp;<apex:outputtext value="{!conReq.Order_Name__c}" rendered="{!submitted}"/>
+        <apex:inputtext value="{!conReq.Order_Name__c}" id="ordrName" rendered="{!!submitted}"/>
+        </apex:outputlabel>
+    </apex:pageblocksection>
+    
+    <apex:pageBlockSection columns="2" title="Order Header" collapsible="false" id="section2">
+        <apex:outputField value="{!conReq.Raised_By__c}" />
+        <apex:outputField value="{!conReq.Status__c}" />
+        <apex:outputField value="{!conReq.District__c}"/>
+        <apex:outputField value="{!conReq.Employee_ID__c}"/>
+    </apex:pageBlockSection>
+    <apex:pageBlockSection columns="1" title="Order Items" collapsible="flase" id="section3">
+        <apex:pageBlockTable value="{!conClassList}" var="con">
+            <apex:column headerValue="Select" rendered="{!!submitted}" >
+                <apex:inputCheckbox value="{!con.isSelected}"/>
+            </apex:column>
+            <apex:column value="{!con.conItem.Product_Code__c}" style="{!con.colour}" id="c1"/>
+            <apex:column value="{!con.conItem.Short_Description__c}" style="{!con.colour}" id="c2"/>
+            <apex:column headervalue="Image">
+                <apex:image url="{!con.conItem.Item_Requested__r.Image_URL__c}" height="50" width="50" />
+            </apex:column>
+            <apex:column value="{!con.conItem.Item_Requested__r.Unit_Quantity__c}" />
+            <apex:column value="{!con.conItem.Cost_Each__c}" style="{!con.colour}" id="c4"/>
+            <apex:column headerValue="Quantity" id="c3">
+                <apex:inputText value="{!con.Quantity}" style="width:30px;" onkeyup="recalculatePrice();" rendered="{!!submitted}" />
+                <apex:outputText value="{!con.Quantity}" style="width:30px;"  rendered="{!submitted}"/>
+            </apex:column>
+            <apex:column headerValue="Lead Number" headerClass="colHeadStyle">
+               <apex:inputField value="{!con.conItem.CHILead__c}" style="width:90px;"  rendered="{!IF(AND(con.conItem.Item_Requested__r.CHI_Lead__c==true, !submitted),true,false)}"/>
+                <apex:outputField value="{!con.conItem.CHILead__c}" style="width:90px;"  rendered="{!submitted}"/>
+            </apex:column>
+            <apex:column headervalue="Remove" rendered="{!!submitted}">
+                <apex:commandlink action="{!RemoveItems}" rerender="block1" title="Removes the full Line">
+                    <apex:image url="{!$Resource.RedCross}" width="15" height="15"/>
+                    <apex:param name="MBCName" value="true" assignTo="{!con.isSelected}"/>
+                </apex:commandlink>
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlockSection>
+    
+    <apex:pageBlockSection title="Additioal Info" id="Section4" >
+   
+    <apex:inputField value="{!conReq.Notes__c}" rendered="{!!submitted}"/>
+    <apex:outputField value="{!conReq.Notes__c}" rendered="{!submitted}"/>
+    <apex:outputLabel title=" Test" value="Total Value" style="font-weight:bold;float:left;padding:2px">
+        &nbsp;&nbsp; <apex:outputText value="£{!totalString}" title="Total value" style="color:red;font-size:30px" rendered="{!needApp}"/>
+        &nbsp;&nbsp; <apex:outputText value="£{!totalString}" title="Total value" style="color:green;font-size:30px" rendered="{!!needApp}"/>     
+    </apex:outputLabel>
+   
+    </apex:pageBlockSection>
+  
+</apex:pageBlock>
+</apex:form>
+<!-- End Default Content REMOVE THIS -->
+</apex:page>

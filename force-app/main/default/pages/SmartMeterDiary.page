@@ -1,0 +1,241 @@
+<apex:page controller="SmartMeterInstallReport" cache="true"
+    standardStyleSheets="false">
+    <apex:includeScript value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryUI/js/jquery-1.2.7.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/js/jquery.simplemodal.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryUI/js/Switchtab.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/css/basic.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/css/style.css')}" />
+    <style type="text/css">
+.popupSpan {
+    Display: none;
+}
+
+a.describe:link {
+    color: #ff0000;
+    font: bold;
+}
+
+a.describe:visited {
+    color: #0000ff;
+}
+
+a.describe:hover {
+    background: #66ff66;
+}
+
+input.btn {
+    color: #0A1B2A;
+    background-color: #808000;
+    font: bold small 'trebuchet ms', helvetica, sans-serif;
+    background-image: none;
+}
+
+.activeTabMain {
+    background: #808000;
+    border-bottom: 3px solid #236FBD;
+    border: 3px solid #236FBD;
+    margin-bottom: -1px;
+    font: bold small 'trebuchet ms', helvetica, sans-serif;
+    background-image: none;
+}
+
+.inactiveTabMain {
+    background: #C0C0C0;
+    border-bottom: 1px solid #C0C0C0;
+    border: 1px solid #C0C0C0;
+    margin-bottom: -1px;
+    font: bold small 'trebuchet ms', helvetica, sans-serif;
+    background-image: none;
+}
+
+.activeTabInner {
+    background: #808000;
+    border-bottom: 3px solid #236FBD;
+    border: 3px solid #236FBD;
+    margin-bottom: -1px;
+    font: bold small 'trebuchet ms', helvetica, sans-serif;
+    background-image: none;
+}
+
+.inactiveTabInner {
+    background: #806517 border-bottom :   1px solid #806517 border :   1px
+        solid #806517 margin-bottom :   -1px;
+    font: bold small 'trebuchet ms', helvetica, sans-serif;
+    background-image: none;
+}
+
+.pageline {
+    background: #808000;
+    border-bottom: 1px solid #808000;
+    border-top: 1px solid #808000;
+    clear: both;
+    height: 6px;
+    line-height: 4px;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+
+.oddRow {
+    border: medium dashed #ff0000;
+    background-color: #95B9C7;
+    color: black;
+}
+
+.evenRow {
+    border: medium dashed #ff0000;
+    color: black;
+}
+
+.denotation {
+    padding: 4px 5px 4px 0px;
+    text-align: left;
+}
+
+.denotation div {
+    display: inline;
+    height: 9px;
+    padding-right: 9px;
+}
+
+.denotation span {
+    margin: 0px 6px 0px 2px;
+    padding-bottom: 2px;
+}
+
+.denotation .acknowledged {
+    background-color: black;
+}
+
+.denotation .unacknowledged {
+    background-color: blue;
+}
+</style>
+    <script type="text/javascript">
+$ac = jQuery.noConflict(); 
+function invokePopUp(idOfTextArea){$ac('#'+idOfTextArea).modal({persist:true});}
+function togglleDiv(show){
+    document.getElementById('darkLayer').style.display = show; 
+    document.getElementById('LoadingDiv').style.display = show;      
+}
+</script>
+    <apex:form >
+        <apex:pageMessages />
+        <apex:image value="{!$Resource.SmartMeterImage}"
+                        style="border: 0px solid gray;" height="70px" width="300px"/>
+        <br/>
+        <!---------------------------------------------- Input data section starts here--------------------------------------------------------------------------------------------------------->
+        <apex:pageblock title="Select District & Date Range" id="selectdata">
+            <apex:pageblocksection id="thesection">
+                <apex:pageblocksectionItem id="thesection0">
+                    <apex:outputLabel value="District:" for="district"></apex:outputLabel>
+                    <apex:inputfield value="{!inputJob1.District__c}" id="district" />
+                </apex:pageblocksectionItem>
+                <apex:pageblocksectionItem id="thesection1">
+                    
+                </apex:pageblocksectionItem>
+                <apex:pageblocksectionItem id="thesection2">
+                    <apex:outputLabel value="Start Date:" for="startDate"></apex:outputLabel>
+                    <apex:inputfield value="{!inputJob1.Smart_meter_installation_date__c}"
+                        id="startDate" />
+                </apex:pageblocksectionItem>
+                <apex:pageblocksectionItem id="thesection3">
+                    <apex:outputLabel value="End Date:" for="endDate"></apex:outputLabel>
+                    <apex:inputfield value="{!inputJob2.Smart_meter_installation_date__c}" id="endDate" />
+                </apex:pageblocksectionItem>
+            </apex:pageblocksection>
+            <apex:pageBlockButtons >
+                <apex:actionstatus id="myStatusRunDiary" onstart="togglleDiv('');"
+                    onstop="togglleDiv('none');"></apex:actionstatus>
+                <apex:commandButton value="Run Search"
+                    action="{!fetchSmartMeterJobList}" status="myStatusRunDiary"
+                    style="background-color:#C0C0C0;" />
+            </apex:pageBlockButtons>
+            </apex:pageBlock>
+            <!---------------------------------------------- Input data section ends here--------------------------------------------------------------------------------------------------------->
+            <!------------------------------------All tabs are starting here-------------------------------------------------------------------------------->
+            <apex:outputPanel id="entireTabbedArea" rendered="{!displayTabs}">
+                <apex:pagemessages />
+                <apex:actionstatus id="myStatus" onstart="togglleDiv('');"
+                    onstop="togglleDiv('none');"></apex:actionstatus>
+                <br />
+                <div class="denotation">
+                <div class="acknowledged">&nbsp;</div>
+                <span>Acknowledged jobs</span>
+                <div class="unacknowledged">&nbsp;</div>
+                <span>Unacknowledged jobs</span></div>
+
+                <apex:tabPanel switchType="client" id="theTabPanelMain"
+                    activeTabClass="activeTabMain" inactiveTabClass="inactiveTabMain">
+
+                    <apex:tab label="Jobs with smart meter install date">
+
+                        <div class="pageline">
+                        <hr style="display: none;" />
+                        </div>
+
+                        <apex:tabPanel switchType="client" id="theTabPanelInner1"
+                            activeTabClass="activeTabInner"
+                            inactiveTabClass="inactiveTabInner">
+                            <apex:tab label="Acknowledged live jobs">
+                                <c:SmartMeterAcknowledgedJobs id="Acknowledged_jobs_with_install_date"
+                                    Acknowledged_jobs_with_install_date="{!Acknowledged_jobs_with_install_date}"
+                                    ReportData="{!ReportData}" />
+                            </apex:tab>
+                            <apex:tab label="Unacknowledged live jobs">
+                                <c:SmartMeterLiveJobsTab id="Live_jobs" Live_jobs="{!Live_jobs}"
+                                    ReportData="{!ReportData}" />
+                            </apex:tab>
+                            <apex:tab label="Suspended jobs">
+                                <c:SmartMeterSuspendedJobsTab id="Suspended_jobs"
+                                    Suspended_jobs="{!Suspended_jobs}" ReportData="{!ReportData}" />
+                            </apex:tab>
+                            <apex:tab label="Jobs with install date changed">
+                                <c:SmartMeterInstallDateChangedJobsTab id="Install_date_changed"
+                                    Install_date_changed="{!Install_date_changed}"
+                                    ReportData="{!ReportData}" />
+                            </apex:tab>
+                            <apex:tab label="Cancelled jobs">
+                                <c:SmartMeterCancelledJobsTab id="Cancelled_jobs"
+                                    Cancelled_jobs="{!Cancelled_jobs}" ReportData="{!ReportData}" />
+                            </apex:tab>
+                        </apex:tabPanel>
+
+                    </apex:tab>
+
+                 <!-- -   <apex:tab label="Jobs without smart meter install date">
+
+                        <div class="pageline">
+                        <hr style="display: none;" />
+                        </div>
+
+                        <apex:tabPanel switchType="client" id="theTabPanelInner2"
+                            activeTabClass="activeTabInner"
+                            inactiveTabClass="inactiveTabInner">
+                            <apex:tab label="{!Cancelled_work_without_install_date.tabName}">
+                                <c:SmartMeterCanWorkWithoutInstallDateTab id="Cancelled_work_without_install_date"
+                                    Cancelled_work_without_install_date="{!Cancelled_work_without_install_date}"
+                                    ReportData="{!ReportData}" />
+                            </apex:tab>
+                            <apex:tab label="{!Pending_jobs_without_delivery_date.tabName}">
+                                <c:SmartMeterPendingJobsWithoutDelDateTab id="Pending_jobs_without_delivery_date"
+                                    Pending_jobs_without_delivery_date="{!Pending_jobs_without_delivery_date}"
+                                    ReportData="{!ReportData}" />
+                            </apex:tab>
+                        </apex:tabPanel>
+
+                    </apex:tab>-->
+
+                </apex:tabPanel>
+                <div id="LoadingDiv"
+                    style="border: 2px solid #555555; background-color: #DDDDDD; height: 50px; width: 300px; position: absolute; left: 360px; top: 320px; display: none;">
+                <div style="margin-left: 10px; margin-top: 10px;"><img
+                    src="/img/loading.gif" /> Please wait...</div>
+                </div>
+                <div id="darkLayer"
+                    style="background-color: white; filter: alpha(opacity =                                                                                                                                                                                                                                                                       50); /* IE */ opacity: 0.5; /* Safari, Opera */ -moz-opacity: 0.50; /* FireFox */ z-index: 20; height: 100%; width: 100%; background-repeat: no-repeat; background-position: center; position: absolute; top: 0px; left: 0px; display: none;">
+                </div>
+            </apex:outputPanel>
+            <!------------------------------------All tabs are finished here-------------------------------------------------------------------------------->
+    </apex:form>
+</apex:page>

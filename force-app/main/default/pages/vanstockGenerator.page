@@ -1,0 +1,28 @@
+<apex:page standardController="Employee__c" extensions="vanstockGenerator">
+<apex:form >
+<apex:inputHidden value="{!Employee__c.Id}"/>
+<apex:inputHidden value="{!Employee__c.Employee_Number__c}"/>
+<apex:inputHidden value="{!Employee__c.TP_card_number__c}"/>
+
+<apex:pageblock id="block">
+    <apex:pageMessages />
+    <apex:pageblockbuttons location="top">
+        <apex:commandbutton value="Deactivate" action="{!checkDeactivateFirst}" rerender="block"/>
+        <apex:commandbutton value="Generate New VS Number" action="{!checkGenerateNewVSNumber}" rerender="block"/>
+    </apex:pageblockbuttons>
+    <apex:pageblocksection >
+        <apex:outputfield value="{!Employee__c.Van_Stock_Card_Other__c}"/>
+        <apex:inputfield value="{!Employee__c.TP_card_number__c}"/>
+    </apex:pageblocksection>
+    <apex:pageblockbuttons location="bottom" rendered="{!showDeactivateConf}">
+        <apex:commandbutton value="Yes - Deactivate" action="{!deactivevanStock}" />
+        <apex:commandbutton value="No" action="{!cancel}" />
+    </apex:pageblockbuttons>
+    <apex:pageblockbuttons location="bottom" rendered="{!showGenNew}">
+        <apex:commandbutton value="Yes- Generate New VS Number" action="{!save}" />
+        <apex:commandbutton value="No" action="{!cancel}" />
+    </apex:pageblockbuttons>
+    
+</apex:pageblock>
+</apex:form>
+</apex:page>

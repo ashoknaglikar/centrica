@@ -1,0 +1,290 @@
+<!-- BGB_CTS: WrapUpScreenPage
+   Description : This Page displays the Wrapup screen.
+   Created : 15/10/09 :By Aruna
+-->
+<apex:page controller="WrapUpScreenController" id="pageID"> 
+<script>
+function update_counter(counter, text_elem, max_len)
+{
+    var counterElem = document.getElementById(counter);
+    var textElem = document.getElementById(text_elem);
+    var len = textElem.value.length;
+    var val = max_len - textElem.value.length;
+    counterElem.innerHTML = val; 
+}
+function checkLimit(limitField, limitCount, limitNum)
+{
+   
+    var textElem = document.getElementById(limitField);
+    if (textElem.value.length > limitNum) {
+       textElem.value = textElem.value.substring(0, limitNum);
+    }else {
+        limitCount.value = limitNum - textElem.value.length;
+    }
+}
+
+</script>
+
+<apex:form id="formID">
+
+
+<apex:pagemessage severity="info" detail="{!$Label.SMRT_Group}" strength="2" rendered="{!var}" />
+<apex:pagemessages />
+<apex:pageBlock title="Wrap Up Screen" id="pageBlockID">
+
+ 
+    <c:ContactEditViewComponentcopy displayModeVal="1" ListContactInfo="{!conList}" DisplayModeobj="{!DisplayMode}"/>    
+    <apex:pageblockSection Title="Lead Comments" columns="1">
+     <apex:outputlabel value="Re-confirm your conversation with your customer and ensure they are fully clear on what has happened and what to expect next..."  style="font-weight:bold;color:red"/>
+
+    <apex:outputpanel >
+    <table width="100%">
+         <br/>
+        <tr>
+            <td><apex:Outputtext value="CHI Lead Num" style="font-weight:bold"/></td>
+            <td><apex:Outputfield value="{!opportunity.CHI_Lead_Id__c}" /></td>
+        </tr>
+        
+        <tr>
+           
+            <td ><apex:outputText value="Lead Comments" style="font-weight:bold" /></td>
+            <td >
+            <apex:inputTextarea id="leadCommentsField" rows="6" value="{!leadCommentsAppend}" cols="80" onkeyup="update_counter('text_counter', '{!$Component.pageID.formID.pageBlockID.leadCommentsField}', 255)"/><br/>
+            <span id="text_counter">255</span> characters left<br/>
+           </td>
+            
+              
+        </tr>
+        <apex:outputpanel rendered="{!Shw_callbackdetails}"> 
+        <tr>
+           
+           <!--<td><apex:Outputtext value="Preffered Time" style="font-weight:bold" /></td>
+           <td><apex:inputfield value="{!opportunity.Preferred_appointment_time__c}"/></td>-->
+           <!-- --Ashok CR:001 CHI CP Start -->
+            <td><apex:Outputtext value="Unappointed Lead Reason" style="font-weight:bold" rendered="{!NOT(DisplayRedUnAppLeadReason)}" /></td>
+            <!--<td><Font color="Red"><apex:Outputtext value="Unappointed Lead Reason" style="font-weight:bold" rendered="{!DisplayRedUnAppLeadReason}" /></Font></td>-->
+            <td><apex:inputfield value="{!opportunity.Unappointed_Lead_Reason__c}" rendered="{!NOT(DisplayRedUnAppLeadReason)}"/></td>
+            
+            
+            <!-- --Ashok CR:001 CHI CP end -->
+        </tr>  
+        <tr>
+           
+            <td><Font color="Red"><apex:Outputtext value="Unappointed Lead Reason" style="font-weight:bold" rendered="{!DisplayRedUnAppLeadReason}" /></Font></td>
+            <td><apex:inputfield value="{!opportunity.Unappointed_Lead_Reason__c}" rendered="{!DisplayRedUnAppLeadReason}"/></td>
+        </tr> 
+        <tr>
+            <!--<td><apex:Outputtext value="Preffered Day" style="font-weight:bold" /></td>
+            <td><apex:inputfield value="{!opportunity.Preferred_appointment_day__c}"/></td>-->
+            
+            <td><apex:Outputtext value="Unappointed Lead Sub Reason" style="font-weight:bold" /></td>
+            <td><apex:inputfield value="{!opportunity.Unappointed_Lead_Sub_Reason__c}"/></td>
+            
+        </tr>
+        </apex:outputpanel>
+        <tr>
+            <td><apex:Outputtext value="Other" style="font-weight:bold" rendered="{!NOT(DisplayRedUnAppLeadReason)}"/></td>
+            <td><apex:inputfield value="{!opportunity.Unappointed_Other_Reason__c}" /></td>
+        </tr>
+        
+        <br/>
+        <tr/>
+                  
+        <!-- Landlord lead  changes starts -->
+        <tr>
+            <td><apex:Outputtext value="Landlord / Tenant / Agent lead details : " style="font-weight:bold" rendered="{!isLanlordNotesRequired}"/></td>
+        </tr>
+         <tr>
+            <td>
+            <apex:inputTextarea id="lanlordLeadDetails" value="{!opportunity.Landlord_lead_details__c}" rendered="{!isLanlordNotesRequired}" cols="80" rows="6"/><br/>
+            </td>
+         </tr>
+        <!-- Landlord lead  changes ends -->
+    </table> 
+    </apex:outputpanel>
+    </apex:PageBlockSection>
+    
+    <apex:pageblocksection title="HA Notes">
+     <table width="100%">
+        <tr>
+            <td><b><apex:outputLabel value="HA Notes "/></b></td>
+        </tr> 
+        <tr>
+            <td><apex:inputTextarea id="taNotedField" value="{!leadTaNotesAppend}" onkeydown="checkLimit('{!$Component.pageID.formID.pageBlockID.taNotedField}',this.form.countdown,1000);" onkeyup="checkLimit('{!$Component.pageID.formID.pageBlockID.taNotedField}',this.form.countdown,1000);" onchange="checkLimit('{!$Component.pageID.formID.pageBlockID.taNotedField}',this.form.countdown,1000);" cols="80" rows="6" />
+            <font size="1"><br/>(Maximum characters: 1000)<br/>
+            You have <input readonly="true" type="text" name="countdown" size="3" value="10"/> characters left.</font>
+            <br/></td>
+        </tr>
+    </table>
+    </apex:pageblocksection>
+    
+    <apex:pageblocksection title="Wrap call" rendered="{!existingLead}">
+        
+        <apex:inputfield value="{!wastecall.Who_is_taking_the_call__c}" />
+        <!--  <apex:inputfield value="{!wastecall.Customer_name__c}" />-->
+        <apex:inputfield value="{!wastecall.Campaign__c}" />
+        <apex:inputfield value="{!wastecall.Source_Of_Call__c}" />
+        <apex:pageblocksectionitem />
+        <apex:inputfield value="{!wastecall.Reason_for_Call__c}" />
+        <apex:inputfield value="{!wastecall.Call_Notes__c}" />
+        
+        
+
+    </apex:pageblocksection> 
+    <c:customerQuesComponent id="CustomerQuestions" displayModeVal="1" ListOpportunity="{!opportunities}" DisplayModeobj="{!DisplayMode}" CallModeobj="{!CallMode}" accountobject="{!accountInfo}" wrapup="True" callModeVal="{!mode}"/>
+    <c:AccountEditViewComponentcopy accountObject="{!accountInfo}" displayModeVal="1" DisplayModeobj="{!DisplayMode}" CallModeobj="{!CallMode}" callModeVal="{!mode}" ListOpportunity="{!opportunities}"/>
+    
+    <apex:outputPanel rendered="{!AppointmentStatus}">
+    
+        <c:AppointViewComponent displayModeVal="1" appointViewList="{!appointments}" DisplayModeobj="{!DisplayMode}" />  
+    
+    </apex:outputPanel>
+    
+    <!--<c:OpportunityEditViewComponentcopy displayModeVal="1"  ListOpportunity="{!opportunities}" DisplayModeobj="{!DisplayMode}" WrapUp="true" renderPriorityInstallDetails="false"/> -->
+    
+    
+        
+    <!-- /////////////////////////// -->
+    <!-- <apex:pageBlockSection title="Opportunity" collapsible="false" columns="1">
+        <apex:pageBlockTable var="opp" value="{!opportunities}">
+            <apex:column headerValue="Lead Num">
+                <apex:outputField value="{!opp.CHI_Lead_Id__c}"/>
+            </apex:column> 
+            <apex:column headerValue="Lead Name">
+                <apex:outputField value="{!opp.Name}"/>
+            </apex:column>
+            <apex:column headerValue="Campaign">
+                <apex:outputField value="{!opp.CampaignId}"/>
+            </apex:column>
+            <apex:column headerValue="Product Interest">
+                <apex:outputField value="{!opp.Product_Interest__c}"/>
+            </apex:column>
+            <apex:column headerValue="Non Op">
+                <apex:outputField value="{!opp.Non_Op__c}"/>
+            </apex:column>
+            <apex:column headerValue="Home Improvement">
+                <apex:outputField value="{!opp.Homecare__c}"/>
+            </apex:column>  
+            <apex:column headerValue="">
+            <apex:facet name="header">
+                <table width="100%">
+                    <tr align="center">
+                        <td colspan="3"  width="100%">Sales Appointment Reqd</td>
+                    </tr>
+                    <tr align="center">
+                        <td width="30%">Day</td>
+                        <td width="40%">Date</td>
+                        <td width="30%">Time</td>
+                    </tr>
+                </table>
+            </apex:facet>
+
+
+                <table width="100%">
+                    <tr>
+                        <td>
+                            <apex:outputField value="{!opp.Preferred_appointment_day__c}"/>
+                        </td>
+                        <td>
+                            <apex:outputText value="{0,date,d/M/yyyy}">
+                                <apex:param value="{!opp.Preferred_Visit_Date_Time__c}" />
+                            </apex:outputText>                            
+                        </td>
+                        <td>
+                            <apex:outputField value="{!opp.Preferred_appointment_time__c}"/>
+                        </td>
+                    </tr>
+                </table>
+            </apex:column>
+            <apex:column headerValue="With Customer">              
+                <apex:outputField value="{!opp.With_Customer__c}"/>
+            </apex:column>
+            <apex:column headerValue="Referral Employee" >
+                <apex:outputField value="{!opp.Referral_Employee__c}"/>
+            </apex:column>
+            <apex:column headerValue="Emp Type" > 
+                <apex:outputField value="{!opp.Referral_Employee__r.Group__c}"/>               
+            </apex:column>
+            <apex:column headerValue="With Customer" rendered="{!IF(OR(CallModeStringValue =='ENGINEERCALLNEWCUST',CallModeStringValue == 'ENGINEERCALLEXISTCUST',CallModeStringValue == 'EMPLOYEECALLNEWCUST',CallModeStringValue == 'EMPLOYEECALLEXISTCUST'),true,false)}">  
+                <apex:outputField value="{!opp.With_Customer__c}"/> 
+            </apex:column>
+            <apex:column headerValue="Referral Employee" rendered="{!IF(OR(CallModeStringValue =='ENGINEERCALLNEWCUST',CallModeStringValue == 'ENGINEERCALLEXISTCUST',CallModeStringValue == 'EMPLOYEECALLNEWCUST',CallModeStringValue == 'EMPLOYEECALLEXISTCUST'),true,false)}"> 
+                <apex:outputField value="{!opp.Referral_Employee__c}"/>
+            </apex:column> 
+        </apex:pageBlockTable>
+        <apex:outputText value="Lead Comments" style="font-weight:bold"/>
+        <apex:inputTextArea value="{!leadCommentsAppend}" cols="80" rows="2"/>
+    </apex:pageBlockSection>  -->
+    <!-- --Ashok  CHI CP Start -->  
+    <!-- --Updated by Amit Kumar --> 
+    <apex:pageblocksection title="Prospect Call Back Details" rendered="{!Shw_callbackdetails}">
+        
+        <apex:inputfield value="{!opportunity.Reason_Code__c}" />
+        <apex:inputfield value="{!opportunity.Call_Back_Date__c}" />
+         <apex:inputfield value="{!opportunity.Override_Call_Back_Date__c}" />
+         <apex:inputfield value="{!opportunity.Preferred_call_back_time_slot__c}" />
+        <apex:inputfield value="{!opportunity.Do_Not_Call_Back__c}" />
+        <apex:inputfield value="{!opportunity.Prospect_Notes__c}" />
+        <apex:inputfield value="{!opportunity.Opt_Out__c}" />
+        
+    </apex:pageblocksection>
+
+    
+     
+    <!-- --Ashok  CHI CP end -->   
+    <!-- /////////////////////////// -->
+    
+    
+   <!-- <apex:outputPanel rendered="{!AppointmentStatus}">
+    
+        <c:AppointViewComponent displayModeVal="1" appointViewList="{!appointments}" DisplayModeobj="{!DisplayMode}" />  
+    
+   
+    
+   <!-- <table width="100%">
+        <tr>
+            <td width="25%" align="center"><b><apex:outputLabel value="Notes: "/></b></td>
+            <td width="75%"><apex:inputTextarea value="{!Appointment.Call_Notes__c}" cols="80" rows="2"/></td>
+        </tr>
+    </table> 
+    
+    </apex:outputPanel>-->
+    <!--<apex:pageBlockSection title="Create Task" collapsible="false" columns="1">
+    <table width="100%">
+        <tr>
+            <td><apex:inputField value="{!newTask.OwnerId}" required="false"/></td>
+            <td><apex:inputField value="{!newTask.Subject}" required="false"/></td>
+            <td><apex:inputField value="{!newTask.Wrap_Up_Call_Type__c}" required="false"/></td>
+            <!--<td><apex:inputField value="{!newTask.Reason_Code__c}" required="false"/></td>
+            <td><apex:inputField value="{!newTask.Reason_Sub_Code__c}" required="false"/></td> //End the comment here
+            
+            <td><apex:inputField value="{!newTask.Status}" required="false"/></td>
+            <td><apex:inputField value="{!newTask.Priority}" required="false"/></td>                        
+            <td><apex:inputField value="{!newTask.activityDate}"/></td>
+            
+            <!--<td><apex:inputField value="{!newTask.Description}"/></td> //End it Here
+            <td>
+            <apex:pageblocksectionitem >
+                <apex:outputLabel value="Comments " style="font-weight:bold"/>
+                <apex:inputTextarea value="{!newTask.Description}" cols="80" rows="2"/>
+            </apex:pageblocksectionitem>
+            </td>
+            
+        </tr>
+    </table> 
+    </apex:pageBlockSection>-->
+    <apex:pageBlockButtons >
+        <!--<apex:commandButton value="Create Task" rendered="{!!showtaskbtn}" action="{!createTask}"/>-->
+         <apex:commandButton value="Close Call" action="{!closeCall}"/>
+    </apex:pageBlockButtons>
+    
+    <script>
+        if({!DisplaySuccessMessage})
+        {
+            alert('Task created successfully.');
+        }
+    </script>
+    
+</apex:pageBlock>
+</apex:form>
+</apex:page>

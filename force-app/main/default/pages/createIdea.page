@@ -1,0 +1,129 @@
+<apex:page Controller="ideaCreateCont" showHeader="true" tabStyle="Job__c">
+<style type="text/css" media="print,screen"> 
+    @page{
+    background-color:white;
+    }
+</style>
+    <apex:form enctype="multipart/form-data">
+        <apex:pagemessages />
+        
+        <apex:pageBlock id="block">
+            <apex:pageblocksection columns="1" >
+
+               
+                <apex:outputpanel style="float:right;">
+                    <apex:image value="{!$Resource.myBusiness}"  width="125" height="40"/>
+                </apex:outputpanel> 
+                
+                
+            </apex:pageblocksection>
+            <apex:pageblockbuttons location="top" rendered="{!!aftPub}">
+                    <apex:commandButton value="Post" action="{!post}" />
+                    <!-- <apex:commandButton value="Draft" action="{!draft}" rerender="block" /> -->
+            </apex:pageblockbuttons>
+            <apex:pageMessages />
+            <apex:pageBlockSection columns="1" rendered="{!!aftPub}"  >
+                                
+                
+                
+                <apex:pageBlockSectionItem helpText="Enter Some Title." > 
+                    <!--font-weight:bold;font-size:15px;-->
+                    <apex:outputText value="I’d like to improve our business by..." style="font-weight:bold;float:left;" title="Title"/>
+                      <!--<apex:outputText value=":" style="font-weight:bold;float:left;"/>-->
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                   <apex:inputfield value="{!newidea.Title}" required="true" style="width:100%"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Tell us more" for="body" style="font-weight:bold;float:left;"/>
+                    <!--<apex:outputText value=":" style="font-weight:bold;float:left;"/>-->
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:inputfield value="{!newidea.Body}" style="width:100%" required="true"/>
+                </apex:pageBlockSectionItem>
+                
+                <!-- <apex:pageBlockSectionItem helpText="How does this effect you and/or our customers? What do you think benefits are?" >
+                    <apex:outputLabel value="What can we do to help ?" for="Reason" style="font-weight:bold;float:left;"/>
+                    <apex:outputText value=":" style="font-weight:bold;float:left;"/>
+                  
+                </apex:pageBlockSectionItem>
+                
+                 <apex:pageBlockSectionItem >
+                    <apex:inputfield value="{!newidea.Reason__c}" style="width:100%"/>
+                </apex:pageBlockSectionItem> -->
+
+                
+                 <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="What can we do to help ?" for="body" style="font-weight:bold;float:left"/>
+                     <!--<apex:outputText value=":" style="font-weight:bold;float:left;"/>-->
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:inputfield value="{!newidea.Suggesstion__c}" style="width:100%"/>
+                </apex:pageBlockSectionItem>
+                
+                <!-- <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="On Behalf of" for="onBehalfOf" style="font-weight:bold;" />
+                    <apex:inputfield value="{!newidea.On_Behalf_Of__c}" style="font-weight:bold;float:right"/>
+                </apex:pageBlockSectionItem> -->
+                <apex:pageBlockSectionItem >
+                      <apex:outputLabel value="Attachemnt" for="file" style="font-weight:bold;float:left"/>
+                      <apex:inputFile value="{!attachment.body}" filename="{!attachment.name}" id="file"/>
+                 </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="With Hold My Name" for="withHoldName" style="font-weight:bold;" />
+                    <apex:inputfield value="{!newidea.WithHold_Name__c}" style="font-weight:bold;float:right"/>
+                </apex:pageBlockSectionItem>
+            
+            </apex:pageBlockSection>
+            
+             <apex:pageBlockSection columns="1" rendered="{!aftPub}">
+                <br/>
+                <apex:pageBlockSectionItem helpText="this is help" > 
+                    <apex:outputText value="Name  Your Idea" style="font-weight:bold;" title="Title"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                   <apex:outputfield value="{!newidea.Title}" style="width:100%;font-weight:bold;"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Tell us more about Idea" for="body" style="font-weight:bold;"/>
+                </apex:pageBlockSectionItem>
+                 
+                <apex:pageBlockSectionItem >
+                    <apex:outputfield value="{!newidea.Body}" style="width:100%;font-weight:bold;" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Whats the reason for Idea:" for="Reason" style="font-weight:bold;"/>
+                </apex:pageBlockSectionItem>
+                
+                 <apex:pageBlockSectionItem >
+                    <apex:outputfield value="{!newidea.Reason__c}" style="width:100%;font-weight:bold;"/>
+                </apex:pageBlockSectionItem>
+
+                
+                 <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="How can we Help us" for="body" style="font-weight:bold;"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputfield value="{!newidea.Suggesstion__c}" style="width:100%;font-weight:bold;"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="With Hold My Name" for="withHoldName" style="font-weight:bold;" />
+                    <apex:outputfield value="{!newidea.WithHold_Name__c}"/>
+                </apex:pageBlockSectionItem>
+            
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+    </apex:form>
+    
+</apex:page>

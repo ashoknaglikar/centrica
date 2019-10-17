@@ -1,0 +1,319 @@
+<apex:page controller="EmployeeNovoSummaryCont" tabstyle="Employee_NOVO_Log__c"  action="{!ReporteeRecords}" sidebar="false" id="pge">
+<apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" />
+  <style>
+body .bPageBlock .helpIcon, body .tagDropDown .tagHelp .helpIcon
+{
+background : url(/img/help/helpOrbs.gif);
+}
+
+</style>
+  <script> 
+      var cntrlEmpID, cntrlEmpName;
+      var isClicked = false;
+       function setEmpData(empName, empID)
+        {
+            try
+            {
+                document.getElementById(cntrlEmpID).value = empName;
+                document.getElementById(cntrlEmpName).value = empID.replace('&#39;','\'');
+            }
+            catch(e){}
+        }
+        function check(obj) {
+          if(isClicked) {
+                alert('Button can only be pressed once');
+                return false;
+            } else {
+                isClicked = true;
+                obj.className = 'btnDisabled';
+                togglleDiv('');
+                
+            }
+        }
+           
+        function isClickedReset(){
+              isClicked = false;
+              togglleDiv('none');
+        }
+        
+        
+        function togglleDiv(show){
+            //document.getElementById('darkLayer').style.display = show; 
+            document.getElementById('LoadingDiv').style.display = show;     
+        } 
+        
+          var lastRow;
+          function highlight(elem){
+              //alert('ok');
+                 var catId = $(elem).find("input[type=hidden]").val();
+                   //alert(catId);
+                   reportee(catId);
+                
+                if(lastRow != undefined)
+                    lastRow.style.backgroundColor = 'white';
+            
+                elem.style.backgroundColor = 'Yellow';
+                lastRow = elem;
+                
+                 
+                  
+    
+            }
+  
+  </script>
+  <apex:form id="frm">
+        
+        <apex:pagemessages id="errMsg"/>
+        <apex:actionFunction name="reportee" action="{!selectedGoalEdit}"  rerender="editmode">
+               <apex:param name="novoIdNew" value=""/>
+        </apex:actionFunction>
+        
+        <apex:pageBlock id="pb">
+            <h3>
+            <apex:actionstatus startText=" (Working... Please Wait)"  id="counterStatus"/>
+            </h3>
+            
+            <apex:pageblockSection columns="1" title="{!title2}" id="pbs2">
+                <apex:pageblockSectionItem >
+                   <apex:outputLabel value="Open Goals:" for="og" style="{!if(OpenGoals>0,'font-weight:bold;font=calibri;size=3;Color:red','color:blue')}"/>
+                   <apex:commandlink value="{!OpenGoals}" action="{!oGoals}" id="og" style="font-weight:bold;font=calibri;size=3;" status="counterStatus" rerender="frm"></apex:commandLink>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                   <apex:outputLabel value="Closed Goals:" for="cg" style="{!if(closedGoals>0,'font-weight:bold;font=calibri;size=3;Color:green','color:red')}"/>
+                   <apex:commandlink value="{!closedGoals}" action="{!cGoals}" id="cg" style="font-weight:bold;font=calibri;size=3;" status="counterStatus" rerender="frm"></apex:commandLink>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                   <apex:outputLabel value="All Goals:" for="cg" style="{!if(AllGoals>0,'font-weight:bold;font=calibri;size=3;Color:blue','color:red')}"/>
+                   <apex:commandlink value="{!AllGoals}" action="{!reRunQuery}" id="cg" style="font-weight:bold;font=calibri;size=3;" status="counterStatus" rerender="frm"></apex:commandLink>
+                </apex:pageblockSectionItem>
+            </apex:pagebLocksection>
+        </apex:pageBlock>
+        <apex:outputPanel id="Results">
+        <apex:pageblock id="pb2">
+         <apex:pageblockButtons location="top" >
+           <apex:commandButton value="New Novo Goal" action="{!newNovoRec}" status="counterStatus" immediate="true"/>
+           <apex:commandButton value="Back" action="{!goBack}" immediate="true"/> <!--reRender="frm" onclick="check(this);return false;" oncomplete="isClickedReset()" -->
+           
+         </apex:pageblockButtons>
+        
+         
+              <apex:pageblocksection columns="1" title="Novo Goals" rendered="{!showLink}" id="pbs4"> 
+                <apex:pageblockTable value="{!novoWrapperList}" var="goal" onRowClick="highlight(this);">
+                    <apex:column headerValue="Goal Num">
+                     
+                     <apex:outputField value="{!goal.empNov.name}"/>
+                     <apex:inputHidden value="{!goal.empNov.id}" id="hideInput" />
+                    </apex:column>
+                    <apex:column value="{!goal.empNov.Reason__c}"/>
+                    <apex:column value="{!goal.empNov.Related_Strategic_Priority__c}"/>
+                    <apex:column value="{!goal.empNov.CreatedDate}"/>
+                    <apex:column value="{!goal.empNov.Goal_Target_Date__c}"/>
+                    <apex:column value="{!goal.empNov.Status__c}"/>
+                </apex:pageblockTable>
+                <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="otpNav2">  
+                 Total Found: <apex:outputText rendered="{!IF(total_size>=10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(total_size < 10000,true,false)}">{!total_size}</apex:outputText>  
+                 <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!DisablePrevious}"/>  
+                 <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!NOT(DisablePrevious)}"/>  
+                 <apex:commandLink action="{!Previous}" title="Previous Page" value="Previous Page" rendered="{!NOT(DisablePrevious)}" rerender="frm"/>&nbsp;  <!-- -->
+                 <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisablePrevious}">Previous Page</apex:outputPanel>           
+                 &nbsp;Showing Page  {!pageNumber} of {!totalPages}&nbsp;&nbsp; 
+                 <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisableNext}">Next Page</apex:outputPanel>           
+                 <apex:commandLink action="{!Next}" title="Next Page" value="Next Page" rendered="{!NOT(DisableNext)}" rerender="frm"/>&nbsp;  <!---->
+                 <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!NOT(DisableNext)}"/>  
+                 <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!DisableNext}"/>            
+                </apex:outputPanel>
+               </apex:pageblockSection>
+               
+               <apex:outputPanel id="editmode">
+                   
+                <apex:pageblock rendered="{!edit}">
+                <apex:pagemessages />
+                  <apex:pageblockButtons location="bottom">
+                  <apex:commandButton value="Save" action="{!save}"  /><!--rerender="editmode,pbs4"/> <!--reRender="frm" onclick="check(this);return false;" oncomplete="isClickedReset()" -->
+                  <apex:commandButton value="View Pdf" onclick="viewPdf('{!SelectedNovoWrapper.empNov.id}');return false;" reRender="frm1"/><!-- onclick="window.open('/apex/Smart_Novo?signsuccess=1&headerID={!SelectedNovoWrapper.empNov.id}&req=NP&view=My People&sfUser={!HoldEmployeeUserId}&e=1','_blank','height=600,width=900')" -->
+                  <apex:commandButton value="Email Pdf" action="{!generatePdf}" reRender="frm1"/><!-- onclick="window.open('/apex/Smart_Novo?signsuccess=1&headerID={!SelectedNovoWrapper.empNov.id}&req=NP&view=My People&sfUser={!HoldEmployeeUserId}&e=1','_blank','height=600,width=900')" -->
+                  </apex:pageBlockButtons>
+                 <apex:pageblockSection columns="2" title="Goal {!SelectedNovoWrapper.empNov.name}" id="pbs5">
+                    <apex:OutputField value="{!SelectedNovoWrapper.empNov.Related_Strategic_Priority__c}"/>
+                    <apex:OutputField value="{!SelectedNovoWrapper.empNov.Where_Are_U_Now__c}" />
+                    <apex:OutputField value="{!SelectedNovoWrapper.empNov.Reason__c}"/>
+                     <apex:OutputField value="{!SelectedNovoWrapper.empNov.How_will_you_measure_prog__c}" />
+                     <apex:OutputField value="{!SelectedNovoWrapper.empNov.Goal_Novo__c}" />
+                    <apex:OutputField value="{!SelectedNovoWrapper.empNov.Status__c}"/>
+                     <apex:InputField value="{!SelectedNovoWrapper.empNov.Note_on_Outcome__c}"/>
+                  </apex:pageblocksection>
+                  <apex:pageblocksection columns="1">
+                    <apex:variable value="{!1}" var="rowNum"/>
+                    <apex:pageblockTable value="{!SelectedNovoWrapper.ActionList1}" var="b" >
+                     <apex:column headerValue="Activity">
+                       <apex:outputText style="color:red;font-weight:bold;" value="Action - {!rowNum}">
+                        <apex:variable value="{!rowNum + 1}" var="rowNum" />
+                        
+                       </apex:outputText>
+                     </apex:column>
+                     <apex:column >
+                        <apex:facet name="header">
+                        <apex:outputPanel >
+                        <apex:outputText value="Action"/>
+                        <apex:image value="/s.gif" styleClass="helpIcon" title="{!$ObjectType.NOVO_Activities__c.Fields.Action_activity__c.inlineHelpText}"/>
+                        </apex:outputPanel>
+                        </apex:facet>
+                        <apex:OutputField value="{!b.novAct.Action_activity__c}" style="width:200px;height:50px;" />
+                     </apex:column>
+                     <apex:column >
+                         <apex:facet name="header">
+                        <apex:outputPanel >
+                        <apex:outputlabel value="Owner"/>
+                        <apex:image value="/s.gif" styleClass="helpIcon" title="{!$ObjectType.NOVO_Activities__c.Fields.Owner__c.inlineHelpText}"/>
+                        </apex:outputPanel>
+                          </apex:facet>  
+                           <apex:OutputField value="{!b.novAct.Owner__c}" />
+                       </apex:column>       
+                   <!--  <apex:column >
+                         <apex:facet name="header">
+                        <apex:outputPanel >
+                        <apex:outputlabel value="Owner" for="txtEmpID"/>
+                        <apex:image value="/s.gif" styleClass="helpIcon" title="{!$ObjectType.NOVO_Activities__c.Fields.Owner__c.inlineHelpText}"/>
+                        </apex:outputPanel>
+                        </apex:facet>
+                        <apex:OutputField value="{!b.novAct.Owner__c}" />
+                       <apex:OutputField value="{!b.novAct.Owner__c}" id="txtEmpName" onchange="javascript: setEmpData('',this.value);" />
+                        <a href="#" onclick="javascript:window.open('/apex/employeesearch','_new','width=700,height=500,menubar=no,directories=no,status=yes,location=no,toolbar=no,scrollbars=yes');" title="Owner Lookup (New Window)">
+                        <img src="/s.gif" alt="Owner Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Owner Lookup (New Window)"/>
+                        </a>
+                        <apex:inputText value="{!b.novAct.Owner__c}" id="txtEmpID" style="display:none;" required="true"/>
+                         <script>
+                         cntrlEmpName = '{!$Component.txtEmpName}';
+                         cntrlEmpID = '{!$Component.txtEmpID}'; 
+                         </script>
+                     </apex:column>-->
+                     <apex:column >
+                         <apex:facet name="header">
+                         <apex:outputPanel >
+                         <apex:outputText value="Action Completion Date"/>
+                         <apex:image value="/s.gif" styleClass="helpIcon" title="{!$ObjectType.NOVO_Activities__c.Fields.Action_Completion_Date__c.inlineHelpText}"/>
+                         </apex:outputPanel>
+                         </apex:facet>
+                         <apex:inputField value="{!b.novAct.Action_Completion_Date__c}"/>
+                     </apex:column>
+                     <apex:column >
+                         <apex:facet name="header">Status</apex:facet>
+                         <apex:InputField value="{!b.novAct.Status__c}" />
+                     </apex:column>
+                     
+                     <apex:column >
+                         <apex:facet name="header">Attachments</apex:facet>
+                         <apex:commandLink value="Upload" action="{!URLFOR('/p/attach/NoteAttach?pid='+b.novAct.id+'&parentname='+b.novAct.name+'&retURL='+'%2Fapex%2FNovoReporteePage%3FsfUser%3D'+HoldEmployeeUserId+'%26view%3D'+selectListType+'%26e%3D1%26goalId%3D'+SelectedNovoWrapper.empNov.id)}"/>
+                         &nbsp;&nbsp;&nbsp;<apex:commandLink value="[{!b.attSize}]" style="color:red;font:bold;" onclick="openAttachment('{!b.novAct.id}')" reRender="editmode"/><!--window.open('/002?parent_id={!b.novAct.id}&id={!b.novAct.id}','mywindow','height=600,width=900')-->
+                     </apex:column>
+                 
+                    </apex:pageblockTable>
+                    
+                    <apex:pageblockSection columns="1">
+                      <apex:OutputField value="{!SelectedNovoWrapper.empNov.Note_on_Outcome__c}" style="width:400px;height:60px;"/>
+                    </apex:pageblocksection>
+                    </apex:pageblockSection>
+                 </apex:pageblock>
+               </apex:outputPanel>
+               
+        </apex:pageBlock>
+        
+        </apex:outputPanel>
+        <apex:outputPanel id="frm1">
+         
+            <apex:actionFunction name="callCont" action="{!ProcessSelected}"> 
+               <apex:param name="req" value=""/>
+            </apex:actionFunction>
+            
+             <apex:pageblock title="Email Details" rendered="{!signSucessRender}">
+              
+             <!--   <apex:pageblocksection >
+                 <apex:pageblockSectionItem >
+                  //    <apex:outputLabel value="Pick the user " for="user" />
+           //      <apex:inputfield value="{!emailHeader.Owner__c}" id="user" />
+                 
+                 <apex:outputpanel >
+                <table>
+                    <tr><td>   
+                    <b>
+                        <apex:outputlabel value="Pick the user" for="txtUserID" />
+                    </b>    
+                    </td>
+                    <td>
+                        <table border="0" cellspacing="0" cellpadding="0"><tr>
+                        <td><apex:inputText id="txtUserName" onchange="javascript: setEmpData('',this.value);" /></td>
+                        <td>                
+                        <a href="#" onclick="javascript:window.open('/apex/employeesearch','_new','width=700,height=500,menubar=no,directories=no,status=yes,location=no,toolbar=no,scrollbars=yes');" title="Owner Lookup (New Window)">
+                        <img src="/s.gif" alt="Owner Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Owner Lookup (New Window)"/>
+                        </a>
+                        </td></tr>
+                        </table>
+                    
+                  
+                <apex:inputText value="{!emailHeader.Owner__c}" id="txtUserID" style="display:none;" />
+                <script>
+                    cntrlEmpName = '{!$Component.txtUserName}';
+                    cntrlEmpID = '{!$Component.txtUserID}'; 
+                </script>
+                </td></tr>
+                </table>    
+                
+                </apex:outputpanel>
+                 </apex:pageblockSectionItem>
+                 <apex:pageblockSectionItem >
+                            <apex:outputLabel value="Enter the Email Address" for="co" />
+                            <apex:inputText value="{!email}" id="email" />
+                 </apex:pageblockSectionItem>
+                </apex:pageblocksection>-->
+                
+                <apex:pageBlockTable value="{!emailWrapList}" var="c" rendered="{!signSucessRender}" >
+                <apex:column >
+                <apex:inputCheckbox value="{!c.checked}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Name">
+                    <apex:inputfield value="{!c.emailHead.Owner__c}" id="user" />
+                </apex:column>
+                <apex:column headerValue="email">
+                 <apex:inputText value="{!c.emailWrap}" id="co" />
+                 </apex:column>
+                 
+        </apex:pageBlockTable>
+        <apex:pageblockbuttons location="bottom" >
+                        <apex:commandbutton value="Send Email" action="{!ProcessSelected}" rerender="frm1"/>
+                        <!--<apex:commandbutton value="Cancel" />-->
+        </apex:pageblockbuttons>
+         </apex:pageblock>
+          </apex:outputPanel>
+    </apex:form>
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:600px; top:150px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> System updating......please wait...
+            </div>
+    </div>
+    <script type='text/Javascript'>
+        function closeAndRefresh(){
+            
+            window.close();
+            if (window.opener && !window.opener.closed) {
+                window.opener.location.reload();
+            } 
+        }
+        
+        function checkPage(req){
+            alert(req);
+          callCont(req);
+        }
+        
+        function openAttachment(NovActId){
+          var myWindow = window.open('/002?parent_id='+NovActId+'&id='+NovActId,'mywindow','height=600,width=900');
+          myWindow.blur();
+        }
+        
+        function viewPdf(sId){
+         var myWindow1 = window.open('/apex/novosmartpdf?signsuccess=2&vPdf=1&headerId='+sId);
+        }
+        
+   </script>
+ 
+</apex:page>

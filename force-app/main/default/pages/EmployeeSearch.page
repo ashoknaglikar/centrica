@@ -1,0 +1,130 @@
+<apex:page standardController="Employee__c" extensions="EmployeeSearchController" sidebar="false" showHeader="false" id="SearchEmployee">
+ 
+<apex:form id="form1">
+    <apex:actionFunction name="SaveEmployee" action="{!Save}" rerender="data" oncomplete="SetValues();" status="mystatus"/>
+    <script type='text/javascript'>
+    var tmpEmpID, tmpEmpName;
+    //var cntrlGoID;
+    function f_SetValue(empID, empName) 
+    {
+        if(empID != '' && empName != '')
+        {
+        
+        	try
+        	{
+            if(window.opener)
+            {
+                //window.opener.document.getElementById('txtempID').value=empID;           
+                //window.opener.document.getElementById('txtempName').value=empName;
+                window.opener.setEmpData(empID, empName);
+            }
+            }catch(e){}
+            window.close();
+        }
+    }
+    
+    function SetValues()
+    {
+        f_SetValue(tmpEmpID, tmpEmpName);
+    }
+</script>
+
+    <div style="font-size:10pt; padding:8px; mapping:8px;">
+        <div class="lookupTab  LookupSearchFrame">
+            <div class="bPageTitle">
+                <div class="ptBody secondaryPalette">
+                    <div class="content">
+                        <img src="/s.gif" alt=""  class="pageTitleIcon" title=""/>
+                        <h1>Lookup</h1>
+                    </div>
+                </div>
+            </div>&nbsp;&nbsp;&nbsp;
+            <apex:OutputLabel value="Search" style="font-weight:bold;font-size:10pt;" id="search_contact">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:outputLabel>
+            <apex:inputText value="{!SearchText}" id="SearchText" onkeyup="return CallSearchFunc(event)"></apex:inputText>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:commandButton value=" Go! " action="{!SearchEmployee}" id="Go" ></apex:commandButton> 
+            <apex:commandButton value=" New " action="{!CreateNewEmployee}" rerender="data" id="New" ></apex:commandButton>
+            <div style="font-size:10pt" align="center"><br/>
+            You can use "*" as a wildcard next to other characters to improve your search results. For example, "ad*" returns all records with a word in one of the searched fields that begins with "ad".
+            <br/><br/>
+            <script>
+                function CallSearchFunc(e)
+                {
+                    var evt = e != null? e : window.event;
+                    var key = evt.charCode? evt.charCode: evt.keyCode;
+                    if(key == 13)
+                    {
+                    	document.getElementById('{!$Component.Go}').click();                        
+                    }
+                    return false;
+                }
+            </script>
+        </div>
+        <apex:outputPanel id="data" >
+            <apex:outputPanel id="mystatus" >
+            <script type='text/javascript'>
+                if({!IF(SaveError,'false','true')})
+                {
+                    tmpEmpID = '{!NewEmployee.ID}';
+                    tmpEmpName = '{!HTMLENCODE(NewEmployee.First_Name__c)}'+' '+'{!HTMLENCODE(NewEmployee.Last_Name__c)}'+ ' - '+'{!NewEmployee.Employee_Number__c}';     
+                }
+            </script>
+            </apex:outputPanel>
+        
+            <apex:outputPanel id="error">
+                <apex:outputText >
+                    <b> <font color="red"> {!err_msg} </font> </b><br/>
+                </apex:outputtext>
+            </apex:outputPanel>
+            <!-- Panel for creating searching new user -->
+            <apex:pageBlock title="Employee" tabstyle="Employee__c" rendered="{!searchMode}">
+                <apex:pageBlockTable value="{!EmployeesList}" var="emp">
+                    <apex:column headerValue="First Name">
+                       <apex:commandLink value="{!emp.First_Name__c}" onclick="javascript: f_SetValue('{!emp.ID}','{!HTMLENCODE(emp.Name)}')"></apex:commandLink>
+                    </apex:column>
+                    <apex:column headerValue="Last Name">                   
+                        <apex:outputLabel value="{!emp.Last_Name__c}"/>                                     
+                    </apex:column>
+                    <apex:column headerValue="Employee Number">
+                       <apex:outputLabel value="{!emp.Employee_Number__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Advisor Id">
+                        <apex:outputLabel value="{!emp.Advisor_Id__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Emp type">
+                       <apex:outputLabel value="{!emp.Emp_type__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Email">
+                        <apex:outputLabel value="{!emp.Email__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Phone">
+                        <apex:outputLabel value="{!emp.Phone_No__c}"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlock>
+            
+            <!-- Panel for creating new user -->
+            
+            <apex:pageBlock title="Create New Employee" tabstyle="Employee__c" rendered="{!!searchMode}" mode="edit">
+                <apex:pageBlockSection collapsible="false" title="Emloyee Information">
+                    <!-- <apex:inputField value="{!NewEmployee.Name}" /><br/>  -->  
+                    <apex:inputField value="{!NewEmployee.First_Name__c}" /><br/>
+                    <apex:inputField value="{!NewEmployee.Last_Name__c}" /><br/>  
+                    <apex:inputField value="{!NewEmployee.Employee_Number__c}" /><br/>
+                    <apex:inputField value="{!NewEmployee.Phone_No__c}" /><br/>
+                    <apex:inputField value="{!NewEmployee.Group__c}" /><br/>  
+                    <apex:inputField value="{!NewEmployee.Primary_Role__c}" /><br/>
+                    <apex:inputField value="{!NewEmployee.Resource_Type__c}" /><br/>
+                </apex:pageBlockSection>
+                
+                <apex:pageblockbuttons >
+                    <apex:commandButton value=" Save " onclick="SaveEmployee(); return false;" rerender="data" id="Save" ></apex:commandButton> 
+                    <apex:commandButton value=" Cancel " action="{!Cancel}" rerender="data" id="Cancel" ></apex:commandButton>
+                </apex:pageblockbuttons>
+                
+            </apex:pageBlock>
+        </apex:outputPanel>     
+    </div>
+</div>
+</apex:form>
+</apex:page>

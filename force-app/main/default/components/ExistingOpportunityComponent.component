@@ -1,0 +1,39 @@
+<apex:component controller="ExistingOppComponentController" id="theComponent">
+    <apex:attribute name="opportunityList" description="This attrribute passes the opportunity list to the controller." type="OppSelectClass[]" assignTo="{!oppList}"/>
+    <apex:attribute name="callModeVal" description="This attrribute is used to determine the call type." type="Integer"/>
+    <apex:attribute name="CallModeobj" description="This attrribute passes the CallMode." type="CallMode"/>
+       
+    <!-- To display the Existing Opportunties -->
+    <apex:pageBlockSection title="Opportunity" columns="1" collapsible="false">
+        <apex:pageBlockTable var="o" value="{!oppList}">
+            <apex:column headerValue="Select">
+                <!--PRB00013945 - <apex:inputCheckbox selected="{!o.oppSelected}" rendered="{!IF(OR(o.opp.StageName!='Closed Lost'),true,false)}"/> -->
+                <apex:inputCheckbox selected="{!o.oppSelected}" rendered="{!IF(AND(o.opp.StageName!='Closed Lost',o.opp.StageName!='Expired',o.opp.StageName!='Closed Won'),true,false)}"/>
+            </apex:column>  
+            <apex:column headerValue="Lead Name">
+                <apex:outputField value="{!o.opp.Name}"/>
+            </apex:column>
+            <apex:column headerValue="Status">
+                <apex:outputField value="{!o.opp.StageName}"/>
+            </apex:column>
+            <apex:column headerValue="Date Created">
+                <apex:outputField value="{!o.opp.CreatedDate}"/>
+            </apex:column>
+            <apex:column headerValue="Days Since Created">
+                <apex:outputField value="{!o.opp.Days_Since_Created__c}"/>
+            </apex:column>
+            <apex:column headerValue="Campaign"  rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST),true,false)}">
+                <apex:outputField value="{!o.opp.CampaignId}"/>
+            </apex:column>
+            <apex:column headerValue="Referral Employee">
+                <apex:outputField value="{!o.opp.Referral_Employee__c}"/>
+            </apex:column>
+            <!--<apex:column headerValue="Emp Type">
+                <apex:outputField value="{!o.opp.Referral_Employee__r.Group__c}"/>
+            </apex:column>-->
+            <apex:column headerValue="Product Interest" >
+                <apex:outputField value="{!o.opp.Commercial_Indicator__c}"/>
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlockSection>
+    </apex:component>

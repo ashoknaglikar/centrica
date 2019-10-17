@@ -1,0 +1,103 @@
+<apex:component id="CustComp" >
+    <apex:attribute name="accountobject" type="account" description="This attribute is used to get the account data"  />
+    <apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" required="true"/>
+    <apex:attribute name="callModeVal" description="This attrribute is used to determine the call type." type="Integer"/>
+    <apex:attribute name="ListOpportunity" description="This attrribute passes the opportunity list to the controller." type="Opportunity[]" />
+    <apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+    <apex:attribute name="CallModeobj" description="This attrribute passes the CallMode." type="CallMode"/>
+    <apex:attribute name="WrapUp" description="This attrribute is used to determine the Opp screen." type="Boolean"/>
+    <apex:attribute name="renderPriorityInstallDetails" description="This attrribute is used to determine rendering of priority install section." type="Boolean"/>
+     <!--<apex:outputLink value="javascript: copyDefaultValues();return false;">Copy</apex:outputLink>-->
+  <apex:pageBlockSection title="About Your Customer And Their Home" columns="1" > <!-- rendered="{!if(OR(callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}" -->
+      <marquee scrolldelay="50" scrollamount="1" behavior="alternate">
+     <apex:outputpanel rendered="{!If(NOT(wrapup), true, false)}"><Font color="red"><b>Let your customer know you would like to ask a small number of questions about their home to fully understand their needs....</b></Font></apex:outputpanel>
+     <!-- <apex:outputlabel value="Let your customer know you would like to ask a small number of questions about their home to fully understand their needs...."  style="font-weight:bold;color:red"/>-->
+      </marquee>
+  </apex:pageBlockSection>
+  <apex:pageBlockSection columns="3" rendered="{!IF(displayModeVal==DisplayModeobj.EDIT,true,false)}" id="pageblock66" collapsible="false">
+     <apex:repeat var="opp" value="{!ListOpportunity}" id="repeat">
+                     <apex:inputField value="{!opp.Why_is_your_customer_considering_a_new_b__c}" required="true" style="width:53%" id="CQ1"/>
+                     <apex:inputField value="{!opp.Product_Interest__c}" required="true" style="width:53%" id="CQ2"/>
+                     <apex:inputField value="{!opp.Home_Care__c}" required="true" id="CQ3"/>
+                     <apex:inputField value="{!accountobject.Number_of_Bedrooms__c}" required="true" id="CQ4"/>
+                     <!-- <apex:inputField value="{!opp.Location_of_Current_Boiler__c}" required="true" id="CQ5"/> -->
+                     
+
+                     <!-- <apex:inputField value="{!accountobject.Property_age__c}" required="true" id="CQ6"/> -->
+                     <!-- <apex:inputField value="{!accountobject.Number_of_Bathrooms__c}" required="true" id="CQ7" /> -->
+                     <!-- <apex:inputField value="{!opp.Keeping_current_boiler_in_same_place__c}" required="true" id="CQ16"/> -->
+
+                     <!-- <apex:inputField value="{!accountobject.Property_type__c}" required="true" id="CQ9"/> -->
+                     <apex:inputField value="{!opp.Boiler_type__c}" required="true" id="CQ10" style="width:53%"/> <!-- make width as 53% if Uncommented above fields -->
+                     <!-- <apex:inputField value="{!opp.Location_of_new_Boiler__c}" required="true" id="CQ8"/> -->
+
+                     <apex:inputField value="{!opp.Boiler_Age__c}" required="true" id="CQ12" style="width:100%"/>
+                     
+                     
+                     
+                     <apex:inputField required="true" value="{!opp.Missing_product_holdings_reason__c}" style="width:53%" id="p2"/> 
+                     <!-- <apex:inputField value="{!opp.Current_annual_gas_spend_over_1500__c}" required="true" id="CQ11"/> -->
+                     <apex:inputField value="{!opp.MGM_Source_Opp__c}" />
+                     <apex:inputField value="{!opp.GDCashBack__c}" />
+                     <apex:inputField value="{!opp.Nectar_Number__c}" />
+                     <apex:inputField value="{!opp.Customer_agreed_to_appointment__c}" id="CQ15" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}" required="true"/>
+                     <apex:inputField value="{!accountobject.Gas_Supply_At_Address1__c}" required="true" id="CQ13" rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}"/>
+                     <apex:inputField value="{!accountobject.Current_Heating_System1__c}" required="true" id="CQ14" rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}"/>
+                     <apex:pageBlockSectionItem rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}"/>
+                     <apex:pageBlockSectionItem rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST),true,false)}"/>
+                     <!--<apex:pageBlockSectionItem >
+                         <b>Where is your current boiler located? </b>
+                         <apex:inputField value="{!opp.Cureent_Boiler_Location__c}" required="true"/>
+                     </apex:pageBlockSectionItem>-->
+                     <apex:pageBlockSectionItem rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}"/>
+                     <apex:pageBlockSectionItem rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}"/>
+                     <!--<apex:pageBlockSectionItem >
+                         <b>How many rooms with a shower in your home? </b>
+                         <apex:inputField value="{!opp.No_Shower_Rooms__c}" required="true"/>
+                     </apex:pageBlockSectionItem>-->
+                     
+
+                    <!-- <apex:inputField value="{!opp.campaignId}" rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST),true,false)}" required="true" id="p16"/> -->
+
+      </apex:repeat>
+   </apex:pageBlockSection>
+   
+    <apex:pageBlockSection rendered="{!IF(displayModeVal==DisplayModeobj.VIEW,true,false)}" id="pageblock1" columns="3" collapsible="false" > <!-- rendered="{!if(OR(callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}" -->
+        <apex:repeat var="opp" value="{!ListOpportunity}" > <!-- use style attrib for width style="width:100px" -->
+                     <apex:outputField value="{!opp.Why_is_your_customer_considering_a_new_b__c}" style="width:53%"/>
+                     <apex:outputField value="{!opp.Product_Interest__c}" style="width:53%"/>
+                     <apex:outputField value="{!opp.Home_Care__c}" />
+                     <apex:outputField value="{!accountobject.Number_of_Bedrooms__c}"/>
+                    <!-- <apex:outputField value="{!opp.Location_of_Current_Boiler__c}"/> -->
+                     
+
+                    <!-- <apex:outputField value="{!accountobject.Property_age__c}" /> -->
+                    <!-- <apex:outputField value="{!accountobject.Number_of_Bathrooms__c}" /> -->
+                    <!-- <apex:outputField value="{!opp.Keeping_current_boiler_in_same_place__c}" /> -->
+
+                    <!-- <apex:outputField value="{!accountobject.Property_type__c}" /> -->
+                     <apex:outputField value="{!opp.Boiler_type__c}" style="width:53%" />
+                    <!-- <apex:outputField value="{!opp.Location_of_new_Boiler__c}" /> -->
+
+                     <apex:outputField value="{!opp.Boiler_Age__c}" style="width:53%" />
+                     
+                     
+                     
+                     <apex:outputField value="{!opp.Missing_product_holdings_reason__c}" style="width:53%" /> 
+                    <!-- <apex:outputField value="{!opp.Current_annual_gas_spend_over_1500__c}" /> -->
+
+                     <apex:outputField value="{!opp.MGM_Source_Opp__c}" />
+                     <apex:outputField value="{!opp.GDCashBack__c}" />
+                     <apex:outputField value="{!opp.Nectar_Number__c}" />
+                     <apex:outputField value="{!opp.Customer_agreed_to_appointment__c}" rendered="{!IF(OR(callModeVal == CallModeobj.ENGINEERCALLEXISTCUST,callModeVal == CallModeobj.ENGINEERCALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}" />
+                     <apex:outputField value="{!accountobject.Gas_Supply_At_Address1__c}" rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}" />
+                     <apex:pageBlockSectionItem />
+                     <apex:outputField value="{!opp.Customer_Marketing_Consent__c}" />         
+                     <apex:outputField value="{!opp.Marketing_Preferences__c}" />
+                     <apex:outputField value="{!accountobject.Current_Heating_System1__c}" rendered="{!IF(OR(callModeVal == CallModeobj.CUSTOMERCALLNEWCUST,callModeVal == CallModeobj.CUSTOMERCALLEXISTCUST,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}" />
+                     
+        </apex:repeat>
+    </apex:pageBlockSection>
+
+                    
+</apex:component>

@@ -1,0 +1,47 @@
+<apex:page controller="barclaysIntegration" tabStyle="opportunity">
+<apex:form >
+    <apex:pageblock title="Barclays Finance Application" id="blk">
+    <apex:pagemessages />
+    <apex:pageBlockButtons >
+        <apex:commandbutton value="Submit Application"  action="{!createApplication}" rerender="blk"/>
+        
+    </apex:pageBlockButtons>
+        <apex:pageblocksection columns="1" title="Customer Details:">
+            <apex:inputfield required="true" value="{!opp.Bill_Title__c}"/>
+            <apex:inputfield required="true" value="{!opp.Bill_FirstName__c}"/>
+            <apex:inputfield required="true" value="{!opp.Bill_LastName__c}"/>
+            <apex:outputfield value="{!opp.Account.Primary_contact__r.Email__c}"/>
+            <apex:outputfield value="{!opp.CHI_Lead_Id1__c}" id="finRef"/>
+            
+            <!--<apex:pageblocksection columns="2" >-->
+            <apex:outputpanel >
+            <b>
+            New Reference Number : 
+            </b> &nbsp;&nbsp; 
+            {!opp.CHI_Lead_Id1__c}-
+            <apex:inputText value="{!financeRefNum}" size="1" maxlength="2" />
+            </apex:outputpanel>
+            
+            <!--  </apex:pageblocksection>-->
+        
+        </apex:pageblocksection>
+        
+         <apex:pageblocksection columns="1" title="Product Details">
+            <apex:outputfield value="{!opp.Product_Interest__c}"/>
+            <apex:pageblocksectionitem >
+                <apex:outputLabel value="Finance Amount" for="financeAmount"/>
+                <apex:inputtext value="{!financeAmount}"  id="financeAmount"/>
+            </apex:pageblocksectionitem>
+         </apex:pageblocksection>
+         
+         <apex:pageblocksection columns="1" title="Address">
+            <apex:inputfield required="true" value="{!opp.Bill_Street__c}"/>
+            <apex:inputfield required="true" value="{!opp.Bill_City__c}"/>
+            <apex:inputfield required="true" value="{!opp.Bill_Post_Code__c}"/>
+            <apex:outputfield value="{!opp.Bill_State__c}"/>
+         </apex:pageblocksection>
+        
+    </apex:pageblock> 
+</apex:form>
+
+</apex:page>

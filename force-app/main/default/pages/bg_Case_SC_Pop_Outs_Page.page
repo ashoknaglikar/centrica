@@ -1,0 +1,54 @@
+<apex:page showHeader="false" sidebar="false" extensions="bg_Javascript_Remote_Methods" standardController="Case">
+   <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+   <apex:includeScript value="/support/console/26.0/integration.js"/>
+   <script type="text/javascript">     
+       
+      function openNewSubtab() {
+          //First find the ID of the current primary tab
+          sforce.console.getFocusedPrimaryTabId(getCaseId);
+      }
+       
+       var openSubtabTimer = null;
+       
+       function openGoogleSubtab() {
+           
+           //getJobs();
+           //getASP();
+           // Use the results primary tab id and open a new subtab 
+           var openSubtab = function(result) { 
+                var primaryTabId = result.id;
+                getQuotes(primaryTabId );              
+                sforce.console.openSubtab(primaryTabId , '/{!case.Opportunity__c}', false, 
+                'salesforce', null, openSuccess, 'salesforceSubtab');
+                sforce.console.openSubtab(primaryTabId , '/50011000000ds8I', false, 
+                'salesforce tab', null, openSuccess, 'salesforceSubtab2');        
+                clearTimeout(openSubtabTimer);
+            };
+            // Get the enclosing primary tab id. The openSubtab method is set as the callback
+            sforce.console.getEnclosingPrimaryTabId(openSubtab);
+       }       
+      var openSuccess = function openSuccess(result) {
+        };
+        var openSuccess = function openSuccess2(result) {
+        };
+       var previousOnload = window.onload;        
+       window.onload = function() { 
+            if (previousOnload) { 
+                previousOnload();
+            }                
+           openSubtabTimer = setTimeout('openGoogleSubtab()', '500'); 
+       }
+       
+       function getQuotes(primaryTabId ) {
+            bg_Javascript_Remote_Methods.sayHello(function(result, event){
+                if(event.status) {
+                    for (var i = 0; i < result.length; i++) {
+                        //alert(result[i]);
+                        sforce.console.openSubtab(primaryTabId , '/kjdhfdsjf', false, 
+                        'salesforce tab 2', null, openSuccess, 'salesforceSubtab3');
+                    }
+                }
+            });
+        }
+   </script>
+</apex:page>

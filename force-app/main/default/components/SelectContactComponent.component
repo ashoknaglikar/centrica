@@ -1,0 +1,55 @@
+<apex:component controller="ContactEditViewComponentController">
+    <apex:attribute name="ListContactInfo" description="This attrribute passes the contactInfo list to the controller." type="ContactInfo[]" />
+    
+    <apex:pageBlockSection title="Contact" columns="1" collapsible="false">
+        <apex:pageBlockTable var="con" value="{!ListContactInfo}" width="100%">
+            <apex:column headerValue="Select" width="20px">
+                <apex:inputCheckbox style="width:20px" value="{!con.ConSlct}"/>&nbsp;
+            </apex:column>            
+            <apex:column headerValue="Title" width="30px">
+                <apex:outputField style="width:30px" value="{!con.contact.Salutation}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Primary" width="20px">    
+                <apex:outputField style="width:20px" value="{!con.contact.Primary_Contact__c}"/>&nbsp;
+            </apex:column>  
+            <apex:column headerValue="First Name" width="95px">
+                <apex:outputField style="width:95px" value="{!con.contact.FirstName}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Surname" width="95px">
+                <apex:outputField style="width:95px" value="{!con.contact.LastName}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Date of Birth" width="95px">
+                <apex:outputField style="width:95px" value="{!con.contact.Birthdate}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Email" width="100px">
+                <apex:outputField style="width:100px" value="{!con.contact.Email}"/>&nbsp;
+            </apex:column>
+           <apex:column headerValue="Vuln Customer" width="120px">
+                <apex:outputField style="width:120px" value="{!con.contact.Circumstance__c}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Type">
+                <apex:outputField style="width:100px" value="{!con.contact.Contact_Type__c}" />&nbsp;
+            </apex:column>           
+            <apex:column headerValue="Home" width="100px">
+                <apex:outputField style="width:100px" value="{!con.contact.HomePhone}"/>&nbsp; 
+            </apex:column>
+            <apex:column headerValue="Mobile" width="100px">
+                <apex:outputField style="width:100px" value="{!con.contact.MobilePhone}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Work" width="100px">
+                <apex:outputField style="width:100px" value="{!con.contact.OtherPhone}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Billing Address" width="140px">
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingStreet}"/>
+                <apex:outputText value="," rendered="{!IF(con.Contact.MailingStreet != null,true,false)}"/>
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingCity}"/>
+                <apex:outputText value="," rendered="{!IF(con.Contact.MailingCity != null,true,false)}"/>
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingState}"/>
+                <apex:outputText value="," rendered="{!IF(con.Contact.MailingState != null,true,false)}"/>
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingCountry}"/>
+                <apex:outputText value="," rendered="{!IF(con.Contact.MailingCountry != null,true,false)}"/>
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingPostalCode}"/>&nbsp;
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlockSection>    
+</apex:component>

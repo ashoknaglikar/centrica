@@ -1,0 +1,139 @@
+@isTest
+private class getCapacityResTest{
+ 
+    static Account account;
+    static Contact contact;
+    static Opportunity opp;
+    static Supplier__c supplier;
+    static Employee__c emp;
+    static Employee_Sales_Skill__c skill;
+   
+   
+    static void createData()
+    {
+        
+        //Prepare account data
+        date pageDate = date.today().addYears(100);
+        account=new Account(Name='Test Account',Number_of_Bedrooms__c=1,BillingStreet='Test Street',BillingState='Test State',
+                                    BillingPostalCode='XXX XXX',BillingCountry='Test Country',BillingCity='Test City');
+     
+        insert account;
+        //Prepare contact data
+        contact=new Contact(Primary_Contact__c=true,Phone='9022332343', MailingStreet='Test Street',MailingState='Test State',
+                                     MailingPostalCode='XXX XXX',MailingCountry='Test Country', MailingCity='Test City',LastName='Last Name',
+                                     FirstName='First name',Email='test@gmail.com',AccountId=account.Id,Salutation='Mr'); 
+                                     
+        insert contact;
+        
+        //prepare supplier data
+        supplier = new supplier__c(Name='Test supplier',Type__c='Resource',Supplier_Num__c='A1234',Resource_Type__c='Resource');
+        insert supplier;
+        
+        //prepare employee data
+        emp = new Employee__c(Name = 'testJI1', Salesforce_User__c = UserInfo.getUserId() ,First_Name__c = 'SBB1', Last_Name__c = 'Test1',Supplier__c=supplier.Id,
+                              Employee_Number__c = '0002991',Resource_Id__c='7fejs2',Resource_Type__c='Installer',Primary_Role__c='OFS Bucket');
+        insert emp;
+        
+        //Prepare opportunity data
+        opp = new Opportunity (Name = 'Test1 Opp', AccountId = account.Id,
+                                                CloseDate = Date.today().addyears(1), 
+                                                StageName = 'Active',Override_Billing_checks__c=false,
+                                                Product_Interest__c='Central Heating Boiler',
+                                                LeadSource='Engineer', Referral_Employee__c =emp.id,
+                                                Customer_Category_Record_Modified_By__c = UserInfo.getUserId());
+        
+        insert opp;
+        
+        Skill = new Employee_Sales_Skill__c(Employee__c = emp.Id, Sales_Skill_Name__c = 'Central Heating Boiler', Start_Date__c = system.today(), End_Date__c = pageDate, Sales_Efficiency__c = 1);
+        insert skill;
+         
+       
+        Role__c TestRole1 = new Role__c(Type__c='HSA', Start_Date__c=date.today(), End_Date__c=pageDate.addYears(1), Employee__c=emp.Id);
+        insert TestRole1;
+        
+        District__c TestSalesDistrict = new District__c(Type__c='Sales', Name='P1Controller_SalesDistrict', Code__c='xxxxxxxx');
+        insert TestSalesDistrict;
+        
+        Sub_Patch__c TestSalesSubPatch = new Sub_Patch__c(Type__c='Sales',Name='P1Controller_SalesSubpatch', District__c=TestSalesDistrict.Id, Code__c='xxxxxxxx');
+        insert TestsalesSubPatch;      
+        
+        Postcode_Sector__c TestSalesSector = new Postcode_Sector__c(Type__c='Sales',Name='XXX X', Sub_Patch__c=TestSalesSubPatch.Id);
+        insert TestsalesSector;
+       
+    }
+ 
+ static testmethod void InvokeCapacityandQuotaData(){
+   CreateData();
+   string[] loc = new string[]{emp.id};
+   Date x = Date.today();
+   Date y = Date.today().adddays(1);
+   Date[] date_x = new date[]{x,y};
+   List<Id> empIdList=new list<Id>{emp.id};
+   Test.startTest();
+   
+   getCapacityRes.getCapacity(loc,date_x,'XXX XXX','XXX X',null);
+   getCapacityRes.getQuotaData(date_x,loc);
+  
+   Test.stopTest();
+ 
+ }
+ 
+  @isTest static void InvokeWebServices(){
+   CreateData();
+   string[] loc = new string[]{emp.id};
+   Date x = Date.today()-100;
+   Date y = Date.today().adddays(1);
+   
+   List<Id> empIdList=new list<Id>{emp.id};
+   Test.startTest();
+   //Test.setMock(WebServiceMock.class, new getCapacityRes());
+    getCapacityRes.getBuckClosure(empIdList,x,y);
+    //getCapacityRes.getInternalActivity(x,y);
+    Test.setMock(WebServiceMock.class, new toaCapacityMockImpl());
+    
+    getCapacityRes.getCalendersResp(empIdList,x,y);
+    getCapacityRes.getInternalActivity(x,y);
+   //toatechResourcemanagement10.GetResourcesCalendarsResponseElement calElement=getCapacityRes.getCalendersResp(empIdList,x,y);
+   Test.stopTest();
+ 
+ }
+  @isTest static void InvokeCalWebServices(){
+   CreateData();
+   string[] loc = new string[]{emp.id};
+   Date x = Date.today()-100;
+   Date y = Date.today().adddays(1);
+   
+   List<Id> empIdList=new list<Id>{emp.id};
+   Test.startTest();
+    Test.setMock(WebServiceMock.class, new toatechResMMockImpl());
+    getCapacityRes.getCalendersResp(empIdList,x,y);
+   Test.stopTest();
+ 
+ }
+ @isTest static void InvokeActWebServices(){
+   CreateData();
+   string[] loc = new string[]{emp.id};
+   Date x = Date.today()-100;
+   Date y = Date.today().adddays(1);
+   
+   List<Id> empIdList=new list<Id>{emp.id};
+   Test.startTest();
+    Test.setMock(WebServiceMock.class, new toaActivityMockImpl());
+    getCapacityRes.getInternalActivity(x,y);
+   Test.stopTest();
+ 
+ }
+    @isTest static void getEmployeeIDandNameMapTest (){
+        supplier = new supplier__c(Name='Test supplier',Type__c='Resource',Supplier_Num__c='A1234',Resource_Type__c='Resource');
+        insert supplier;
+        emp = new Employee__c(Name = 'testJI1', Salesforce_User__c = UserInfo.getUserId() ,First_Name__c = 'SBB1', Last_Name__c = 'Test1',Supplier__c=supplier.Id,
+                              Employee_Number__c = '0002991',Resource_Id__c='7fejs2',Resource_Type__c='Installer',Primary_Role__c='HSA',Inactive__c=False);
+        insert emp;
+        test.startTest();
+     getCapacityRes.getEmployeeIDandNameMap();   
+        Test.stopTest();
+        
+    }
+ 
+
+}

@@ -1,0 +1,193 @@
+<apex:component controller="AppointViewComponentController">
+<apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" required="true"/>
+<apex:attribute name="appointViewList" description="This attribute passes the list of appointments to component." type="Appointment__c[]"/> 
+<apex:attribute name="appointExistList" description="This attribute passes the list of appointments to component." type="SelectedAppointment[]"/>
+<apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+
+<!-- To display the Appointments view mode-->
+    <apex:pageBlockSection title="Appointments" collapsible="false" columns="1" rendered="{!IF(displayModeVal==DisplayModeobj.VIEW,true,false)}">
+        <apex:pageBlockTable var="appoint" value="{!appointViewList}">
+            <apex:column headerValue="Num" value="{!appoint.name}"/>
+            <apex:column headerValue="Status" value="{!appoint.Status__c}"/>
+            <apex:column headerValue="Type" value="{!appoint.Type__c}"/>
+            <apex:column headerValue="Date">
+            <apex:outputText value="{0,date,EEEEE d MMMMMM yyyy}">
+                <apex:param value="{!appoint.Visit_Date__c}" />
+            </apex:outputText>
+            </apex:column>
+            <apex:column headerValue="Band" value="{!appoint.Time_Band__c}"/>
+            <apex:column headerValue="Time" value="{!appoint.Start_Time__c} - {!appoint.End_Time__c}"/>
+            <apex:column headerValue="Agent" value="{!appoint.BM_Salesperson__c}"/>
+            <apex:column headerValue="Primary Role" value="{!appoint.Assigned_To__r.Primary_Role__c}"/>
+            <!-- CR Add bring forward visit checkbox on wrap up screen-->
+            <apex:column headerValue="Bring forward visit">
+            <apex:inputField value="{!appoint.Bring_forward_visit__c}"/>
+            </apex:column>
+        </apex:pageBlockTable>        
+    </apex:pageBlockSection>
+<!-- To display the Appointments existing mode-->
+    <apex:pageBlockSection title="Appointments" collapsible="false" columns="1" rendered="{!IF(displayModeVal==DisplayModeobj.EXISTING,true,false)}">        
+    <apex:pageBlockTable var="appoint" value="{!appointExistList}">
+            <apex:column headerValue="Select">
+               <!-- <apex:inputCheckbox value="{!appoint.Appointment.Id}" selected="{!appoint.appoinSelected}"/> -->
+               <apex:inputCheckbox value="{!appoint.appoinSelected}" rendered="{!appoint.showIsSelct}"/>
+            </apex:column>
+            <apex:column headerValue="Num" value="{!appoint.Appointment.name}"/>
+            <apex:column headerValue="Status" value="{!appoint.Appointment.Status__c}"/>
+            <apex:column headerValue="Type" value="{!appoint.Appointment.Type__c}"/>
+            <apex:column headerValue="Date">
+            <apex:outputText value="{0,date,EEEEE d MMMMMM yyyy}">
+                <apex:param value="{!appoint.Appointment.Visit_Date__c}" />
+            </apex:outputText>
+            </apex:column>
+            <apex:column headerValue="Band" value="{!appoint.Appointment.Time_Band__c}"/>
+            <apex:column headerValue="Time" value="{!appoint.Appointment.Start_Time__c} - {!appoint.Appointment.End_Time__c}"/>
+            <apex:column headerValue="Agent" value="{!appoint.Appointment.BM_Salesperson__c}"/>
+            <apex:column headerValue="Primary Role" value="{!appoint.Appointment.Assigned_To__r.Primary_Role__c}"/>
+        </apex:pageBlockTable>        
+    </apex:pageBlockSection>
+    
+   <!-- To display the Appointments APPOINTSUCCESS mode-->
+    <apex:pageBlockSection title="Appointments" collapsible="false" columns="1" rendered="{!IF(displayModeVal==DisplayModeobj.APPOINTSUCCESS,true,false)}">        
+        <table width="100%">
+            <tr>
+                <td width="10%"><b>Num</b></td>
+                <td width="10%"><b>Status</b></td>
+                 <td width="10%"><b>Type</b></td>
+                <td width="25%"><b>Date</b></td>
+                <td width="5%"><b>Band</b></td>
+                <td width="15%"><b>Time</b></td>
+                <td width="25%"><b>Agent</b></td>
+                <td width="10%"><b>Primary Role</b></td>
+            </tr>           
+            <apex:repeat var="appoint" value="{!appointExistList}">
+                <tr>
+                    <td width="10%">{!appoint.Appointment.name}</td>
+                    <td width="10%">{!appoint.Appointment.Status__c}</td>
+                    <td width="10%">{!appoint.Appointment.Type__c}</td>
+                    <td width="25%">
+                        <apex:outputText value="{0,date,EEEEE d MMMMMM yyyy}">
+                        <apex:param value="{!appoint.Appointment.Visit_Date__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td width="5%">{!appoint.Appointment.Time_Band__c}</td>
+                    <td width="15%">{!appoint.Appointment.Start_Time__c} - {!appoint.Appointment.End_Time__c}</td>
+                    <td width="25%">{!appoint.Appointment.BM_Salesperson__c}</td>
+                    <td width="10%">{!appoint.Appointment.Assigned_To__r.Primary_Role__c}</td>
+                </tr>  
+                <tr>
+                    <td colspan="7">
+                        <apex:outputText value="TA Notes" style="font-weight:bold" rendered="{!IF(appoint.Appointment.Status__c!='Cancelled',true,false)}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="7">
+                        <apex:outputText value="{!appoint.Appointment.TA_Notes_All__c}" rendered="{!IF(appoint.Appointment.Status__c!='Cancelled',true,false)}"/>
+                    </td>               
+                </tr>       
+            </apex:repeat> 
+            </table>  
+    </apex:pageBlockSection>
+    
+    <!-- To display the Appointments APPOINTSUCCESSEXIST mode: Used in Exixting customer,employee,engineer workflow after continue button click :CREATED DATE: 17/11/09 -->
+    <apex:pageBlockSection title="Appointments" collapsible="false" columns="1" rendered="{!IF(displayModeVal==DisplayModeobj.APPOINTSUCCESSEXIST,true,false)}">        
+        <table width="100%">
+            <tr>
+                <td width="5%"><b>Select</b></td>
+                <td width="20%"><b>Num</b></td> 
+                <td width="15%"><b>Status</b></td>
+                <td width="15%"><b>Type</b></td>
+                <!-- <td width="25%"><b>Status Reason</b></td> -->
+                <td width="15%"><b>Date</b></td>
+                <td width="5%"><b>Band</b></td>
+                <td width="15%"><b>Time</b></td>
+                <td width="20%"><b>Agent</b></td>
+                <td width="5%"><b>Primary Role</b></td>
+            </tr>           
+            <apex:repeat var="appoint" value="{!appointExistList}">
+                <tr>
+                    <td width="5%"><apex:inputCheckbox value="{!appoint.appoinSelected}" rendered="{!appoint.showIsSelct}"/></td>
+                    <td width="20%">{!appoint.Appointment.name}</td>
+                    <td width="15%">{!appoint.Appointment.Status__c}</td> 
+                    <td width="15%"> {!appoint.Appointment.Type__c}</td>
+                    <td width="15%">
+                        <apex:outputText value="{0,date,EEEEE d MMMMMM yyyy}">
+                        <apex:param value="{!appoint.Appointment.Visit_Date__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td width="5%">{!appoint.Appointment.Time_Band__c}</td>
+                    <td width="15%">{!appoint.Appointment.Start_Time__c} - {!appoint.Appointment.End_Time__c}</td>
+                    <td width="20%">{!appoint.Appointment.BM_Salesperson__c}</td>
+                    <td width="5%">{!appoint.Appointment.Assigned_To__r.Primary_Role__c}</td>
+                </tr>
+                <!-- -ashok CR:002 commented because not needed to display 
+                <tr>
+                    <td width="5%">&nbsp;</td>
+                    <td colspan="7">
+                        <apex:outputText value="Status Reason" style="font-weight:bold"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%">&nbsp;</td>
+                    <td colspan="7">
+                        <apex:inputField value="{!appoint.Appointment.Status_Reason__c}" rendered="{!IF(appoint.Appointment.Status__c = 'Appointed',true,false)}"/>
+                        <apex:outputField value="{!appoint.Appointment.Status_Reason__c}" rendered="{!IF(appoint.Appointment.Status__c != 'Appointed',true,false)}"/>
+                    </td>               
+                </tr>-->
+                <apex:outputpanel rendered="{!appoint.showIsSelct}">
+                <tr>
+                    <td width="5%">&nbsp;</td>
+                    <td colspan="7">
+                        <apex:outputText value="Primary Cancellation Reason" style="font-weight:bold" rendered="{!OR(appoint.Appointment.Status__c != 'Appointed',NOT(appoint.displayRedTextForCanReasons))}"/>
+                        <Font color='Red'><apex:outputText value="Primary Cancellation Reason" rendered="{!AND(appoint.Appointment.Status__c == 'Appointed',appoint.displayRedTextForCanReasons)}" style="font-weight:bold"/></Font>
+                        
+                       
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%">&nbsp;</td>
+                    <td colspan="7">
+                        
+                        <!-- -Ashok CR: 02 CP start -->
+                        
+                       <apex:inputField value="{!appoint.Appointment.Primary_Cancellation_Reason__c}" rendered="{!IF(appoint.Appointment.Status__c = 'Appointed',true,false)}"/>
+                       <apex:outputField value="{!appoint.Appointment.Primary_Cancellation_Reason__c}" rendered="{!IF(appoint.Appointment.Status__c != 'Appointed',true,false)}"/>
+                     
+                        <!-- -Ashok CR: 02 CP End -->
+                    </td>               
+                </tr> 
+                <tr>
+                    <td width="5%">&nbsp;</td>
+                    <td colspan="7">
+                        <apex:outputText value="Secondary Cancellation Reason" rendered="{!OR(appoint.Appointment.Status__c != 'Appointed',NOT(appoint.displayRedTextForCanReasons))}" style="font-weight:bold"/>
+      <Font color='Red'><apex:outputText value="Secondary Cancellation Reason" rendered="{!AND(appoint.Appointment.Status__c == 'Appointed',appoint.displayRedTextForCanReasons)}" style="font-weight:bold"/></Font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%">&nbsp;</td>
+                    <td colspan="7">
+                        
+                        <!-- -Ashok CR: 02 CP start -->
+                        
+                        <apex:inputField value="{!appoint.Appointment.Secondary_Cancellation_Reason__c}" rendered="{!IF(appoint.Appointment.Status__c = 'Appointed',true,false)}"/>
+                        <apex:outputField value="{!appoint.Appointment.Secondary_Cancellation_Reason__c}" rendered="{!IF(appoint.Appointment.Status__c != 'Appointed',true,false)}"/>
+                        <!-- -Ashok CR: 02 CP End -->
+                	</td>               
+                </tr> 
+                </apex:outputpanel>          
+                <tr>
+                    <td width="5%">&nbsp;</td>
+                    <td colspan="7">
+                        <apex:outputText value="TA Notes" style="font-weight:bold" rendered="{!IF(appoint.Appointment.Status__c!='Cancelled',true,false)}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="5%">&nbsp;</td>
+                    <td colspan="7">
+                        <apex:outputText value="{!appoint.Appointment.TA_Notes_All__c}" rendered="{!IF(appoint.Appointment.Status__c!='Cancelled',true,false)}"/>
+                    </td>               
+                </tr>       
+            </apex:repeat> 
+            </table>  
+    </apex:pageBlockSection>
+</apex:component>

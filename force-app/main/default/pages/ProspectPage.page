@@ -1,0 +1,40 @@
+<apex:page controller="ProspectPageController" >
+    <apex:form >
+        <apex:pagemessages />
+        <apex:pageblock > 
+             <apex:pageblockbuttons >
+             <apex:commandbutton action="{!BtnContinue_Click}" id="BtnContinue" value="Continue" />
+             <apex:commandbutton action="{!BtnWasteCall_Click}" id="BtnWasteCall"  value="Waste Call/Prospect" />
+             </apex:pageblockbuttons>
+             <c:AccountEditViewComponent id="AccountView" DisplayModeobj="{!DisplayMode}" displayModeVal="3" accountObject="{!Acc}"/>
+             <apex:pageBlockSection title="Prospects" columns="1" collapsible="false">
+                <apex:pageBlockTable var="p" value="{!LeadClassList}">
+                    <apex:column headerValue="Select">
+                         <apex:inputCheckbox selected="{!p.isSelected}" disabled="{!p.isDisabled}"/><!-- rendered="{!IF(OR(o.opp.StageName!='Closed Lost'),true,false)}"/> -->
+                    </apex:column>   
+                    <apex:column headerValue="Enquiry Number">
+                        <apex:outputField value="{!p.ava_lead.Enquiry_Num__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Name">
+                        <apex:outputField value="{!p.ava_lead.Name}"/>
+                    </apex:column>
+                    <apex:column headerValue="Phone">
+                        <apex:outputField value="{!p.ava_lead.Phone}"/>
+                    </apex:column>
+                    <apex:column headerValue="Status">
+                        <apex:outputField value="{!p.ava_lead.Status}"/>
+                    </apex:column>
+                    <apex:column headerValue="Reason Code">
+                        <apex:outputField value="{!p.ava_lead.Reason_Code__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Call Back Date">
+                        <apex:outputField value="{!p.ava_lead.Call_Back_Date__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Date Created">
+                        <apex:outputField value="{!p.ava_lead.CreatedDate}"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+        </apex:pageblock>
+    </apex:form>    
+</apex:page>

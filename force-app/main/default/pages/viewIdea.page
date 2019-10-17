@@ -1,0 +1,180 @@
+<apex:page standardController="idea"  showHeader="true" sidebar="false"  extensions="viewIdeaExtension" id="page" standardstylesheets="false">
+
+<script type='text/javascript' src='/canvas/sdk/js/publisher.js'/> 
+    <html>
+    <body >
+
+    <style type="text/css">
+    .commentTable{}   
+    } 
+    </style> 
+ 
+
+<apex:form id="frm" > 
+
+<div>
+  «&nbsp;<apex:outputLink value="/apex/IdeasHome" style="color:#0000FF">
+  <!--<apex:image value="{!$Resource.Ideahome}" width="65" height="20"/>-->
+      <b>Ideas Home</b>
+    </apex:outputLink>
+
+</div>
+<apex:pagemessage severity="info" detail="{!$Label.Duplicate_Idea}" strength="2" rendered="{!Duplicateideamsg}" />
+<apex:pagemessages />
+<apex:pageblock id="blk1"> 
+
+
+ <apex:outputPanel id="like" style="width=100%">
+   
+        <div style="width:10%;text-align:center;font-weight:bold;color:#0000FF">
+              Likes             
+        </div>
+    
+    
+        
+     <div style="width:99%;height:100px;border: 2px solid #0000FF;padding:5px 5px 5px 5px; margin-bottom:10px ; border-radius:5px 5px 5px 5px;">
+         <apex:outputpanel style="width:10%;float:left;border: 1px solid #66CCFF;height:100%; margin-right:5px;border-radius: 4px" id="scoreDiv" >
+                
+                <div style="text-align:center;font-weight:bold;height:95%;padding:5px 5px 5px 5px;font-size:80px;color:#66CCFF ;font-family:calibri;">
+                            
+            
+                    <apex:outputpanel >
+                        {!ida.Decimalremove__c} 
+                    </apex:outputpanel> 
+                    
+                </div>
+                    
+       </apex:outputpanel>
+   
+  
+     
+    <div style ="height:100%;"> 
+            <div style ="margin-left:5px;margin-bottom:8px;font: bold 15px calibri,serif; ;height:15px; font-family:calibri;"> 
+        
+                {!ida.Title}
+
+           </div>
+
+         
+        <div style ="margin-left:5px;margin-bottom:5px;height:60%;margin-top:3px;font-family:calibri;">
+           <!--<apex:outputLabel value="{!ida.Body}" style="width:1000px;height:50px;"/>-->
+    
+             {!ida.Body}
+      
+        </div>
+ 
+
+       <!--<apex:pageblocksection columns="4" >-->
+       <!--<div style ="margin:right:10px;height:10px;float:left; ">-->
+       <!--<apex:outputpanel rendered="{!attachementBln}">     
+         <apex:outputtext value="Attachment: " style="font-size:15px;font-family:calibri; color: red; font-weight:bold; float:left;" />
+         <a href="https://c.{$label.Salesforce_Server}.content.force.com/servlet/fileField?field=AttachmentBody&entityId={!idea.id}"  style="font-size:15px;font-family:calibri; color:green; float:left;" >{!ida.AttachmentName}</a>
+       </apex:outputpanel> -->
+       <!--</div>-->
+       <!--</apex:pageblocksection>-->
+    
+<!--<br/>-->
+  
+  
+     <div  style ="margin:right:10px;height:5px;float:left; "> 
+     
+            <apex:commandlink action="{!createVote}" id="link6" rendered="{!alreadyliked}" rerender="blk1" style="font-weight:bold;font-family:calibri;" >
+               <b style="font-family:calibri;">Like</b>
+           </apex:commandlink>
+    
+         <apex:outputtext value="Liked" rendered="{!!alreadyliked}" style="font-weight:bold;font-family:calibri;"/>
+
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   
+
+        <b>
+            <a href="#postComment" style="font-family:calibri;">Add Comment</a>
+         </b>
+
+
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;       
+
+     <apex:outputtext value="Submitted By :" style="font-weight:bold;font-family:calibri;"/> 
+                     &nbsp;
+    <apex:outputtext value="{!idea.Submitters_Name__c}" style="font-family:calibri;"/>
+                    
+                     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        
+        <apex:outputText value="{0,date,dd'/'MM'/'yyyy  HH:mm}" style="font-family:calibri;">
+        <b style="font-family:calibri;" >
+            Submitted Date: <apex:param value="{!idea.CreatedDate}" /> 
+         </b>
+        </apex:outputText>
+        
+     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   
+    <apex:outputtext value="Status:" style="font-weight:bold;font-family:calibri;"/> 
+                    &nbsp;
+                    
+   <apex:outputtext value="{!ida.Sub_Status__c}"  />    
+
+</div>
+</div>       
+</div> 
+
+</apex:outputpanel>
+
+<apex:pageBlockSection rendered="{!attachementBln}" columns="4">
+<!--<apex:outputpanel>-->      
+         
+         <apex:outputtext value="Attachment: " style="font-size:15px;font-family:calibri; color: red; font-weight:bold; float:right;" />
+         <a href="https://c.{$label.Salesforce_Server}.content.force.com/servlet/fileField?field=AttachmentBody&entityId={!idea.id}"  style="font-size:15px;font-family:calibri; color:green; float:left;" >{!ida.AttachmentName}</a>
+
+<!--</apex:outputpanel> -->
+</apex:pageBlockSection>
+
+  <apex:pageBlockSection title="Status Indicator" columns="1" >
+  <apex:pageblocksectionitem >
+   <apex:outputText value="{!idea.Status_Indicator__c}" escape="false" style="font-family:calibri;" />
+   </apex:pageblocksectionitem>
+  </apex:pageBlockSection>
+
+<apex:pageblocksection collapsible="flase" title="Comments" columns="1" rendered="{!Commentsectionrendered}"> 
+<apex:outputfield value="{!idea.Status_Notes__c}" style="text-align:left;font-family:calibri;"/>  
+<div id = "comments" style ="width:100%"> 
+
+<apex:dataTable value="{!idea.Comments}" var="c" style="cellspacing:50; width:100%;" >
+ <apex:column value="{!c.CommentBody}" width="50%"  style="padding-bottom: 2em;"/><!--headerValue="Body"-->
+ <apex:column width="25%"  value="{!c.CreatedDate}"  style="padding-bottom: 2em;"/> <!--headerValue="Date Time"-->
+ <apex:column width="25%"  value="{!c.CreatedBy.Name}"  style="padding-bottom: 2em;"/><!--headerValue="Posted By"-->
+</apex:dataTable>
+    <br/>
+    <a id="postComment">
+    <apex:outputLabel value="Please enter your comments below: " style="font-weight:bold;font-size:15px;font-family:calibri;"/>
+    <apex:pageblocksectionitem >
+        
+        <apex:inputTextarea value="{!comment.CommentBody}" style="width:60%;height:50px;"/>
+    </apex:pageblocksectionitem>
+    <apex:commandButton value="Post" action="{!post}" oncomplete="refreshFeed();" />
+   
+    </a>    
+
+</div>
+</apex:pageblocksection>
+</apex:pageblock>  
+
+<div style="text-align:left;font-size:15px;color:#FF0000 ;">
+<apex:commandLink action="{!Go}" rendered="{!outputlinkforparent}" style="color:#0000FF">
+                           
+<!--<apex:outputLink value="{!idea.Parent_Idea__c}" style="color:#0000FF" >-->
+<!--<apex:outputLink value="{!URLFOR('/apex/viewIdea?id=')}"  style="color:#0000FF" rendered="{!outputlinkforparent}">-->
+<!--<apex:outputLink value="{!ida.Parent_Idea__c}"  style="color:#0000FF" rendered="{!outputlinkforparent}">-->
+
+  <b>Parent Idea</b>
+<!--</apex:outputLink>-->
+     </apex:commandLink>  
+</div>
+</apex:form> 
+
+
+   
+</body>
+
+     
+</html> 
+
+  
+</apex:page>

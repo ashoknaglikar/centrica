@@ -1,0 +1,162 @@
+<apex:page controller="FinanceApplicationDetail" tabStyle="Finance_Application__c">
+    
+    <script>
+    window.onload = function applyPickListValues(){
+        
+        var fromRec = '{!FR}';
+        //alert('---->'+fromRec);
+        if(fromRec == 'True'){
+            togglleDiv('');      
+            submitApplication();
+            //togglleDiv('none');      
+        }
+        
+    }
+    
+    
+    var isClicked = false;
+    function check(obj) {
+        if(isClicked) {
+            alert('Button can only be pressed once');
+            return false;
+        } else {
+            isClicked = true;
+            obj.className = 'btnDisabled';
+            togglleDiv('');
+            
+        }
+    }
+    
+    function isClickedReset(){
+        
+        togglleDiv('none');
+    }
+    
+    function togglleDiv(show){
+        //document.getElementById('darkLayer').style.display = show; 
+        document.getElementById('LoadingDiv').style.display = show;      
+    }  
+    
+    </script>
+    
+    <apex:form id="frm">
+        <apex:pagemessages />
+        <apex:pageBlock id="ErrMsg" rendered="{!Err}">
+            <apex:outputText escape="false" value="{!ErrDesc}" style="color:{!if(fApplication.Application_Status__c == 'Declined','Red','green')};font-size:20px;font-weight: bold;font-family: Times New Roman;text-align: center;"/>  
+        </apex:pageBlock>
+        <apex:actionFunction name="submitApplication" action="{!LoadApplication}" rerender="frm"  status="stat" oncomplete="isClickedReset();"/>
+        <apex:actionstatus id="stat" onstop="check(true);" ></apex:actionstatus>
+        <apex:pageBlock id="Pblk">
+            <apex:pageblockSection title="Finance Application Details" id="pbsec">
+                <apex:outputfield value="{!fApplication.Name}"/>
+                <apex:outputfield value="{!fApplication.CHI_Lead__c}"/>
+                <apex:outputfield value="{!fApplication.Finance_Product__c}"/>
+                <apex:outputfield value="{!fApplication.Type_of_Finance__c}"/>
+                <apex:outputfield value="{!fApplication.Deposit__c }"/>
+                <apex:outputfield value="{!fApplication.Cash_Price__c }"/>
+                <apex:outputfield value="{!fApplication.Monthly_Repayments__c}"/>
+                <apex:outputField value="{!fApplication.Application_Status__c}" />
+                <apex:outputfield value="{!fApplication.X2nd_Lended_Soft_Search__c}" rendered="{!isFreedomFinance}"/>
+                <apex:outputfield value="{!fApplication.X2nd_Lender_Name__c}" rendered="{!isFreedomFinance}"/>
+                <!--  <apex:outputfield value="{!fApplication.Lender_Code__c    }" rendered="{!isFreedomFinance}"/>-->
+                <apex:outputField value="{!fApplication.Referral_Reason__c}" rendered="{!isFreedomFinance}"/> 
+                <apex:pageblocksectionitem rendered="{!isFreedomFinance}" />
+                <apex:outputField value="{!fApplication.Interest_Rate__c}" rendered="{!!renderHighlight}" />
+                <apex:outputField value="{!fApplication.Monthly_Repayments__c}" rendered="{!!renderHighlight}" />
+                <apex:outputField value="{!fApplication.Total_Amount_Repayable__c}" rendered="{!!renderHighlight}" />
+                
+                <apex:outputpanel style="color:red;font-weight: bold;" rendered="{!renderHighlight}" >
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <apex:outputlabel value=" Interest Rate" for="intRate"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <apex:outputField value="{!fApplication.Interest_Rate__c}"  id="intRate"/>
+                </apex:outputpanel>
+                <apex:outputpanel style="color:red;font-weight: bold;" rendered="{!renderHighlight}" >
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <apex:outputlabel value="Monthly Repayments"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <apex:outputField value="{!fApplication.Monthly_Repayments__c}" />
+                </apex:outputpanel>
+                <apex:outputpanel style="color:red;font-weight: bold;" rendered="{!renderHighlight}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <apex:outputlabel value="Total Amount Repayable"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <apex:outputField value="{!fApplication.Total_Amount_Repayable__c}"  />
+                </apex:outputpanel>
+                
+                
+            </apex:pageBlocksection>
+            <apex:pageblockSection title="2nd lender Details"  rendered="{!fFinanceBtn}">
+                <apex:inputField value="{!fApplication.Gross_Annual_Income__c}" required="true" />
+                <apex:inputField value="{!fApplication.Partner_Employment_Status__c}" required="{!OR(fApplication.Marital_Status__c == 'Married',  fApplication.Marital_Status__c == 'Cohabiting')}" rendered="{!OR(fApplication.Marital_Status__c == 'Married',  fApplication.Marital_Status__c == 'Cohabiting')}"/>
+                <apex:inputField value="{!fApplication.Applicant_Net_Monthly_income__c}"/>
+                <apex:inputField value="{!fApplication.Partner_Income__c}" rendered="{!AND(OR(fApplication.Partner_Employment_Status__c ==  'Employed', fApplication.Partner_Employment_Status__c ==  'Self employed', fApplication.Partner_Employment_Status__c ==  'Part-time', fApplication.Partner_Employment_Status__c ==  'Housepersons'), OR(fApplication.Marital_Status__c == 'Married',  fApplication.Marital_Status__c == 'Cohabiting'))}"
+                                    required="{!AND(OR(fApplication.Partner_Employment_Status__c ==  'Employed', fApplication.Partner_Employment_Status__c ==  'Self employed', fApplication.Partner_Employment_Status__c ==  'Part-time', fApplication.Partner_Employment_Status__c ==  'Housepersons'), OR(fApplication.Marital_Status__c == 'Married',  fApplication.Marital_Status__c == 'Cohabiting'))}" />
+                <apex:inputField value="{!fApplication.Applicant_Other_Income__c}"/>
+            </apex:pageBlocksection>
+            <!--  <apex:outputpanel style = "font-color:red;font-weight: bold;">
+<apex:pageblocksection>
+<apex:outputField value="{!fApplication.Interest_Rate__c}" />
+<apex:outputField value="{!fApplication.Monthly_Repayments__c}" />
+<apex:outputField value="{!fApplication.Total_Amount_Repayable__c}"/>
+</apex:pageblocksection>
+</apex:outputpanel>-->
+            <apex:outputpanel id="poller">
+                <!--App Status : {!AppStatus}-->
+                
+                <apex:actionPoller action="{!ApplicationEnquiry}" reRender="frm" interval="5" rendered="{!AppStatus}"  onsubmit="togglleDiv('');" timeout="180000"/>
+                <apex:actionPoller reRender="frm" interval="5" rendered="{!!AppStatus}" onsubmit="isClickedReset();" timeout="5"/> 
+                
+            </apex:outputpanel>
+            <!-- <apex:pageblockSection title="Customer Details">
+<apex:outputfield value="{!fApplication.Title__c}"/>
+<apex:outputfield value="{!fApplication.Home_Phone__c}"/>
+<apex:outputfield value="{!fApplication.First_Name__c}"/>
+<apex:outputfield value="{!fApplication.Work_Phone__c}"/>
+<apex:outputfield value="{!fApplication.Middle_Name__c}"/>
+<apex:outputfield value="{!fApplication.Mobile__c}"/>
+<apex:outputfield value="{!fApplication.Last_Name__c}"/>
+<apex:outputfield value="{!fApplication.Email__c}"/>
+<apex:outputfield value="{!fApplication.Alias__c}"/>
+
+</apex:pageblockSection>  
+
+<apex:pageblockSection title="contd..">
+<apex:outputfield value="{!fApplication.Date_Of_Birth__c}"/>
+<apex:outputfield value="{!fApplication.Nationality__c}"/>
+<apex:outputfield value="{!fApplication.Marital_Status__c}"/>
+<apex:outputfield value="{!fApplication.Number_Of_Dependents__c}"/>
+<apex:outputfield value="{!fApplication.Gender__c}"/>
+</apex:pageblockSection> -->
+            
+            <apex:pageBlockButtons location="bottom" >
+                <apex:commandButton value="Submit Application" onclick="check(this);"  action="{!LoadApplication}" reRender="frm" rendered="{!btn_show}"/>
+                <apex:commandButton value="Edit" action="{!edit}" rerender="frm" rendered="{!btn_show}"/>
+                <apex:commandButton value="Delete" action="{!cancel}" rerender="frm" rendered="{!btn_show}"/>
+                <apex:commandbutton value="Do Soft Search with Freedom Finance" rendered="{!fFinanceBtn}" action="{!doFFSoftSearch}" />
+                <apex:commandbutton value="Apply with Freedom Finance" rendered="{!applyFFFinance}" action="{!applyForFFApplication}" />
+                <apex:commandButton value="Exit" action="{!exit}"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:600px; top:150px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+                <img src="/img/loading.gif" /> System updating......please wait...
+            </div>
+        </div>
+        
+        <!--<div id="darkLayer" style ="background-color: white; 
+filter:alpha(opacity=50); /* IE */ 
+opacity: 0.5; /* Safari, Opera */ 
+-moz-opacity:0.50; /* FireFox */ 
+z-index: 20; 
+/*height: 100%; 
+width: 100%; */
+background-repeat:no-repeat; 
+background-position:center; 
+position:absolute; 
+top: 0px; 
+left: 0px; 
+display:none;">
+</div>-->
+    </apex:form>
+    
+    
+</apex:page>

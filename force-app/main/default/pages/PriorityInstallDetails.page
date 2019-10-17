@@ -1,0 +1,453 @@
+<apex:page standardController="Opportunity"
+    extensions="PriorityInstallDetailsController">
+    {!reason}
+    {!subreason}
+    <script>
+        var reason1,subreason1,fromOnload;
+        
+        window.onload = function applyPickListValues(){
+                          //alert('ok');
+                          subreason1 = '{!subreason}';
+                          //alert('Onload:'+subreason1);
+                          reason1 = '{!reason}';
+                          fromOnload = true;
+                          //alert('Onload:'+subreason1+' '+reason1+' '+fromOnload);
+                          checkCustomerCategoryQuestions();
+                           
+                       }
+
+
+       function checkCustomerCategoryQuestions(){
+                var labe = '{!$Label.new_Vulnerable_Reason}';
+                //alert('-----');
+                var categryType ='{!customerCateogryType}';
+                //alert(' -=-=--=-=-='+categryType);
+                
+
+                var customers_boiler_working_element = document.getElementById("1").getElementsByTagName("select")[0];
+                var customer_have_hot_water_element = document.getElementById("2").getElementsByTagName("select")[0];
+                var customer_have_heat_element = document.getElementById("3").getElementsByTagName("select")[0];
+                var vulnerable_reason_element = document.getElementById("4").getElementsByTagName("select")[0];
+                if(labe == 'Yes'){
+                var vulnerable_reason_dependent_element = document.getElementById("5").getElementsByTagName("select")[0];
+                }
+                
+                //var customercategoryindicator = document.getElementById("customercategoryindicator").getElementsByTagName("img")[0];
+                //var customercategoryindexinputvalue = document.getElementById("customercategoryindexvalue").getElementsByTagName("input")[0];;
+                //customercategoryindexinputvalue.disabled="disabled";
+                
+                var select = document.getElementById('optionList');
+                var optGroup = '';
+               
+               
+               if(categryType == '1'){
+                  if(customers_boiler_working_element.value == 'Yes'){
+                       customer_have_heat_element.value ='';
+                  }
+                  
+                  if(vulnerable_reason_element.value == 'Yes' && fromOnload == true){
+                                
+                                //alert('$$$$'+select.options.length);
+                                //alert('subreason:'+subreason1);
+                                //setSelectedValue(select, subreason1);
+                                optGroup = reason1;
+                                //alert('*******'+optGroup+'Reason:'+reason1);
+                                for(var i = 0; i < select.options.length; i++) {
+                                   
+                                    if(select.options[i].text == subreason1) {
+                                        //alert('setSelected value:'+subreason1);
+                                        select.options[i].selected = true;
+                                        //return;
+                                    }
+                                  }
+                                
+                                
+                                
+                    }else if(vulnerable_reason_element.value == 'Yes' && fromOnload == false){
+                                //alert('Inside');
+                                //select = document.getElementById('optionList');
+                                select.disabled = false;
+                                //alert(select.value);
+                                var selectedIndex = select.selectedIndex; // 0-based index of which element in the <select> is selected
+                                var selectedElement = select.options[selectedIndex]; // DOM element selected
+                                optGroup = selectedElement.parentNode.label; // <optgroup> element
+                                //alert('optGroup:'+optGroup);
+                    }else{
+                               select = document.getElementById('optionList');
+                               select.disabled = true;
+                               select.value = '-- NONE --';
+                               //alert('else:'+select.value+''+select);
+                     }
+                            
+                     fromOnload = false;
+                     
+                     //alert('-=-=-=->'+optGroup+'-->'+select.value+'&&'+customers_boiler_working_element.value+''+customer_have_hot_water_element.value+''+customer_have_heat_element.value+''+vulnerable_reason_element.value);
+                     parafunction(optGroup,select.value,customers_boiler_working_element.value,customer_have_hot_water_element.value,customer_have_heat_element.value,vulnerable_reason_element.value);
+                             
+               }else{                                
+               if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "Yes"){
+                       
+                        customer_have_heat_element.value="Not applicable";
+                        customer_have_heat_element.disabled="disabled";
+                       // vulnerable_reason_element.value="";
+                        //vulnerable_reason_element.disabled="disabled";
+                        
+                        if(labe == 'Yes'){
+                          vulnerable_reason_dependent_element.value ="";
+                          vulnerable_reason_dependent_element.disabled ="disabled";
+                        }else{
+                          
+                          select = document.getElementById('optionList');
+                          select.disabled = true;
+                          select.value = '-- NONE --';
+                          
+                        }
+                        
+                  }else if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "No"){
+                  
+                        customer_have_heat_element.value="Not applicable";
+                        customer_have_heat_element.disabled="disabled";
+                        
+                        if(vulnerable_reason_element.disabled){
+                        
+                               // vulnerable_reason_element.disabled="";
+                               // vulnerable_reason_element.value="";
+                                
+                         }
+                        if(labe == 'Yes'){
+
+                            if(vulnerable_reason_dependent_element.disabled){
+                            
+
+                                   vulnerable_reason_dependent_element.disabled="";
+                                   vulnerable_reason_dependent_element.value="";
+                                   
+                             }
+                        }else{
+                         if(select.disabled){
+                            select.disabled = true;
+                            select.value = '-- NONE --';
+
+                         }
+                        }  
+
+                  }else{
+                  
+                        if(customer_have_heat_element.disabled){
+                        
+                           customer_have_heat_element.disabled="";
+                           customer_have_heat_element.value="";
+                           
+                        }
+                        
+                        if(vulnerable_reason_element.disabled){
+                        
+                         //  vulnerable_reason_element.disabled="";
+                         //  vulnerable_reason_element.value="";
+                           
+                        }
+                        
+                        if(labe == 'Yes'){
+                            if(vulnerable_reason_dependent_element.disabled){
+
+
+
+                            
+                                vulnerable_reason_dependent_element.disabled="";
+                                vulnerable_reason_dependent_element.value="";
+                                
+                            }
+                        }else{
+                            if(select.disabled){
+                                select.disabled = true;
+                                select.value = '-- NONE --';
+                             }
+                        }
+
+                  }
+                  
+                 if(vulnerable_reason_element.value != "Yes"){
+                 
+                        if(labe == 'Yes'){
+                         vulnerable_reason_dependent_element.disabled="disabled";
+                         vulnerable_reason_dependent_element.value="";
+                        }else{
+                         select.disabled = true;
+                         select.value = '-- NONE --';
+                        }
+                        
+                        
+                 }  
+                 
+                 if(labe == 'Yes'){
+                     if(vulnerable_reason_dependent_element.disabled && vulnerable_reason_element.value == "Yes"){
+                     
+                            vulnerable_reason_dependent_element.disabled="";
+                            vulnerable_reason_dependent_element.value="";
+                            
+                     }  
+                 }else{
+                     if(select.disabled && vulnerable_reason_element.value == "Yes"){
+                     
+                            select.disabled = false;
+                            select.value = '-- NONE --';
+                            
+                     }
+
+
+
+
+                 }
+                 
+                 if(labe != 'Yes'){
+                     if(!select.disabled && fromOnload == false){
+                            select = document.getElementById('optionList');
+                            select.disabled = false;
+                            
+                            var selectedIndex = select.selectedIndex; // 0-based index of which element in the <select> is selected
+                            var selectedElement = select.options[selectedIndex]; // DOM element selected
+                            optGroup = selectedElement.parentNode.label; // <optgroup> element
+                            //alert('======>'+select.value);
+                         
+                     }
+                     
+                     if(vulnerable_reason_element.value == 'Yes' && fromOnload == true){
+                        console.log('Inside onload');
+                        // alert('Inside onload');
+                         select.disabled = false;
+                         optGroup = reason1;
+                         for(var i = 0; i < select.options.length; i++) {        
+                             if(select.options[i].text == subreason1) {
+                                // alert('setSelected value:'+subreason1);
+                                 select.options[i].selected = true;
+                                 //return;
+                              }
+                         }
+                         
+                     }
+                }
+                 
+              /*if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Operational}');
+              }else if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "No" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "Yes" && customer_have_hot_water_element.value == "No" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Vulnerable}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "Yes" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "Yes" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Non_Op}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "Yes"){
+                       setIndicatorImage('{!$Resource.Vulnerable}');
+              }else if(customers_boiler_working_element.value == "No" && customer_have_hot_water_element.value == "No" && 
+                       customer_have_heat_element.value == "No" && vulnerable_reason_element.value == "No"){
+                       setIndicatorImage('{!$Resource.Emergency_Non_Op}');
+              }else{
+                       setIndicatorImage('{!$Resource.Undefined}');
+              }*/
+              fromOnload = false;
+              if(labe != 'Yes'){
+               
+               //alert('-=-=-=->'+optGroup+'-->'+select.value+'&&'+customers_boiler_working_element.value+''+customer_have_hot_water_element.value+''+customer_have_heat_element.value+''+vulnerable_reason_element.value);
+               parafunction(optGroup,select.value,customers_boiler_working_element.value,customer_have_hot_water_element.value,customer_have_heat_element.value,vulnerable_reason_element.value);
+               
+              }
+              }
+
+     }
+
+     function setIndicatorImage(imageSource){
+
+           var customercategoryindicator = document.getElementById("customercategoryindicator").getElementsByTagName("img")[0];
+           var customercategoryindexinputvalue = document.getElementById("customercategoryindexvalue").getElementsByTagName("input")[0];
+           
+           customercategoryindicator.src = imageSource;
+           
+           
+           if(imageSource.indexOf('Vulnerable') != -1){
+             customercategoryindexinputvalue.value = 1;
+           }else if(imageSource.indexOf('Emergency_Non_Op') != -1){
+             customercategoryindexinputvalue.value = 2;
+           }else if(imageSource.indexOf('Non_Op') != -1){
+             customercategoryindexinputvalue.value = 3;
+           }else if(imageSource.indexOf('Operational') != -1){
+             customercategoryindexinputvalue.value = 4;
+           }else if(imageSource.indexOf('Undefined') != -1){
+             customercategoryindexinputvalue.value = 99;
+           }
+           
+     }
+     
+     
+     
+     function validatePriorityData()
+     {
+        var vulnerable_reason_element1 = document.getElementById("4").getElementsByTagName("select")[0];
+        var vulnerable_reason_dependent_element1 = document.getElementById("5").getElementsByTagName("select")[0];
+        var customercategoryindexinputvalue1 = document.getElementById("customercategoryindexvalue").getElementsByTagName("input")[0];;
+        if(vulnerable_reason_element1.value == "Yes" && vulnerable_reason_dependent_element1.value == "")
+        {
+            alert('You must provide proper vulnerable reason.')
+            return false;
+        }
+        if(customercategoryindexinputvalue1.value == 99)
+        {
+            alert('Please make sure that you derive a defined customer category.');
+            return false;
+        }
+        
+            validateData();
+      }
+     
+     function reloadOppPage()
+     {
+        window.top.location='/{!opp.id}';
+     }
+     
+     </script>
+
+    <apex:form >
+    <apex:actionFunction name="parafunction" action="{!indicator}" immediate="true" reRender="faaa,faaa1">
+                 <apex:param name="reason" value="" assignTo="{!subreason}"/>
+                 <apex:param name="subreason" value="" assignTo="{!reason}"/>
+                 <apex:param name="Heat" value=""/>
+                 <apex:param name="HW" value=""/>
+                 <apex:param name="OH" value=""/>
+                 <apex:param name="vul" value=""/> 
+    </apex:actionFunction>
+    
+    <apex:pageMessages />
+        <apex:pageBlock rendered="{!NOT(isEdit)}">
+        <table cellspacing="15px" border="0" width="100%">
+            <tr>
+                <td width="50%">
+                <div id="1" ><apex:outputLabel value="Is the customers main source of heating working?" style="font-weight:bold" />&nbsp;&nbsp;&nbsp;&nbsp;
+                <apex:inputField value="{!Opp.Is_the_customers_boiler_working__c}"
+                    onChange="checkCustomerCategoryQuestions();" style="font-weight:bolder;width:80px"/></div>
+                </td>
+                <td width="50%">
+                <div id="2" ><apex:outputLabel value="Does the customer have hot water?" style="font-weight:bold" />&nbsp;&nbsp;
+                <apex:inputField value="{!Opp.Does_the_customer_have_hot_water__c}"
+                    onChange="checkCustomerCategoryQuestions();" /></div>
+                </td>
+            </tr>
+            <tr>
+                <td width="50%">
+                <div id="3" ><apex:outputLabel value="Other Form Of Heat That Heats The Entire Home"
+                    style="font-weight:bold" />&nbsp;&nbsp; <apex:inputField value="{!Opp.Customer_have_any_other_form_of_HEAT__c}"
+                    onChange="checkCustomerCategoryQuestions();" /></div>
+                </td>
+                <td width="70%">
+                <div id="4" ><apex:outputLabel value="Is the occupier of the property vulnerable?" style="font-weight:bold" />&nbsp;&nbsp;
+                <apex:inputField value="{!Opp.Is_the_customer_vulnerable__c}"
+                    onChange="checkCustomerCategoryQuestions();" required="true"/></div>
+                </td>
+            </tr>
+            <tr>
+                <td width="50%">
+                <div id="5" ><apex:outputLabel value="Vulnerable reason" style="font-weight:bold" />&nbsp;&nbsp;
+                 <apex:inputField value="{!Opp.Vulnerable_reason__c}" rendered="{!$Label.new_Vulnerable_Reason == 'Yes'}"/>
+                 <apex:outputpanel id="se" rendered="{!$Label.new_Vulnerable_Reason != 'Yes'}">
+                           <select name="categoryMap" id="optionList" onchange="checkCustomerCategoryQuestions()">
+                                <option> -- NONE -- </option>
+                                <apex:repeat value="{!rMap}" var="key" id="re">
+                                <optgroup label="{!key}" id="myOptgroup">
+                                   <apex:repeat value="{!rMap[key]}" var="keyvalue" id="re1">
+                                    <option value="{!keyvalue}" id="a">{!keyvalue}</option>
+                                   </apex:repeat>              
+                                </optgroup>
+                                </apex:repeat>
+                             </select>
+                   </apex:outputpanel>
+                </div>
+                </td>
+                <td></td>
+            </tr>
+            
+             <tr>
+
+                <td width="50%">
+                <div id="customercategoryindicator" ><apex:outputpanel id="faaa"><apex:outputLabel value="Latest customer category indicator" style="font-weight:bold" />&nbsp;&nbsp;
+                <!--<img width="90" height="25"></img>-->
+                <apex:outputText value="{!catIndicator}" escape="false"/>
+                </apex:outputpanel>
+                </div>
+                </td>
+                <td width="50%">
+                <div id="customercategoryindexvalue" ><apex:outputpanel id="faaa1"><apex:outputLabel value="Latest customer category" style="font-weight:bold" />&nbsp;&nbsp;
+                <apex:inputField value="{!opp.Latest_customer_category__c}"/></apex:outputpanel></div>
+                </td>
+            </tr>
+           
+        </table>
+        <apex:pageBlockButtons location="top">
+            <apex:commandButton value="Save"  rendered="{!NOT(isEdit)}" onclick="return validatePriorityData();" oncomplete="return reloadOppPage();"/>
+            <apex:actionFunction name="validateData" action="{!saveDetails}" oncomplete="reloadOppPage();"></apex:actionFunction>
+            <apex:commandButton action="{!cancelDetails}" value="Cancel"  rendered="{!NOT(isEdit)}" />
+        </apex:pageBlockButtons>
+        </apex:pageBlock>
+        
+       <apex:PageBlock rendered="{!isEdit}">
+            <table cellspacing="15px" border="0" width="100%">
+            <tr>
+                <td width="50%">
+                <div id="1" style="width: 400px"><apex:outputLabel value="Is the customer's main source of heating working?" style="font-weight:bold" />&nbsp;&nbsp;
+                <apex:outputField value="{!Opp.Is_the_customers_boiler_working__c}" /></div>
+                </td>
+                <td width="50%">
+                <div id="2" style="width: 400px"><apex:outputLabel value="Does the customer have hot water?" style="font-weight:bold" />&nbsp;&nbsp;
+                <apex:outputField value="{!Opp.Does_the_customer_have_hot_water__c}"/></div>
+                </td>
+            </tr>
+            <tr>
+                <td width="50%">
+                <div id="3" style="width: 400px"><apex:outputLabel value="Other Form Of Heat That Heats The Entire Home"
+                    style="font-weight:bold" />&nbsp;&nbsp; <apex:outputField value="{!Opp.Customer_have_any_other_form_of_HEAT__c}" /></div>
+                </td>
+                <td width="50%">
+                <div id="4" style="width: 400px"><apex:outputLabel value="Is the occupier of the property vulnerable?" style="font-weight:bold" />&nbsp;&nbsp;
+                <apex:outputField value="{!Opp.Is_the_customer_vulnerable__c}" /></div>
+                </td>
+            </tr>
+            <tr>
+                <td width="50%">
+                <div id="5" style="width: 400px"><apex:outputLabel value="Vulnerable reason" style="font-weight:bold" />&nbsp;&nbsp;
+                <apex:outputField value="{!Opp.Vulnerable_reason__c}" /></div>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td width="50%">
+                <div id="customercategoryindicator" style="width: 400px"><apex:outputLabel value="Latest customer category indicator" style="font-weight:bold" />&nbsp;&nbsp;
+                <apex:outputField value="{!Opp.Latest_customer_category_indicator__c}"/>
+                <!-- <apex:outputText value="{!catIndicator}" escape="false"/>                -->
+                </div> 
+                </td>
+                <td width="50%">
+                <div id="customercategoryindexvalue" style="width: 400px"><apex:outputLabel value="Latest customer category" style="font-weight:bold" />&nbsp;&nbsp;
+                <apex:outputField value="{!Opp.Latest_customer_category__c}" /></div>
+                </td>
+            </tr>
+        </table>
+        <apex:pageBlockButtons location="top">
+           <apex:commandButton action="{!editDetails}" value="Edit" rendered="{!isEdit}" />
+        </apex:pageBlockButtons>
+        </apex:PageBlock>
+        
+        </apex:form>
+</apex:page>

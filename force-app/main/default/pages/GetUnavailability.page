@@ -1,0 +1,93 @@
+<apex:page standardController="HSA_Unavailability__c" extensions="GetUnavailabilityController" >
+  <script type="text/javascript">
+        function selectAllCheckboxes(obj,receivedInputID){
+            var inputCheckBox = document.getElementsByTagName("input");
+            for(var i=0; i<inputCheckBox.length; i++){
+                if(inputCheckBox[i].id.indexOf(receivedInputID)!=-1){
+                    inputCheckBox[i].checked = obj.checked;
+                }
+            }
+        }
+        
+        
+        function togglleDiv(show)
+        {
+            document.getElementById('darkLayer').style.display = show; 
+            document.getElementById('LoadingDiv').style.display = show;      
+        }
+        
+   </script>
+
+ <apex:form >
+ <apex:pageBlock id="block">
+ 
+ 
+   <apex:pageblockbuttons location="top" >
+            <apex:commandbutton value="Remove Unavailability" action="{!removeUnavail}"  rendered = "{!IF(AND(NOT(ISNULL(total_size)),total_size > 0),true,false)}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender = "block"/>
+            <apex:commandbutton value="Apply New Unavailability" action="{!createUnavailability}"  rendered="{!IF(AND(NOT(ISNULL(total_size)),total_size == 0, HSA_Unavailability__c.Status__c == 'Open'),true,false)}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');" rerender="block"/>
+            <apex:commandbutton value="Exit" action="{!cancel}" />
+ </apex:pageblockbuttons>
+ <apex:pagemessages />
+ <apex:pagemessage severity="Error"  strength="3"  summary="Please remember to update the quota in OFS as you are applying unavailability to a commercially skilled employee. " rendered="{!IF(CONTAINS(HSA_Unavailability__c.Employee__r.Employee_Skills__c, 'Comm'),true,false)}" />
+ <apex:pagemessage severity="Info"  strength="3"  summary="There are no existing unavailabilites during this period. You can now apply this unavailability." rendered="{!IF(AND(NOT(ISNULL(total_size)),total_size == 0, HSA_Unavailability__c.Status__c == 'Open'),true,false)}" />
+ 
+ <apex:pageblocksection title="New Unavilability Details:">
+    <apex:outputfield value="{!HSA_Unavailability__c.Name}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Activity_Type__c}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Work_Time_Start__c}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Work_Time_End__c}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Status__c}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Employee_Group__c}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Employee__c}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Notes__c}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Type__c}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Day__c}" />
+    <apex:outputfield value="{!HSA_Unavailability__c.Weeks_Between_Occurences__c}" />
+    
+ </apex:pageblocksection>
+ 
+ <apex:pagemessage severity="Error"  strength="3"  summary="Please deal with exisiting unavailabilities first to apply this new Unavailability." rendered = "{!IF(AND(NOT(ISNULL(total_size)),total_size > 0),true,false)}" />
+ 
+ 
+
+   <apex:pageblockSection title="Unavailabilities from OFS" columns="1"  rendered = "{!IF(AND(NOT(ISNULL(total_size)),total_size > 0),true,false)}" >
+ 
+                <apex:pageBlockTable value="{!unavailWrapList}" var="unavailWrap" id="table">
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:inputCheckbox onclick="selectAllCheckboxes(this,'inputId')"/>
+                        </apex:facet>
+                        <apex:inputCheckbox value="{!unavailWrap.selectAct}" id="inputId"/>
+                    </apex:column>
+                    <apex:column headerValue="Activity Type" value="{!unavailWrap.hsaUnavailability.Activity_Type__c}"  />
+                    <apex:column headerValue="Employee" value="{!unavailWrap.hsaUnavailability.Employee__c}"  />
+                    <apex:column headerValue="Status" value="{!unavailWrap.status}"  />
+                    <apex:column headerValue="Start Date" value="{!unavailWrap.hsaUnavailability.Work_Time_Start__c}"  />
+                    <apex:column headerValue="End Date" value="{!unavailWrap.hsaUnavailability.Work_Time_End__c}"  />
+                   
+                </apex:pageBlockTable>
+                
+
+    </apex:pageblockSection>
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+        </div>
+    <div id="darkLayer" style ="background-color: white; 
+                                filter:alpha(opacity=50); /* IE */ 
+                                opacity: 0.5; /* Safari, Opera */ 
+                                -moz-opacity:0.50; /* FireFox */ 
+                                z-index: 20; 
+                                height: 100%; 
+                                width: 100%; 
+                                background-repeat:no-repeat; 
+                                background-position:center; 
+                                position:absolute; 
+                                top: 0px; 
+                                left: 0px; 
+                                display:none;"></div>
+ 
+  </apex:pageBlock>
+ </apex:form> 
+</apex:page>

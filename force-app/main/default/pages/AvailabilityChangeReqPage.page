@@ -1,0 +1,218 @@
+<apex:page controller="AvailabilityChangeReqController" tabstyle="Diary_Change__c" showheader="true" sidebar="true">
+  <script>
+    function confirmDel()
+            {
+                if(confirm('Clicking OK button will Delete Records.'))
+                {
+                    togglleDiv('');
+                    return true;
+                    
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            function togglleDiv(show)
+            {
+                document.getElementById('darkLayer').style.display = show; 
+                document.getElementById('LoadingDiv').style.display = show;      
+            }  
+  
+  </script>  
+
+  <apex:form id="form">
+  <apex:pageMessages /> 
+  <apex:actionFunction name="SelectBox" action="{!onSelect}" immediate="true"/>
+  
+  <apex:pageblock title="Availability Details:" id="PageBlock">
+  <apex:pageBlockButtons >
+          <apex:commandButton value="Back" action="{!onClickBack}"/>
+          <!--  <apex:commandButton value="Refresh" action="{!onClickRefresh}"/>-->  
+          <apex:commandButton value="Apply Availability Changes" action="{!onClickAvailability}" rendered="{!appointmentMOde}"/>
+          <apex:commandButton value="Apply Unavailability" action="{!onClickUnAvailability}" rendered="{!!appointmentMOde}"/>
+          <apex:commandbutton value="Delete Available Appointments" action="{!onClickDeleteAvailable}" onclick="if(!confirmDel()) return;" oncomplete="togglleDiv('none');alert('Sucessfully Deleted Selected Available Appointment Records');" reRender="form" rendered = "{!if(total_size1>0, true,false)}" />
+          <apex:commandbutton value="Delete Unavailable Appointments" action="{!onClickDeleteUnavailable}" onclick="if(!confirmDel()) return;" oncomplete="togglleDiv('none');alert('Sucessfully Deleted Selected Unavailable Records');" reRender="form" rendered = "{!if(total_size3>0, true,false)}" />
+  </apex:pageBlockButtons>
+     
+  <apex:pageblocksection title="Employee Details:">
+          <apex:outputfield value="{!diaryChng.Employee__c}"/>
+          <apex:outputfield value="{!diaryChng.Employee_Group__c}"/>            
+          <apex:outputfield value="{!diaryChng.Start__c}"/>
+          <apex:outputfield value="{!diaryChng.End__c}"/>
+  </apex:pageblocksection> 
+  
+   <apex:pageblocksection title="Delete All :" columns="2">
+          <apex:outputText value="Delete All Available Appointments" rendered = "{!if(total_size1>0, true,false)}"/>
+          <apex:inputcheckbox value="{!delSals}" rendered = "{!if(total_size1>0, true,false)}"/>            
+          <apex:outputText value="Delete All Unavailable Appointments"  rendered = "{!if(total_size3>0, true,false)}"/>
+          <apex:inputcheckbox value="{!delUnav}"  rendered = "{!if(total_size3>0, true,false)}"/>  
+  </apex:pageblocksection>   
+     
+  <apex:pageblocksection title="Related Appointment Details:" id="pgBlkSection">  
+  
+  <apex:tabPanel switchType="client" selectedTab="Available Appointments" id="theTabPanel">
+    <apex:tab label="Available Appointments" name="Available Appointments" id="tabOne" onclick="SelectTab"> 
+        <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="Pag1_1">  
+	         Total Available Appts : <apex:outputText rendered="{!IF(total_size1>=10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(total_size1 < 10000,true,false)}">{!total_size1}</apex:outputText>  
+	         <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!DisablePrevious1}"/>  
+	         <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!NOT(DisablePrevious1)}"/>  
+	         <apex:commandLink action="{!Previous1}" title="Previous Page" value="Previous Page" rendered="{!NOT(DisablePrevious1)}"  rerender="pgBlkSection"/>&nbsp;  
+	         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisablePrevious1}">Previous Page</apex:outputPanel>           
+	         &nbsp;Showing Page  {!pageNumber1} of {!totalPages1}&nbsp;&nbsp; 
+	         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisableNext1}">Next Page</apex:outputPanel>           
+	         <apex:commandLink action="{!Next1}" title="Next Page" value="Next Page" rendered="{!NOT(DisableNext1)}" rerender="pgBlkSection"/>&nbsp;  
+	         <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!NOT(DisableNext1)}"/>  
+	         <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!DisableNext1}"/>            
+     	</apex:outputPanel>
+        <apex:dataTable value="{!avListWrap}" var="av" styleClass="class" rules="rows" width="1000px" columnsWidth="50px,100px,150px,200px,200px" cellpadding="4" Cellspacing="4" border="1" style="border-color:black;" >                          
+                
+                <apex:column headerValue="Action">
+                <apex:inputCheckbox id="input" value="{!av.isSelected}" immediate="true"/>
+                </apex:column>
+                 
+                <apex:column >              
+                <apex:facet name="header">Appointment Name</apex:facet>
+                <apex:outputlink value="/{!av.appointment.id}">                  
+                <apex:outputText value="{!av.appointment.Name}"/>
+                </apex:outputlink>                
+                </apex:column>
+
+                
+                <apex:column >
+                <apex:facet name="header">Employee Name</apex:facet>
+                <apex:outputText value="{!av.appointment.Assigned_To__r.Name}"/>
+                </apex:column>
+                
+                <apex:column >
+                <apex:facet name="header">Start Date</apex:facet>
+                <apex:outputField value="{!av.appointment.Start__c}"/>
+                </apex:column>
+                 
+                <apex:column >
+                <apex:facet name="header">End Date</apex:facet>
+                <apex:outputField value="{!av.appointment.End__c}"/>
+                </apex:column> 
+                             
+        </apex:dataTable> <br/> 
+    </apex:tab>
+    
+    <apex:tab label="Appointed Appointments" name="Appointed Appointments" id="tabTwo" >
+        <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="Pag2_1">  
+	         Total Appointed Appts: <apex:outputText rendered="{!IF(total_size2>=10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(total_size2 < 10000,true,false)}">{!total_size2}</apex:outputText>  
+	         <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!DisablePrevious2}"/>  
+	         <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!NOT(DisablePrevious2)}"/>  
+	         <apex:commandLink action="{!Previous2}" title="Previous Page" value="Previous Page" rendered="{!NOT(DisablePrevious2)}"  rerender="pgBlkSection"/>&nbsp;  
+	         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisablePrevious2}">Previous Page</apex:outputPanel>           
+	         &nbsp;Showing Page  {!pageNumber2} of {!totalPages2}&nbsp;&nbsp; 
+	         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisableNext2}">Next Page</apex:outputPanel>           
+	         <apex:commandLink action="{!Next2}" title="Next Page" value="Next Page" rendered="{!NOT(DisableNext2)}" rerender="pgBlkSection"/>&nbsp;  
+	         <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!NOT(DisableNext2)}"/>  
+	         <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!DisableNext2}"/>            
+     	</apex:outputPanel>
+        
+        <apex:dataTable value="{!apListWrap}" var="ap" styleClass="class" rules="rows" width="1000px" columnsWidth="50px,100px,150px,200px,200px,100px,100px" cellpadding="4" Cellspacing="4" border="1" style="border-color:black;" >                          
+                
+                <apex:column headerValue="Action">
+                <apex:inputCheckbox id="input" value="{!ap.isSelected}" immediate="true"/>
+                </apex:column>
+                 
+                <apex:column >              
+                <apex:facet name="header">Appointment Name</apex:facet>
+                <apex:outputlink value="/{!ap.appointment.id}" >                  
+                <apex:outputText value="{!ap.appointment.Name}"/>
+                </apex:outputlink>                
+                </apex:column>
+                
+                <apex:column >
+                <apex:facet name="header">CHI Lead</apex:facet>
+                <apex:outputfield value="{!ap.appointment.Opportunity__c}"/>
+                </apex:column> 
+                
+                <apex:column >
+                <apex:facet name="header">CHI Lead Address</apex:facet>
+                <apex:outputText value="{!ap.appointment.Account_Address__c}"/>
+                </apex:column>                
+                 
+                <apex:column >
+                <apex:facet name="header">Start Date</apex:facet>
+                <apex:outputField value="{!ap.appointment.Start__c}"/>
+                </apex:column>
+                 
+                <apex:column >
+                <apex:facet name="header">End Date</apex:facet>
+                <apex:outputField value="{!ap.appointment.End__c}"/>
+                </apex:column> 
+                             
+        </apex:dataTable> <br/> 
+    </apex:tab>
+    
+    <apex:tab label="Unavailable Appointments" name="Unavailable Appointments" id="tabThree">
+         <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="Pag3_1">  
+	         Total Unavailable Appts : <apex:outputText rendered="{!IF(total_size3>=10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(total_size3 < 10000,true,false)}">{!total_size3}</apex:outputText>  
+	         <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!DisablePrevious3}"/>  
+	         <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!NOT(DisablePrevious3)}"/>  
+	         <apex:commandLink action="{!Previous3}" title="Previous Page" value="Previous Page" rendered="{!NOT(DisablePrevious3)}"  rerender="pgBlkSection"/>&nbsp;  
+	         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisablePrevious3}">Previous Page</apex:outputPanel>           
+	         &nbsp;Showing Page  {!pageNumber3} of {!totalPages3}&nbsp;&nbsp; 
+	         <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!DisableNext3}">Next Page</apex:outputPanel>           
+	         <apex:commandLink action="{!Next3}" title="Next Page" value="Next Page" rendered="{!NOT(DisableNext3)}" rerender="pgBlkSection"/>&nbsp;  
+	         <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!NOT(DisableNext3)}"/>  
+	         <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!DisableNext3}"/>            
+     	</apex:outputPanel>
+     	
+        <apex:dataTable value="{!unavListWrap}" var="unav" styleClass="class" rules="rows" width="1000px" columnsWidth="50px,100px,150px,200px,200px" cellpadding="4" Cellspacing="4" border="1" style="border-color:black;" >                          
+                
+                <apex:column headerValue="Action">
+                <apex:inputCheckbox id="input" value="{!unav.isSelected}" immediate="true"/>
+                </apex:column>             
+                 
+                <apex:column >              
+                <apex:facet name="header">Appointment Name</apex:facet>
+                <apex:outputlink value="/{!unav.appointment.id}" >                  
+                <apex:outputText value="{!unav.appointment.Name}"/>
+                </apex:outputlink>                
+                </apex:column>
+                
+                <apex:column >
+                <apex:facet name="header">Reason</apex:facet>
+                <apex:outputField value="{!unav.appointment.Unavailability_Reason__c}"/>
+                </apex:column>
+               
+                
+                <apex:column >
+                <apex:facet name="header">Start Date</apex:facet>
+                <apex:outputField value="{!unav.appointment.Start__c}"/>
+                </apex:column>
+                 
+                <apex:column >
+                <apex:facet name="header">End Date</apex:facet>
+                <apex:outputField value="{!unav.appointment.End__c}"/>
+                </apex:column> 
+                             
+        </apex:dataTable> <br/> 
+    </apex:tab>
+    </apex:tabPanel>
+    </apex:pageblocksection>
+  </apex:pageblock> 
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+        </div>
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;"></div>
+  
+</apex:form>  
+</apex:page>

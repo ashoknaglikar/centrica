@@ -1,0 +1,287 @@
+<apex:page controller="readParameters" id="pge" tabstyle="Job__c" showHeader="false" sidebar="false">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css"/>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+  
+  <style>
+    #ui-datepicker-div {font-size:16px;}
+  </style>  
+    
+ <script>
+  function myFunction(obj){
+     //alert('-----');
+     //var cdate= document.getElementById("cdate").value;
+     
+     var cdate= document.getElementById("cdate").value; //page:frm:Pb:sec1:secitem1:cdate
+     //alert(cdate);
+     dosrch(cdate);
+    
+   }
+  
+  
+  var isClicked = false;
+    function check(obj) {
+      if(isClicked) {
+            alert('Button can only be pressed once');
+            return false;
+        } else {
+            isClicked = true;
+            obj.className = 'btnDisabled';
+            togglleDiv('');
+            
+        }
+    }
+       
+    function isClickedReset(){
+          isClicked = false;
+          togglleDiv('none');
+    }
+    
+    
+    function togglleDiv(show){
+        document.getElementById('darkLayer').style.display = show; 
+        document.getElementById('LoadingDiv').style.display = show;     
+    } 
+ 
+ </script>
+ <apex:form id="frm">
+    <apex:actionfunction name="dosrch" action="{!createJob}" rerender="frm" status="stat"> <!--  -->
+    <apex:param name="cDate" value=""/>
+    </apex:actionfunction>
+    <apex:actionstatus id="stat" onstart="check(true);" onstop="isClickedReset()"></apex:actionstatus>
+  <apex:pageMessages />
+  <apex:pageBlock title="Error" rendered="{!errorRender}" id="pgError">
+         <font color="red" size="2"><b>{!errorMsg}</b></font>
+  </apex:pageBlock>
+  <apex:pageblock rendered="{!!confirm}">
+      <apex:pageblocksection Title="Job Details" collapsible="False" columns="2">
+          
+           <apex:pageblockSectionItem >
+            <apex:outputlabel value="CHI Lead Num"/>
+            <apex:Outputtext value="{!Chileadno}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Status"/>
+            <apex:OutputField value="{!job.Status__c}"/>
+          </apex:pageblockSectionItem>
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Installation Type"/>
+            <apex:OutputField value="{!job.Installation_Type__c}"/>
+          </apex:pageblockSectionItem>
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Sub Status"/>
+            <apex:OutputField value="{!job.Sub_Status__c}"/>
+          </apex:pageblockSectionItem>
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Boiler Location"/>
+            <apex:OutputField value="{!job.Boiler_Location__c}"/>
+          </apex:pageblockSectionItem> 
+          <!--<apex:pageblockSectionItem> 
+             <apex:outputText value="Engineer Workload : " style="font-weight:bold;text-align:top;"/>
+             <apex:image url="{!$Resource.Low_utilisation_test}" height="35" width="200"/>
+         </apex:pageblockSectionItem>-->
+         <apex:pageBlockSectionItem rendered="{!lowIndicator}">
+             <apex:outputText value="Engineer Workload : " style="font-weight:bold;text-align:top;"/>
+             <apex:image url="{!$Resource.Low_Utilisation}" height="35" width="200" rendered="{!lowIndicator}"/>
+         </apex:pageBlockSectionItem>
+    </apex:pageblocksection>      
+    <apex:pageblocksection Title="Skill Details" collapsible="False" columns="2">
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Mechanical Hours"/>
+            <apex:OutputField value="{!job.Mechanical_Hours__c}"/>
+          </apex:pageblockSectionItem>
+           <apex:pageblockSectionItem >
+            <apex:outputlabel value="PowerFlush Hours"/>
+            <apex:OutputField value="{!job.PowerFlush_Hours__c}"/>
+          </apex:pageblockSectionItem>
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Electrical Hours"/>
+            <apex:OutputField value="{!job.Electrical_Hours__c}"/>
+          </apex:pageblockSectionItem>
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Building Work Hours"/>
+            <apex:OutputField value="{!job.Building_Work_Hours__c}"/>
+          </apex:pageblockSectionItem>
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Remote Heating Hours"/>
+            <apex:OutputField value="{!job.Remote_Heating__c}"/>
+          </apex:pageblockSectionItem>  
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="RoofWork Hours"/>
+            <apex:OutputField value="{!job.Roof_Work_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+         <!-- <apex:pageblockSectionItem >
+            <apex:outputlabel value="ECO Hours"/>  
+            <apex:OutputField value="{!job.ECO_Hours__c}"/>
+          </apex:pageblockSectionItem> -->
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Specialist Building Hours"/>
+            <apex:OutputField value="{!job.Specialist_Building_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+         <!-- <apex:pageblockSectionItem >
+            <apex:outputlabel value="Connect Solar Panel Hours"/>
+            <apex:OutputField value="{!job.Connect_Solar_Panel_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Contractor Installation Hours"/>
+            <apex:OutputField value="{!job.Contractor_Installation_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="FireWall Heater Fixing Hours"/>
+            <apex:OutputField value="{!job.Fire_Wall_Heater_Fixing_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="LPG Installation Hours"/>
+            <apex:OutputField value="{!job.LPG_Installation_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Payment Collection Hours"/>
+            <apex:OutputField value="{!job.Payment_Collection_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Ecogen Mechanical Hours"/>
+            <apex:OutputField value="{!job.Ecogen_Mechanical_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Scaffolder Hours"/>
+            <apex:OutputField value="{!job.Scaffolder_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Unvented Hot Water Hours"/>
+            <apex:OutputField value="{!job.Unvented_Hot_Water_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Water Heating Fixing Hours"/>
+            <apex:OutputField value="{!job.Water_Heating_Fixing_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Electrical Work ASP Hours"/>
+            <apex:OutputField value="{!job.Electrical_Work_ASP_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Asbestos Removal Hours"/>
+            <apex:OutputField value="{!job.Asbestos_Removal_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Asbestos Removal Fixed Rate Hours"/>
+            <apex:OutputField value="{!job.Asbestos_Removal_Fixed_Rate_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Ecogen Electrical Hours"/>
+            <apex:OutputField value="{!job.Ecogen_Electrical_Hours__c}"/>
+          </apex:pageblockSectionItem> -->
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Landlord Check Hours"/>
+            <apex:OutputField value="{!job.Landlord_Check_Hours__c}"/>
+          </apex:pageblockSectionItem> 
+          
+          <!--<apex:pageblockSectionItem >
+            <apex:outputlabel value="Customer Preferred Date"/>
+            <apex:InputField value="{!job.Customer_Preferred_Date__c}"/>
+          </apex:pageblockSectionItem>  -->
+          
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Customer Preferred Date"/>
+            <input class="datepicker" name="date1" type="text" id="cdate" value="{!custDate}"/>
+            <script>
+                $(function() {
+                   $(".datepicker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    dateFormat: 'dd/mm/yy',
+                    showOn: 'button',
+                    onClose: function(dateText, inst) 
+                    { 
+                      $(this).attr("disabled", false);
+                    },
+                    beforeShow: function (input, inst) {
+                        $(this).attr("disabled", true);
+                        var rect = input.getBoundingClientRect();
+                        setTimeout(function () {
+                            inst.dpDiv.css({ top: rect.top + 40, left: rect.left + 0 });
+                        }, 0);
+                    }
+                   }); 
+                   $(".hasDatepicker").on("blur", function(e) { $(this).datepicker("hide"); }); 
+                   
+                   });
+             </script>
+          </apex:pageblockSectionItem>
+      </apex:pageblocksection>
+      
+      <apex:pageBlockSection title="Installation Details" columns="2" rendered="{!exstng}">
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Installation Date"/>
+            <apex:OutputField value="{!job.Installation_Date__c}"/>
+          </apex:pageblockSectionItem> 
+          
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Delivery Date"/>
+            <apex:OutputField value="{!job.Delivery_Date__c}"/>
+          </apex:pageblockSectionItem> 
+          
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Start Time"/>
+            <apex:OutputField value="{!job.Start_Data_Time__c}"/>
+          </apex:pageblockSectionItem>
+          
+          <apex:pageblockSectionItem >
+            <apex:outputlabel value="Delivery Slot"/>
+            <apex:OutputField value="{!job.Delivery_Slot__c}"/>
+          </apex:pageblockSectionItem>
+          
+      </apex:pageBlockSection>
+      
+      
+      <apex:pageBlockButtons location="bottom">
+         <apex:commandButton value="Create & Plan Job" onclick="myFunction();" rerender="pge" disabled="{!OR(exstng,Edisable)}"/>
+      </apex:pageBlockButtons>
+ 
+ </apex:pageblock>
+ 
+ <!-- <apex:pageblock rendered="{!confirm}">
+      <apex:outputPanel >
+                <hr/>
+                    <font face='calibri' color = '#787878' size ='3'>
+                        <p>
+                        <b><center>
+                            Job created successfully. Click on Plan Job to Plan
+                        </center></b>
+                        </p>
+                    </font>
+                <hr/>
+                <p/>
+                <hr/>
+                <center>
+                   <apex:commandButton action="{!runSearch}" value="Plan Job" onclick="check(this);"  oncomplete="isClickedReset()" reRender="frm"/>
+                </center>
+                <hr/>
+     </apex:outputPanel> 
+               
+
+ </apex:pageblock>-->
+ 
+ <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:600px; top:150px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Job Planning is under progress...please wait...
+            </div>
+ </div>
+ 
+ <div id="darkLayer" style ="background-color: white; 
+                            filter:alpha(opacity=50); /* IE */ 
+                            opacity: 0.5; /* Safari, Opera */ 
+                            -moz-opacity:0.50; /* FireFox */ 
+                            z-index: 20; 
+                            height: 100%; 
+                            width: 100%; 
+                            background-repeat:no-repeat; 
+                            background-position:center; 
+                            position:absolute; 
+                            top: 0px; 
+                            left: 0px; 
+                            display:none;">
+</div>
+ 
+ </apex:form>
+ 
+</apex:page>

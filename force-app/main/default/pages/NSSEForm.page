@@ -1,0 +1,110 @@
+<apex:page controller="NSSEFormController"  sidebar="false" showHeader="false" standardStylesheets="false">
+<apex:stylesheet value="{!$Resource.BritishGasStyle}"/>
+  <apex:form >
+  <div class="page" align="center">
+  <div class="wrapper">
+  <apex:pageBlock >
+  <div align="right">     
+      <apex:image value="{!$Label.Logo_BG_header}" width="197px" rendered="{!BGLogo}" />
+      <apex:image value="{!$Label.Logo_SG_header}" width="197px" rendered="{!SGLogo}" />
+  </div>
+  </apex:pageBlock>
+      <br></br>
+      <h1 style="font:20pt Calibri;text-align:left;width:500px;" >Customer Satisfaction Survey</h1>
+      <apex:pageMessages />
+      <apex:pageBlock rendered="true">
+      <body>     
+      <apex:pageBlockSection columns="1" id="Q1" collapsible="false" rendered="{!questionSection}">
+      <div id="Question1" >
+          <h2>Q1) Between 0 and 10, 10 being the best service, how satisfied were you with the initial appointment time made with you for the visit?</h2>
+          <apex:selectList styleClass="radio" size="1" value="{!question1}">
+              <apex:selectOptions value="{!Question2Items}" />
+          </apex:selectList>
+      </div>
+      <br/><br/>   
+      </apex:pageBlockSection>  
+
+      <apex:pageBlockSection columns="1" id="Q2" collapsible="false" rendered="{!questionSection}">
+          <p><h2>Q2) Between 0 and 10, 10 being the best service, how satisfied were you with the communication leading up to your appointment?</h2></p>
+          <apex:selectList size="1" styleClass="radio" value="{!question2}"> 
+              <apex:selectOptions value="{!Question2Items}"/> 
+          </apex:selectList>
+      <br/><br/>
+      </apex:pageBlockSection>     
+
+      <apex:pageBlockSection columns="1" id="Q3" collapsible="false" rendered="{!questionSection}">
+          <p><h2>Q3) Between 0 and 10, 10 being the best service, did the Heating Adviser listen to your requirements and offer good advice?</h2></p>       
+          <apex:selectList size="1" styleClass="radio" value="{!question3}" > 
+              <apex:selectOptions value="{!Question2Items}"/> 
+          </apex:selectList>
+      <br/><br/>  
+      </apex:pageBlockSection>
+    
+      <apex:pageBlockSection columns="1" id="Q4" collapsible="false" rendered="{!questionSection}">
+          <p><h2>Q4) Between 0 and 10, 10 being the best service, did the Heating Adviser demonstrate the savings you could make with a new boiler?</h2></p>
+          <apex:selectList size="1" styleClass="radio" value="{!question4}"> 
+              <apex:selectOptions value="{!Question2Items}"/> 
+          </apex:selectList>
+      <br/><br/> 
+      </apex:pageBlockSection> 
+
+      <apex:pageBlockSection columns="1" id="Q5" collapsible="false" rendered="{!questionSection}">
+          <p><h2>Q5) Between 0 and 10, 10 being the best service. We offer various ways of helping you fund the cost of a new boiler. How well were these explained to you? </h2></p>
+          <apex:selectList size="1" value="{!question5}" styleClass="radio"> 
+              <apex:selectOptions value="{!Question2Items}"/> 
+          </apex:selectList>
+      <br/><br/>
+      </apex:pageBlockSection>     
+
+      <apex:pageBlockSection columns="1" id="Q6" collapsible="false" rendered="{!questionSection}">
+          <p><h2>Q6) Overall how would you rate the experience the Heating Adviser delivered?</h2></p>
+          <apex:selectList size="1" value="{!question6}" styleClass="radio"> 
+              <apex:selectOptions value="{!Question2Items}"/> 
+          </apex:selectList>
+          <br></br>
+          <br></br>
+      </apex:pageBlockSection>
+
+      <apex:pageBlockSection columns="1" id="Q8" collapsible="false" rendered="{!questionSection}">
+          <p><h2>Q7) On a scale of 0-10, 10 being the best, how would you rate the conversation with our customer service colleague when booking your appointment?</h2></p>
+          <apex:selectList size="1" value="{!question8}" styleClass="radio"> 
+              <apex:selectOptions value="{!Question2Items}"/> 
+          </apex:selectList>
+          <br></br>
+          <br></br>
+      </apex:pageBlockSection>
+
+
+            
+      <apex:pageblockSection columns="1" id="Q7" collapsible="false" rendered="{!questionSection}">
+      <p><h2>Please use the space below to let us know any further comments or feedback you may have:</h2></p>
+      <apex:inputTextarea value="{!question7}" id="theTextInput" rendered="true" cols="100" rows="5" />
+      </apex:pageblockSection>
+
+      <apex:pageBlockSection rendered="{!questionSection}">
+          <apex:commandButton image="{!URLFOR($Resource.Submit_Button_Green)}" style="background-repeat:no-repeat;"  
+              action="{!saveNSSEForm}" >          
+          </apex:commandbutton>        
+      </apex:pageBlockSection>
+            
+    <!-- Section displayed when the customer has already had NSSE details added to the current lead -->
+    <apex:pageBlocksection rendered="{!dataPresentSection}">
+        <h2><p>Sorry, you have already responded and submitted your feedback for this survey.</p>
+        <p>Thank you for your time.</p></h2>
+    </apex:pageBlocksection>    
+    
+    <!-- Section displayed after the customer has pressed the 'Submit' button to add the NSSE scores -->
+    <apex:pageblockSection rendered="{!submitSection}">
+        <h2>
+        <p>Thank you for taking the time to complete our survey.  Your feedback is important to us.</p>
+        <p>If you would like to speak to someone about your recent visit, please contact our Customer Support team on <b>0333 202 9669.</b></p> 
+        </h2>
+    </apex:pageblocksection>
+    
+    </body>      
+    </apex:pageBlock>
+
+    </div>
+    </div>  
+    </apex:form>  
+</apex:page>

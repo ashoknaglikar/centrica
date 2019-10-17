@@ -1,0 +1,197 @@
+<apex:page controller="captureLandlordDetails" tabstyle="Contact" id="page">
+    <script type="text/javascript">
+        function invokeBillingAddressFunctionJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.frm.blk1.addressSection.billingAddQuestion}").value;
+            //alert(txtVal1);
+            invokeBillingAddressFunction(txtVal1);
+        }
+    </script>
+<apex:form id="frm">
+    <apex:pageMessages />
+<apex:pageblock rendered="{!editMode}" id="blk1">
+    <apex:pageblockbuttons >
+        <apex:commandbutton action="{!saveDetails}" value="Save"/>
+        <apex:commandbutton action="{!exitClick}" value="Exit" immediate="true"/>
+        <apex:commandbutton action="{!bookAppointmet}" value="Sales Appointment"/>
+    </apex:pageblockbuttons>
+    
+    <apex:pageblocksection title="Capture Landlord/Agent details" columns="3" id="sec1">
+        <apex:inputfield value="{!LanlordContact.Salutation}" required="true"/>
+        <apex:inputfield value="{!LanlordContact.FirstName}"/>
+        <apex:inputfield value="{!LanlordContact.LastName}" required="true"/>
+        
+        <apex:inputfield value="{!LanlordContact.Contact_Type__c}" required="true"/>
+        <apex:inputfield value="{!LanlordContact.Preferred_Contact_Method__c}" required="true"/>
+        <apex:inputfield value="{!LanlordContact.Email__c}"/>
+        
+        <apex:inputfield value="{!LanlordContact.MobilePhone}"/>
+        <apex:inputfield value="{!LanlordContact.HomePhone}"/>
+        <apex:inputfield value="{!LanlordContact.OtherPhone}"/>
+        
+        <apex:inputfield value="{!opp.Multi_Premise__c}"/>
+        <!--  <apex:in-->
+    </apex:pageblocksection>
+    <apex:actionFunction name="invokeBillingAddressFunction" action="{!invokeBillingAddressFunction}" rerender="addressSection" >
+        <apex:param name="billingAdd" value=""/>
+    </apex:actionFunction><!--/apex:actionFunction> /-->
+    <apex:actionFunction name="invokeOverAddress" action="{!invokeOverAddress}" rerender="addressSection,furherDetails" />
+    <apex:Pageblocksection title="Capture Billing Address" columns="2" id="addressSection">
+        <apex:inputfield value="{!opp.BillingAddress__c}" required="true" onchange="invokeBillingAddressFunctionJS();" id="billingAddQuestion"/>
+        <apex:pageblocksectionItem />
+        <!-- <apex:inputfield value="{!opp.Live_Abroad__c}" required="true" onchange="invokeOverAddress();"/> -->
+        
+         <apex:pageblocksection title="Job Address:" columns="1" ><!-- rendered="{!!showBilling}"> -->
+            <apex:outputfield value="{!opp.Customer_Name__c}"/>
+          
+            <apex:outputfield value="{!opp.Install_Address_Street__c}"/>
+            <apex:outputfield value="{!opp.Install_Address_City__c}"/>
+            <apex:outputfield value="{!opp.Install_Address_County__c}"/>
+            <apex:outputfield value="{!opp.Install_Postcode__c}"/>
+            <!-- <apex:outputfield value="{!opp.Bill_Country__c}"/> -->
+        </apex:pageblocksection>
+        
+        <apex:pageblocksection title="Billing Address:" columns="1" ><!-- rendered="{!showBilling}"> -->
+            <apex:inputfield value="{!opp.Bill_Title__c}">
+            <apex:actionSupport event="onchange" action="{!removeFirstName}" rerender="addressSection" status="wait"/> 
+            <apex:actionStatus id="wait" startText=" (Processing...)" stopText=""/>
+            </apex:inputfield>
+            <apex:inputfield value="{!opp.Bill_FirstName__c}" rendered="{!NOT(removeFirstNameBool)}"/>
+            <apex:inputfield value="{!opp.Bill_LastName__c}"/>
+            
+            <apex:pageblocksectionitem >
+                <c:AddressLookup AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+                    StreetLabel="Street" StreetField="{!opp.Bill_Street__c}" 
+                    CityLabel="City" CityField="{!opp.Bill_City__c}" StateLabel="State" 
+                    StateField="{!opp.Bill_State__c}" PostalCodeLabel="Postcode" 
+                    PostalCodeField="{!opp.Bill_Post_Code__c}" CountryLabel="Country" 
+                    CountryField="{!opp.Bill_Country__c}"/>  
+            </apex:pageblocksectionitem>
+        
+        </apex:pageblocksection>
+    </apex:pageblocksection>
+        
+    <apex:pageblocksection title="Further Details:" id="furherDetails">
+        <apex:inputfield value="{!opp.Live_Abroad__c}" required="true" onchange="invokeOverAddress();"/>
+        <apex:pageblocksectionitem />
+        
+        
+        <apex:pageblocksection title="Oversea Address:" columns="1" rendered="{!showOverSeaAdd}">
+        
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Address Line1"/>
+                <apex:inputfield value="{!LanlordContact.MailingStreet}" required="false"/>
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="City"/>
+                <apex:inputfield value="{!LanlordContact.MailingCity}"/>
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="State"/>
+                <apex:inputfield value="{!LanlordContact.MailingState}"/>
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Post Code"/>
+            <apex:inputfield value="{!LanlordContact.MailingPostalCode}"/>
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Country"/>
+                <apex:inputfield value="{!LanlordContact.MailingCountry}"/>
+            </apex:pageblocksectionitem>
+        
+        </apex:pageblocksection>
+   </apex:Pageblocksection>
+   <apex:pageblocksection title="Q-Does LL give permission for appointment?">
+   <apex:inputfield value="{!opp.Landlords_permission__c}"/>
+   </apex:pageblocksection>
+   </apex:pageblock> 
+
+   <apex:pageblock rendered="{!!editMode}" id="blk2">
+    <apex:pageblockbuttons >
+        <apex:commandbutton action="{!exitClick}" value="Exit"/>
+        <apex:commandbutton action="{!editBtn}" value="Edit"/>
+        <apex:commandbutton action="{!bookAppointmet}" value="Sales Appointment"/>
+    </apex:pageblockbuttons>
+    
+    <apex:pageblocksection title="Landlord/Agent details" columns="3" >
+        <apex:outputfield value="{!LanlordContact.Salutation}" />
+        <apex:outputfield value="{!LanlordContact.FirstName}"/>
+        <apex:outputfield value="{!LanlordContact.LastName}" />
+        
+        <apex:outputfield value="{!LanlordContact.Contact_Type__c}" />
+        <apex:outputfield value="{!LanlordContact.Preferred_Contact_Method__c}"/>
+        <apex:outputfield value="{!LanlordContact.Email}"/>
+        
+        <apex:outputfield value="{!LanlordContact.MobilePhone}"/>
+        <apex:outputfield value="{!LanlordContact.HomePhone}"/>
+        <apex:outputfield value="{!LanlordContact.OtherPhone}"/>
+        <!--  <apex:in-->
+    </apex:pageblocksection>
+    
+    
+    <apex:Pageblocksection title="Addresses" columns="2" id="addressSectionOut">
+         <apex:outputfield value="{!opp.BillingAddress__c}" />
+         <apex:pageblocksectionitem />
+         
+         <apex:pageblocksection title="Job Address:" columns="1" >
+            <apex:outputfield value="{!opp.Customer_Name__c}"/>
+          	<apex:outputfield value="{!opp.Install_Address_Street__c}"/>
+            <apex:outputfield value="{!opp.Install_Address_City__c}"/>
+            <apex:outputfield value="{!opp.Install_Address_County__c}"/>
+            <apex:outputfield value="{!opp.Install_Postcode__c}"/>
+            <!-- <apex:outputfield value="{!opp.Bill_Country__c}"/> -->
+        </apex:pageblocksection>
+        
+        <apex:pageblocksection title="Billing Address:" columns="1" >
+            <apex:outputfield value="{!opp.Bill_Title__c}"/>
+            <apex:outputfield value="{!opp.Bill_FirstName__c}"/>
+            <apex:outputfield value="{!opp.Bill_LastName__c}"/>
+            <apex:outputfield value="{!opp.Bill_Street__c}"/>
+            <apex:outputfield value="{!opp.Bill_City__c}"/>
+            <apex:outputfield value="{!opp.Bill_State__c}"/>
+            <apex:outputfield value="{!opp.Bill_Post_Code__c}"/>
+            <apex:outputfield value="{!opp.Bill_Country__c}"/>
+        </apex:pageblocksection>
+        <apex:outputfield value="{!opp.Live_Abroad__c}" />
+        
+        <apex:pageblocksectionitem />
+        <apex:pageblocksection title="Oversea Address:" columns="1" rendered="{!showOverSeaAdd}">
+        
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Address Line1"/>
+                <apex:outputfield value="{!LanlordContact.MailingStreet}" />
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="City"/>
+                <apex:outputfield value="{!LanlordContact.MailingCity}"/>
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="State"/>
+                <apex:outputfield value="{!LanlordContact.MailingState}"/>
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Post Code"/>
+                <apex:outputfield value="{!LanlordContact.MailingPostalCode}"/>
+            </apex:pageblocksectionitem>
+            
+            <apex:pageblocksectionitem >
+                <apex:outputlabel value="Country"/>
+                <apex:outputfield value="{!LanlordContact.MailingCountry}"/>
+            </apex:pageblocksectionitem>
+        
+        </apex:pageblocksection>
+        
+        <apex:outputfield value="{!opp.Landlords_permission__c}" />
+   </apex:Pageblocksection>
+
+</apex:pageblock>
+
+</apex:form>
+</apex:page>

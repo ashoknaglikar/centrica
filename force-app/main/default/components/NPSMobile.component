@@ -1,0 +1,126 @@
+<apex:component >
+     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=0"/>
+    <style>
+        
+        input[type="radio"]:checked+label{ font-weight: 900; }
+        input[type="radio"]:unchecked+label{ font-weight: 900;color:red; } 
+        
+        .Required{
+        color:red;
+        font-size:150%;
+        }
+       
+        
+        
+        .Input
+        {
+            font-size:130%;
+            width: 100%;
+            height: 60px;
+            border-color:black;
+        }
+        
+        .Description{
+            font-size:140%;
+            padding-top:2em;
+            padding-bottom:2em;
+            
+        }
+        
+        .Question{
+            font-size:140%;
+            font-weight:bold;
+            padding-top:1em;
+            padding-bottom:1em;
+            
+        }
+        
+        .radio_class{
+            font-size:130%;
+            padding-top:1em;
+            padding-bottom:1em;
+        }
+        
+      
+             @media only screen and (max-width:414px)
+             {
+                 .Description{
+                     font-size:100%;
+                 }
+                 .Question{
+                    font-size:100%;
+                    padding-top:1em;
+                    padding-bottom:1em;
+                 }
+                 
+                .Input{
+                    font-size:100%;
+                } 
+
+                 .radio_class{
+                    font-size:xx-small;
+                    padding-top:1em;
+                    padding-bottom:1em;
+                   
+                }
+                .radioOpt td, .radioOptInput , .radioOpt label{
+                    font-size:9px;
+                    
+
+                }
+
+
+                
+                
+                
+
+    </style>
+    
+    <apex:attribute name="description" description="description before Question" type="String"  required="False"/>
+    <apex:attribute name="Question" description="Ques" type="String" required="False"/>
+    <apex:attribute name="selectOptions" description="Selected value for the Question" type="selectOption" required="False"/>
+    <apex:attribute name="QuestionType"  description="Type of Question" type="String" required="False"/>
+    <apex:attribute name="selectValue" description="common input Box for Question" type="String" required="False"/>
+    <apex:attribute name="tradingName" description="Trading Name " type="string" required="false"/>
+    <apex:attribute name="rowNum" description="question serial number " type="Integer" required="false"/>
+    <apex:attribute name="questoinRecord" description="question Record  " type="QMaster__c" required="false"/>
+    <apex:attribute name="QuesColor" description="Queestion Color " type="string" required="false"/>
+    <div >
+         
+            <apex:outputpanel rendered="{!!ISNULL(description)}">
+                <div class ="Description">
+                <apex:outputText value="{!description}" />
+                </div>
+            </apex:outputpanel>
+        
+        <div class ="Question">
+            <apex:outputLabel value="*" for="question" rendered="{!if(questoinRecord.Required__c = 'Yes', true, false)}" styleClass="Required"/>
+            <!--<apex:outputText value="{!FLOOR(rowNum)}"  style="{!QuesColor}"/>
+            <apex:outputLabel value="." style="{!QuesColor}"/>-->
+            <apex:outputText value="{!Question}"  id="question" style="{!QuesColor}"/>
+        </div>
+       
+           
+        <!--<apex:outputpanel rendered="{!QuestionType == 'Radio Button Horizontal'}">-->
+        <div styleClass="radio_class">
+            <apex:selectRadio value="{!selectValue}"   rendered="{!QuestionType == 'Radio Button Horizontal'}" styleClass="radioOpt">
+                <apex:selectOptions value="{!selectOptions}"  />
+            </apex:selectRadio>
+        </div>
+        <!--</apex:outputpanel>-->
+   
+    <!--<apex:outputpanel rendered="{!QuestionType == 'Radio Button Vertical'}"> -->
+        <div styleClass="radio_class">
+            <apex:selectRadio value="{!selectValue}" layout="pageDirection" rendered="{!QuestionType == 'Radio Button Vertical'}" >
+                <apex:selectOptions value="{!selectOptions}"  />
+            </apex:selectRadio>
+        </div>
+            <!--</apex:outputpanel> -->
+        
+        <div >
+        <apex:outputpanel rendered="{!QuestionType == 'Text'}" >
+            <apex:inputTextarea value="{!selectValue}" styleclass="Input"/>
+        </apex:outputpanel>
+        </div>
+    </div>
+</apex:component>

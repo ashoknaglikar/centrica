@@ -1,0 +1,36 @@
+<!--
+Type Name: SearchOrderNumber
+Author: Cognizant
+Created Date: 21/05/2010
+Reason:This page is UI to create new record in SAP NUMBER through given range
+Change History:
+-->
+
+<apex:page controller="OrderNumberController" tabStyle="SAP_Number__c" >
+    <apex:form > 
+    <apex:pagemessages />
+        <apex:pageBlock >        
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton title="Save" value="Save" action="{!OrderSearch}"/>  
+                <apex:commandButton title="Cancel" value="Cancel" action="{!Cancel1}" immediate="true" />
+                <apex:commandButton title="Clear" value="Clear" immediate="true" action="{!Clear1}" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Enter the range for which the SAP Orders should be generated" columns="2" collapsible="false">
+                <apex:pageBlockSectionItem dataTitle="StartNum" id="startNumSection"  >
+                    <apex:outputLabel value="Start Number" for="startNumber"></apex:outputLabel>
+                    <apex:inputText value="{!iStartNum}" size="20" required="true" id="startNumber"/>                             
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem dataTitle="EndNum"> 
+                    <apex:outputLabel value="End Number" for="endNumber"></apex:outputLabel>
+                    <apex:inputText title="End Number" value="{!iEndNum}" size="20" required="true" id="endNumber"/>            
+                </apex:pageBlockSectionItem> 
+                
+                <apex:pageblocksectionItem >
+                    <apex:outputLabel value="Increment Number" for="incrementNumber"></apex:outputLabel>
+                    <apex:inputText title="Increment Number" value="{!iIncrementNumber}" size="10" required="true" id="incrementNumber" />            
+                </apex:pageblocksectionItem>
+                
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

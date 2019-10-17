@@ -1,0 +1,19 @@
+<apex:page controller="GasSafeConroller" cache="true" title="Generate Gas Safe Report">
+<apex:form title="Generate Gas Safe Report">
+<apex:pageblock title="Select date range">
+<apex:pageBlockSection title="Date Range: " columns="2" collapsible="false"> 
+<apex:inputField value="{!dateObj.Start_Date__c}" required="true"/>
+<apex:inputField value="{!dateObj.End_Date__c}" required="true"/>
+ </apex:pageBlockSection>
+ <apex:PageBlockButtons location="bottom">                
+<apex:commandbutton value="Generate Report" action="{!CreateReport}"></apex:commandbutton>
+</apex:PageBlockButtons> 
+ </apex:pageblock>
+
+<!--  
+<apex:pageblock rendered="{!!IsGenerate}" >
+
+</apex:pageblock>
+ -->
+</apex:form>
+</apex:page>

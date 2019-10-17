@@ -1,0 +1,200 @@
+<apex:page standardController="Job__c"
+    extensions="InstallPlanningReturnTransferController"
+    tabStyle="Product_Work_Code__c" id="transferworkPage">
+    <script type="text/javascript" src="/soap/ajax/15.0/connection.js"></script>
+    <script type="text/javascript" src="/soap/ajax/15.0/apex.js"></script>
+    <script type="text/javascript" src="/js/functions.js"></script>
+    <script>
+      function togglleDiv(show){
+           document.getElementById('darkLayer').style.display = show;
+      } 
+      
+      function checkEmployeeSelected(){       
+    
+            var inputs = document.getElementsByTagName('input');
+            var inputsArray = new Array();
+                         
+            for (var i=0;i<inputs.length;i++) {
+                if (inputs[i].type == 'text' && (inputs[i].id.indexOf("pgTransfer")>-1 && inputs[i].value.length == 0)) {                                        
+                    inputsArray.push(inputs[i].value);                
+                   }                                       
+            }
+           
+            if(inputsArray.length > 0)
+            {
+                alert('Please enter a valid employee/not before date for each item in the transfer list.');
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+    
+        } 
+     
+     </script>
+<style>
+    .hourClass{
+    color:blue;
+    }
+</style>
+    <apex:outputPanel id="page">
+
+        <apex:sectionHeader title="Installation Planning - Transfer Work Same Supplier" />
+
+        <apex:form id="frm">
+
+            <apex:pagemessages id="pageMess"/>
+
+            <h2><apex:actionstatus id="fetchStatus"
+                startText="Fetching data, please wait..." /></h2>
+
+
+
+            <!-- //////////////////// This is the first page of journey for transfer as well as re-plan. START //////////////////////////////////////////-->
+
+            <apex:pageBlock title="Error" rendered="{!stepIndex == 'error'}"
+                id="pgError">
+
+                <apex:pageBlockButtons location="bottom">
+
+                    <apex:commandButton action="{!returnToJob}" value="Back" />
+
+                </apex:pageBlockButtons> 
+                
+                {!errorText}
+                
+            </apex:pageBlock>
+
+            <apex:outputPanel id="innerPanel">
+
+                <apex:actionFunction name="selectAll" action="{!selectAll}"
+                    rerender="innerPanel" status="myStatus" />
+
+                <apex:actionStatus startText="Processing..." id="myStatus">
+
+                </apex:actionStatus>
+
+                <apex:pageBlock title="Transfer Hours" id="pgStart">
+
+                    <apex:pageBlockButtons >
+
+                        <apex:commandButton action="{!returnToJob}" value="Back" />
+
+                        <apex:commandButton action="{!confirmTransfer}"
+                            value="Confirm Transfer"
+                            onclick="togglleDiv('');"
+                            oncomplete="togglleDiv('none');"
+                            rendered="{!isConfirmRendered && !isEmployeeNotHaveSkill && !isEmployeeNotActive}" rerender="pageMess"/> 
+                    </apex:pageBlockButtons>
+
+                    <font face='calibri' size='4'><b><apex:outputText rendered="{!OR(wizardType == 'Transfer',wizardType == 'DETransfer')}">Please select Diary Entries to Transfer hours and then
+                    click 'Transfer Work'.</apex:outputText> <apex:outputText rendered="{!wizardType == 'Plan additional'}">
+                        <p>Please find the below work items which needs to be
+                        re-planned on this job.</p>
+                    </apex:outputText> </b></font>
+
+                    <br />
+                    <br />
+                   
+                    <apex:pageBlockSection title="Work Details for {!thisJob.Name}"
+                        columns="1" collapsible="false">
+     
+
+                        <apex:pageBlockTable value="{!DItems}" var="workElement"
+                            columns="8" rendered="{!Tran}">
+                            <apex:column value="{!workElement.dE.Sub_Type__c}" headerValue="Type" />
+                            <apex:column value="{!workElement.dE.Employee_Name__c}"
+                                headerValue="Employee Name" />
+                            
+                            <!--<apex:column value="{!workElement.dE.Hours__c}"
+                                headerValue="Hours" />-->
+                             <apex:column value="{!workElement.dE.Job_Hours__c}"
+                                headerValue="Total Hours" />
+                            <apex:column headerValue="Reduction">
+                               <apex:inputText value="{!workElement.reduction}"/>
+                            </apex:column>
+                            
+                            
+                            <!-- <apex:column headervalue="Employee">
+                               <apex:inputField value="{!workElement.hInfo.job.Named_Employee__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Customer Preferred Date">
+                               <apex:inputField value="{!workElement.hInfo.job.Customer_Preferred_Date__c}"/>
+                            </apex:column> -->
+
+                        </apex:pageBlockTable>
+                         
+                <!--        <apex:CommandButton action="{!defineWork}"
+                        value="Transfer Work" rerender="pgStart,pageMess"
+                        status="fetchStatus" /> -->
+                         
+                    </apex:pageBlockSection>
+                    
+                    
+                    <apex:pageBlockSection title="Select an employee to transfer hours"  collapsible="false" id="pgTransfer">
+                        <apex:pageblocksectionitem >
+                            <apex:outputlabel value="Employee" />
+                            <apex:inputField value="{!dummyJob.Named_Employee__c}" />
+                        </apex:pageblocksectionitem>
+                        <apex:pageblocksectionitem >
+                            <apex:outputlabel value="Transfer Date" />
+                            <apex:inputField value="{!dummyJob.Customer_Preferred_Date__c}" />
+                        </apex:pageblocksectionitem>
+                    <apex:CommandButton action="{!checkAvailability}"
+                        onClick="if(!checkEmployeeSelected()) return false;"
+                        value="Check Availability" rerender="pgStart,pageMess"
+                        status="fetchStatus" />
+
+                </apex:pageBlockSection>
+                   
+                   <apex:pageBlockSection title="" collapsible="false"
+                    id="transferData" columns="1">
+
+                    <apex:dataTable cellpadding="2" 
+                        value="{!employeebreakdown}" var="em" id="availabilityTable" 
+                        rendered="{!isAvailabilityRendered && !isEmployeeNotHaveSkill}">
+
+                        <apex:column width="300" value="{!em.employeeName}"
+                            headerValue="Employee" />
+                        <apex:column width="150" value="{!em.availability.Start__c}"
+                            headerValue="Start" />
+                        <apex:column width="150" value=" {!em.endDateTime}"
+                            headerValue="End" />
+                        <apex:column width="150" value="{!em.combinedHours}"
+                            headerValue="Hours" />
+                        <apex:column width="150" value="{!em.availability.Overbooked_Hours__c}"
+                            headerValue="Overbooked Hours" />
+                        <apex:column value="{!em.backTravel}"
+                            headerValue="Travel Time" />
+
+                    </apex:dataTable>
+
+                </apex:pageBlockSection>
+                
+                <br />
+                <br />
+
+                <apex:outputText rendered="{!!isConfirmRendered && isAvailabilityRendered}">At least one employee does not have availability. Please amend the 'not before' date or choose a different employee. 
+                </apex:outputText>
+
+                <apex:outputText rendered="{!isEmployeeNotHaveSkill}">Selected employee does not have one or more required skills to do this work.
+                </apex:outputText>
+                
+                <apex:outputText rendered="{!isEmployeeNotActive}">One or more of the selected employees is/are Inactive. Please choose a different employee.
+                </apex:outputText>
+                
+                   
+                </apex:pageBlock>
+                
+                </apex:outputPanel>
+                
+               <div id="darkLayer"
+                style="background-color: white; filter: alpha(opacity = 50); /* IE */ opacity: 0.5; /* Safari, Opera */ -moz-opacity: 0.50; /* FireFox */ z-index: 20; height: 100%; width: 100%; background-repeat: no-repeat; background-position: center; position: absolute; top: 0px; left: 0px; display: none;">
+               </div>  
+          
+        </apex:form>
+
+    </apex:outputPanel>
+
+</apex:page>

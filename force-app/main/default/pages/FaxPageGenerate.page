@@ -1,0 +1,12 @@
+<apex:page controller="TopcallOrderGenerationPDF"  showHeader="false" sidebar="false" title="Purchase Order">
+    <apex:form >
+        <CENTER><apex:image value="{!$Resource.Loading}" style="position: absolute; top: 50%;"/></CENTER>
+        <apex:actionFunction name="loadTopcall" action="{!GeneratePDF}" rerender="out" status="myStatus"/>  
+        <apex:outputPanel id="out">
+        <apex:actionStatus id="myStatus">
+        </apex:actionStatus>
+        </apex:outputPanel>
+    </apex:form>
+    
+    <script>window.setTimeout(loadTopcall,1)</script>
+</apex:page>

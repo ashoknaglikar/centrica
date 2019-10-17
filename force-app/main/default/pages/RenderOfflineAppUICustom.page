@@ -1,0 +1,66 @@
+<apex:page doctype="html-5.0" controller="cscfga.StatelessUIController" action="{!init}" showHeader="false" standardStylesheets="false" sidebar="false">
+    <body>
+        <div>
+            <apex:repeat var="screenSequence" value="{!screenSequences}">
+                <apex:repeat var="layout" value="{!screenSequence.layouts}">
+
+                    <apex:outputText escape="false" value="{!'<script type=\"text/html\" data-cs-ref=\"' & layout.ref & '\">'}" />
+                        <div id="CSValidationMessageBox"><div id="CSValidationMessage"></div></div>
+                        <div id="CSInfoMessageBox"><div id="CSInfoMessage"></div></div>
+                        <div class="scrollable">
+                            <apex:repeat var="section" value="{!layout.sections}">
+                                <h3>{!section.name}</h3><apex:outputText escape="false" value="<" />!--
+                                <apex:variable var="first" value="first" />
+                                <apex:repeat var="row" value="{!section.rows}">
+                                    --<apex:outputText escape="false" value=">" /><div class="rowWrapper"><div data-role="fieldcontain" class="ui-field-contain">
+                                       <apex:outputPanel layout="none" rendered="{!row.first.cscfga__Type__c != '' && row.first.cscfga__Type__c != 'Text Display' &&  row.first.cscfga__Type__c != 'MultiSelect Lookup With Quantity'}">
+                                            <label for="{!layout.domSafeScreenName & ':' & row.first.cscfga__reference_name__c}_%idx%" data-cs-label="%ctx%{!row.first.cscfga__reference_name__c}_%idx%" data-cs-required="%ctx%{!row.first.cscfga__reference_name__c}_%idx%"></label>
+                                        </apex:outputPanel>
+                                        <p>
+                                            <c:AttributeTemplateWithNumericKeypadDepot type="{!row.first.cscfga__Type__c}"
+                                                domId="{!layout.domSafeScreenName & ':' & row.first.cscfga__reference_name__c}"
+                                                flavour="mobile"
+                                                ref="{!row.first.cscfga__reference_name__c}"
+                                                definition="{!row.first}"
+                                            />
+                                        </p>
+                                    </div><apex:outputText escape="false" value="<" />!--
+                                    <apex:outputPanel layout="none" rendered="{!row.hasSecond}">
+                                        --<apex:outputText escape="false" value=">" /><div data-role="fieldcontain" class="ui-field-contain">
+                                            <apex:outputPanel layout="none" rendered="{!row.first.cscfga__Type__c != '' && row.first.cscfga__Type__c != 'Text Display' &&  row.first.cscfga__Type__c != 'MultiSelect Lookup With Quantity'}">
+                                                <label for="{!layout.domSafeScreenName & ':' & row.second.cscfga__reference_name__c}_%idx%" data-cs-label="%ctx%{!row.second.cscfga__reference_name__c}_%idx%" data-cs-required="%ctx%{!row.second.cscfga__reference_name__c}_%idx%"></label>
+                                            </apex:outputPanel>
+                                            <p>
+                                                <c:AttributeTemplateWithNumericKeypadDepot type="{!row.second.cscfga__Type__c}"
+                                                    domId="{!layout.domSafeScreenName & ':' & row.second.cscfga__reference_name__c}"
+                                                    flavour="mobile"
+                                                    ref="{!row.second.cscfga__reference_name__c}"
+                                                    definition="{!row.second}"
+                                                />
+                                            </p>
+                                        </div><apex:outputText escape="false" value="<" />!--
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="none" rendered="{!NOT(row.hasSecond) && row.first.cscfga__Column_Span__c < 2}">
+                                        --<apex:outputText escape="false" value=">" /><div data-role="fieldcontain" class="ui-field-contain">
+                                            <p>
+                                            </p>
+                                        </div><apex:outputText escape="false" value="<" />!--
+                                    </apex:outputPanel>
+                                    <apex:variable var="first" value="" />
+                                    --<apex:outputText escape="false" value=">" /></div><apex:outputText escape="false" value="<" />!--
+                                </apex:repeat>--<apex:outputText escape="false" value=">" />
+                            </apex:repeat>
+                            <apex:repeat var="list" value="{!layout.lists}">
+                                <h3>{!list.name}</h3>
+                                <div data-cs-binding="%ctx%{!list.def.cscfga__Reference_Name__c}_%idx%"></div>
+                            </apex:repeat>
+                        </div>
+                    <apex:outputText escape="false" value="</script>" />
+
+                </apex:repeat>
+            </apex:repeat>
+
+            <cscfga:OutputRules />
+        </div>
+    </body>
+</apex:page>

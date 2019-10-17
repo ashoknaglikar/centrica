@@ -1,0 +1,85 @@
+<apex:page controller="GetAvailableResources" action="{!deleteDummyRecords}">
+    <apex:form >
+    <apex:pagemessages />
+    
+        <style>
+            .controldiv{float:left; padding:4px;}
+        </style>
+        <!--<apex:messages />-->
+        <apex:pageblock >
+             <apex:pageblockbuttons >
+                <apex:Commandbutton value="Get Resources" action="{!getResources}"/>
+        </apex:pageblockbuttons>
+                     
+            <div style="width:49%;float:left">
+                <c:AddressLookup AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+                StreetLabel="Street" StreetField="{!accountSearch.BillingStreet}" 
+                CityLabel="City" CityField="{!accountSearch.BillingCity}" StateLabel="State" 
+                StateField="{!accountSearch.BillingState}" PostalCodeLabel="Postcode" 
+                PostalCodeField="{!accountSearch.BillingPostalcode}" CountryLabel="Country" 
+                CountryField="{!accountSearch.BillingCountry}"/>
+             </div>
+              <div style="width:50%; float:left">
+                <div class="controldiv">Customer Preffered Date</div>
+                <div class="controldiv"><apex:inputField value="{!job.Customer_Preferred_Date__c}"/></div> 
+                <br/><br/><br/><div class="controldiv">Override Gap Size Tolerance</div>
+                <div class="controldiv"><apex:inputField value="{!job.Override_Gap_Size_Tolerance__c}"/></div> 
+            </div>
+           
+            <div style="clear:both;"></div>   
+             <!--</apex:pageblocksection> -->
+             <apex:pageblocksection title="Skill Hours" columns="4" collapsible="false">
+             
+                Mechanical Hours
+                <apex:inputText value="{!job.Mechanical_Hours__c}" maxlength="10" required="true"/>
+                
+                Building Work Hours
+                <apex:inputText value="{!job.Building_Work_Hours__c}" maxlength="10" />
+                
+                PowerFlush Hours
+                <apex:inputText value="{!job.PowerFlush_Hours__c}" maxlength="10" />
+                
+                Roof Work Hours
+                <apex:inputText value="{!job.Roof_Work_Hours__c}" maxlength="10" />
+                
+                Electrical Hours
+                <apex:inputText value="{!job.Electrical_Hours__c}" maxlength="10" />
+                
+               </apex:pageblocksection> 
+                    
+               <apex:pageblocksection title="Other skill Hours" columns="4" collapsible="false">
+                   Specialist Building Hours
+                   <apex:inputText value="{!job.Specialist_Building_Hours__c}" maxlength="10" />
+                   Scaffolder Hours
+                   <apex:inputText value="{!job.Scaffolder_Hours__c}" maxlength="10" />
+                   Connect Solar Panel Hours
+                   <apex:inputText value="{!job.Connect_Solar_Panel_Hours__c}" maxlength="10" />
+                   Unvented Hot Water Hours
+                   <apex:inputText value="{!job.Unvented_Hot_Water_Hours__c}" maxlength="10" />
+                   Contractor Installation Hours
+                   <apex:inputText value="{!job.Contractor_Installation_Hours__c}" maxlength="10" />
+                   Water Heater Fixing Hours
+                   <apex:inputText value="{!job.Water_Heating_Fixing_Hours__c}" maxlength="10" />
+                   Fire Wall Heater Fixing Hours
+                   <apex:inputText value="{!job.Fire_Wall_Heater_Fixing_Hours__c}" maxlength="10" />
+                   Electrical Work ASP Hours
+                   <apex:inputText value="{!job.Electrical_Work_ASP_Hours__c}" maxlength="10" />
+                   LPG Installation Hours
+                   <apex:inputText value="{!job.LPG_Installation_Hours__c}" maxlength="10" />
+                   Asbestos Removal Hours
+                   <apex:inputText value="{!job.Asbestos_Removal_Hours__c}" maxlength="10" />
+                   Payment Collection Hours
+                   <apex:inputText value="{!job.Payment_Collection_Hours__c}" maxlength="10" />
+                   Asbestos Removal Fixed Rate Hours
+                   <apex:inputText value="{!job.Asbestos_Removal_Fixed_Rate_Hours__c}" maxlength="10" />
+                   Ecogen Electrical
+                   <apex:inputText value="{!job.Ecogen_Electrical_Hours__c}" maxlength="10" />
+                   Ecogen Mechanical
+                   <apex:inputText value="{!job.Ecogen_Mechanical_Hours__c}" maxlength="10" />
+            </apex:pageblocksection>        
+            
+             
+            <div style="clear:both;"></div>
+            </apex:pageblock>
+    </apex:form>
+</apex:page>

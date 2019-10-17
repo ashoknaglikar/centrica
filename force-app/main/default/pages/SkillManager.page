@@ -1,0 +1,46 @@
+<apex:page controller="skillManagerController" >
+    <!-- This is the input section to allow the required skills to be chosen for addition. -->
+    <apex:form >
+    
+     <apex:pageblock >
+        <apex:pageblockbuttons >
+            <apex:commandButton action="{!addSkills}" value="Add Skills" rendered="{!!nonInstaller}"/>
+            <apex:commandButton value="Go Back" action="{!goBack}"/>
+        </apex:pageblockbuttons>
+        <apex:pagemessages />
+         <apex:pageblocksection title="Skill Listings" columns="2" rendered="{!!nonInstaller}">
+         <apex:outputpanel rendered="{!newSkillTb}"> 
+         <apex:outputtext value="{!skillsAdd}" style="font-weight:bold;color:red;"/>
+         <apex:pageblocksectionitem >
+           
+             <apex:pageBlockTable value="{!skillClassLst}" align="center" var="s" rendered="true" columns="3" border="2px" >
+                 <apex:column headerValue="Select" width="100">
+                      <apex:inputCheckbox selected="{!s.isSelect}" id="select"/>
+                 </apex:column> 
+                 <apex:column headerValue="Owns Job Only" width="100">
+                     <apex:inputCheckbox selected="{!s.ownJobs}"/>
+                 </apex:column>  
+                 <apex:column headerValue="Skill Name">
+                     <apex:outputtext value="{!s.skillName}"/>
+                 </apex:column>
+                 
+            </apex:pageBlockTable>
+            
+         </apex:pageblocksectionitem>
+         </apex:outputpanel>
+         <apex:outputpanel rendered="{!oldskillTb}">
+         <apex:outputtext value="{!skillsPresent}" style="font-weight:bold;color:red;"/>
+         <apex:pageblocksectionitem >
+             <apex:pageBlockTable value="{!skillList}" align="center" var="s" rendered="true" columns="4" border="2px">
+                  <apex:column value="{!s.Skill_Name__c}" />   
+                  <apex:column value="{!s.Own_Jobs_Only__c}" />
+                  <apex:column value="{!s.createdbyid}" />   
+                  <apex:column value="{!s.createddate}"/>  
+             </apex:pageBlockTable>
+         </apex:pageblocksectionitem>   
+         </apex:outputpanel>
+         </apex:pageblocksection>
+    </apex:pageblock>
+   
+     </apex:form>
+</apex:page>

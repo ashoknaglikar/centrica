@@ -1,0 +1,66 @@
+<apex:page controller="WeekReserver" sidebar="false" tabstyle="Week__c">
+    <apex:form >
+        <apex:pageblock title="Week Reserve for Week: {!weekCommencing}" id="blk1">
+            <apex:pagemessages />
+            <apex:pageblockbuttons >
+                    <apex:commandbutton value="Save" action="{!saveWeeks}" rendered="{!shwSave}"/>
+                    <apex:commandbutton value="Fectch Engineers" action="{!refersh}"/>
+                    <apex:commandbutton value="Dairy View" action="{!openDiary}"/>
+            </apex:pageblockbuttons>
+            <apex:pageblocksection title="Input Details" id="sec1">
+                
+                <apex:pageblocksectionitem >
+                     <apex:outputlabel value="Week" for="week"/>
+                     <apex:inputfield value="{!wk.Week_Commencing__c}" id="week"/>
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="District" for="areaDropDown"/>
+                     <apex:selectList style="font-size:7pt;" value="{!districtId}" multiselect="false" size="1" id="areaDropDown">
+                        <apex:selectOptions value="{!AreaItems}"/>
+                    </apex:selectList>
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Confirm:" rendered="{!showConfirm}">
+                <b>Yes - I want to lock one or more Weeks for an Year. </b>
+                <apex:inputcheckbox value="{!confirm}" />
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection title="Unresereved Weeks" columns="1" rendered="{!Unresr}" id="sec2">
+            
+                <apex:pageblocktable value="{!unReservedWeeks}" var="uw">
+                
+                    <apex:column value="{!uw.Employee__r.Name}" headerValue="Employee"/>
+                        
+                    <apex:column headerValue="Week No" value="{!uw.Name}" />
+                        
+                    <apex:column headerValue="Locking Category">
+                        <apex:inputfield value="{!uw.Locking_Category__c}" />
+                    </apex:column>
+                    
+                    <apex:column headerValue="Release Date">
+                        <apex:inputfield value="{!uw.Release_Date__c}" />
+                    </apex:column>
+                </apex:pageblocktable>
+            </apex:pageblocksection>
+
+            <apex:pageblocksection title="Resereved Weeks" columns="1" rendered="{!resr}">
+                <apex:pageblocktable value="{!reserevedWeeks}" var="rw">
+                
+                    <apex:column value="{!rw.Employee__r.Name}" headerValue="Employee"/>
+                        
+                    <apex:column headerValue="Week No" value="{!rw.Name}" />
+                        
+                    <apex:column headerValue="Locking Category">
+                        <apex:inputfield value="{!rw.Locking_Category__c}" />
+                    </apex:column>
+                    
+                    <apex:column headerValue="Release Date">
+                        <apex:inputfield value="{!rw.Release_Date__c}" />
+                    </apex:column>
+                </apex:pageblocktable>
+            </apex:pageblocksection>
+        </apex:pageblock>
+    </apex:form>
+
+</apex:page>

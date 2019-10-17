@@ -1,0 +1,24 @@
+<apex:page standardController="Job__c"
+    extensions="JobNamedResourceController">
+    <apex:form >
+        <apex:pagemessages />
+        <apex:pageBlock rendered="{!renderPage}">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!returnToJob}" value="Back" />
+                <apex:commandButton action="{!save}" value="Save" />
+                <apex:commandButton action="{!clearAll}" value="Clear all" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Create Named Resources On This Job" columns="2">
+                <apex:pageBlockTable value="{!jobCombinedNamedResourceRecordList}"
+                    var="jobNamedResourceRecord">
+                    <apex:column headerValue="Employee">
+                        <apex:inputfield value="{!jobNamedResourceRecord.Employee__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Skill">
+                        <apex:inputfield value="{!jobNamedResourceRecord.Skill_Name__c}" />
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

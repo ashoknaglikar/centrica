@@ -1,0 +1,369 @@
+<apex:page controller="ConsumableSearch" sidebar="false">
+  <apex:includeScript value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryUI/js/jquery-1.2.7.min.js')}" />
+  <apex:includeScript value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/js/jquery.simplemodal.js')}" />
+  <apex:stylesheet value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/css/basic.css')}" />
+  <apex:stylesheet value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/css/style.css')}" />
+  <style type="text/css"> 
+    .popupSpan {
+        Display: none;
+    }
+    a.describe:link { 
+        color: #ff0000;
+        font: bold;
+    }
+     
+    a.describe:visited {
+        color: #0000ff;
+    }
+    
+    a.describe:hover {
+        background: yellow;
+         border:1px solid ;
+    }
+    #simplemodal-container{
+        background-color: #333;
+        border: 4px solid #444;
+        color: #BBB;
+        height: 480px;
+        padding: 12px;
+        width: 750px;
+    }
+    .oddRow {
+        border: medium thick #ff0000;
+        background-color: #95B9C7;
+        color: black;
+    }
+    
+    .link{
+        color:blue;
+        font-size:17px;
+        font:bold
+        }
+</style> 
+<script type="text/javascript" src="/soap/ajax/16.0/connection.js"/>
+<script type="text/javascript" src="/soap/ajax/16.0/ajax.js"/>
+<script type="text/javascript">
+$ac = jQuery.noConflict(); 
+function invokePopUp(idOfDiv){$ac('#'+idOfDiv).modal({persist:false});}
+
+//Code written on 31st May. Tried to call Next using Action function - only when no checkbox checked.
+    function checkSelected()
+    {
+      
+    //alert('ok');
+        var isSelected = false;
+        var inputs = document.getElementsByTagName('input');
+       
+        for (var i = 0; i < inputs.length; i++) {
+
+          if (inputs[i].type == 'checkbox') {
+
+            if (inputs[i].checked) {
+
+              isSelected = true;
+              break;
+              }
+          }
+          }
+          
+      if(isSelected == false )
+      {
+     
+        
+        return true;
+      }
+      else
+      {
+          alert("Warning:Please add the selected products into basket before navigating to new page.");   
+          return false; 
+      }                
+    }
+        
+
+</script>
+ 
+  <apex:form id="form">
+ 
+ 
+  <apex:pageBlock title="Find Me A Consumable!" mode="edit" rendered="true" id="block1">
+  <div style="text-align:center;font-size:25px;color:red;font-weight:bold">
+    {!shoppingMode}
+  </div>
+  <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+        </div>
+        <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;"></div>
+  <table width="100%" border="0">
+  <tr>  
+    <td width="250" valign="top" align="left">
+ 
+      <apex:pageBlock title="Parameters" mode="edit" id="criteria">
+ 
+      <script type="text/javascript">
+      function doSearch() {
+        togglleDiv('');
+        searchServer(
+          document.getElementById("Name").value
+          );
+        togglleDiv('none');
+      }
+      
+      function openImage(url)
+      {
+        //alert(url);
+        url= '/apex/DisplayConsumable?Id='+url;
+        window.open(url,'','width=450,height=450,left=500');
+      }
+      
+      function togglleDiv(show)
+        {
+            document.getElementById('darkLayer').style.display = show; 
+            document.getElementById('LoadingDiv').style.display = show;      
+        }             
+      </script> 
+      
+      <apex:actionFunction name="searchServer" action="{!runSearch}" rerender="results,debug,errors">
+          <apex:param name="Name" value="" />
+      </apex:actionFunction>
+      
+     
+      
+       <apex:actionFunction name="populateSubcategory" action="{!populateSubcategory}" rerender="panel1,criteria,results,debug,errors" oncomplete="togglleDiv('none');"/>
+       <apex:actionStatus startText="Processing...."  stoptext="" id="status1"/>
+       
+       <apex:actionFunction name="populateConsumables" action="{!populateConsumables}" rerender="panel1,criteria,results,debug,errors" oncomplete="togglleDiv('none');"/>
+       
+      <table cellpadding="2" cellspacing="2">
+      <apex:outputPanel id="panel2" rendered="{!bln_mode }" styleClass="font-weight:bold;">
+      
+       <tr>
+        <td style="font-weight:bold;">Category<br/>
+        
+        <apex:selectList value="{!category}" multiselect="false" size="1" onchange="togglleDiv('');populateSubcategory();"  style="width:150px" >
+            <apex:selectOptions value="{!categoryList}"/>
+            <apex:actionsupport event="onchange" rerender="block1" status="status1"/>
+        </apex:selectList>
+        
+        </td>
+      </tr>
+      <br/>
+       <tr>
+        <td style="font-weight:bold;">Sub Category<br/>
+        <!--<input type="text" id="SubGroup" onkeyup="doSearch();"/>-->
+        <apex:selectList value="{!Subcategory}" multiselect="false" size="1" onchange="togglleDiv('');populateConsumables();" style="width:150px">
+            <apex:selectOptions value="{!SubcategoryList}"/>
+        </apex:selectList>
+        </td>
+      </tr>
+      <br/>
+      <tr>
+        <td style="font-weight:bold;">Filter By Name<br/>
+        <input type="text" id="Name" onkeyup="doSearch();"/>
+        </td>
+      </tr>
+      <br/>
+     
+       <tr>
+         <td style="font-weight:bold;"><br/>
+         <apex:commandLink action="{!toggleMode}" value="My Favorite List" rerender="panel1,criteria" style="font-weight:bold" >
+          <apex:param name="mode" value="2" assignTo="{!newmode}"/>
+          </apex:commandLink>
+        </td>
+      </tr>
+      </apex:outputPanel>
+      
+      <apex:outputPanel id="panel3" rendered="{!!bln_mode }" style="font-weight:bold;">
+      <tr>
+          <td style="font-weight:bold;"><br/>
+          <apex:commandLink action="{!toggleMode}" value="Search By Product" rerender="panel1,criteria" style="font-weight:bold" >
+           <apex:param name="mode" value="1" assignTo="{!newmode}"/>
+           </apex:commandLink>
+         </td>
+       </tr>
+       
+      </apex:outputPanel>
+      <tr>
+        <td style="font-weight:bold;color:blue;"><br/>
+        <a href="#" onclick="invokePopUp('Basket')" class="describe">Basket Quick View<br/>
+        <apex:image id="theImage" value="{!$Resource.ShoppingCart}" width="80" height="50"/>
+        </a>
+        </td>
+      </tr>
+       </table>
+       
+      <apex:outputPanel id="newPanel">
+          
+       <table>
+      <tr>
+          <td>
+              <apex:outputLabel value="No of Items in Basket" for="noOfItems" style="font-weight:bold;color:blue;"/>
+              &nbsp; &nbsp; 
+              <apex:outputText value="{!count}" id="noOfItems" style="font-weight:bold"/>
+         </td>     
+      </tr>
+      <tr>
+          <td>
+              <apex:outputLabel value="Basket Value" for="basketValue" style="font-weight:bold;color:blue;"/>
+              &nbsp; &nbsp; 
+              <apex:outputText value="{!BasketTotalString}" id="basketValue" style="font-weight:bold;color:green" rendered="{!!redValue}"/>
+              <apex:outputText value="{!BasketTotalString}" style="font-weight:bold;color:red" rendered="{!redValue}"/>
+         </td>     
+      </tr>
+     
+      </table>
+      </apex:outputPanel>
+      </apex:pageBlock>
+ 
+ 
+ 
+    </td>
+    <td valign="top">
+   
+    <apex:outputPanel id="panel1"> 
+    <apex:outputtext value="{!info}" rendered="{!bln_info}" style="color:green;font-weight:bold;font-size:15px;"/>
+    
+    <apex:pageBlock mode="edit" id="results" >
+    <apex:pageMessages id="errors" /> 
+   
+    
+        <apex:pageblockButtons >
+            <apex:CommandButton value="Add selected to Basket" action="{!addBasket}" rerender="form,debug,table1,newPanel,panel1,errors" onclick="togglleDiv('');"  oncomplete="togglleDiv('none');"/>
+            <apex:CommandButton value="Back to Search Page" action="{!toggleMode}" rerender="panel1,criteria" rendered="{!!bln_mode }"/>        
+            <apex:CommandButton value="Check Out" action="{!continue_Btn}" rendered="{!checkOutBtn}"/>               
+        </apex:pageblockButtons>
+        <apex:pageblocksection columns="1">
+             <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="otpNav2">  
+                   Total Records Found: <apex:outputText rendered="{!IF(stdcon.resultSize==10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(stdcon.resultSize < 10000,true,false)}">{!stdcon.resultSize}</apex:outputText>  
+                   <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!NOT(stdcon.HasPrevious)}"/>  
+                   <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!stdcon.HasPrevious}"/>  
+                   <apex:commandLink action="{!Previous}" title="Previous Page" value="Previous Page" rendered="{!stdcon.HasPrevious}" onclick="if(!checkSelected()) return false;" rerender="otpNav2,table1,otpNav3"/>&nbsp;  
+                   <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!NOT(stdcon.HasPrevious)}">Previous Page</apex:outputPanel>           
+                   &nbsp;({!IF(stdcon.PageNumber == 1,1,((stdcon.PageNumber -1) * stdcon.PageSize)+1)}-{!IF(stdcon.resultSize < stdcon.PageSize,stdcon.resultSize,stdcon.PageNumber * stdcon.pageSize)})&nbsp;  
+                   <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!NOT(stdcon.HasNext)}">Next Page</apex:outputPanel>           
+                   <apex:commandLink action="{!Next}" title="Next Page" value="Next Page" rendered="{!stdcon.HasNext}" onclick="if(!checkSelected()) return false;" rerender="otpNav2,table1,otpNav3"/>&nbsp;  
+                   <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!stdcon.HasNext}"/>  
+                   <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!NOT(stdcon.HasNext)}"/>            
+              </apex:outputPanel> 
+            <apex:pageBlockTable value="{!consumables}" var="con" border="2px" id="table1">
+                 
+                <apex:column headerValue="Select" >
+                 <apex:inputcheckbox value="{!con.isSelected }" id="inputCheckBoxId"/><br/>
+
+                    
+                </apex:column>
+                <apex:column headervalue="Favorite">
+                    <apex:commandlink action="{!addFavorite}" rerender="panel1,fav" rendered="{!!con.isalreadyfav}" title="Add to Favorite">
+                        <apex:image url="{!$Resource.HeartPlus}" width="35" height="25"/>
+                        <apex:param name="consumableId" value="{!con.consu.Id}" assignTo="{!consumableId}"/>
+                    </apex:commandlink> 
+                    <apex:commandlink value="Remove" action="{!removeFavorite}" oncomplete="alert('Sucessfully Removed')" rendered="{!(con.isalreadyfav && !bln_mode)}" rerender="panel1">
+                        <apex:param name="consumableId" value="{!con.consu.Id}" assignTo="{!consumableId}"/>
+                    </apex:commandlink> 
+                    <apex:image url="{!$Resource.GreenHeart}" width="35" height="25" rendered="{!(con.isalreadyfav && bln_mode)}" title="Favorite Item"/>
+                </apex:column>
+     
+                <apex:column headervalue="Name">
+                    <apex:outputField value="{!con.consu.Name}"/>
+                </apex:column>
+                
+                <!--<apex:column headerValue="Code" value="{!con.consu.Product_Code__c}"/>-->
+                
+                <apex:column headerValue="Image">
+                    <a href="#" onclick="openImage('{!con.consu.Id}')">
+                        <!--<apex:image url="{!con.consu.Image_URL__c}"  alt="No image" width="50" height="50"/>-->
+                        
+                        <apex:image url="{!URLFOR($Resource[con.resourceName] , con.Static_Resource_Location)}" width="50" height="50"/>
+                    </a>
+                </apex:column>
+                
+                <apex:column value="{!con.consu.Unit_Quantity__c}" headervalue="Unit Quantity"/>
+                
+                <apex:column headervalue="Category">
+                    <apex:outputField value="{!con.consu.Product_Group_Lookup__c}"/>
+                </apex:column>
+     
+                <apex:column headervalue="Sub Category">
+                    <apex:outputField value="{!con.consu.Sub_Product_Description__r.Name }"/>
+                </apex:column>
+                
+               <apex:column headerValue="Cost Price" value="{!con.consu.CostPrice__c}"/>
+               
+               <apex:column headerValue="Quantity">
+                   <apex:inputText value="{!con.Quantity}" style="width:30px;"/>
+               </apex:column>
+               
+               <apex:column headerValue="Add Item" id="fav">
+                     <apex:commandlink action="{!addBasket}" rerender="debug,table1,newPanel,panel1,errors" title="Add item to basket">
+                        <apex:image url="{!$Resource.GreenPlus}" width="30" height="30"/>
+                        <apex:param name="consumaId" value="true" assignTo="{!con.isSelected }"/>
+                    </apex:commandlink> 
+               </apex:column>
+               
+            </apex:pageBlockTable>
+             <apex:outputPanel layout="block" styleClass="pSearchShowMore" id="otpNav3">  
+                   Total Records Found: <apex:outputText rendered="{!IF(stdcon.resultSize==10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(stdcon.resultSize < 10000,true,false)}">{!stdcon.resultSize}</apex:outputText>  
+                   <apex:image url="/img/search_prevarrow_disabled.gif" styleClass="prevArrow" rendered="{!NOT(stdcon.HasPrevious)}"/>  
+                   <apex:image url="/img/search_prevarrow.gif" title="Previous Page" styleClass="prevArrow" rendered="{!stdcon.HasPrevious}"/>  
+                   <apex:commandLink action="{!Previous}" title="Previous Page" value="Previous Page" rendered="{!stdcon.HasPrevious}" onclick="if(!checkSelected()) return false;" rerender="otpNav2,table1,otpNav3"/>  
+                   <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!NOT(stdcon.HasPrevious)}">Previous Page</apex:outputPanel>           
+                   &nbsp;({!IF(stdcon.PageNumber == 1,1,((stdcon.PageNumber -1) * stdcon.PageSize)+1)}-{!IF(stdcon.resultSize < stdcon.PageSize,stdcon.resultSize,stdcon.PageNumber * stdcon.pageSize)})&nbsp;  
+                   <apex:outputPanel styleClass="pShowLess noLink" style="color:grey" rendered="{!NOT(stdcon.HasNext)}">Next Page</apex:outputPanel>           
+                   <apex:commandLink action="{!Next}" title="Next Page" value="Next Page" rendered="{!stdcon.HasNext}" onclick="if(!checkSelected()) return false;" rerender="otpNav2,table1,otpNav3"/>&nbsp;  
+                   <apex:image url="/img/search_nextarrow.gif" title="Next Page" styleClass="nextArrow" rendered="{!stdcon.HasNext}"/>  
+                   <apex:image url="/img/search_nextarrow_disabled.gif" rendered="{!NOT(stdcon.HasNext)}"/>            
+              </apex:outputPanel> 
+        </apex:pageblocksection> 
+    </apex:pageBlock>
+    </apex:outputPanel>
+    </td>
+  </tr>
+
+  </table>
+  </apex:pageBlock>
+ 
+ <div id="Basket" class="popupSpan"> 
+ <apex:actionFunction name="check" action="{!continue_Btn}"/>
+   <apex:pageBlock title="Basket" id="debug">
+      <apex:pageblockbuttons >
+       <!--  <apex:commandbutton value="Empty basket" action="{!Discard}" rerender="debug,panel1,criteria" onclick="if(!confirmDiscard()) return;" oncomplete="alert('Sucessfully Deleted.')"/>-->
+       <apex:commandButton value="Check Out" onclick="check();" rendered="{!checkOutBtn}"/>
+      </apex:pageblockbuttons>
+      <apex:pageBlocksection columns="1">
+          <apex:pageBlockTable value="{!selectedConsumables}" var="selcon" border="2px">
+              <apex:column headerValue="Name" value="{!selcon.consu.Name}"/> 
+              <!--<apex:column headerValue="Code" value="{!selcon.consu.Product_Code__c}"/>-->
+              <apex:column headerValue="Image">
+                <apex:image url="{!selcon.consu.Image_URL__c}"  alt="No image" title="Other" width="50" height="50"/>
+              </apex:column> 
+              <apex:column headerValue="Unit Quantity" value="{!selcon.consu.Unit_Quantity__c}"/>
+              <apex:column headerValue="Unit Price" value="{!selcon.consu.CostPrice__c}"/>
+              <apex:column headerValue="Quantity" value="{!selcon.Quantity}"/>
+              <apex:column headerValue="Total Cost" value="£{!selcon.LineCostStng}"/>
+          </apex:pageBlockTable>    
+      </apex:pageBlocksection> 
+      <apex:pageblockSection >
+          <apex:outputLabel title="Total Basket Value" value="Total Value" style="font-weight:bold;float:left;padding:2px">
+              &nbsp;&nbsp;<apex:outputText value="£{!BasketTotalString}" title="Total" style="color:green;font-size:30px" rendered="{!!redValue}"/> 
+              &nbsp;&nbsp;<apex:outputText value="£{!BasketTotalString}" title="Total" style="color:red;font-size:30px" rendered="{!redValue}"/> 
+          </apex:outputLabel> 
+      </apex:pageblockSection> 
+  </apex:pageBlock>
+
+</div> 
+  </apex:form>
+ 
+</apex:page>

@@ -1,0 +1,35 @@
+<apex:component >
+<apex:includeScript value="/support/console/20.0/integration.js"/>
+   <script type="text/javascript">     
+
+       var openSubtabTimer = null;
+       
+       function openGoogleSubtab() {
+       
+           // Use the results primary tab id and open a new subtab 
+           var openSubtab = function(result) {               
+                sforce.console.openSubtab(result.id,'https://encrypted.google.com/search?q=Test',false,'Search Results...');           
+                clearTimeout(openSubtabTimer);
+            };
+            // Get the enclosing primary tab id. The openSubtab method is set as the callback
+            sforce.console.getEnclosingPrimaryTabId(openSubtab);
+            
+            ///////////////////////////
+            // Use the results primary tab id and open a new subtab 
+           var openSubtab2 = function(result) {               
+                sforce.console.openSubtab2(result.id,'https://encrypted.google.com/search?q=Test%202',false,'Search Results...');           
+                clearTimeout(openSubtabTimer);
+            };
+            // Get the enclosing primary tab id. The openSubtab method is set as the callback
+            sforce.console.getEnclosingPrimaryTabId(openSubtab2);
+       }       
+      
+       var previousOnload = window.onload;        
+       window.onload = function() { 
+            if (previousOnload) { 
+                previousOnload();
+            }                
+           openSubtabTimer = setTimeout('openGoogleSubtab()', '500'); 
+       }
+   </script>
+</apex:component>

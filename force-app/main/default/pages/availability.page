@@ -1,0 +1,229 @@
+<!-- Page: Edited-->
+<!-- IntegratedScript changes -->
+<apex:page controller="AvailabilityP1Controller" tabstyle="Appointment__c" showheader="{!showButton}" sidebar="{!showButton}">
+<!-- end IntegratedScript changes -->
+<script type="text/javascript">
+ 
+    function togglleDiv(show)
+     {
+         document.getElementById('darkLayer').style.display = show; 
+         document.getElementById('LoadingDiv').style.display = show;      
+     } 
+     /*
+     window.document.onload = new function(e)
+    {
+       var PI = '{!$CurrentPage.parameters.PI}';
+      if(PI=='RemoteQuote')
+      {
+        alert("You are trying to book a Remote Quote Appointment! If you are looking to book a HSA Appointment than cancel  this lead and create a new lead to book a HSA Appointment.");
+      }
+    }*/
+ 
+</script> 
+
+<apex:form id="form">   
+
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+    </div>
+    <div id="darkLayer" style ="background-color: white; 
+             filter:alpha(opacity=50); /* IE */ 
+             opacity: 0.5; /* Safari, Opera */ 
+             -moz-opacity:0.50; /* FireFox */ 
+             z-index: 20; 
+             height: 100%; 
+             width: 100%; 
+             background-repeat:no-repeat; 
+             background-position:center; 
+             position:absolute; 
+             top: 0px; 
+             left: 0px; 
+             display:none;">
+    </div>
+     
+<html>
+<head>
+<!-- Priority Installations CR start -->
+    <script src="/js/functions.js"></script>
+    <script src="/soap/ajax/17.0/connection.js"></script>
+    <script src="/soap/ajax/17.0/apex.js"></script>
+    <script>
+    function navigateToUrl(url) {
+        window.open(url);
+    }
+    </script>
+    <!-- Priority Installations CR end -->
+    <style>
+        .messageclass {color:red; font-style:bold;}
+    </style>
+</head>
+<apex:pagemessages />
+<apex:sectionHeader title="Availability for {!Opportunity.Account.BillingPostalCode}" subtitle="Week commencing {!StartOfWeek}" /> 
+
+    <apex:pageblock title="Please Pick Secondary Product Of Interest" rendered="{!greenDeal}">
+        <apex:pageblocksection columns="1">
+            <apex:inputfield value="{!thisOpp.Secondary_Product_Interest__c}" id="secProInt"/>
+        </apex:pageblocksection>
+        
+        <apex:pageblockbuttons >
+            <apex:commandButton action="{!onClickExit}" value="Exit" />           
+            <apex:commandbutton value="Continue" action="{!nextpage}"/>
+            
+        </apex:pageblockbuttons>
+    </apex:pageblock>
+    <body>
+
+   
+    
+    <apex:pageBlock title="" id="TheBlock" rendered="{!!greenDeal}">
+        
+    <h1 align="center"><apex:outputText value="{!displayMessage}" style="color:red;text-align: center;" /></h1>
+    <apex:pageMessage summary="You are trying to book a Video Call Appointment! If you are looking to book a HSA visit then change the Product Interest on the lead and book a HSA Appointment in Call Centre Booking." rendered="{!thisOpp.Product_Interest__c == 'Guided Sale'}" severity="warning" strength="3"/>
+      <apex:pageBlockButtons >
+          <!-- IntegratedScript changes -->
+          <apex:commandButton action="{!onClickExit}" value="Exit" />
+          <!-- end IntegratedScript changes -->
+          <!-- <apex:commandButton action="{!onClickHours}" value="{!twoHrLabel}"/> -->
+          <apex:commandButton action="{!onClickNoSuitable}" value="{!NoSuitableLabel}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"  reRender="TheBlock" rendered="{!!isHSA}"/>      
+          <apex:commandButton action="{!onClickBack7}" value="Back 7 Days"/>
+          <apex:commandButton action="{!onClickForward7}" value="Forward 7 Days"/>   
+          <!-- CR MC014 -->
+          <apex:commandButton action="{!onClickCancel}" value="Cancel Original Appointment" rendered="{!showCancelButton}" />   
+          <!-- CR MC014 -->          
+          <!-- Priority Installation CR start -->
+          <apex:commandButton value="Team Calender (Sales)" onclick="navigateToUrl('/servlet/servlet.Integration?scontrolCaching=1&lid={!$Label.Team_Calendar_Sales_Id}&eid={!thisOpp.id}&ic=1','DETAIL');" rendered="{!!isHSA}"/>
+          <apex:commandButton action="{!onClickLLPage}" value="Landlord Page" rendered="{!!isHSA}"/>
+          <!-- Priority Installation CR end -->
+      </apex:pageBlockButtons><br/>
+      <apex:outputpanel rendered="{!include_priority_install}">
+        <table>
+            <tr>
+                <td width="20%" valign="middle">
+                    <label><b>Customer Category Indicator : </b></label>
+                </td>
+                <td valign="top" width="13%">
+                    <apex:outputField value="{!thisOpp.Latest_customer_category_indicator__c}" ></apex:outputField>
+                </td>
+            <td valign="middle" width="67%">
+                    <apex:outputText value="To be appointed within 24 hours." rendered="{!isFirstCategory}" style="color:red; font-style:bold; font-weight:bold;"/>
+                    <apex:outputText value="To be appointed within 24 hours." rendered="{!isSecondCategory}" style="color:red; font-style:bold; font-weight:bold;"/>
+                    <apex:outputText value="To be appointed within 48 hours." rendered="{!isThirdCategory}" style="color:red; font-style:bold; font-weight:bold;"/>
+                    <!-- <apex:outputText value="Operational Category." rendered="{!isFourthCategory}" style="color:red; font-style:bold; font-weight:bold;"/>
+                    <apex:outputText value="Undefined Category." rendered="{!isUndefinedCategory}" style="color:red; font-style:bold; font-weight:bold;"/> -->
+                </td>
+            </tr>
+        </table> 
+      </apex:outputpanel> <br/>  
+      
+       <apex:outputpanel rendered="{!$Label.Guided_Sale=='on'}">
+        <table>
+            <tr>
+                <td >
+                    <label><b>Product Interest :</b></label>
+                </td>
+                <td >
+                    <apex:inputField value="{!thisOpp.Product_Interest__c}" >
+                        <apex:actionSupport event="onchange" action="{!getAvailabiltyOnProductInterest}" reRender="form"/>
+                    </apex:inputField>
+                    
+                </td>
+            </tr>
+        </table> 
+      </apex:outputpanel> <br/>  
+      
+      
+      <apex:outputPanel id="ThePanel">
+      <h2 align="center"><apex:outputText value="Summary View" style="color:black; font-style:bold; font-weight:bold; text-align:center; font-size:14px"> </apex:outputText> </h2> <br/> <br/>
+        <apex:dataTable value="{!SummaryView}" var="ava" styleClass="list" rules="rows">                          
+                <apex:column >
+                        <apex:facet name="header">Time</apex:facet>
+                        <apex:outputText value="{!ava.timeTitle}"/>
+                </apex:column>
+                   <apex:column headerValue="{!day0Title}">         
+                        <!-- IntegratedScript changes -->                                       
+                        <apex:outputLink style="{!If(ava.Availability0Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day0availableminutes}&var_date={!activeDate0}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability0Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day0Available}</apex:outputLink>                                       
+                        <!-- endIntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day1Title}">  
+                        <!-- IntegratedScript changes -->                       
+                        <apex:outputLink style="{!If(ava.Availability1Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day1availableminutes}&var_date={!activeDate1}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability1Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day1Available}</apex:outputLink>        
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day2Title}">                       
+                        <!-- IntegratedScript changes -->
+                        <apex:outputLink style="{!If(ava.Availability2Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day2availableminutes}&var_date={!activeDate2}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability2Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day2Available}</apex:outputLink>                        
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day3Title}">
+                        <!-- IntegratedScript changes -->
+                        <apex:outputLink style="{!If(ava.Availability3Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day3availableminutes}&var_date={!activeDate3}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability3Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day3Available}</apex:outputLink>          
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day4Title}">
+                        <!-- IntegratedScript changes -->                   
+                        <apex:outputLink style="{!If(ava.Availability4Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day4availableminutes}&var_date={!activeDate4}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability4Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day4Available}</apex:outputLink>
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day5Title}">                       
+                        <!-- IntegratedScript changes -->
+                        <apex:outputLink style="{!If(ava.Availability5Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day5availableminutes}&var_date={!activeDate5}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability5Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day5Available}</apex:outputLink>
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                 <apex:column headerValue="{!day6Title}">                       
+                         <!-- IntegratedScript changes -->
+                        <apex:outputLink style="{!If(ava.Availability6Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day6availableminutes}&var_date={!activeDate6}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability6Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day6Available}</apex:outputLink>
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+        </apex:dataTable> <br/> 
+        
+        <h2 align="center"><apex:outputText value="Two Hour View" style="color:black; font-style:bold; font-weight:bold;text-align:center; font-size:14px"  rendered="{!if((gDeal!='3' && useOFS == false) , true, false)}"> </apex:outputText> </h2> <br/> <br/>
+        <apex:dataTable value="{!TwoHrView}" var="ava" styleClass="list" rules="rows" rendered="{!if((gDeal!='3' && useOFS == false)  , true, false)}">                          
+                <apex:column >
+                        <apex:facet name="header">Time</apex:facet>
+                        <apex:outputText value="{!ava.timeTitle}"/>
+                </apex:column>
+                   <apex:column headerValue="{!day0Title}">         
+                        <!-- IntegratedScript changes -->                                       
+                        <apex:outputLink style="{!If(ava.Availability0Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate0}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability0Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day0Available}</apex:outputLink>                                       
+                        <!-- endIntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day1Title}">  
+                        <!-- IntegratedScript changes -->                       
+                        <apex:outputLink style="{!If(ava.Availability1Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate1}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability1Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day1Available}</apex:outputLink>        
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day2Title}">                       
+                        <!-- IntegratedScript changes -->
+                        <apex:outputLink style="{!If(ava.Availability2Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate2}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability2Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day2Available}</apex:outputLink>                        
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day3Title}">
+                        <!-- IntegratedScript changes -->
+                        <apex:outputLink style="{!If(ava.Availability3Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate3}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability3Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day3Available}</apex:outputLink>          
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day4Title}">
+                        <!-- IntegratedScript changes -->                   
+                        <apex:outputLink style="{!If(ava.Availability4Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate4}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability4Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day4Available}</apex:outputLink>
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                <apex:column headerValue="{!day5Title}">                       
+                        <!-- IntegratedScript changes -->
+                        <apex:outputLink style="{!If(ava.Availability5Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate5}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability5Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day5Available}</apex:outputLink>
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+                 <apex:column headerValue="{!day6Title}">                       
+                         <!-- IntegratedScript changes -->
+                        <apex:outputLink style="{!If(ava.Availability6Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate6}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability6Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day6Available}</apex:outputLink>
+                        <!-- end IntegratedScript changes -->
+                </apex:column>
+        </apex:dataTable>
+       </apex:outputpanel>              
+    </apex:pageBlock>
+    
+  </body>
+  </html>      
+</apex:form> 
+</apex:page>

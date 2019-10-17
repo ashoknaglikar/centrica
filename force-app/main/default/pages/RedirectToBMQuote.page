@@ -1,0 +1,9 @@
+<apex:page >
+  <script>
+  var query = window.location.search.substring(1);
+  var queryParams = query.split("&");
+  var subQueryParams = queryParams[0].split("=");
+  var quoteId = subQueryParams[1];
+  window.parent.location.replace("/"+quoteId);
+  </script>
+</apex:page>

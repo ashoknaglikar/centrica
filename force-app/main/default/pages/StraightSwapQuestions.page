@@ -1,0 +1,252 @@
+<apex:page standardController="CombiSwapQuestion__c" extensions="StraightSwapExtenstion">
+<style type="text/css">
+ .label{
+    //float: left;
+    //height: 30px;
+    //padding-right: 4px;
+    //padding-top: 2px;
+    //position: relative;
+    //text-align: right;
+    //vertical-align: middle;
+    //width: 20px;
+}
+.label:before{
+ content:"*" ;
+ font-weight: bold;
+ color:red    
+}
+
+.label1{
+
+}
+</style>
+    <apex:form id="frm">
+        <apex:pageblock id="blk1">
+            <apex:pagemessages />
+            <apex:pageblockbuttons >
+                <apex:commandButton value="{!saveBtn}" action="{!saveExit}" rerender="frm"/>
+                <apex:commandbutton value="Cancel" action="{!exitBtn}"/>
+            </apex:pageblockbuttons>
+            
+            <apex:pageblocksection columns="1" id="sec3" rendered="{!sec3}">
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is the Customers boiler LPG?" for="lpg1"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q1__c}" id="lpg1" onchange="Telesalesconv()" />
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="What is the output range of the boiler?" for="lpg"/>
+                    <apex:inputfield value="{!ssObj.S_S_TC1__c}" id="lpg" onchange="Telesalesconv()" />
+                </apex:pageblocksectionitem>
+                  
+                <apex:actionFunction name="Telesalesconv" reRender="blk1" action="{!TelesalesconAction}" rerender="blk1"/> 
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" rendered="{!showPi}">
+                    <apex:outputLabel value="Product Interest?" for="pi"/>
+                    <apex:inputfield value="{!opp.Product_Interest__c}"  id="pi"/> 
+                </apex:pageblocksectionitem>
+           </apex:pageblocksection>
+            
+            <apex:pageblocksection columns="1" id="sec1" rendered="{!sec1}">
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is the Customers boiler LPG?" for="lpg"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q1__c}" id="lpg" onchange="lpgActinFunc()" />
+                </apex:pageblocksectionitem>    
+                <apex:actionFunction name="lpgActinFunc" reRender="blk1" action="{!lpgAction}" rerender="blk1"/> 
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;" rendered="{!showPi}">
+                    <apex:outputLabel value="Product Interest?" for="pi"/>
+                    <apex:inputfield value="{!opp.Product_Interest__c}"  id="pi"/> 
+                </apex:pageblocksectionitem>
+           </apex:pageblocksection>
+           
+             <apex:pageblocksection columns="1" id="sec2" rendered="{!sec2}">     
+                 <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;"> 
+                    <apex:outputLabel value="Is a Fused Spurr required?" for="fuseSpur" styleClass="{!IF((sec5 && ssObj.S_S_Q2__c==''),'label','label1')}"/> <!--  {!CASE(ssObj.S_S_Q2__c,'','label1','label')} --> 
+                    <apex:inputfield value="{!ssObj.S_S_Q2__c}" id="fuseSpur" /> 
+                 </apex:pageblocksectionitem> 
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Protective Equipotential Bonding (PEB) required?" for="meb" styleClass="{!IF((sec5 && ssObj.S_S_Q3__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q3__c}" id="meb" /> 
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Does the customer need central heating controls ?" for="hive" styleClass="{!IF((sec5 && ssObj.S_S_Q12__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q12__c}" id="hive" /> 
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is the Customer interested in a Scale reducer?" for="scale" styleClass="{!IF((sec5 && ssObj.S_S_Q11__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q11__c}" id="scale" /> 
+                </apex:pageblocksectionitem>
+                
+                <!-- Hidden
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Powercleanse comes as standard, does the system need a powerflush?" for="powerFlush" styleClass="{!IF((sec5 && ssObj.S_S_TC4__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_TC4__c}" id="powerFlush" /> 
+                </apex:pageblocksectionitem>
+                -->
+            
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is the Customer interested in a Magna Booster?" for="boost" styleClass="{!IF((sec5 && ssObj.S_S_Q10__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q10__c}" id="boost" /> 
+                </apex:pageblocksectionitem>
+            
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a Plume kit Required?" for="plume" styleClass="{!IF((sec5 && ssObj.S_S_Q4__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q4__c}" id="plume" /> 
+                </apex:pageblocksectionitem>
+                
+                
+                  <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a Terminal Guard Required?" for="guard" styleClass="{!IF((sec5 && ssObj.S_S_Q9__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q9__c}" id="guard" /> 
+                </apex:pageblocksectionitem>
+                
+                
+                <!-- A horizonal flue comes free as standard, can you confirm if a flue extension is required? -->
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;"> <!-- style="background-color:{!IF(ssObj.S_S_Q6__c=='--None--','','red')}" -->
+                    <apex:outputLabel value="A horizontal flue comes as standard, Can you confirm if a flue extension is required?" for="hori" styleClass="{!IF((sec5 && ssObj.S_S_Q6__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q6__c}" id="hori" /> 
+                </apex:pageblocksectionitem>
+            
+                
+                  <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Are any Flue bends required?" for="flue" styleClass="{!IF((sec5 && ssObj.S_S_Q7__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q7__c}" id="flue" /> 
+                </apex:pageblocksectionitem>
+                
+                <!-- Hidden
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Which Flue Bend?" for="bend" />
+                    <apex:inputfield value="{!ssObj.S_S_Q8__c}" id="bend" required="true"/> 
+                </apex:pageblocksectionitem>
+                -->
+                
+                <!--
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is an external condensate run/condenseualte required?" for="conden" />
+                    <apex:inputfield value="{!ssObj.S_S_TC6__c}" id="conden" /> 
+                </apex:pageblocksectionitem>
+                -->
+                
+                <!--
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a condensate soak away required?" for="soak" styleClass="{!IF((sec5 && ssObj.S_S_TC7__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_TC7__c}" id="soak" /> 
+                </apex:pageblocksectionitem>
+                -->
+                
+                <!--
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a condensate pump required?" for="pump" styleClass="{!IF((sec5 && ssObj.S_S_TC8__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_TC8__c}" id="pump" /> 
+                </apex:pageblocksectionitem>
+                -->
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a balance flue brick up/major building work required?" for="building" styleClass="{!IF((sec5 && ssObj.S_S_TC9__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_TC9__c}" id="building" /> 
+                </apex:pageblocksectionitem>
+                
+                
+                
+                
+                 <!-- <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is an internal Filling loop required?" for="loop" styleClass="{!IF((sec5 && ssObj.S_S_Q5__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q5__c}" id="loop" /> 
+                </apex:pageblocksectionitem> -->
+                  
+                
+                  
+                 
+                 
+                <!--   <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is the Customer interested in upgrading to a Wireless Thermostat?" for="therm"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q13__c}" id="therm" /> 
+                </apex:pageblocksectionitem>-->
+                
+            </apex:pageblocksection> 
+            <apex:pageblocksection rendered="{!sec2}">  
+                <apex:pageblocksectionitem labelStyle="text-align:left;width:35%;" datastyle="width:2%;" >
+                    <apex:outputLabel value="Is the customer entitled to SM Discresionary Discount?" for="sm" style="width:70%;" styleClass="{!IF((sec5 && ssObj.S_S_Q14__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q14__c}" id="sm" /> 
+                </apex:pageblocksectionitem> 
+                <apex:pageblocksectionitem >
+                    <apex:inputfield value="{!ssObj.S_M_Authorisation_Number__c}" id="sm" />
+               </apex:pageblocksectionitem>     
+            </apex:pageblocksection>
+            
+            
+            <!-- -----------------------------Telesales conventional------------------------------------------------------------------ -->
+            <apex:pageblocksection columns="1" id="sec4" rendered="{!sec4}">     
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a Fused Spurr required?" for="fuseSpur" styleClass="{!IF((sec5 && ssObj.S_S_Q2__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q2__c}" id="fuseSpur" /> 
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Protective Equipotential Bonding (PEB) required?" for="meb" styleClass="{!IF((sec5 && ssObj.S_S_Q3__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q3__c}" id="meb" /> 
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is frost protection required?" for="frost" styleClass="{!IF((sec5 && ssObj.S_S_TC3__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_TC3__c}" id="frost" /> 
+                </apex:pageblocksectionitem>
+                 
+                 
+                 
+                 
+                
+                  <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="What is the flu position?" for="flu" styleClass="{!IF((sec5 && ssObj.S_S_TC5__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_TC5__c}" id="flu" /> 
+                </apex:pageblocksectionitem>
+                  <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Are any Flue bends required?" for="flue" styleClass="{!IF((sec5 && ssObj.S_S_Q2__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q7__c}" id="flue" /> 
+                </apex:pageblocksectionitem>
+                  <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Which Flue Bend?" for="bend" styleClass="{!IF((sec5 && ssObj.S_S_Q8__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q8__c}" id="bend" required="true"/> 
+                </apex:pageblocksectionitem>
+                 <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a horizontal flue extension required?" for="ext" styleClass="{!IF((sec5 && ssObj.S_S_Q6__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q6__c}" id="ext" /> 
+                </apex:pageblocksectionitem>
+                 <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a Plume kit Required?" for="plume" styleClass="{!IF((sec5 && ssObj.S_S_Q4__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q4__c}" id="plume" /> 
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a Terminal Guard Required?" for="guard" styleClass="{!IF((sec5 && ssObj.S_S_Q9__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q9__c}" id="guard" /> 
+                </apex:pageblocksectionitem>
+                 
+                 
+                
+                 
+                
+                
+                
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a terminal deflector required?" for="terminal" styleClass="{!IF((sec5 && ssObj.S_S_TC10__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_TC10__c}" id="terminal" /> 
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Does the customer require heating controls" for="customer" styleClass="{!IF((sec5 && ssObj.S_S_Q12__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q12__c}" id="customer" /> 
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem labelStyle="text-align:left;" datastyle="width:20%;">
+                    <apex:outputLabel value="Is a magnetic system filter required?" for="magnetic" styleClass="{!IF((sec5 && ssObj.S_S_TC11__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_TC11__c}" id="magnetic" /> 
+                </apex:pageblocksectionitem>
+                <apex:pageblocksectionitem labelStyle="text-align:left;width:35%;" datastyle="width:2%;" >
+                    <apex:outputLabel value="Is the customer entitled to SM Discresionary Discount?" for="sm1" style="width:70%;" styleClass="{!IF((sec5 && ssObj.S_S_Q14__c==''),'label','label1')}"/>
+                    <apex:inputfield value="{!ssObj.S_S_Q14__c}" id="sm1" /> 
+                </apex:pageblocksectionitem> 
+                 
+            </apex:pageblocksection> 
+            
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

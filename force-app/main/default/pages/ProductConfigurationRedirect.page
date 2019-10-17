@@ -1,0 +1,3 @@
+<apex:page standardController="cscfga__Product_Configuration__c" extensions="UISupport" showHeader="false" sidebar="false" standardStylesheets="false" action="{!redirectProductConfiguration}">
+	<p>Redirecting...</p>
+</apex:page>

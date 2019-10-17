@@ -1,0 +1,199 @@
+<apex:page standardController="cscfga__Product_Basket__c" extensions="CS_ProductBasketController" tabStyle="Appointment__c">
+
+  <apex:stylesheet value="{!$Resource.cscfga__BundleDetail_css}"/>
+  <style type="text/css">
+        .numberCol {
+            text-align: right
+        }
+        .main {
+            padding-top: 8px;
+        }
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+    
+    <script type="text/javascript">
+    
+        
+    </script>
+    
+    <apex:pageMessages />
+
+    <apex:detail relatedList="false" subject="{!cscfga__Product_Basket__c.Id}"/>
+    
+    <apex:form >
+
+        <apex:pageBlock title="Configured Products">
+        
+            <!-- apex:commandButton action="{!cloneBasket}" value="Clone Basket" id="cloneBasketButton"/-->
+            <input type="button" class="btn" onclick="cloneBasketJSfnc()" id="cloneBasketBtn" style="display:none;" />
+            <apex:actionFunction name="cloneBasketJSfnc" action="{!cloneBasket}" />
+        
+            <table class="list bundleDetail" width="100%" cellpadding="0" cellspacing="0">
+                <tbody>
+                <!-- headerRow - version without discount columns -->
+                <apex:outputPanel layout="none">
+                <tr class="headerRow" >
+                    <th class="headingCellText" style="width: 100px">Action</th>
+                    <th class="headingCellText" style="width: 100px">Status</th>
+                    <th class="headingCellText">Item</th>
+                    <th class="headingCellNumber">Quantity</th>
+                    <th class="headingCellNumber">Total Net Price</th>
+                    <th class="headingCellNumber">Total Price Incl VAT</th>
+                </tr>
+                </apex:outputPanel>
+                
+                <apex:repeat var="configWrapper" value="{!allBasketItems}">
+                <!--
+                #############################################
+                Top Row
+                #############################################
+                -->
+                
+                    <td class="controls">
+                        <apex:outputPanel rendered="{!configWrapper.canBeEdited}" >
+                             <a href="{!URLFOR($Page.ProductConfigurationScreen, null, [configId=configWrapper.config.Id, definitionId=configWrapper.config.cscfga__Product_Definition__c, linkedId=appointmentId, basketId=basketId, retURL='/' & basketId])}" onclick="CS.progressOn()">Edit</a>
+                        </apex:outputPanel>
+                    </td>
+                    <td>
+                        {!configWrapper.config.cscfga__Configuration_Status__c}
+                    </td>
+                    <td class="totalCellText">
+                        <a href="/{!configWrapper.config.Id}">
+                            {!configWrapper.config.Name}
+                        </a>
+                    </td>
+                    <td class="totalCellNumber">
+                       &nbsp;
+                    </td>
+                    <td class="detailCellNumber">
+                        &nbsp;
+                    </td>
+                     <td class="detailCellNumber">
+                        &nbsp;
+                    </td>
+                    
+                        <!--
+                    #############################################
+                    LINE ITEM ATTRIBUTES
+                    #############################################
+                    -->
+                    <apex:repeat var="item" value="{!configWrapper.lineItemList}">
+                        <tr>
+                            <td colspan="2">&nbsp;</td>
+
+                            <td class="detailCellText" style="padding-left: 20px">
+                                {!item.ItemDescription}
+                            </td>
+                            <td class="detailCellNumber">
+                               {!item.ItemQuantity}
+                            </td>
+                             <td class="detailCellNumber">
+                                 <apex:outputText value="{0, number, #,###,##0.00}">
+                                     <apex:param value="{!item.ItemTotalNetPrice}" />
+                                 </apex:outputText>
+                            </td>
+                             <td class="detailCellNumber">
+                                  <apex:outputText value="{0, number, #,###,##0.00}">
+                                     <apex:param value="{!item.ItemTotalPriceInclVAT}" />
+                                 </apex:outputText>
+                            </td>
+                         </tr>
+                    </apex:repeat>
+                         
+                    <!--
+                    #############################################
+                    TOTALS ROW
+                    #############################################
+                    -->
+                    <tr class="subtotals">
+                        <td colspan="2" style="border:none">
+                            &nbsp;
+                        </td>
+                        <apex:outputPanel layout="none">
+                            <apex:outputPanel layout="none">
+                                <td class="totalCellText">Totals</td>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        <td class="totalCellNumber">
+                            &nbsp;
+                        </td>
+                        <td class="totalCellNumber">
+                            <apex:outputText value="{0, number, #,###,##0.00}">
+                                <apex:param value="{!configWrapper.totalNetPrice}" />
+                            </apex:outputText>
+                        </td>
+                        <td class="totalCellNumber">
+                            <apex:outputText value="{0, number, #,###,##0.00}">
+                                <apex:param value="{!configWrapper.totalPriceInclVAT}" />
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                    
+                     <!--
+                    #############################################
+                    ALLOWANCE LINE ITEM ATTRIBUTES
+                    #############################################
+                    -->
+                    <apex:repeat var="item" value="{!configWrapper.allowanceItemList}">
+                        <tr>
+                            <td colspan="2">&nbsp;</td>
+
+                            <td class="detailCellText" style="padding-left: 20px">
+                                {!item.ItemDescription}
+                            </td>
+                            <td  class="detailCellNumber">
+                                &nbsp;
+                            </td>
+                             <td  class="detailCellNumber">
+                                &nbsp;
+                            </td>
+                             <td class="detailCellNumber">
+                                  <apex:outputText value="{0, number, #,###,##0.00}">                                    
+                                    <apex:param value="{!-item.ItemTotalPriceInclVAT}" />
+                                 </apex:outputText>
+                            </td>
+                         </tr>
+                    </apex:repeat>
+                    
+                     <!--
+                    #############################################
+                    PAYABLE TOTALS ROW
+                    #############################################
+                    -->
+                    <tr class="subtotals">
+                        <td colspan="2" style="border:none">
+                            &nbsp;
+                        </td>
+                        <apex:outputPanel layout="none">
+                            <apex:outputPanel layout="none">
+                                <td class="totalCellText">Payable Total</td>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        <td class="totalCellNumber">
+                            &nbsp;
+                        </td>
+                        <td class="totalCellNumber">
+                            &nbsp;
+                        </td>
+                        <td class="totalCellNumber">
+                            <apex:outputText value="{0, number, #,###,##0.00}">
+                                <apex:param value="{!configWrapper.totalPayable}" />
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                
+                </apex:repeat>
+                
+                </tbody>
+              </table>
+        
+        </apex:pageBlock>
+    
+    </apex:form>
+   
+    <apex:relatedList list="CombinedAttachments" />
+ 
+    
+</apex:page>

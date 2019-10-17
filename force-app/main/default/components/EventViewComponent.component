@@ -1,0 +1,20 @@
+<apex:component >
+<apex:attribute name="eventList" description="This attribute passes the list of events to component." type="Inbound_Call__c[]"/>
+    <apex:pageBlockSection title="Call History" collapsible="false" columns="1">
+       <!-- Fix Cognizant support - display call start & end date time using current users local time zone.  Starts -->
+       <!-- Deleted orignal date time start and end time fields from this page for inbound call object, 
+            instead of that we are displaying formatted date time string field corrected in apex code. -->
+      <apex:pageBlockTable var="e" value="{!eventList}" width="100%">
+         <apex:column headerValue="Start Date and Time" width="35%">
+            <apex:outputText value="{!e.Start_Date_Time_Formatted__c}">
+            </apex:outputText>
+        </apex:column>  
+        <apex:column headerValue="End Date and Time" width="35%">
+            <apex:outputText value="{!e.End_Date_Time_Formatted__c}">
+            </apex:outputText>
+        </apex:column>  
+       <!-- Fix Cognizant support - display call start & end date time using current users local time zone.  Ends -->
+        <apex:column headerValue="Owner" value="{!e.CreatedBy.Name}" width="30%"/>
+      </apex:pageBlockTable>  
+    </apex:pageBlockSection>
+</apex:component>

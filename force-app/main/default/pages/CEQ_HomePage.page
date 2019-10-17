@@ -1,0 +1,305 @@
+<apex:page >
+    
+</apex:page>
+<!--controller="CEQ_HomePageCont" tabStyle="Job__c" id="page" readOnly="true" sidebar="false" showHeader="false">
+    <apex:includeScript value="/soap/ajax/29.0/connection.js"/>
+   <apex:includeScript value="/support/console/29.0/integration.js"/>
+    <script type="text/javascript">
+ 
+ 
+     function togglleDiv(show)
+     {
+         document.getElementById('darkLayer').style.display = show; 
+         document.getElementById('LoadingDiv').style.display = show;      
+     }  
+    </script>	
+
+
+    <apex:form >  
+    <html>
+        <body>
+            <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:100px;position:absolute;left:500px; top:300px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Processing...
+            </div>
+            </div>
+            <div id="darkLayer" style ="background-color: white; 
+                                    filter:alpha(opacity=50); /* IE */ 
+                                    opacity: 0.5; /* Safari, Opera */ 
+                                    -moz-opacity:0.50; /* FireFox */ 
+                                    z-index: 20; 
+                                    height: 100%; 
+                                    width: 100%; 
+                                    background-repeat:no-repeat; 
+                                    background-position:center; 
+                                    position:absolute; 
+                                    top: 0px; 
+                                    left: 0px; 
+                                    display:none;">
+     		</div>
+            <div id="container" style="width:100%;" >
+                
+                <div id="header1" style="background-color:#00CCFF; width:100%; height:150px;">
+                    <!--<div id ="header1item1" style="width:20%;float:left;text-align:center;height:99%">
+                        <fieldset style="height:90%;">
+                            <legend>Total No. of CEQ</legend>
+                                <span style="font-size:100px;">
+                                {!Count}
+                                </span>
+                        </fieldset>
+                        
+                    </div>
+                    <apex:commandLink action="{!showFailedJobs_Large}" ><!--reRender="blk2sec1" onclick="togglleDiv('');" oncomplete="togglleDiv('none');">
+                    <div id ="header1item2" style="width:25%;float:left;height:99%;">
+                        <fieldset style="height:90%;text-align:left;">
+                            <legend>Total Failed Installs</legend>
+                                <!--<apex:chart height="140" width="280" data="{!FodNormalClass}" name="ceqChart"><!-- animate="true" >
+                                    <apex:pieSeries dataField="data" labelField="name"  />
+                                    <apex:legend position="left"/>
+                                </apex:chart>
+                                <apex:chart height="130" width="280" data="{!FodNormalClass}" name="FailedJobs" animate="true" >
+                                <apex:axis type="Numeric" position="left" fields="data" title="" grid="true"/>
+                                <apex:axis type="Category" position="bottom" fields="name" title="" />    
+                                 <apex:barSeries title="Cases By Classification" orientation="vertical" axis="left" xField="name" yField="data" colorSet="brown"/>
+                                </apex:chart>
+                        </fieldset>    
+                    </div>
+                    </apex:commandlink>    
+                    
+                    <apex:commandLink action="{!showCases_Large}"><!-- reRender="blk2sec1" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"> 
+                    <div id ="header1item3" style="width:25%;float:left;height:99%;">
+                        <fieldset style="height:90%;text-align:left;">
+                            <legend>Cases By Classification</legend>
+                            
+                                <apex:chart height="130" width="280" data="{!caseNormClass}" name="caseChart" animate="true" >
+                                <apex:axis type="Numeric" position="left" fields="data" title="" grid="true"/>
+                                <apex:axis type="Category" position="bottom" fields="name" title="" />    
+                                 <apex:barSeries title="Cases By Classification" orientation="vertical" axis="left" xField="name" yField="data" colorSet="brown"/>
+                                </apex:chart>
+                        </fieldset>    
+                    </div>
+                    </apex:commandlink>
+                    <apex:commandLink action="{!showASPS_Large}" ><!--reRender="blk2sec1" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"> 
+                    <div id ="header1item4" style="width:25%;float:left;height:99%;">
+                        <fieldset style="height:90%;text-align:left;">
+                            <legend>ASP By Function</legend>
+                                <apex:chart height="130" width="280" data="{!ASPNormalClass}" name="aspChart" animate="true" >
+                                <apex:axis type="Numeric" position="left" fields="data" title="" grid="true"/>
+                                <apex:axis type="Category" position="bottom" fields="name" title="" />    
+                                 <apex:barSeries title="ASPs By Function" orientation="vertical" axis="left" xField="name" yField="data" colorSet="brown"/>
+                                </apex:chart>
+                        </fieldset>    
+                    </div>
+                    </apex:commandlink> 
+                    <apex:commandLink action="{!showSales_Large}">
+                     <div id ="header1item5" style="width:25%;float:left;height:99%;">
+                        <fieldset style="height:90%;text-align:left;">
+                            <legend>Sales Audit Questions</legend>
+                                <apex:chart height="130" width="280" data="{!ceqSaleClass}" name="CEQSaleChart" animate="true" >
+                                <apex:legend position="left"/>
+                                <apex:axis type="Numeric" position="left" fields="countVal,countVal2" title="" grid="true"/>
+                                <apex:axis type="Category" position="bottom" fields="value1" title="" />    
+                                 <apex:barSeries orientation="vertical" axis="left" xField="value1" yField="countVal,countVal2" title="Yes,No" colorSet="Green,Red" stacked="true" />
+                                </apex:chart>
+                        </fieldset>   
+                    </div>
+                    </apex:commandlink> 
+                </div>
+                <div id= "header2" style="width:80%; height:100%;float:left;">
+                  <div id= "header2item1" style="width:100%; height:200px;">
+                  
+                  <apex:pageBlock >
+                      <apex:pageBlockButtons location="top">
+                          <apex:commandButton value="Re-Run"  action="{!refreshData}" />
+                      </apex:pageBlockButtons>
+                      <apex:pageblocksection title="Date Criteria">
+                          <apex:pageBlockSectionItem >
+                              <apex:outputLabel value="Start Date" for="start"/>
+                                  <apex:inputField value="{!job.Customer_Journey_First_Update__c}" id="start"/>
+                              
+                          </apex:pageBlockSectionItem>
+                           <apex:pageBlockSectionItem >
+                               <apex:outputLabel value="End Date" for="End"/>
+                                  <apex:inputField value="{!job.BGNE_Install_Date__c}" id="End"/>
+                              
+                          </apex:pageBlockSectionItem>
+                          <apex:pageBlockSectionItem >
+                              <apex:outputLabel value="Region" for="region"/>
+                                  <apex:selectList style="font-size:7pt;" value="{!region}" multiselect="false" size="1" id="region" title="Failed Installations Details">
+                                      <apex:selectOptions value="{!RegionList}"/>
+                                  </apex:selectList>
+                              
+                          </apex:pageBlockSectionItem>
+                          <apex:pageBlockSectionItem >
+                              <apex:outputLabel value="District" for="region"/>
+                                  <apex:selectList style="font-size:7pt;" value="{!district}" multiselect="false" size="1" id="region" title="Failed Installations Details">
+                                      <apex:selectOptions value="{!districtList}"/>
+                                  </apex:selectList>
+                             
+                          </apex:pageBlockSectionItem>
+                      </apex:pageblocksection>
+                  </apex:pageBlock> 
+                  <apex:pageblock id="blk1">
+                      <!--<apex:pageBlockSection id="blk2sec2" columns="1" rendered="{!fodChart}">
+                      	
+                          </apex:pageBlockSection>
+                      <apex:pageBlockSection id="blk2sec1" columns="1">
+                          <apex:pageMessages />
+                         <apex:outputPanel rendered="{!fodChart}">
+                             <apex:commandLink action="{!fetchFOD}" >
+                             <fieldset style="height:99%;text-align:left;">
+                                <legend>Total Failed Installs</legend>
+                              	<apex:chart height="330" width="680" data="{!FodNormalClass}" name="FailedJobs_Large" animate="true" legend="true" >
+                                <apex:axis type="Numeric" position="bottom" fields="data" title="Cause" grid="true"/>
+                                <apex:axis type="Category" position="left" fields="name" title="Failed Jobs" />    
+                                 <apex:barSeries title="Total Failed Installs" orientation="horizontal" axis="left" xField="data" yField="name"/>
+                                </apex:chart>
+                          	</fieldset>
+                          	</apex:commandLink>
+                          </apex:outputPanel>
+                          <apex:pageBlockTable value="{!failedList}" var="f" rendered="{!fodTable}">
+                              <apex:column value="{!f.Name}"/>
+                              <apex:column value="{!f.Job__c}"/>
+                              <apex:column value="{!f.Date_Failed__c}"/>
+                              <apex:column value="{!f.Cause__c}"/>
+                              <apex:column value="{!f.Reason__c}"/>
+                              <apex:column value="{!f.Installer__c}"/>
+                          </apex:pageBlockTable>
+                          
+                          <!---
+                          CASE Details:
+                          
+                          
+                          
+                          <apex:outputPanel rendered="{!caseChart}">
+                          <apex:commandLink action="{!fetchCases}" >
+                            <fieldset style="height:99%;text-align:left;">
+                                <legend>Cases By Classification</legend>
+                              	<apex:chart height="330" width="680" data="{!caseNormClass}" name="Cases_Large" animate="true" legend="true" >
+                                <apex:axis type="Numeric" position="bottom" fields="data" title="Cases Count" grid="true"/>
+                                <apex:axis type="Category" position="left" fields="name" title="Classification" />    
+                                <apex:barSeries title="Cases By Classification" orientation="horizontal" axis="left" xField="data" yField="name"/>
+                                </apex:chart>
+                          	</fieldset>
+                          </apex:commandLink>	
+                          </apex:outputpanel>
+                          <apex:pageBlockTable value="{!CaseList}" var="c" title="Case Table" rendered="{!caseTable}">
+                              <apex:column value="{!c.CaseNumber}"/>
+                              <apex:column value="{!c.Classification__c}"/>
+                              <apex:column value="{!c.AccountId}"/>
+                              <apex:column value="{!c.Sales_Region__c}"/>
+                              <apex:column value="{!c.Account.Sales_District__c}"/>
+                              <apex:column value="{!c.Status}"/>
+                          </apex:pageBlockTable>
+                          
+                          
+                          
+                           <apex:outputPanel rendered="{!aspChart}">
+                          	<apex:commandLink action="{!fetchASPs}" >
+                            <fieldset style="height:90%;text-align:left;">
+                            <legend>ASP By Function</legend>
+                                <apex:chart height="330" width="680" data="{!ASPNormalClass}" name="aspChart_Large" animate="true" >
+                                <apex:axis type="Numeric" position="bottom" fields="data" title="ASP's Count" grid="true"/>
+                                <apex:axis type="Category" position="left" fields="name" title="Function" />    
+                                 <apex:barSeries title="ASPs By Function" orientation="horizontal" axis="left" xField="data" yField="name"/>
+                                </apex:chart>
+                        	</fieldset> 
+                        	</apex:commandLink>
+                          </apex:outputpanel>
+                          
+                          <apex:pageBlockTable value="{!aspList}" var="a" title="ASP Table" rendered="{!aspTable}">
+                              <apex:column value="{!a.Name}"/>
+                              <apex:column value="{!a.Function__c}"/>
+                              <apex:column value="{!a.Definition__c}"/>
+                              <apex:column value="{!a.Picklist__c}"/>
+                              <apex:column value="{!a.Charge_to_Customer__c}"/>
+                              <apex:column value="{!a.App_Assigned_To__c}"/>
+                          </apex:pageBlockTable>
+                          
+                          <apex:outputPanel rendered="{!saleChart}">
+                         <fieldset style="height:90%;text-align:left;">
+                            <legend>Sales Audit Questions</legend>
+                                <apex:chart height="330" width="680" data="{!ceqSaleClass}" name="CEQSale_Large" animate="true" >
+                                <apex:legend position="left"/>
+                                <apex:axis type="Numeric" position="left" fields="countVal,countVal2" title="Count" grid="true"/>
+                                <apex:axis type="Category" position="bottom" fields="value1" title="Sales Questions" />    
+                                <apex:barSeries orientation="vertical" axis="left" xField="value1" yField="countVal,countVal2" title="Yes,No" colorSet="Green,Red" stacked="true" />
+                                </apex:chart>
+                        </fieldset> 
+                      </apex:outputpanel>
+                      
+                      <apex:outputPanel rendered="{!instChart}">
+                         <fieldset style="height:100%;text-align:left;">
+                           <legend>Installations Audit Questions</legend>
+                               <apex:chart height="330" width="680" data="{!ceqInstClass}" name="CEQInst_Large" animate="true" >
+                               <apex:legend position="bottom"/>
+                               <apex:axis type="Numeric" position="left" fields="countVal,countVal2" title="Count" grid="true"/>
+                               <apex:axis type="Category" position="bottom" fields="value1" title="Installation Questions" />    
+                                <apex:barSeries orientation="vertical" axis="left" xField="value1" yField="countVal,countVal2" title="Yes,No" colorSet="Green,Red" stacked="true"  />
+                               </apex:chart>
+                       </fieldset> 
+                      </apex:outputpanel>
+                      
+                      <apex:outputPanel rendered="{!custChart}">
+                         <fieldset style="height:90%;text-align:left;">
+                            <legend>Customer Audit Questions</legend>
+                                <apex:chart height="330" width="680" data="{!ceqOtherClass}" name="CEQOther_Large" animate="true" >
+                                <apex:legend position="bottom"/>
+                                <apex:axis type="Numeric" position="left" fields="countVal,countVal2,countVal3" title="Count" grid="true"/>
+                                 
+                                <apex:axis type="Category" position="bottom" fields="value1" title="Customer Questions" />    
+                                    <apex:barSeries orientation="vertical" axis="left" xField="value1" yField="countVal,countVal2,countVal3" title="Yes,No,Cust N/A" colorSet="Green,Red,Brown" stacked="true"/>
+                                </apex:chart>
+                        </fieldset>  
+                      </apex:outputpanel> 
+                          
+                      </apex:pageBlockSection>
+                      </apex:pageblock>  
+                  </div>    
+                </div>   
+                <div id= "header3" style="background-color:#00CCFF; height:100%; width:20%; float:left;">
+                <apex:commandLink action="{!showInstallation_Large}">
+                   <div id ="header3item1" style="width:100%;height:190px;">
+                       <fieldset style="height:170px;text-align:left;">
+                           <legend>Installations Audit Questions</legend>
+                               <apex:chart height="170" width="100%" data="{!ceqInstClass}" name="CEQInstChart" animate="true" >
+                               <apex:legend position="bottom"/>
+                               <apex:axis type="Numeric" position="left" fields="countVal,countVal2" title="" grid="true">
+                                   
+                               </apex:axis>    
+                               <apex:axis type="Category" position="bottom" fields="value1" title="" />    
+                                <apex:barSeries orientation="vertical" axis="left" xField="value1" yField="countVal,countVal2" title="Yes,No" colorSet="Green,Red" stacked="true"  />
+                               </apex:chart>
+                       </fieldset>       
+                   </div>
+                   </apex:commandLink>
+                    <apex:commandLink action="{!showCustomer_Large}">
+                    <div id ="header3item1" style="width:100%;height:190px;">
+                        <fieldset style="height:170px;text-align:left;">
+                            <legend>Customer Audit Questions</legend>
+                                <apex:chart height="170" width="100%" data="{!ceqOtherClass}" name="CEQOtherChart" animate="true" >
+                                <apex:legend position="bottom"/>
+                                <apex:axis type="Numeric" position="left" fields="countVal,countVal2,countVal3" title="" grid="true">
+                                    
+                                </apex:axis>    
+                                <apex:axis type="Category" position="bottom" fields="value1" title="" />    
+                                    <apex:barSeries orientation="vertical" axis="left" xField="value1" yField="countVal,countVal2,countVal3" title="Yes,No,Cust N/A" colorSet="Green,Red,Brown" stacked="true"/>
+                                </apex:chart>
+                        </fieldset>       
+                    </div>
+                    </apex:commandLink>
+                    <!--<div id ="header3item2" style="width:100%;height:190px;">
+                        <fieldset style="height:90%;text-align:center">
+                            <legend>AVG NPS</legend>
+                                <span style="font-size:100px;">
+                                {!Count}
+                                </span>
+                        </fieldset>       
+                    </div>
+                </div>  
+                
+            </div>
+        </body>
+    </html>
+    </apex:form> 
+</apex:page>-->

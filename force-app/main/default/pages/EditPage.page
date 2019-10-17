@@ -1,0 +1,198 @@
+<apex:page standardController="idea" extensions="publishidea" showHeader="true" sidebar="false" tabStyle="Job__c">
+<script type="text/javascript">
+  
+function openPopup(page,param){
+    window.open(page+'?id='+param,'_blank', 'toolbar=no, scrollbars=no, resizable=yes, width=940, height=480')
+}
+
+function chek(chkd){
+   callAddRow(chkd);
+}
+
+</script>
+
+
+
+<apex:pagemessages />
+<apex:form id="theForm">
+
+<apex:pageBlock id="editPB">
+
+
+    <apex:pageBlockButtons id="editButtons" location="top" rendered="true">
+    
+       <apex:commandButton id="saveBtn" value="Save" action="{!saveidea}" rendered="{!savebutton}" />
+       <apex:commandButton id="editBtn" value="Edit" action="{!editidea}" rendered="{!editbutton}" />
+        <apex:commandButton id="cnclBtn" value="Cancel" action="{!cancelidea}" rendered="{!cancelbutton}"/>
+        
+   </apex:pageBlockButtons>
+
+    <apex:pageBlockSection title="Idea Details " columns="1" id="pgBlckSct1">
+        
+        <apex:outputField value="{!idea.Idea_Number__c}"/>
+        <apex:outputField value="{!idea.Title}"/>
+        <apex:outputField value="{!idea.Body}"/>
+        <apex:outputField value="{!idea.Reason__c}"/>
+        <apex:outputField value="{!idea.Suggesstion__c}"/>
+        <apex:outputField value="{!idea.WithHold_Name__c}"/>
+        <apex:outputField value="{!idea.On_Behalf_Of__c}" />
+        <apex:outputField value="{!idea.No_Of_Votes__c}"/>
+        <apex:outputField label="Submitted By" value="{!idea.CreatedById}"/>
+        <apex:outputField label="Submitted Date" value="{!idea.CreatedDate}"/>
+        
+        
+     </apex:pageBlockSection>
+     
+<apex:pageBlockSection title="Admin Section" columns="2" id="pgBlckSct2" >
+
+   <apex:inputField value="{!idea.District__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.District__c}" rendered="{!(!flag)}" />
+   <apex:inputField value="{!idea.Region__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Region__c}"  rendered="{!(!flag)}" />
+   <apex:outputField value="{!idea.Status}"  rendered="{!(!flag)}" />
+   
+   <apex:inputField value="{!idea.Sub_Status__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Sub_Status__c}"  rendered="{!(!flag)}" />
+   <apex:inputField value="{!idea.Business_Area__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Department__c}" rendered="{!(!flag)}"/>
+   <apex:outputField value="{!idea.Business_Area__c}"  rendered="{!(!flag)}" />
+   <apex:outputField value="{!idea.Next_Action_Date__c}" rendered="{!!flag}"/>
+   <apex:inputField value="{!idea.Next_Action_Date__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Owner__c}" rendered="{!!flag}"/>
+   <apex:inputField value="{!idea.Owner__c}" rendered="{!flag}"/>
+   
+   <apex:inputfield value="{!idea.Accepted_Date__c}" rendered="{!flag}"/>
+   <apex:outputfield value="{!idea.Accepted_Date__c}" rendered="{!(!flag)}"  />
+   <apex:inputField value="{!idea.Categories}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Categories}"  rendered="{!(!flag)}" />
+   
+   <!-- Change by Ashok G-->
+   <apex:inputField value="{!idea.Contact__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Contact__c}"  rendered="{!(!flag)}" />
+   
+   <apex:inputField value="{!idea.Final_Resolution_Answer__c}" style="width: 500px; height: 200px" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Final_Resolution_Answer__c}"  rendered="{!(!flag)}" />
+  
+   <apex:inputField value="{!idea.Work_Product__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Work_Product__c}"  rendered="{!(!flag)}" />
+   
+   <apex:inputField value="{!idea.Recorded_Date__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Recorded_Date__c}"  rendered="{!(!flag)}" />
+   
+   <!-- End -->
+   <apex:inputField value="{!idea.Others__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Others__c}"  rendered="{!(!flag)}" />
+   <apex:inputField value="{!idea.Prioritisation_Score__c}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.Prioritisation_Score__c}"  rendered="{!(!flag)}" />
+   
+   <apex:inputfield value="{!idea.Benefit_Type__c}" rendered="{!flag}"/>
+   <apex:outputfield value="{!idea.Benefit_Type__c}" rendered="{!(!flag)}"  />
+   <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+   <apex:inputField value="{!idea.LastModifiedById}" rendered="{!flag}"/>
+   <apex:inputfield value="{!idea.Parent_Idea__c}" rendered="{!flag}"/>  
+   
+   <apex:outputField value="{!idea.Parent_Idea__c}" rendered="{!(!flag)}"/>
+   <apex:outputField value="{!idea.LastModifiedById}"  rendered="{!(!flag)}" />
+   <!--<apex:outputText value="{0,date,MM'/'dd'/'yyyy  HH:mm}"/>-->
+   <apex:inputField value="{!idea.LastModifiedDate}" rendered="{!flag}"/>
+   <apex:outputField value="{!idea.LastModifiedDate}"  rendered="{!(!flag)}" />
+   
+   <!-- <apex:inputfield value="{!idea.Make_this_a_Parent_Idea__c}" id="lpg1" onchange="callAddRow()" rendered="{!flag}"/>
+   <apex:outputfield value="{!idea.Make_this_a_Parent_Idea__c}" rendered="{!(!flag)}"/>         
+  
+   <apex:actionFunction name="callAddRow" action="{!DefaultIdea}" rerender="theForm">
+      
+   </apex:actionFunction>-->
+   
+ </apex:pageBlockSection>
+ 
+ 
+ <!--  <apex:outputPanel rendered="{!ARow}">
+   <div align="center" draggable="false" >
+   <apex:commandButton value="AddRow" action="{!AddRow}" rendered="{!ARow}" reRender="theForm" style="float:center;"/> &nbsp;&nbsp;&nbsp;
+   <apex:commandButton value="RemoveRow" action="{!RemoveRow}" rendered="{!ARow}" reRender="theForm"/>
+   </div>
+   <center>
+   <apex:PageBlocktable value="{!IdeaList}" var="ide" rendered="{!ARow}" id="rep" columns="2" style="width:50%;">
+      <apex:column headerValue="Linked To">
+         <apex:inputField value="{!ide.Parent_Idea__c}" />
+      </apex:column>
+      <apex:column headerValue="Submitted By">
+         <apex:inputField value="{!ide.CreatedById}" />
+      </apex:Column>   
+    </apex:pageblockTable>
+    </center>
+   </apex:outputPanel>
+ -->
+ 
+ <apex:pageBlockSection title="Notes" columns="1" id="notes" showHeader="false" >
+    <apex:InputField value="{!idea.Send_Email__c}"  rendered="{!flag}" />
+    <apex:outputField value="{!idea.Send_Email__c}"  rendered="{!(!flag)}" />
+    <apex:inputfield value="{!idea.Status_Notes__c}" style="width: 800px; height: 200px" rendered="{!flag}"/>
+    <apex:outputField value="{!idea.Status_Notes__c}"  rendered="{!(!flag)}" />
+ </apex:pageBlockSection>
+ 
+ 
+  <apex:pageBlockSection title="Status Indicator" columns="1" id="pgBlckSc3" rendered="{!IdeaComment}">
+  <apex:pageblocksectionitem >
+    <apex:outputfield value="{!idea.Status_Indicator__c}" />
+  </apex:pageblocksectionitem> 
+  </apex:pageBlockSection>
+   
+  
+   <apex:pageBlockSection title="Status update Details" columns="2" id="pgBlckSct4" rendered="{!Statusupdate}">
+        <apex:outputField value="{!idea.Awaiting_Reading__c}"/>
+        <apex:outputField value="{!idea.Sent_for_review__c}" />
+        <apex:outputField value="{!idea.Sent_for_prioritization__c}"/>
+        <apex:outputField value="{!idea.Awaiting_allocation__c}"/>
+        <apex:outputField value="{!idea.Assigned_We_ve_assigned_someone_to_st__c}"/>
+        <apex:outputField value="{!idea.In_progress_We_re_doing_it__c}" />
+        <apex:outputField value="{!idea.Complete_We_ve_completed_it__c}"/>
+        <apex:outputField value="{!idea.Complete_Unable_to_Progress__c}"/>
+        <apex:outputField value="{!idea.Complete_Central_change__c}"/>
+        <apex:outputField value="{!idea.Duplicate__c}"/>
+     </apex:pageBlockSection>
+     
+     
+<apex:pageblocksection collapsible="flase" title="Comments" columns="1" rendered="{!IdeaComment}">    
+ <apex:dataTable value="{!idea.Comments}" var="c" style="cellspacing:10">
+ <apex:column value="{!c.CommentBody}" width="50%"  headerValue="Body" />
+ 
+ <apex:column width="10%" headerValue="Date Time">
+     <apex:outputField value="{!c.CreatedDate}"/>
+ </apex:column>
+  <apex:column width="15%" headerValue="Posted By">
+     <apex:outputField value="{!c.CreatedBy.Name}"/>
+ </apex:column>
+    
+ </apex:dataTable>
+ </apex:pageblocksection>
+ 
+ <apex:pageBlockSection title="Related Ideas" showHeader="True" collapsible="True" columns="1" rendered="{!childRec}">
+        <apex:pageblocktable value="{!RelatedIdeas}" var="a" >
+            <apex:column value="{!a.Idea_Number__c}"/>
+            <apex:column value="{!a.status}"/>
+            <apex:column value="{!a.Region__c}"/>
+            <apex:column value="{!a.Accepted_Date__c}"/>
+            <apex:column value="{!a.createdByID}"/>
+            <apex:column value="{!a.createddate}"/>
+        </apex:pageBlockTable>
+ </apex:pageBlockSection>
+ 
+   <apex:pageBlockSection title="Idea History Details" showHeader="True" collapsible="True" columns="1" rendered="{!IdeaHistory}">
+        <apex:pageblocktable value="{!history}" var="a" columns="5">
+            <apex:column value="{!a.Idea_Ref__c}"/>
+            <apex:column value="{!a.From_status__c}"/>
+            <apex:column value="{!a.To_Status__c}"/>
+            <apex:column value="{!a.createdByID}"/>
+            <apex:column value="{!a.createddate}"/>
+        </apex:pageBlockTable>
+    </apex:pageBlockSection>
+    <!-- <apex:outputlink value="/apex/IdeaHistory?Id={!Ida.id}" target="_blank" rendered="{!IdeaHistory}" >showall</apex:outputlink>-->
+    
+    <apex:outputlink onclick="openPopup('{!$Page.IdeaHistory}','{!ida.id}');" target="_blank" rendered="{!showall}" id="popup">showall</apex:outputlink>
+ </apex:pageBlock>
+ 
+</apex:form>
+</apex:page>

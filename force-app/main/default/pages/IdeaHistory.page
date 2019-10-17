@@ -1,0 +1,26 @@
+<apex:page standardController="idea"  showHeader="true" sidebar="false"  extensions="viewIdeaHistoryExtension" id="page" standardstylesheets="false">
+
+<apex:form id="frm" > 
+
+<apex:outputPanel id="readOnly" >
+<apex:pageBlock >
+    <div align="Center">
+        <h1>Business Admin History</h1>
+    </div>
+</apex:pageBlock>
+    
+    <apex:pageBlock >
+    <apex:pageBlockSection title="Idea History Details" showHeader="True" collapsible="false" columns="1">
+        <apex:pageblocktable value="{!history}" var="a" columns="5">
+            <apex:column value="{!a.Idea_Ref__c}"/>
+            <apex:column value="{!a.From_status__c}"/>
+            <apex:column value="{!a.To_Status__c}"/>
+            <apex:column value="{!a.createdByID}"/>
+            <apex:column value="{!a.createddate}"/>
+        </apex:pageBlockTable>
+    </apex:pageBlockSection>
+    </apex:pageblock>
+</apex:outputpanel>
+<!--<apex:commandlink value="showall" action="{!showall}" rerender="frm" rendered="{!showall}"/>-->
+</apex:form>
+</apex:page>

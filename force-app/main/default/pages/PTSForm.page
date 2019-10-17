@@ -1,0 +1,33 @@
+<apex:page showheader="false" controller="PTSFormController">
+<apex:outputPanel rendered="{!IsError}">
+	<div style="width:100%;padding-top:130px;padding-left:40px;height:80px;color:#AA0000;font-size:20px;text-align:left;vertical-align:middle;" >
+		<apex:pagemessages />
+	</div>  
+</apex:outputPanel>
+
+<apex:outputPanel rendered="{!!IsError}">
+    <div  id="divfrm" style="visibility:hidden;"> <!--  -->
+    <form action="{!$Label.PTS_Target_URL}/AutoPost.aspx" method="POST">
+        userId&nbsp;<input type="text" name="userId" value="{!$Label.PTSLoginID}" /><br/> 
+        userPassword&nbsp;<input type="text" name="userPassword" value="{!$Label.PTSLoginPassword}" /><br/>
+        deliveryId&nbsp;<input type="text" name="deliveryId" value="{!Job.DeliveryID__c}" /> <br/>
+        customerUser&nbsp;<input type="text" name="customerUser" value="{!$User.ID}" /><br/>
+        sapNumber&nbsp;<input type="text" name="sapNumber" value="" /><br/>
+        jobnumber&nbsp;<input type="text" name="jobnumber" value="{!Job.Name}" /><br/>
+        enquiryNumber&nbsp;<input type="text" name="enquiryNumber" value="{!Job.Name}" /><br/>
+        addressLine1&nbsp;<input type="text" name="addressLine1" value="{!Job.Install_Street__c}" /><br/>
+        addressLine2&nbsp;<input type="text" name="addressLine2" value="{!Job.Install_City__c}" /><br/>
+        addressLine3&nbsp;<input type="text" name="addressLine3" value="{!Job.Installation_County__c}" /><br/>
+        addressLine4&nbsp;<input type="text" name="addressLine4" value="" /><br/>
+        postcode&nbsp;<input type="text" name="postcode" value="{!Job.Install_Postcode__c}" /><br/>
+        date&nbsp;<input type="text" name="date" value="{!DeliveryDateNew}"/> <br/>
+        addressLine4&nbsp;<input type="text" name="notes" value="{!Job.Delivery_Notes__c}" /><br/>
+        <input type="submit" id='submit' value="submit" />
+        
+    </form> 
+    <script>
+        document.getElementById('submit').click();
+    </script>
+    </div>
+</apex:outputPanel>
+</apex:page>

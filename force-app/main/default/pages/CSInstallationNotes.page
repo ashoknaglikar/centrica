@@ -1,0 +1,538 @@
+<apex:page standardController="cscfga__Product_Basket__c" extensions="CS_InstallationNotesController" renderAs="pdf" showHeader="false" standardStylesheets="false" applyHtmlTag="false" sidebar="false" contentType="html"  action="{!deleteTempAttachment}">
+<html>
+    <head>
+		<title>Installation notes BG</title>
+	    <style>
+	        .bg-logo-box {
+			    background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}");
+                background-repeat: no-repeat;
+                background-position: right top;
+                background-size: 100px 100px;
+			}
+			
+			.sg-logo-box {
+			    background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'SG_logo_s.resource')}");
+                background-repeat: no-repeat;
+                background-position: right top;
+                background-size: 100px 100px;
+			}
+			
+	    	@page {
+                size: A4;
+                
+                margin-top: 5mm;
+                margin-bottom: 5mm;
+                margin-left: 10mm;
+                margin-right: 10mm;
+                font-size: 70%;
+
+            
+                @bottom-right {
+                	font-family: sans-serif;
+            		font-size: 60%;
+                    content: "Page " counter(page) " of " counter(pages);
+                }
+	        }
+	        .page-break {
+	            visibility: hidden;
+	            display:block;
+	            page-break-after:always;
+	        }
+	        body {
+	        	font-size: 80%;
+	            font-family: sans-serif;
+	        }
+
+			/*---Brand colours for fonts ---*/
+			.darkBlue{color:#0072bc}
+			.midBlue{color:#00baf2}
+			.lightBlue{color:#b9e5fb;}
+			.pink{color:#ec008c}
+			.slate{color:#333F48;}
+
+			/*---Brand colours for element backgrounds---*/
+			.bg-darkBlue{background-color:#0072bc}
+			.bg-midBlue{background-color:#00baf2}
+			.bg-lightBlue{background-color:#b9e5fb}
+			.bg-green{background-color: #bed62f}
+
+			.clearfix:after {
+	            content: " ";
+	            visibility: hidden;
+	            display: block;
+	            height: 0;
+	            clear: both;
+	        }
+
+			
+			/*--Tags and classes using bold font--*/
+			h1,h2,h3{font-family: sans-serif;color:rgb(0,169,224);font-weight:normal;}
+			h2,h3{font-family: sans-serif;
+				  padding-bottom: 0px;
+				  margin-bottom: 0px;
+			}
+			
+
+			.bold {
+			    font-family: sans-serif;
+			    font-weight: bold;
+			}
+			
+	        .body   {margin-top: 1em}
+	        
+	        .smaller{font-size: smaller;}
+			.asbestosIdentified {color:red; font-weight:bold; margin-bottom:0.5em}
+			.warning{border:solid 1px red;padding:0.5em; border-radius:8px; color:red; display:inline-block}
+			.warning p {margin: 0.2em;}
+			
+			span.noAsbestos{color:green}
+
+			page {
+				background: #FFF;
+				display: block;
+				margin: 0 auto;
+				page-break-inside: avoid;
+				position:relative;
+				width: 21cm;
+				height: 29.7cm;
+				border-bottom:1px solid grey;
+			}
+	        
+	        .table  { display: table; width: 100%; }
+	        .row    { display: table-row; height: 70px; width:100%; }
+	        .cell   { display: table-cell; border: 1px solid #FFFFFF; padding: 10px; }
+	        
+	        .cell-dark  {background-color: #B0E2EC;}
+	        .cell-light {background-color: #D6F1F5;}
+	        .cell-left  {width: 30%; display: inline-block;}
+	        .cell-right {width: 69%; display: inline-block;}
+	        
+	        input[type=text], textarea {-webkit-appearance: none; -webkit-border-radius:0; font-family: 'BGFlame'; font-size: 15px; padding: 3px; border-radius:0; border-style: none;}
+	        input[type=text] { height: 25px; box-sizing: border-box; width: 100%;}
+	        textarea {width: 100%;}
+	    
+	        .footer {bottom: 0px; font-size: smaller; margin-top: 10px}
+	        
+	        .inlineDivs{
+	           width: 30%;
+	        }
+
+	        .moreSpace{
+	            margin-top: 10px;
+	            margin-bottom: 5px;
+	        }
+	        .mediumDiv{
+	            margin-top: 5px;
+	            margin-bottom: 5px;
+	        }
+
+	        .bigDiv{
+	            font-family: 'BGFlame';
+	            font-size: 14px;
+	            margin-top: 10px;
+	            margin-bottom: 10px;
+	        }
+
+	        .bgLogo{float:right;}
+
+	        .smallWidth{width: 30%;}
+
+	        .mediumWidth{
+	            width: 50%;
+	        }	
+	        
+	       
+
+    	        .simpleTable tr:nth-child(odd){
+    				border-collapse: collapse;
+    				font-size: 13px;
+    				background-color: #b9e5fb;
+    				width: 90%;
+    				margin-top:2px;
+    				margin-bottom:2px;
+    				text-align: left;
+    	        }
+    			
+    			.simpleTable tr:nth-child(even){
+    				font-size: 13px;
+    				background-color: white;
+    	        }
+    	        .radiatorTable {
+    	        	font-size: 13px;
+    	            border-collapse: collapse;
+    	            width: 100%;
+    	            background-color: #b9e5fb;
+    	            text-align: left
+    			}
+    			
+    			.signatureLeft {
+                    float: left;
+                    width: 100%;
+                }
+                
+                .signatureRight {
+                    float: right;
+                    width: 100%;
+                }
+                
+                .signatureCenter {
+                    width: 100%;
+                    margin-left: 6px;
+                }
+            
+    
+    		   .radiatorTable tr:nth-child(even){background-color: white;}
+    		   .radiatorTable th{font-weight:bold}
+    		   
+    		   .inlineDisplaySignature{width: 70%; display: inline-block; margin:2px;}
+    		   
+    		    #acceptance-box {
+    	            padding: 0.5em 0.5em 0.5em 0.5em;
+    	            margin-top: 0rem;
+    	            background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'lightBlueBoxBig2.resource')}");
+    	            background-repeat: no-repeat;
+    	            height: 167px;
+    	        }
+    	        
+    	        #acceptance-box h3 {
+    	            margin: 0
+    	        }
+    	        
+    	        #acceptance-box p {
+    	            font-size: 84%
+    	            
+    	        }
+    	        
+    	        .signature-box {
+    	            border: 1px solid #fff;
+    	            border-radius: 10px;
+    	            background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'whiteBoxSmall2.resource')}");
+    	            background-repeat: no-repeat;
+    	            height: 50px;
+    	            padding: 2px;
+    	            background-size: 230px 50px;
+    	        }
+    		
+    
+    		   .signature-box {
+                    /*background-color: #fff;
+                    border: 1px solid #fff;
+                    border-radius: 10px;
+                    -webkit-border-radius:10px;
+                    -moz-border-radius:5px;*/
+                    background-image: url("{!URLFOR($Resource.quoteOnlinePageRes, 'whiteBoxSmall2.resource')}");
+                    background-repeat: no-repeat;
+                    height: 50px;
+                    padding: 2px;
+                    background-size: 230px 50px;
+                }
+    			.signature-box p{margin:0;font-family: sans-serif;}
+    			
+    			.newPage{
+    			    margin-top:2em;
+    			    page-break-before: always;
+    			    
+    			}
+                
+                .contact-table{margin:1em 0;}
+                .align-right{text-align: right}
+    			
+    			.leftRadius{border-bottom-left-radius: 14px;}
+    			
+    			.shadedTable{font-size:85%;}
+                .shadedTable th{font-weight:bold;text-align: left}
+                .shadedTable tr:nth-child(odd){background-color: #eae7e7;}
+        		.shadedTable tr:nth-child(even){background-color: white;}
+        		tr.red {color: red;}
+        		
+        		span.asbestosIdentified {color:red; font-weight:bold; margin-bottom:0.5em}
+        		span.warning{border:solid 1px red;padding:0.5em; border-radius:8px; color:red; display:inline-block}
+        		.warning p {margin: 0.2em;}
+        		.disclaimer{font-size: 80%;}
+        		.tradingStatement{font-size: 75%; margin: 0.3em 0;}
+        		.clearfix:after {content: " ";visibility: hidden;display: block;height: 0;clear: both;}
+                .flex{display: flex}
+                .darkBlue{color:#0072bc}    
+        		
+	    </style>
+	</head>
+
+    <body>
+        <div class="content" style="width: 700px; height: 950px;">
+			<div class='body {!logoCSSClass}'>
+			    <div style='position: relative; top: 15mm;'>
+    				<h1>Your Personal Central Heating Specification</h1>
+    				<apex:outputpanel rendered="{!inputNotes.productDefinition=='Small Commercial'}">
+    				<h3 style = "color:red;">{!inputNotes.productDefinition} </h3>
+    			    </apex:outputpanel>
+    				<table class="contact-table">
+            			<tbody>
+            			<tr>
+            				<td style='width:50%'>{!inputNotes.customerName}</td>
+            				<td class='align-right'>Quote Reference:</td>
+            				<td style='width:100px' class='align-right'>{!inputNotes.quoteReference}</td>
+            			</tr>
+            			<tr>
+            				<td>{!inputNotes.customerAddress}</td>
+            				<td class='align-right' valign='top'>Visit Date:</td>
+            				<td valign='top' class='align-right'>{!inputNotes.visitDate}</td>
+            			</tr>
+            
+            		    </tbody>
+            		</table>
+    				<div class="clearfix">
+    					<p>Keeping you and your home safe is our number one priority. The detail your Heating Adviser has captured<br/> 
+    					here gives your engineer all they need to know to install your new heating solution in the safest way.<br/>
+    					You'll need to keep this information, along with your quote, inside the back of your customer folder<br/>
+    					for your installer to look through on the day of installation.</p>
+    					<!--<p>Your installation reference is: <span id="CHILeadNumber" class='bold'>{!inputNotes.CHILeadNumber}</span></p>-->
+    				</div>
+    				
+    			
+                    <apex:outputpanel rendered="{!inputNotes.connectedProductAdded == 'True'}">
+        			<h3>Your Connected Products</h3>
+        			<div style='clearfix'>
+        			    <table>
+            			    <tr>
+            			        <td>
+            				<div><apex:image id="theImage" value="{!$Resource.hive}" width="100" height="100" alt="Description of image here"/></div>
+            				</td>
+            				<td>
+            				<div>
+            	              <p>As you have selected either Hive, Boiler IQ or both, we will be sending you an email in the next 24 hours to start your Connected journey.<br/>
+            	                 The email will have specific details on how to create your own digital account which allows you to use your connected products.
+            	                 It would be fantastic if you could have your digital account up and running prior to the installation engineer arriving.<br/>
+            	                 The email will be sent to <span id="custEmail" class='bold'>{!inputNotes.connectedEmail}</span><br/>
+            	                 If this is incorrect, please ask your Heating Sales Advisor to update this for you, or you can contact one of our team in the office and they can do this for you.</p>
+            	             </div>
+            	            </td> 
+            	             </tr>
+        	             </table>
+                     </div>
+                     </apex:outputpanel>
+ 
+            	
+    
+    				<h2>Safe Working Information</h2>
+    
+    				<h3>Asbestos Information</h3>
+    				<apex:outputpanel rendered="{!inputNotes.AsbestosIdentified == 'Yes'}" >    
+    				<!--<div id="AsbestosIdentified">
+    				<apex:outputtext value="{!inputNotes.AsbestosIdentified}" escape="false"/></div>-->
+    				<!--<div id="AsbestosNotes"><apex:outputtext value="{!inputNotes.AsbestosNotes}" escape="false"/></div>-->
+    				<!--<p class="smaller">Refer to the customer guide to asbestos left by the advisor</p>-->
+    				<p>Suspect materials have been identified, please refer to the Suspect Materials Record for further details.</p>
+                    </apex:outputpanel>
+    				<h3>Electrical Safety</h3>
+    				<table class="simpleTable">
+    					<tr>
+    						<td style="background-color: #b9e5fb;">Earth System Type</td>
+    						<td style="background-color: #b9e5fb;">{!inputNotes.EarthSystem}</td>
+    					</tr>
+    					<tr>
+    						<td style="background-color: white;">Visible Earth </td>
+    						<td style="background-color: white;">{!inputNotes.VisibleEarth}</td>
+    					</tr>
+    					<tr>
+    						<td style="background-color: #b9e5fb;">Working VOELCB</td>
+    						<td style="background-color: #b9e5fb;">{!inputNotes.Voelcb}</td>
+    					</tr>
+    					<tr>
+    						<td style="background-color: white;">Customer to arrange</td>
+    						<td style="background-color: white;">{!inputNotes.CustomerArrange}</td>
+    					</tr>
+    					 <tr>
+    						<td style="background-color: #b9e5fb;">RCD</td>
+    						<td style="background-color: #b9e5fb;">{!inputNotes.Rdc}</td>
+    					</tr>
+    					<tr>
+    						<td style="background-color: white;">Socket and See reading</td>
+    						<td style="background-color: white;">{!inputNotes.SocketSee}</td>
+    					</tr>
+    					<tr>
+    						<td style="background-color: #b9e5fb;">Location</td>
+    						<td style="background-color: #b9e5fb;">{!inputNotes.EarthLocation}</td>
+    					</tr>
+    					<tr>
+    						<td style="background-color: white;">Is protective equipotential bonding (PEB) required? </td>
+    						<td style="background-color: white;">{!inputNotes.Peb}</td>
+    					</tr>
+    					<tr>
+    						<td style="background-color: #b9e5fb;">Is Supplementary Equipotential Bonding (SEB) required? </td>
+    						<td style="background-color: #b9e5fb;">{!inputNotes.Seb}</td>
+    					</tr>
+    				</table>
+    
+    				<h3>Working at Heights</h3>
+    				<p class='bold'>Ladder/Scaffold Work Identified:</p>
+    				<span class="answer" id="LadderWork"><apex:outputText value="{!inputNotes.LadderWork}" escape="false"/></span>
+    
+    				<p class='bold'>Scaffolding Identified:</p>
+    				<span class="answer" id="Scaffolding"><apex:outputText value="{!inputNotes.Scaffolding}" escape="false"/></span>
+    
+    				<h3>Access and Restricted Working</h3>
+    
+    				<p class='bold'>Restrictions to work areas or specific access permission required:</p>
+    				   
+    				<span class="answer" id="AccessNotes"><apex:outputText value="{!inputNotes.AccessNotes}" escape="false"/></span>
+    					
+    				<p class='bold'>External work areas that may prove potentially hazardous:</p>
+    				<span class="answer" id="WorkAreas"><apex:outputText value="{!inputNotes.WorkAreas}" escape="false"/></span>
+    			   
+    
+    				<h3>Manual Handling-Heavy or Difficult loads/materials</h3>
+    
+    				<p class='bold'>Component(s) that may require assistance for removal:</p>
+    				<span class="answer" id="RemovalAssistance"><apex:outputText value="{!inputNotes.RemovalAssistance}" escape="false"/></span>
+    			   
+    				<div class="pageBreak">&nbsp;</div>
+    
+    				<h2 class="newPage">Overview of Proposed Works</h2>
+    				<p>Installer transition notes (Boiler/Flue/Gas/Water pipe/Disruption/Special requirements)</p>
+    				<div id="AllNotes" class="mediumDiv"><apex:outputText value="{!inputNotes.AllNotes}" escape="false"/></div>
+    
+    				<div id="BoilerDetails"><apex:outputText value="{!inputNotes.boilerDetailsTable}" escape="false"/></div>
+    				<h2>Radiator Details</h2>
+    				<div id="Radiator"><apex:outputText value="{!inputNotes.Radiator}" escape="false"/></div>
+    
+    				<h3>Water Pressure</h3>
+    				<table border="0" cellpadding="2" cellspacing="0" class="simpleTable">
+    					<tr>
+    						<td style="background-color: #b9e5fb; font-weight: bold;">Flow Rate (l/min)</td>
+    						<td style="background-color: #b9e5fb; font-weight: bold;">Water Test Pressure (bar)</td>
+    						
+    					</tr>
+    					<tr>
+    						<td style="background-color: white;">{!inputNotes.Flow}</td>
+    						<td style="background-color: white;">{!inputNotes.WaterTestPressure}</td>
+    					</tr>
+    				</table>
+    				<p class="bold">System characteristics to be aware of:</p>
+    				<span id="SystemCharacter" class="answer"><apex:outputText value="{!inputNotes.SystemCharacter}" escape="false"/></span>
+    				
+    
+    				<div class="clearfix" id="acceptance-section">
+    					<div id="acceptance-box" style="height: 167px;width: 780px;">
+    	                    <h3 class='darkBlue'>Customer Signature</h3>
+    	                    <p style="font-size: 10px;width: 660px;">I confirm that I understand and agree with the proposed work involved to fulfil the Heating Installation quotation.<br/></p>
+    	                    <p style="font-size: 10px;width: 660px;">{!inputNotes.asbestosConfirmed}<br/></p>
+    	                    <p style="font-size: 8px;"> <br/></p>
+    	                    <div style="width:100%; position: relative;top:-10px;">
+                                <div style="width:210px;float:left;height:50px;border: none;" class="signature-box signatureLeft">
+                                    <p style="font-size: 12px;" class="signature-box-label">Signature</p>
+                                </div>
+                                <div style="width:210px;float:left;height:50px;border: none;margin-left:9px" class="signature-box signatureLeft">
+                                    <p style="font-size: 12px;" class="signature-box-label">Print Name</p>
+                                    <p style="font-size: 12px; float:right">Role :{!inputNotes.jobTitle}</p>
+                                </div>
+                                <div style="width:210px;float:left;height:50px;border: none;position: relative;margin-left:10px;" class="signature-box signatureLeft">
+                                    <p style="font-size: 12px;" class="signature-box-label">Date</p>
+                                </div>
+    	                     </div>
+    		            </div>
+    		        </div>
+    			   <div id="FooterText" class='footer'>{!inputNotes.FooterText}</div>
+    			   <apex:outputpanel rendered="{!inputNotes.AsbestosIdentified == 'Yes'}">
+    			   <div class="pageBreak">&nbsp;</div>
+    			   
+    			   <h2 class="newPage">Suspected Asbestos Material Record</h2>
+    			   <table class="contact-table">
+            			<tbody>
+            			<tr>
+            				<td style='width:50%'>{!inputNotes.customerName}</td>
+            				<td class='align-right'>Quote Reference:</td>
+            				<td style='width:100px' class='align-right'>{!inputNotes.quoteReference}</td>
+            			</tr>
+            			<tr>
+            				<td>{!inputNotes.customerAddress}</td>
+            				<td class='align-right' valign='top'>Visit Date:</td>
+            				<td valign='top' class='align-right'>{!inputNotes.visitDate}</td>
+            			</tr>
+            
+            		    </tbody>
+            		</table>
+            		
+    				<div>
+            			<p>
+            				Whilst visiting your property, our representative identified material suspected to contain asbestos. It is impossible to
+            				positively identify all suspect materials visually and where necessary, a sample will be taken to confirm if asbestos is
+            				present by scientific analysis. The results of the analysis will determine what work is required to ensure your safety
+            				and to comply with current Health &amp; Safety regulations
+            			</p>
+            
+            			Where asbestos is in poor condition or will need to be disturbed, we can deal with this in one of three ways:
+            			<ol style='padding-left:3em;margin:1em 0'>
+            				<li> - We can safely work with it in line with our British Gas technical operational procedures P3</li>
+            				<li> - We can organise for a licensed removal contractor to complete the work*</li>
+            				<li> - You can arrange for the work to be complete by a licensed asbestos contractor**</li>
+            			</ol>
+            
+            			<h3>The following is a record of any suspected asbestos materials found</h3>
+            			<br/>
+            			<div>
+            			    <apex:outputtext value="{!inputNotes.suspectMaterials}" escape="false"/>
+            			    <apex:outputpanel rendered="{!inputNotes.asbestosSample == 'Yes'}">
+            			    <div id="asbestosSampleText">
+            				    <p>
+                					One or more of the suspect material recordings requires further analysis.  We will arrange analysis of the sample(s) taken, all as part of our service.
+                					We will notify you of the results, as soon as we receive confirmation of the analysis.
+                					Your heating advisor can then discuss the various options open to you dependant on the outcome.
+                				</p>
+            			    </div>
+            			    </apex:outputpanel>
+            			</div>
+            			<footer>
+                    		<div class="clearfix">
+                    			<div>
+                    				<h3 class="darkBlue">Useful Contacts</h3>
+                    				<table class="contact-table">
+                    					<tbody><tr>
+                    						<td>Health &amp; Safety Executive</td>
+                    						<td>www.hse.gov.uk</td>
+                    						<td></td>
+                    					</tr>
+                    					<tr>
+                    						<td>The Asbestos Removal Contractors Association</td>
+                    						<td>www.arcaweb.org.uk</td>
+                    						<td>012383 566467</td>
+                    					</tr>
+                    					<tr>
+                    						<td>United Kingdom Accreditation Service</td>
+                    						<td>www.ukas.com</td>
+                    						<td>028 9178400</td>
+                    					</tr>
+                    					<tr>
+                    						<td>British Gas</td>
+                    						<td>www.britishgas.co.uk</td>
+                    						<td>0333 200 8899</td>
+                    					</tr>
+                    				</tbody>
+                    				</table>
+                    
+                    			</div>
+                    
+                    
+                    			<div class="clearfix ">
+                    				<p class='disclaimer'>
+                    					*It is important to ensure that the licensed contractor is made aware of all the areas in which work will be carried out
+                    					to ensure that all asbestos material likely to be disturbed can be removed or made safe by encapsulation.
+                    				</p>
+                    				<p class='disclaimer'>
+                    					**If a customer wishes to appoint their own licensed asbestos contractor then the customer MUST be advised that
+                    					<span class='tradingName'>****</span> will only undertake further work at the property upon receipt of official four stage re-occupation certificate by the contractor.
+                    
+                    				</p>
+                    				<p class='tradingStatement'><span class='tradingName'>****{!inputNotes.tradingName}</span> is the trading name of British Gas New Heating Limited. Registered in England &amp; Wales (No. 06723244). Registered office: Millstream, Maidenhead Road, Windsor, Berkshire SL4 5GD</p>
+                    			</div>
+                    		</div>
+                    
+                    	</footer>
+            		</div>	
+    			   </apex:outputpanel>
+    			</div>
+			</div>
+		</div>
+	</body>
+</html>
+    
+</apex:page>

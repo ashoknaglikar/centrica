@@ -1,0 +1,103 @@
+<apex:component >
+   <apex:attribute name="accountobject" type="account" description="This attribute is used to get the account data" />
+    <apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" required="true"/>
+    <apex:attribute name="callModeVal" description="This attrribute is used to determine the call type." type="Integer"/>
+    <apex:attribute name="EmpQues" description="This attrribute passes the opportunity list to the controller." type="Opportunity[]" />
+    <apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+    <apex:attribute name="CallModeobj" description="This attrribute passes the CallMode." type="CallMode"/>
+   <script>
+        var cntrlEmpID, cntrlEmpName;
+        function setEmpData(empName, empID)
+        {
+            try
+            {
+                document.getElementById(cntrlEmpID).value = empName;
+                document.getElementById(cntrlEmpName).value = empID.replace('&#39;','\'');
+            }
+            catch(e){}
+        }
+   </script>    
+    
+    
+  <apex:pageBlockSection title="Employee Questions" id="pageblock" rendered="{!IF(displayModeVal==DisplayModeobj.EDIT,true,false)}" columns="1" collapsible="false"> <!-- rendered="{!if(OR(callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}" -->
+        
+        
+        <apex:pageBlockTable var="emp" value="{!EmpQues}" id="pageblocktable"> <!-- use style attrib for width style="width:100px" -->
+            <apex:column headerValue="Referral Employee" rendered="{!IF(OR(callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}">  <!-- ,callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST -->
+                
+                <table border="0" cellspacing="0" cellpadding="0"><tr>
+                <td><apex:inputText id="txtEmpName" onchange="javascript: setEmpData('',this.value);" /></td>
+                <td>                
+                <a href="#" onclick="javascript:window.open('/apex/employeesearch','_new','width=700,height=500,menubar=no,directories=no,status=yes,location=no,toolbar=no,scrollbars=yes');" title="Referral Employee Lookup (New Window)">
+                <img src="/s.gif" alt="Referral Employee Lookup (New Window)"  class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Referral Employee Lookup (New Window)"/>
+                </a>
+                </td></tr></table>
+                
+                
+                <apex:inputText value="{!emp.Referral_Employee__c}" id="txtEmpID" style="display:none;" required="true"/>
+                <script>
+                    cntrlEmpName = '{!$Component.txtEmpName}';
+                    cntrlEmpID = '{!$Component.txtEmpID}'; 
+                </script>
+                <!--<apex:inputField value="{!emp.Referral_Employee__c}" required="true"/>-->
+                
+            </apex:column>
+            
+            <apex:column headerValue="Employee Referral Reason">
+                <apex:inputField value="{!emp.Enquiry_Reason__c}" required="true"/>
+            </apex:column> 
+            <apex:column headerValue="Fusion Media Code">
+                <apex:inputField value="{!emp.CampaignId}"/>
+            </apex:column>
+            <apex:column headerValue="Fusion Store"> 
+                 <apex:inputField value="{!emp.Fusion_Store__c}"/>
+            </apex:column>
+            <apex:column headerValue="Fusion UCRN ">
+                <apex:inputField value="{!emp.Fusion_UCRN__c}"/>
+            </apex:column>
+            <apex:column headervalue="MGM Source CHI">
+                <!-- rendered="{!opp.isMGM__c=='Yes'}" -->
+                <apex:inputField value="{!emp.MGM_Source_Opp__c}"/>
+            </apex:column> 
+  
+           </apex:pageBlockTable>
+     </apex:pageblocksection>
+     
+     <apex:pageBlockSection title="Employee Questions" id="pageblock1" rendered="{!IF(displayModeVal==DisplayModeobj.VIEW,true,false)}" columns="1" collapsible="false"> <!-- rendered="{!if(OR(callModeVal == CallModeobj.EMPLOYEECALLNEWCUST,callModeVal == CallModeobj.EMPLOYEECALLEXISTCUST),true,false)}" -->
+        
+        
+        <apex:pageBlockTable var="emp" value="{!EmpQues}" id="pageblocktable1"> <!-- use style attrib for width style="width:100px" -->
+            <apex:column headerValue="Referral Employee"> 
+                <apex:outputField value="{!emp.Referral_Employee__c}"/>
+            </apex:column>
+            
+            <apex:column headerValue="Employee Referral Reason">
+                <apex:outputField value="{!emp.Enquiry_Reason__c}"/>
+            </apex:column> 
+            <apex:column headerValue="Fusion Media Code">
+                <apex:outputField value="{!emp.CampaignId}"/>
+            </apex:column>
+            <apex:column headerValue="Fusion Store"> 
+                 <apex:outputField value="{!emp.Fusion_Store__c}"/>
+            </apex:column>
+            <apex:column headerValue="Fusion UCRN ">
+                <apex:outputField value="{!emp.Fusion_UCRN__c}"/>
+            </apex:column>
+            <apex:column headerValue="MGM Source CHI " rendered="{!emp.isMGM__c=='Yes'}"> 
+               <apex:outputField value="{!emp.isMGM__c}"/>
+            </apex:column>
+            
+            <!--<apex:column>
+              <apex:outputpanel rendered="{!emp.isMGM__c=='Yes'}">  <!-- rendered="{!opp.isMGM__c=='Yes'}" 
+                    <tr><td>
+                            <b>MGM Source CHI Lead</b>
+                    </td></tr>
+                    <tr><td>
+                            <apex:outputField value="{!emp.MGM_Source_Opp__c}"/>
+                    </td></tr>
+               </apex:outputpanel>
+            </apex:column> -->
+  
+           </apex:pageBlockTable>
+     </apex:pageblocksection>
+</apex:component>

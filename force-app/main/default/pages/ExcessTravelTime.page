@@ -1,0 +1,97 @@
+<apex:page title="New Excess Travel Claim" standardController="Excess_Travel_Claim__c" extensions="ExcessTravelTimeExtension">
+   <apex:pageMessages /> 
+  <apex:form id="frm" rendered="{!NOT(error)}">
+     
+       <script type="text/javascript">  
+       function blink() {
+           var f = document.getElementById('heading');
+           setInterval(function() {
+              f.style.display = (f.style.display == 'none' ? '' : 'none');
+           }, 1000);
+        }
+       <!--window.onload = blink;-->
+       </script>
+       
+       <html>
+       <head>
+
+        </head>
+       <body >
+       <div style="background-color:SkyBlue; color:black; margin:20px; padding:20px;">
+        <marquee style="height:40;width:40;" scrollAmount="50" scrollDelay="500"  direction="right">
+        <h2 id="heading" style="color:black;font-size:200%;text-align:center;"> <center><u> <em>Reminder of Excess Travel agreement </em></u></center></h2>
+        </marquee>
+        
+        <p style="font-size:120%;">
+        •    30 minutes travel at the start and end of the day will not attract a payment <br/><br/>
+        •    30 minutes to one hour will attract a payment of plain time<br/><br/>
+        •    Travel time in excess of 1 hour will be paid at time and a third<br/><br/>
+ 
+        All travel time claimed will only be paid with the agreement of the line manager. 
+        A balanced and reasonable approach is expected from both sides. To assist this, the online AA route-master can be utilised.<br/><br/>
+ 
+        Where an engineer requests to work on another district, the travel calculation will start from that district boundary - i.e.
+        the additional time will be credited at plain time after the first 30 minutes travel to and from that district boundary. 
+        </p> 
+        <table border="1" border-style="solid" border-collapse="collapse" border-color="black" style="border-color:black;width:50%;text-align:center;border-collapse: collapse;border-style: solid;">
+          <tr>
+            <td><b>Plain Time claimed</b></td>
+            <td><b>Time 1/3 Claimed</b></td> 
+          </tr>
+          <tr>
+            <td> >30 - 60 </td>
+            <td> >60 </td> 
+          </tr>
+           <tr>
+            <td> 0 </td>
+            <td> 0 </td> 
+          </tr>
+        </table> <br/>
+
+       
+       <apex:pageBlock title="New Excess Travel Claim">  
+        <apex:pageBlockButtons >
+            <apex:commandButton value="Save" action="{!onClickSave}"/>
+            <apex:commandButton value="Cancel" action="{!onClickCancel}"/>
+        </apex:pageBlockButtons>
+        <apex:pageblock title="Information">
+           <apex:pageBlockSection > 
+           <apex:outputField value="{!Excess_Travel_Claim__c.Employee__c}"/> 
+           <apex:outputField value="{!Excess_Travel_Claim__c.Job__c}"/>
+           <apex:outputField value="{!Excess_Travel_Claim__c.Installation_date__c}" />
+           <apex:outputField value="{!Excess_Travel_Claim__c.District__c}" /> 
+           <apex:outputField value="{!Excess_Travel_Claim__c.Region__c}" /> 
+           <apex:outputField value="{!Excess_Travel_Claim__c.Status__c}" />
+           </apex:pageBlockSection>  
+        </apex:pageblock>
+        
+        <apex:pageBlock title="Excess Travel to Job"> 
+        <apex:pageBlockSection title="Greater than 30 less than 60 min Normal Time">
+            <apex:inputField value="{!Excess_Travel_Claim__c.Hour1__c}"/> 
+            <apex:inputField value="{!Excess_Travel_Claim__c.Minutes1__c}"/> 
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Greater than 60 Minutes Time and Third">
+            <apex:inputField value="{!Excess_Travel_Claim__c.Hour2__c}"/> 
+            <apex:inputField value="{!Excess_Travel_Claim__c.Minutes2__c}"/> 
+        </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+         <apex:pageBlock title="Excess Travel Home"> 
+        <apex:pageBlockSection title="Greater than 30 less than 60 min Normal Time">
+            <apex:inputField value="{!Excess_Travel_Claim__c.Hour3__c}"/> 
+            <apex:inputField value="{!Excess_Travel_Claim__c.Minute3__c}"/> 
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Greater than 60 Minutes Time and Third">
+            <apex:inputField value="{!Excess_Travel_Claim__c.Hour4__c}"/> 
+            <apex:inputField value="{!Excess_Travel_Claim__c.Minute4__c}"/> 
+        </apex:pageBlockSection>
+        </apex:pageBlock>
+       </apex:pageBlock>
+     </div>
+     </body>
+     </html>
+    </apex:form> 
+
+</apex:page>

@@ -1,0 +1,86 @@
+<apex:page controller="InstallPlanningReturnMaterialsController" tabStyle="Product_Materials__c">
+<head>
+<script>    
+    function checkSelected(){       
+                    
+        var noNewQuantitiesSet = true;
+        var inputs = document.getElementsByTagName('input');
+        var inputsArray = new Array();
+        var currentQtyArray = new Array();
+        var currentQtystring = '{!currentQuantity}';        
+        currentQtyArray = currentQtystring.split(" ");
+                     
+       	for (var i=0;i<inputs.length;i++) {
+        	if (inputs[i].type == 'text' && (inputs[i].id.indexOf("newQuantity")>-1)) {                        
+            	inputsArray.push(inputs[i].value);  
+               }                                       
+        }
+       
+        for (var i=0;i<inputsArray.length;i++) {
+        	if (inputsArray[i]!='') {                        
+           		noNewQuantitiesSet = false;        
+            if(isNaN(inputsArray[i])||(parseFloat(inputsArray[i]) != parseInt(inputsArray[i]))){                 
+                alert ("Warning: The value you entered '"+inputsArray[i]+"' is not an integer. New quantity values must be entered as integers, please correct this entry before clicking the Return Materials button.");
+            	return false;                           
+                } 
+            }                                             
+        }       
+        
+        if(noNewQuantitiesSet){
+            alert ("Warning: No new quantity values have been entered. If required enter a new quantity value for a material before clicking the Return Materials button.");
+            return false;           
+        }   
+        
+        for (var i=0;i<inputsArray.length;i++) {
+          if (inputsArray[i]!='') {                                 
+               if(parseInt(inputsArray[i],10)>=parseInt(currentQtyArray[i],10)){                 
+                   alert ("Warning: All the new quantity values entered must be lower than the current value of each material. You have entered a new quantity of '"+inputsArray[i]+"' when the current quantity is '"+currentQtyArray[i]+"'. Please correct the new quantity input before clicking Return Materials.");  
+                   return false;                         
+               } 
+            }                                             
+        }
+        
+        var confirmContinue = confirm("You are about to return material job elements. If you wish to continue please click 'Ok'.");
+        if(confirmContinue)
+        	return true;  
+        else
+        	return false;          
+    }
+</script> 
+</head>
+<body>
+<apex:sectionHeader title="Installation Planning - Return Materials"/>    
+    <apex:messages />
+    <apex:form >
+    <apex:pageBlock title="Error" rendered="{!!showData}" id="pgError">
+            <apex:pageBlockButtons location="bottom">                                                                                                       
+                <apex:commandButton action="{!returnToJob}" value="Back"/> 
+            </apex:pageBlockButtons> 
+            	{!userMessage}
+       </apex:pageBlock>
+        <apex:pageBlock title="Return Materials" rendered="{!showData}">
+            <br />
+            <apex:pageBlockButtons location="bottom">                                                                                                       
+                <apex:commandButton action="{!returnToJob}" value="Back"/>                                          
+                <apex:commandButton action="{!returnJobElements}" value="Return Materials" onclick="return checkSelected();"/>                      
+            </apex:pageBlockButtons>                                                                        
+            <h1><apex:outputText value="{!userMessage}"/></h1>
+            <br /><br />   
+            <apex:pageBlockSection title="Work Details for {!Job.Name}" columns="1">                                                                                                                                     
+                <apex:pageBlockTable value="{!AvailDataSet}" var="workElement" columns="6">                      
+                    <apex:column value="{!workElement.Name}" headerValue="ID"/>
+                    <apex:column value="{!workElement.Code}" headerValue="Code"/>
+                    <apex:column value="{!workElement.Description}" headerValue="Description" width="35%"/>
+                    <apex:column value="{!workElement.Product_ID}" headerValue="Product ID"/>                                                                                   
+                    <apex:column headerValue="Current Quantity">    
+                        <apex:outputText id="currentQuantity" value="{!workElement.Units}"/>        
+                    </apex:column>  
+                    <apex:column headerValue="New Quantity">    
+                        <apex:inputText id="newQuantity" value="{!workElement.newUnits}"/>      
+                    </apex:column>                                                              
+                </apex:pageBlockTable>  
+            </apex:pageBlockSection>                                                                        
+        </apex:pageBlock>                
+  </apex:form>   
+</body>  
+</apex:page>

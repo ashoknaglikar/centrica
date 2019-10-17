@@ -1,0 +1,118 @@
+<apex:page controller="InboundCallController">
+    <apex:form id="frm">
+    <apex:pagemessages />
+    
+        <style>
+            .controldiv{float:left; padding:4px;}
+        </style>
+        <script type="text/javascript" src="/soap/ajax/16.0/connection.js"/>
+        <script type="text/javascript" src="/soap/ajax/16.0/ajax.js"/>
+        <script>
+            function checkBeforeCloseLost()
+            {
+                if(confirm('Are you sure you want to Close Lost this Lead & Create a new Lead.'))
+                return true;
+                else
+                return false;
+            }
+        </script>    
+        <!--<apex:messages />-->
+        <apex:pageblock rendered="{!startCall}">
+            <apex:pageblockbuttons >
+                <apex:Commandbutton value="Customer Call" action="{!InvokeCustomerCall}"/>
+                <apex:Commandbutton value="Engineer Call" action="{!InvokeEngineerCall}"/>
+                <apex:Commandbutton value="Employee Call" action="{!InvokeEmployeeCall}"/>
+                <apex:Commandbutton value="HSA Call" action="{!InvokeHSACall}"/>
+                <!--<apex:Commandbutton value="Waste Call" action="{!InvokeWasteCall}"/>-->
+                <apex:Commandbutton value="Small Commercial Lead" action="{!InvokeCommerialCall}" rendered="{!startCall}"/>
+            </apex:pageblockbuttons>
+           
+            <div style="width:49%;float:left">
+                <c:AddressLookup AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+                StreetLabel="Street" StreetField="{!accountSearch.BillingStreet}" 
+                CityLabel="City" CityField="{!accountSearch.BillingCity}" StateLabel="State" 
+                StateField="{!accountSearch.BillingState}" PostalCodeLabel="Postcode" 
+                PostalCodeField="{!accountSearch.BillingPostalcode}" CountryLabel="Country" 
+                CountryField="{!accountSearch.BillingCountry}"
+                BuildingNumber="{!houseNumber}"
+                BuildingName="{!houseName}"
+                POBoxNumber="{!poBoxNumber}"/>
+                <!--  <div class="controldiv">Confirm Account Address</div>
+                <apex:inputCheckbox value="{!ConfirmAccountAddress}"/>-->
+            </div>
+            <div style="width:49%; float:left">
+                <div class="controldiv">Lead Number</div>
+                <div class="controldiv"><apex:inputText value="{!LeadNumber}" maxlength="10" /></div> 
+            </div>
+            <div style="clear:both;"></div>
+        </apex:pageblock>
+
+        <apex:pageblock title="Exisitng Customers" rendered="{!If(mode == 1 , true, false)}">
+       
+            <apex:pageblockSection title="Opporunity Details" columns="1">
+         
+         <apex:pageblocktable value="{!opportunityClassList}" var="o" >
+             <apex:column headervalue="Select">
+                <apex:inputcheckbox value="{!o.isSelect}" disabled="{!if(o.opp.StageName == 'Closed Lost' ||o.opp.StageName == 'Closed Won', true, false )}"/>
+             </apex:column>
+             
+             <apex:column value="{!o.opp.Name}" />
+             
+             <apex:column value="{!o.opp.Product_Interest__c}" />
+             
+             <apex:column value="{!o.opp.StageName}" />
+             
+             <apex:column value="{!o.opp.CreatedDate}" />
+         
+         </apex:pageblocktable>
+            
+            
+         </apex:pageblockSection>
+         
+         <apex:pageblockbuttons >
+            <apex:commandbutton value="Continue" action="{!contiueBtnMethod}" rerender="frm"/>
+            <apex:commandbutton value="Close Lost & Create New" action="{!createNew}" onclick="return checkBeforeCloseLost();"/>
+            <apex:Commandbutton value="Exit" action="{!exitInbound}" immediate="true" />
+         </apex:pageblockbuttons>
+        
+        </apex:pageblock>
+        
+        
+        <!-- --------- New Customer---------------- -->
+        
+        <apex:pageblock title="New Customer" rendered="{!If(mode == 2 , true, false)}">
+           
+            
+            <c:AccountEditViewComponent rendered="true" DisplayModeobj="{!objDisplay}" displayModeVal="1" accountObject="{!accountSearch}" CallModeobj="{!CallMode}" callModeVal="1" />
+            
+            <c:UKBOpportunityComponent rendered="true"  DisplayModeobj="{!objDisplay}" displayModeVal="2"  opportunityObject="{!oppurtunitySelect}" / >
+            
+            <c:UKBContact rendered="{!showContact}"  DisplayModeobj="{!objDisplay}" displayModeVal="2"  contactList="{!contact}"/ >
+            
+            <apex:pageblockbuttons >
+                <apex:Commandbutton value="Next" action="{!validateOpp}" rendered="{!!showContact}" rerender="frm"/> 
+                <apex:commandbutton value="Create Lead" action="{!createRecords}" rendered="{!showContact}" />
+                <apex:Commandbutton value="Exit" action="{!exitInbound}" immediate="true" />
+                
+            </apex:pageblockbuttons>
+        </apex:pageblock>
+        
+        <!-- --------- Customer Detail---------------- -->
+        
+        <apex:pageblock title="Lead Details " rendered="{!If(mode == 3 , true, false)}">
+            <c:AccountEditViewComponent rendered="true" DisplayModeobj="{!objDisplay}" displayModeVal="1" accountObject="{!accountSearch}" CallModeobj="{!CallMode}" callModeVal="1" />   
+            <c:UKBOpportunityComponent rendered="true"  DisplayModeobj="{!objDisplay}" displayModeVal="1"  opportunityObject="{!oppurtunitySelect}" / >
+            <c:UKBContact rendered="true"  DisplayModeobj="{!objDisplay}" displayModeVal="1"  contactList="{!contact}"/ >    
+            
+            <c:AppointViewComponent displayModeVal="1" appointViewList="{!appList}" DisplayModeobj="{!objDisplay}"  rendered = "{!if(appList.size>0,true,false)}" />  
+            
+             <apex:pageblockbuttons >
+                    <!--  <apex:commandbutton value="Close Lost & Create New" action="{!createNew}" onclick="return checkBeforeCloseLost();"/>-->
+                    <apex:commandbutton value="Book Appointment" action="{!salesAptBtn}" />
+                    <apex:Commandbutton value="Exit" action="{!exitInbound}" immediate="true" />
+             </apex:pageblockbuttons>
+        </apex:pageblock>
+
+        
+    </apex:form>
+</apex:page>

@@ -1,0 +1,42 @@
+<apex:page standardController="order__c" extensions="clsOrderEmail" action="{!sendMail}">
+    <apex:sectionHeader title="Purchase Order" Subtitle="{!order__c.Name}"/>
+    <apex:form >
+        <script type="text/javascript">
+            function redirectPage(){
+                window.location="/{!order__c.id}";
+            }
+        </script>
+        <apex:inputhidden value="{!order__c.SAP_Number__c}"/>
+        <apex:inputhidden value="{!order__c.Supplier_Email_Address__c}"/>
+        <apex:pageblock >
+            <apex:pageblockSection title="Email Details" collapsible="false">
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="SAP Order Number:" for="sapnumber"></apex:outputLabel>
+                    <apex:outputField value="{!order__c.SAP_Number__c}"/>
+                </apex:pageblockSectionItem>       
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Order Date:" for="orderdate"></apex:outputLabel>
+                    <apex:outputField value="{!order__c.Order_Date__c}"/>
+                </apex:pageblockSectionItem>         
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Supplier:" for="supplier"></apex:outputLabel>
+                    <apex:outputField value="{!order__c.Supplier__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Email Address" for="emailaddress"></apex:outputLabel>
+                    <apex:outputField value="{!order__c.Supplier_Email_Address__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel value="Status:" for="status"></apex:outputLabel>
+                    <apex:outputText value="{!sMessage}"/>
+                </apex:pageblockSectionItem>
+            </apex:pageblockSection>   
+            <apex:pageBlockButtons location="bottom">
+                <input type="button" onClick="redirectPage()" value="Return to Order" class="btn"/>
+            </apex:pageBlockButtons> 
+        </apex:pageblock>
+        <apex:inputHidden value="{!order__c.Email_Sent__c}"/>
+        <apex:inputHidden value="{!order__c.Email_Sent_By__c}"/>
+        <apex:inputHidden value="{!order__c.Email_Sent_Date__c}"/>
+    </apex:form>    
+</apex:page>

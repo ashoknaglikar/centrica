@@ -1,0 +1,51 @@
+<apex:page controller="NBBSInterfaceController" showHeader="false"
+    sidebar="false">
+    <script>
+var isClicked = false;
+function check(obj) {   
+
+    var v=document.getElementsByName('j_id0:j_id2:j_id7:j_id9:ConfirmButton');
+    if(v[0].className == 'btnDisabled') {
+        alert('Button can only be pressed once.');
+        return false;
+    } else {
+        //isClicked = true;       
+        v[0].className = 'btnDisabled';
+        return true;
+    }
+
+}
+</script>
+    <apex:form >
+        <apex:pageblock rendered="{!isPlatformSFDC}">
+            <h2>{!DisplayMessage}</h2>
+            <apex:PageBlockButtons location="bottom">
+                <apex:commandbutton value="Cancel" onclick="window.close();"></apex:commandbutton>
+            </apex:PageBlockButtons>
+        </apex:pageblock>
+        <apex:pageblock rendered="{!!IsConfirmed && !isPlatformSFDC}">
+Are you sure you want to send this Quote for Billing?
+<apex:PageBlockButtons location="bottom">
+                <!-- If user clicks Confirm button, then Installation Billing will be created -->
+                <apex:commandbutton id="ConfirmButton" value="Confirm" action="{!InsertData}" onclick="return check(this);"></apex:commandbutton>
+                <apex:commandbutton value="Cancel" onclick="window.close();"></apex:commandbutton>
+            </apex:PageBlockButtons>
+        </apex:pageblock>
+        <apex:pageblock rendered="{!IsConfirmed}">
+            <apex:PageBlockButtons location="bottom">
+                <apex:commandbutton value="Ok" onclick="window.close();"></apex:commandbutton>
+                <apex:pageblock rendered="{!!IsError}">
+                    <!-- Refresh the parent VF page -->
+                    <script>window.opener.location.reload();</script>
+                </apex:pageblock>
+            </apex:PageBlockButtons>
+            <!-- If any error, display the error message and image accordingly -->
+            <apex:image url="{!$Resource.ErrorImage}" width="50" height="50"
+                rendered="{!IsError}" />
+            <apex:image url="{!$Resource.GreenCheck}" width="50" height="50"
+                rendered="{!!IsError}" />
+            <h2>{!DisplayMessage}</h2>
+
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

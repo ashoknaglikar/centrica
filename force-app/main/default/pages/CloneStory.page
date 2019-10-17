@@ -1,0 +1,90 @@
+<apex:page controller="CloneStory" showheader="true" sidebar="false" 
+	docType="html-5.0" standardStylesheets="false" tabstyle="Work_Product__c">
+    <!-- 
+    <head>
+        <meta charset="utf-8"></meta>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"></meta>
+        <title></title>
+        <meta name="description" content=""></meta>
+        <meta name="viewport" content="width=device-width"></meta>
+
+        <link rel="stylesheet" href="{!URLFOR($Resource.pmtoolkit,'css/bootstrap.min.css')}"></link>
+        
+        <style>
+            body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }
+        </style>
+        <link rel="stylesheet" href="{!URLFOR($Resource.pmtoolkit,'css/bootstrap-responsive.min.css')}"></link>
+        <link rel="stylesheet" href="{!URLFOR($Resource.pmtoolkit,'css/css/main.css')}"></link>
+
+        <script src="{!URLFOR($Resource.pmtoolkit,'js/vendor/modernizr-2.6.2-respond-1.1.0.min.js')}"></script>
+    </head>
+     -->
+    <body>
+        <div class="container">
+        	<apex:form >
+        		<apex:pageBlock title="Split User Story: {!workProduct.Name} - {!workProduct.Name}" mode="detail">
+        			<apex:pageBlockSection title="User Story Details" collapsible="true" columns="1">
+						<section>
+								<!-- This is the top part of the page where the Work Product Fields go -->
+							<div class="control-group">
+								<div class="controls">
+									<apex:inputField id="Name" value="{!workProduct.Name}" style="width:400px"/>
+								</div>						
+							</div>
+							<div class="control-group">
+								<div class="controls">
+									<apex:inputTextarea richText="true" id="Description" value="{!workProduct.Description__c}"/>
+								</div>						
+							</div>
+							<div class="control-group">
+								<div class="controls">
+									<apex:inputTextarea richText="true" id="Acceptance_Critiera" value="{!workProduct.Acceptance_Critiera__c}"/>
+								</div>						
+							</div>
+						</section>
+					</apex:pageBlockSection>
+					<apex:pageBlockSection title="Tasks" collapsible="true" columns="1">
+						<div class=".row">
+		   					 <apex:pageBlockTable value="{!taskList}" var="checkedTask" id="Tasks" cellPadding="4">
+								<apex:column > 
+									<apex:facet name="header">Select </apex:facet>
+									<apex:inputCheckbox value="{!checkedTask.checked}" /> 
+								</apex:column>
+								<apex:column > 
+									<apex:facet name="header">Name</apex:facet>
+									<apex:outputText value="{!checkedTask.task.Name}" id="Name"/>
+								</apex:column>
+								<apex:column > 
+									<apex:facet name="header">State</apex:facet>
+									<apex:outputText value="{!checkedTask.task.State__c}" id="Stqte"/>
+								</apex:column>
+								<apex:column > 
+									<apex:facet name="header">To Do</apex:facet>
+									<apex:outputText value="{!checkedTask.task.To_Do__c}" id="Todo"/>
+								</apex:column>
+								<apex:column > 
+									<apex:facet name="header"> Description </apex:facet>
+									<apex:outputText value="{!checkedTask.task.Description__c}" id="Description"/>
+								</apex:column>									
+							</apex:pageBlockTable>
+		   				</div>
+			   		</apex:pageBlockSection>
+		            <footer>
+		                <p>
+		                	<apex:commandButton value="Save" action="{!save}"/>
+		                	<apex:commandButton value="Cancel" action="{!cancel}"/>
+		                </p>
+		            </footer>
+        		</apex:pageBlock>
+			</apex:form>
+        </div> <!-- /container -->
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+        <script src="{!URLFOR($Resource.pmtoolkit,'js/vendor/bootstrap.min.js')}"></script>
+        <script src="{!URLFOR($Resource.pmtoolkit,'js/main.js')}"></script>
+    </body>
+</apex:page>

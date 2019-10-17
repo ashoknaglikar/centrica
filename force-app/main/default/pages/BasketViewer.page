@@ -1,0 +1,271 @@
+<apex:page StandardController="cscfga__Product_Basket__c" extensions="BasketViewerController" >
+    <apex:includeScript value="{!$Resource.cscfga__jQuery_1_4_2_min}" />
+    <style>
+        tr.screen {
+            margin: 0px;
+            padding: 0px;
+            vertical-align: top;
+            background: #aaa;
+            border-spacing: 0px;
+        }
+        tr.section {
+            margin: 0px;
+            padding: 0px;
+            vertical-align: top;
+            background: #eee;
+            border-spacing: 0px;
+        }
+        tr.odd {
+            margin: 0px;
+            padding: 0px;
+            vertical-align: top;
+            background: #e8edff;
+            border-spacing: 0px;
+        }
+        tr.even {
+            margin: 0px;
+            padding: 0px;
+            vertical-align: top;
+            background: #e8ffff;
+            border-spacing: 0px;
+        }
+    </style>
+    <script>
+        $('document').ready(function () {   
+            getProductConfigurations('{!cscfga__Product_Basket__c.Id}');
+            //
+        });
+        //
+        function getProductConfigurations(id) {
+            BasketViewerController.getMainProduct(id,handleGetProductConfigurationsResponse);
+        }
+        //
+        function handleGetProductConfigurationsResponse(result, event) {
+            if (event.type == 'exception') {
+                alert(event.message);
+            } else {
+                var configCollection = result;
+                var mainProductConfig = configCollection.mainProductConf;
+                //
+                //console.log('**result: '+result);
+                var oldSection = '';
+                var oldScreen = '';
+                var tr = '';
+                var oldRow = '';
+                for(var i = 0; i < mainProductConfig.cscfga__Attributes__r.length; i++) {
+                    //
+                    var attribute = mainProductConfig.cscfga__Attributes__r[i];
+                    if (attribute.cscfga__Attribute_Definition__r != undefined && 
+                        attribute.cscfga__Attribute_Definition__r.cscfga__Configuration_Screen__r != undefined && 
+                        attribute.cscfga__Attribute_Definition__r.cscfga__Configuration_Screen__r.Name != 'Summary' && 
+                        attribute.cscfga__Value__c != undefined) {
+                        if (attribute.cscfga__Attribute_Definition__r.cscfga__Configuration_Screen__r.Name != oldScreen) {
+                            // This is a new screen
+                            oldScreen = attribute.cscfga__Attribute_Definition__r.cscfga__Configuration_Screen__r.Name
+                            //console.log('--------Screen-------'+oldScreen);
+                            tr += '<tr class="screen"><th ColSpan="4">'+oldScreen+'</th></tr>';
+                            
+                        }
+                        if (attribute.cscfga__Attribute_Definition__r.cscfga__Screen_Section__r != undefined &&
+                            attribute.cscfga__Attribute_Definition__r.cscfga__Screen_Section__r.Name != 'Financial websites') {
+                            //
+                            var rowClass = 'odd';
+                            if (i % 2 == 0) rowClass = 'even';
+                            if (attribute.cscfga__Attribute_Definition__r.cscfga__Screen_Section__r.Name != oldSection) {
+                                // This is a new section
+                                oldSection = attribute.cscfga__Attribute_Definition__r.cscfga__Screen_Section__r.Name
+                                //console.log('--------Section-------'+oldSection);
+                                tr += '<tr class="section"><th ColSpan="4">'+oldSection+'</th></tr>';
+                            } 
+                            //var li = createRuleLi(rule,'associatedrule');
+                            //console.log('Name: '+attribute.Name+' - Value: '+attribute.cscfga__Value__c);
+                            //console.log('attribute.cscfga__Attribute_Definition__r.cscfga__Row__c: '+attribute.cscfga__Attribute_Definition__r.cscfga__Row__c+' - oldRow: '+oldRow);
+                            if (attribute.cscfga__Attribute_Definition__r.cscfga__Row__c != oldRow) {
+                                tr += '<tr class="'+rowClass+'">';
+                                oldRow = attribute.cscfga__Attribute_Definition__r.cscfga__Row__c;
+                            }
+                            tr += '<td><b>'+(attribute.Name == 'Boiler Image' ? '' : attribute.Name)+':</b> </td><td>'+(attribute.Name == 'Boiler Image' ? '' : attribute.cscfga__Value__c)+'</td>';
+                            if (attribute.cscfga__Attribute_Definition__r.cscfga__Row__c != oldRow)
+                                tr += '</tr>';
+                        }
+                    }
+                }
+                $('#main-table').append(tr);
+                //
+                var condensateProductConfigList = configCollection.condensateProductConfigList;
+                tr = '';
+                for(var j = 0; j < condensateProductConfigList.length; j++) {
+                    var rowClass = 'odd';
+                    if (j % 2 == 0) rowClass = 'even';
+                    tr += '<tr class="'+rowClass+'">';
+                    for(var i = 0; i < condensateProductConfigList[j].cscfga__Attributes__r.length; i++) {
+                        var attribute = condensateProductConfigList[j].cscfga__Attributes__r[i];
+                        if (attribute.Name == 'Condensate Name' || 
+                            attribute.Name == 'Condensate Price' || 
+                            attribute.Name == 'Condensate Building Work Effort' || 
+                            attribute.Name == 'Condensate Electrical Effort' || 
+                            attribute.Name == 'Condensate Mechanical Effort' || 
+                            attribute.Name == 'Condensate Roofing Effort') {
+                            tr += '<td>'+attribute.cscfga__Value__c+'</td>';
+                        }
+                    }
+                    tr += '</tr>';
+                }
+                $('#condensate-table').append(tr);
+                //
+                var fluePackProductConfigList = configCollection.fluePackProductConfigList;
+                tr = '';
+                for(var j = 0; j < fluePackProductConfigList.length; j++) {
+                    var rowClass = 'odd';
+                    if (j % 2 == 0) rowClass = 'even';
+                    tr += '<tr class="'+rowClass+'">';
+                    for(var i = 0; i < fluePackProductConfigList[j].cscfga__Attributes__r.length; i++) {
+                        var attribute = fluePackProductConfigList[j].cscfga__Attributes__r[i];
+                        if (attribute.Name == 'Pack Code' || 
+                            attribute.Name == 'Pack Description' || 
+                            attribute.Name == 'Pack Price' || 
+                            attribute.Name == 'Building Work Effort' || 
+                            attribute.Name == 'Electrical Effort' || 
+                            attribute.Name == 'Mechanical Effort' || 
+                            attribute.Name == 'Roofing Effort') {
+                            tr += '<td>'+attribute.cscfga__Value__c+'</td>';
+                        }
+                    }
+                    tr += '</tr>';
+                }
+                $('#flue-pack-table').append(tr);
+                //
+                var packCProductConfigList = configCollection.packCProductConfigList;
+                tr = '';
+                for(var j = 0; j < packCProductConfigList.length; j++) {
+                    var rowClass = 'odd';
+                    if (j % 2 == 0) rowClass = 'even';
+                    tr += '<tr class="'+rowClass+'">';
+                    for(var i = 0; i < packCProductConfigList[j].cscfga__Attributes__r.length; i++) {
+                        var attribute = packCProductConfigList[j].cscfga__Attributes__r[i];
+                        if (attribute.Name == 'Pack C Name' || 
+                            attribute.Name == 'Pack C Code' || 
+                            attribute.Name == 'Pack C Price' || 
+                            attribute.Name == 'Pack C Building Work Effort' || 
+                            attribute.Name == 'Pack C Electrical Effort' || 
+                            attribute.Name == 'Pack C Mechanical Effort' || 
+                            attribute.Name == 'Pack C Roofing Effort') {
+                            tr += '<td>'+attribute.cscfga__Value__c+'</td>';
+                        }
+                    }
+                    tr += '</tr>';
+                }
+                $('#pack-c-table').append(tr);
+                //
+                var packXProductConfigList = configCollection.packXProductConfigList;
+                tr = '';
+                for(var j = 0; j < packXProductConfigList.length; j++) {
+                    var rowClass = 'odd';
+                    if (j % 2 == 0) rowClass = 'even';
+                    tr += '<tr class="'+rowClass+'">';
+                    for(var i = 0; i < packXProductConfigList[j].cscfga__Attributes__r.length; i++) {
+                        var attribute = packXProductConfigList[j].cscfga__Attributes__r[i];
+                        if (attribute.Name == 'Pack X Name' || 
+                            attribute.Name == 'Pack X Code' || 
+                            attribute.Name == 'Pack X Price' || 
+                            attribute.Name == 'Pack X Building Work Effort' || 
+                            attribute.Name == 'Pack X Electrical Effort' || 
+                            attribute.Name == 'Pack X Mechanical Effort' || 
+                            attribute.Name == 'Pack X Roofing Effort') {
+                            tr += '<td>'+attribute.cscfga__Value__c+'</td>';
+                        }
+                    }
+                    tr += '</tr>';
+                }
+                $('#pack-x-table').append(tr);
+                //
+                var radiatorProductConfigList = configCollection.radiatorProductConfigList;
+                tr = '';
+                for(var j = 0; j < radiatorProductConfigList.length; j++) {
+                    var rowClass = 'odd';
+                    if (j % 2 == 0) rowClass = 'even';
+                    tr += '<tr class="'+rowClass+'">';
+                    for(var i = 0; i < radiatorProductConfigList[j].cscfga__Attributes__r.length; i++) {
+                        var attribute = radiatorProductConfigList[j].cscfga__Attributes__r[i];
+                        if (attribute.Name == 'Radiator Manufacturer' || 
+                            attribute.Name == 'Radiator Type' || 
+                            attribute.Name == 'Radiator Model' || 
+                            attribute.Name == 'Radiator Height' || 
+                            attribute.Name == 'Radiator Width' || 
+                            attribute.Name == 'Radiator Power') {
+                            tr += '<td>'+attribute.cscfga__Value__c+'</td>';
+                        }
+                    }
+                    tr += '</tr>';
+                }
+                $('#radiator-table').append(tr);
+            }
+        } 
+    </script>
+    <table id="main-table" style="border: 1px solid; width:100%;">
+        
+    </table>
+    <br/><br/>
+    <h1>Condensate related list</h1>
+    <table id="condensate-table" style="border: 1px solid; width:100%;">
+        <tr>
+        <th>Condensate</th>
+        <th>Pack Price</th>
+        <th>Building Work Effort</th>
+        <th>Electrical Effort</th>
+        <th>Mechanical Effort</th>
+        <th>Roofing Effort</th>
+        </tr>
+    </table>
+    <br/><br/>
+    <h1>Flue Pack related list</h1>
+    <table id="flue-pack-table" style="border: 1px solid; width:100%;">
+        <tr>
+        <th>Pack Code</th>
+        <th>Pack Description</th>
+        <th>Pack Price</th>
+        <th>Building Work Effort</th>
+        <th>Electrical Effort</th>
+        <th>Mechanical Effort</th>
+        <th>Roofing Effort</th>
+        </tr>
+    </table>
+    <br/><br/>
+    <h1>Pack C related list</h1>
+    <table id="pack-c-table" style="border: 1px solid; width:100%;">
+        <tr>
+        <th>Pack C</th>
+        <th>Pack C Code</th>
+        <th>Pack C Price</th>
+        <th>Building Work Effort</th>
+        <th>Electrical Effort</th>
+        <th>Mechanical Effort</th>
+        <th>Roofing Effort</th>
+        </tr>
+    </table>
+    <br/><br/>
+    <h1>Pack X related list</h1>
+    <table id="pack-x-table" style="border: 1px solid; width:100%;">
+        <tr>
+        <th>Pack X</th>
+        <th>Pack X Code</th>
+        <th>Pack X Price</th>
+        <th>Building Work Effort</th>
+        <th>Electrical Effort</th>
+        <th>Mechanical Effort</th>
+        <th>Roofing Effort</th>
+        </tr>
+    </table>
+    <br/><br/>
+    <h1>Radiator related list</h1>
+    <table id="radiator-table" style="border: 1px solid; width:100%;">
+        <tr>
+        <th>Radiator Manufacturer</th>
+        <th>Radiator Type</th>
+        <th>Radiator Model</th>
+        <th>Radiator Height</th>
+        <th>Radiator Width</th>
+        <th>Radiator Power</th>
+        </tr>
+    </table>
+</apex:page>

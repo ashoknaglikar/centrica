@@ -1,0 +1,106 @@
+<apex:page doctype="html-5.0" controller="cfgoffline.StatelessUIController" action="{!init}" showHeader="false" standardStylesheets="false" sidebar="false">
+	<div>
+		<apex:repeat var="screenSequence" value="{!screenSequences}">
+			<apex:repeat var="layout" value="{!screenSequence.layouts}">
+
+				<apex:outputText escape="false" value="{!'<script type=\"text/html\" data-cs-ref=\"' & layout.ref & '\">'}" />
+		
+					<div class="apexp">
+						<div class="individualPalette">
+							<div class="Custom24Block">
+								<div class="bPageBlock brandSecondaryBrd apexDefaultPageBlock secondaryPalette">
+									<div class="pbHeader">
+										<table border="0" cellpadding="0" cellspacing="0">
+											<tr>
+												<td class="pbTitle"><h2 class="mainTitle">{!layout.definition.Name}</h2></td>
+												<td class="pbButton CS_configButtons">
+												</td>
+											</tr>
+										</table>
+									</div>
+									<div class="pbBody">
+										<apex:repeat var="section" value="{!layout.sections}">
+											<div class="pbSubheader tertiaryPalette"><img src="/s.gif"
+												alt="Hide Section - {!section.name}" class="hideListButton"
+												name="{!section.name}" onclick="twistSection(this);"
+												style="cursor: pointer;" title="Hide Section - {!section.name}" />
+											<h3>{!section.name}</h3>
+											</div>
+											<apex:repeat var="row" value="{!section.rows}">
+												<div class="pbSubsection bEditBlock">
+												<table class="detailList" border="0" cellspacing="0"
+													cellpadding="0">
+													<tbody>
+														<tr>
+															<apex:outputPanel layout="none" rendered="{!NOT(row.hasFirst)}">
+																<td class="labelCol attrLabel first last empty">
+																</td>
+																<td class="dataCol empty">
+																</td>
+															</apex:outputPanel>
+															<apex:outputPanel layout="none" rendered="{!row.hasFirst}">
+																<apex:variable var="colspan" value="{!IF(row.first.cscfga__Column_Span__c > 1, IF(row.first.cscfga__Type__c != 'Text Display', 4, 3), 1)}"/>
+																<apex:outputPanel layout="none" rendered="{!row.first.cscfga__Type__c != '' && row.first.cscfga__Type__c != 'Text Display'}">
+																	<td class="labelCol attrLabel first last">
+																		<label for="{!layout.domSafeScreenName & ':' & row.first.cfgoffline__Reference_Name__c}_%idx%" data-cs-label="%ctx%{!row.first.cfgoffline__Reference_Name__c}_%idx%"></label>
+																	</td>
+																</apex:outputPanel>
+																<td class="dataCol attrWrapper first last" colspan="{!colspan}">
+																	<div data-cs-required="%ctx%{!row.first.cfgoffline__Reference_Name__c}_%idx%" />
+																	<cfgoffline:AttributeTemplate type="{!row.first.cscfga__Type__c}" domId="{!layout.domSafeScreenName & ':' & row.first.cfgoffline__Reference_Name__c}" flavour="standard" ref="{!row.first.cfgoffline__Reference_Name__c}" definition="{!row.first}" />
+																</td>
+															</apex:outputPanel>
+															<apex:outputPanel layout="none" rendered="{!row.hasSecond}">
+																<apex:outputPanel layout="none" rendered="{!row.second.cscfga__Type__c != '' && row.second.cscfga__Type__c != 'Text Display'}">
+																	<td class="labelCol attrLabel first last">
+																		<label for="{!layout.domSafeScreenName & ':' & row.second.cfgoffline__Reference_Name__c}_%idx%" data-cs-label="%ctx%{!row.second.cfgoffline__Reference_Name__c}_%idx%"></label>
+																	</td>
+																</apex:outputPanel>
+																<td class="dataCol attrWrapper first last">
+																	<div data-cs-required="%ctx%{!row.second.cfgoffline__Reference_Name__c}_%idx%" />
+																	<cfgoffline:AttributeTemplate type="{!row.second.cscfga__Type__c}" domId="{!layout.domSafeScreenName & ':' & row.second.cfgoffline__Reference_Name__c}" flavour="standard" ref="{!row.second.cfgoffline__Reference_Name__c}" definition="{!row.second}" />
+																</td>
+															</apex:outputPanel>
+															<apex:outputPanel layout="none" rendered="{!AND(NOT(row.hasSecond), NOT(row.first.cscfga__Column_Span__c > 1))}">
+																<td class="labelCol attrLabel first last empty">
+																</td>
+																<td class="dataCol empty">
+																</td>
+															</apex:outputPanel>
+														</tr>
+													</tbody>
+												</table>
+												<!-- .detailList --></div>
+												<!-- .pbSubsection -->
+											</apex:repeat>
+										</apex:repeat>
+									</div>
+									<div class="pbBottomButtons">
+										<table border="0" cellpadding="0" cellspacing="0">
+											<tr>
+												<td class="pbTitle">&nbsp;</td>
+												<td class="pbButtonb CS_configButtons">
+												</td>
+											</tr>
+										</table>
+									</div>
+									<div class="pbFooter secondaryPalette">
+										<div class="bg"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<apex:repeat var="list" value="{!layout.lists}">
+							<div data-cs-binding="%ctx%{!list.def.cfgoffline__Reference_Name__c}_%idx%"></div>
+						</apex:repeat>
+
+					</div>		
+				<apex:outputText escape="false" value="</script>" />
+			</apex:repeat>
+		</apex:repeat>
+
+		<cfgoffline:OutputRules />
+
+	</div>
+</apex:page>

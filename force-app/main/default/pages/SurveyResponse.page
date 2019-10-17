@@ -1,0 +1,420 @@
+<!--
+
+ Copyright Salesforce.com 2014
+ original author Daniel Harfleet - Salesforce Services
+ First written for use within the Development Surveys functionality of CHI Depot
+
+-->
+<apex:page showHeader="true"
+    sidebar="true"
+    standardController="Survey_Response__c"
+    extensions="SurveyTakingController" >
+
+    <apex:includeScript value="{!URLFOR($Resource.jquery_1_8_3)}" />
+    <apex:includeScript value="{!URLFOR($Resource.jQueryUI, 'jquery-ui.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.jQueryUI, 'jquery-ui.css')}" />
+
+    <style type="text/css" media="print,screen">
+        .greenProgressBar,
+        .grayProgressBar {
+            margin-bottom: 3px;
+        }
+        .progressBarSample {
+            width: 10px;
+            display: inline-block;
+            margin-bottom: 0 !important;
+        }
+        .greenProgressBar .ui-progressbar-value {
+            /*background: #92c945;*/
+            background: #8dc63f;
+        }
+        .grayProgressBar .ui-progressbar-value {
+            /*background: #00bef3;*/
+            background: #bbcbd3;
+        }
+        .answers {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+        }
+        .answers li {
+            display: inline-block;
+            margin: 0;
+            width: 25%;
+        }
+        .answers :first-child,
+        .answers :last-child {
+            width: 12.5%;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var valuesMap = {
+            'Never'         : 0,
+            'Occasionally'  : 25,
+            'Sometimes'     : 50,
+            'Mostly'        : 75,
+            'Always'        : 100
+        }
+        
+        function confirmDelete()
+        {
+            if(confirm('Are you Sure you want to delete this record?')
+            {
+                  
+                  return true;
+            }
+            else
+            {    
+                  return false;
+            }
+        }
+    </script>
+
+    <apex:form style="width:100%">
+
+    <apex:pageBlock title="Development Survey Response" rendered="{!surveyLoaded}">
+        
+        <apex:pageMessages />
+    
+        <!-- BUTTON BAR FOR ACTIONS -->
+        <apex:pageBlockButtons >
+
+            <apex:commandButton value="Save for later"
+                action="{!saveForLater}"
+                rendered="{!saveForLaterVisible && isParticipant}"
+                title="Save your answers and comments for a later time"
+                alt="save" />
+
+            <apex:commandButton value="Mark Ready for Review"
+                action="{!markReadyForReview}" 
+                rendered="{!markReadyForReviewVisible && isParticipant}"
+                title="Mark your answers and comments ready for review by {!otherName} and yourself"
+                alt="review" />
+
+            <apex:commandButton value="Mark Reviewed"
+                action="{!markReviewed}"
+                rendered="{!markReviewedVisible && isParticipant}"
+                title="Mark this survey as reviewed, this will complete the survey"
+                alt="reviewed" />
+            <apex:commandbutton value="Delete" action="{!deleteRecord}" onclick="return confirmDelete();"/>
+        </apex:pageBlockButtons>
+        
+        <!-- DETAILS OF THE SURVEY -->
+        <apex:pageBlockSection title="Details" columns="2" collapsible="true" showHeader="true">
+            
+            <apex:outputLabel value="Survey Name" for="surveyName" style="font-weight:bold"/>
+            <apex:outputText id="surveyName" value="{!surveyName}" />
+
+            <apex:outputLabel value="Overall Status" for="overallStatus" style="font-weight:bold"/>
+            <apex:outputText id="overallStatus" value="{!overallStatus}" />
+
+            <apex:outputLabel value="{!userPersona}" for="userName" style="font-weight:bold"/>
+            <apex:outputText id="userName" value="{!userName}" />
+
+            <apex:outputLabel value="{!userPersona}'s Status" for="userStatus" style="font-weight:bold"/>
+            <apex:outputText id="userStatus" value="{!userStatus}" />
+
+            <apex:outputLabel value="{!otherPersona} " for="otherName" style="font-weight:bold"/>
+            <apex:outputText id="otherName" value="{!otherName}" />
+
+            <apex:outputLabel value="{!otherPersona}'s Status" for="otherStatus" style="font-weight:bold"/>
+            <apex:outputText id="otherStatus" value="{!otherStatus}" />
+
+            <apex:outputLabel value="Created" for="createdDate" style="font-weight:bold"/>
+            <apex:outputText id="createdDate" value="{!createdDate}" />
+
+            <apex:outputLabel value="Last Modified" for="lastModifiedDate" style="font-weight:bold"/>
+            <apex:outputText id="lastModifiedDate" value="{!lastModifiedDate}" />
+
+        </apex:pageBlockSection>
+
+        <br/>
+        <br/>
+
+        <!-- QUESTIONS -->
+
+        <table width="100%">
+            <tr>
+                <td>
+                    <apex:outputText value="Questions" style="font-size:175%; font-weight:bold;"/>
+                </td>
+                <td style="vertical-align: bottom; display: {!IF(followUpRendered, '', 'none')};">
+                    <script type="text/javascript">
+                        $(function() {
+                            $( '#greenProgressBarSample, #grayProgressBarSample' ).progressbar({
+                                value: 100
+                            }).height(10);
+                        });
+                    </script>
+                    <span class="greenProgressBar progressBarSample" id="greenProgressBarSample"></span> Recipient
+                    <span class="grayProgressBar progressBarSample" id="grayProgressBarSample" style="margin-left: 10px;"></span> You
+                </td>
+            </tr>
+
+            <tr><td colspan="2"><hr/></td></tr>
+            
+            <!-- START REPEAT LOOP -->
+            <apex:repeat value="{!questionResponses}" var="questionResponse">
+
+            <tr>
+                <td width="50%" style="font-size:150%">
+                    <apex:outputLabel value="{!questionResponse.order}. " for="questionText" style="font-weight:bold"/>
+                    <apex:outputText id="questionText" value="{!questionResponse.questiontext}" style="font-weight:bold"/>
+                </td>
+                <td width="50%">
+                    <apex:outputPanel rendered="{!isAllocator && followUpRendered}">
+                        <script type="text/javascript">
+                            $(function() {
+                                $( '#recipientProgressBar-{!questionResponse.order}' ).progressbar({
+                                    value: valuesMap.{!questionResponse.otherPersonsAnswerText}
+                                }).height(10);
+                                $( '#allocatorProgressBar-{!questionResponse.order}' ).progressbar({
+                                    value: valuesMap.{!questionResponse.answerText}
+                                }).height(10);
+                            });
+                        </script>
+
+                        <div class="greenProgressBar" id="recipientProgressBar-{!questionResponse.order}"></div>
+                        <div class="grayProgressBar" id="allocatorProgressBar-{!questionResponse.order}"></div>
+
+                        <ul class="answers">
+                            <li class="text-left">Never</li>
+                            <li class="text-center">Occasionally</li>
+                            <li class="text-center">Sometimes</li>
+                            <li class="text-center">Mostly</li>
+                            <li class="text-right">Always</li>
+                        </ul>
+                    </apex:outputPanel>
+                </td>
+            </tr>
+
+            <tr><td colspan="2"><br/></td></tr>
+
+            <tr>
+                <td width="50%" align="left" valign="baseline" style="font-size:125%">
+                    <apex:selectList rendered="{!userInProgress && isParticipant}"
+                            value="{!questionResponse.answerText}" multiselect="false" size="1">
+                        <apex:selectOptions value="{!questionResponse.possibleAnswers}"/>
+                    </apex:selectList>
+                    <apex:outputText value="{!userName}'s Answer: {!questionResponse.answerText}"
+                        rendered="{!!userInProgress || !isParticipant}" />
+                </td>
+
+                <td width="50%" align="left" valign="baseline" style="font-size:125%">
+                {!otherName}'s Answer: {!questionResponse.otherPersonsAnswerText}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" colspan="1" style="font-size:120%">Comment:</td>
+                <td width="50%" colspan="1" style="font-size:120%">Comment:</td>
+            </tr>
+            <tr>
+                <td width="50%" colspan="1" style="font-style:italic">
+                    <apex:inputTextarea value="{!questionResponse.answerComment}" 
+                        style="width:95%;height:95%;font-style:italic" readonly="{!!userInProgress || !isParticipant}"
+                        rendered="{!userInProgress}" rows="3"/>
+                    <apex:outputText value="{!questionResponse.answerComment}" 
+                        rendered="{!!userInProgress}"/>
+                </td>
+                <td width="50%" colspan="1" style="font-style:italic">
+                    <apex:outputText value="{!questionResponse.otherPersonsAnswerComment}"/>
+                </td>
+            </tr>
+
+            <tr><td colspan="2"><hr/></td></tr>
+
+        </apex:repeat>
+        <!-- END REPEAT LOOP -->
+        <tr>
+            <td width="50%" colspan="1" style="font-style:italic">
+                &nbsp;
+            </td>
+            <td width="50%" colspan="1">
+                <apex:outputText value="Additional Comments (Recipient)"
+                style="font-size:100%;font-size:150%;font-weight:bold"/>
+                <br/>
+                <apex:inputTextarea value="{!recipientAdditionalComments}" 
+                    style="width:95%;height:95%;font-style:italic"
+                    readonly="{! !userInProgress || !isParticipant}"
+                    rendered="{!userInProgress && isRecipient}" rows="3"/>
+                <apex:outputText value="{!recipientAdditionalComments}" 
+                    rendered="{! !userInProgress || !isParticipant}"/>
+            </td>
+ 
+        </tr>
+
+        </table>
+
+        <br/>
+
+        <!-- FOLLOW-UP INFORMATION -->
+        <apex:outputPanel rendered="{!followUpRendered}">
+            <apex:outputText value="Follow-up" style="font-size:175%;font-weight:bold"/>
+            <table width="100%">
+                <tr>
+                    <td width="50%">Review date</td>
+                    <td>
+                        <apex:inputText id="reviewDate" disabled="{!!followUpInputEnabled}" size="10"
+                            onclick="DatePicker.pickDate(false, this, false);" styleClass="cssbody"
+                            value="{!reviewDate}" style="width:30%" label="Review Date" />
+                    </td>
+                </tr>
+            </table>
+
+        </apex:outputPanel>
+
+        <!-- SURVEY ACTIONS -->
+        <apex:pageBlockSection title="Survey Actions" columns="1" collapsible="true" showHeader="true" rendered="{!followUpRendered}">
+            <apex:variable value="{!0}" var="index">
+
+            <apex:pageBlockTable value="{!surveyActions}" var="surveyAction" rendered="{!surveyActions.size!=0}">
+                <apex:column style="font-weight: bold;">
+                    <apex:variable var="index" value="{!index + 1}"/>
+                    {!index}
+                </apex:column>
+
+                <apex:column headerValue="{!$ObjectType.Survey_Action__c.fields.Action__c.label}">
+                    <apex:outputField value="{!surveyAction.Action__c}"> 
+                        <apex:inlineEditSupport event="ondblClick"
+                            rendered="{!surveyActionInlineEditEnabled}"
+                            showonEdit="saveButton,cancelButton"
+                            hideonEdit="newItemButton" />
+                    </apex:outputField>
+                </apex:column>
+
+                <apex:column headerValue="{!$ObjectType.Survey_Action__c.fields.Action_Timescale__c.label}">
+                    <apex:outputField value="{!surveyAction.Action_Timescale__c}"> 
+                        <apex:inlineEditSupport event="ondblClick"
+                            rendered="{!surveyActionInlineEditEnabled}"
+                            showonEdit="saveButton,cancelButton"
+                            hideonEdit="newItemButton" />
+                    </apex:outputField>
+                </apex:column>
+
+                <apex:column headerValue="{!$ObjectType.Survey_Action__c.fields.Action_Owner__c.label}">
+                    <apex:outputField value="{!surveyAction.Action_Owner__c}"> 
+                        <apex:inlineEditSupport event="ondblClick"
+                            rendered="{!surveyActionInlineEditEnabled}"
+                            showonEdit="saveButton,cancelButton"
+                            hideonEdit="newItemButton" />
+                    </apex:outputField>
+                </apex:column>
+
+                <apex:column headerValue="{!$ObjectType.Survey_Action__c.fields.Desired_Outcome__c.label}">
+                    <apex:outputField value="{!surveyAction.Desired_Outcome__c}"> 
+                        <apex:inlineEditSupport event="ondblClick"
+                            rendered="{!surveyActionInlineEditEnabled}"
+                            showonEdit="saveButton,cancelButton"
+                            hideonEdit="newItemButton" />
+                    </apex:outputField>
+                </apex:column>
+
+                <apex:column headerValue="{!$ObjectType.Survey_Action__c.fields.Progress_Made__c.label}">
+                    <apex:outputField value="{!surveyAction.Progress_Made__c}"> 
+                        <apex:inlineEditSupport event="ondblClick"
+                            rendered="{!progressMadeInlineEditEnabled}"
+                            showonEdit="saveButton,cancelButton"
+                            hideonEdit="newItemButton" />
+                    </apex:outputField>
+                </apex:column>
+            </apex:pageBlockTable>
+
+            <div align="center" draggable="false">
+                <apex:commandButton value="Save Progress"
+                    action="{!saveProgress}"
+                    rendered="{!saveProgressVisible && surveyActions.size!=0 && isParticipant}"
+                    title="Save the progress information"
+                    alt="save" />
+            </div>
+            
+            </apex:variable>
+
+            <br />
+
+            <apex:outputPanel rendered="{!isAllocator}">
+                <table width="100%">
+                    <tr>
+                        <td width="20%">{!$ObjectType.Survey_Action__c.fields.Action__c.label}</td>
+                        <td>
+                            <apex:inputTextArea id="developmentAction"
+                                value="{!developmentAction}"
+                                rows="3" style="width:100%" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>{!$ObjectType.Survey_Action__c.fields.Action_Timescale__c.label}</td>
+                        <td>
+                            <apex:inputTextArea id="actionTimescales"
+                                value="{!actionTimescales}"
+                                rows="3" style="width:100%" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>{!$ObjectType.Survey_Action__c.fields.Action_Owner__c.label}</td>
+                        <td>
+                            <apex:inputText id="actionOwner"
+                                value="{!actionOwner}" 
+                                style="width:50%" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>{!$ObjectType.Survey_Action__c.fields.Desired_Outcome__c.label}</td>
+                        <td>
+                            <apex:inputTextArea id="desiredOutcome"
+                                value="{!desiredOutcome}"
+                                rows="3" style="width:100%" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>{!$ObjectType.Survey_Action__c.fields.Progress_Made__c.label}</td>
+                        <td>
+                            <apex:inputTextArea id="actionProgress"
+                                value="{!actionProgress}"
+                                rows="3" style="width:100%" />
+                        </td>
+                    </tr>
+                </table>
+
+                <div align="center" draggable="false">
+                    <apex:commandButton value="Add Action"
+                        action="{!addAction}" 
+                        title="Add action"
+                        alt="Add Action" />
+                </div>
+            </apex:outputPanel>
+        </apex:pageBlockSection>
+
+        <!-- STATUS -->
+        <apex:pageBlockSection title="Status" columns="2" collapsible="true" showHeader="true">
+            
+            <apex:facet name="header">
+                <apex:outputText value="Status (Overal is {!overallStatus})" />
+            </apex:facet>
+
+            <apex:outputLabel value="Overall Status" for="overallStatus" style="font-weight:bold"/>
+            <apex:outputText id="overallStatus" value="{!overallStatus}" />
+
+            <apex:outputLabel value="{!userPersona}'s Status" for="userStatus" style="font-weight:bold"/>
+            <apex:outputText id="userStatus" value="{!userStatus}" />
+
+            <apex:outputLabel value="{!otherPersona}'s Status" for="otherStatus" style="font-weight:bold"/>
+            <apex:outputText id="otherStatus" value="{!otherStatus}" />
+
+        </apex:pageBlockSection>
+
+    </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

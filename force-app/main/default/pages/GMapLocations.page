@@ -1,0 +1,295 @@
+<apex:page standardStylesheets="false" sidebar="false" showheader="false" controller="GMAPLocationsController">
+  
+<style>
+body{font-family:verdana: font-weight:bold; background-color:#FFFFFF;}
+h3{font-size:14px; color:#095EB9;}
+.divEventInfo{background-color:#FFFFFF; cursor:default;font-size:12px; color:#095EB9;}
+.divEventInfo:hover{background:#E5F9FA; cursor:default;font-size:12px; color:#095EB9;}
+</style>
+
+<script type="text/javascript" src="/soap/ajax/8.0/connection.js"></script>
+<script type="text/javascript" src="/js/functions.js"></script>
+<script src="/js/dojo/0.3.1/dojo.js"></script>
+
+<script src="http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=ABQIAAAAvC9ZqenznQK3rFF_TvojNBSrgmzWJOwyGeTQgF-gd0lkQqzJ9BQfDYWG9Y2J99RmsW3G0A0VEfMd8g" type="text/javascript"></script>
+<script type="text/javascript">
+var map = null; 
+var geocoder = null;
+var address = '';
+var cnt1=0;
+var cnt2=0;
+var eventInfos = new Array();
+var locations = new Array();
+var isDataPresent = false;
+ 
+function setup()
+{
+   if (!sforce.connection.sessionId)
+   {
+       var sid = getCookie("sid");
+       if (sid)
+       {
+          sforce.connection.sessionId = sid;
+       }
+       else 
+       {
+          //window.location = "/?startURL=" + window.location;
+          return;
+       }
+   }
+}
+
+var evtVals = new Array();
+
+function initialize() 
+{
+    if (GBrowserIsCompatible()) 
+    {
+        map = new GMap2(document.getElementById("map_canvas"));
+        map.addControl(new GSmallMapControl());
+        geocoder = new GClientGeocoder();
+        
+      	var eventInfo;
+        <apex:repeat value="{!MyLocations}" var="e">
+        	eventInfo = new Object();
+	        eventInfo.address = '{!e.Address}';
+	        eventInfo.desc = '{!e.Description}';
+	        eventInfo.datetime = '{!e.ActivityDateTime}';
+	        evtVals.push(eventInfo);
+            //loadData('{!e.Address}','{!e.Description}','{!e.ActivityDateTime}');
+        </apex:repeat>
+        
+        //hide components
+        document.getElementById("trMap").style.display = 'none';
+        document.getElementById("Events").style.display = 'none';
+        document.getElementById("loading_img").style.display = 'block';
+        
+        if({!!isDataPresent})
+        {
+            document.getElementById("trMap").style.display = 'none';
+            document.getElementById("trNoData").style.display = '';
+            document.getElementById("loading_img").style.display = 'none';
+        }
+        else
+        {
+        	startAddressParsing();
+        }
+        
+		
+    }
+}
+
+var addressCounter = 0;
+var loadedAll = false;
+function startAddressParsing()
+{
+	if(addressCounter == null) addressCounter = 0;
+	loadData(evtVals[addressCounter].address, evtVals[addressCounter].desc, evtVals[addressCounter].datetime);
+	addressCounter++;
+	
+	if(addressCounter < evtVals.length)
+	{
+		setTimeout(startAddressParsing, 100);
+	}
+	else
+	{
+		loadedAll = true;
+		if({!!isDataPresent})
+        {
+            document.getElementById("trNoData").style.display = '';
+        }
+	}
+}
+
+function addItems(response)
+{
+   cnt2++;
+   locations.push(response);
+   for(var i=0; i < eventInfos.length; i++)
+   {
+        if(eventInfos[i].address == response.name)
+        {
+           eventInfos[i].location = response;
+        }
+   }
+   
+   document.getElementById("Events").innerHTML = '';
+   if(cnt1== cnt2 && loadedAll)
+   {
+     //data for all locations retrieved
+     //alert('all locations retrieved');  
+     //SHOW MARKERS
+     for(var i=0; i < eventInfos.length; i++)
+     {
+        try
+        {
+            var place = eventInfos[i].location.Placemark[0]; 
+            markpoint = new GLatLng(place.Point.coordinates[1], place.Point.coordinates[0]);
+            marker = new GMarker(markpoint); 
+            /*var descHTML = '<h3>Event</h3>';
+            descHTML += '<b>Date/Time:</b>&nbsp;' + eventInfos[i].datetime + '<br/>';
+            descHTML += '<b> Description:</b>&nbsp;' + eventInfos[i].desc + '<br/>';
+            descHTML += '<b> Address:</b>&nbsp;' + eventInfos[i].address;*/
+            var descHTML = getEventHTML(eventInfos[i].datetime, eventInfos[i].desc, eventInfos[i].address);
+             
+            marker.bindInfoWindowHtml(descHTML); 
+            map.addOverlay(marker);
+            map.setCenter(markpoint, 5); 
+            addEvent(eventInfos[i].desc, eventInfos[i].datetime, markpoint, descHTML, i);
+        }
+        catch(e){}
+      }
+        if(!isDataPresent)
+        {
+            document.getElementById("trMap").style.display = 'none';
+            document.getElementById("trNoData").style.display = '';
+        }
+        else if(eventInfos != null && eventInfos.length > 0)
+        {
+        	//alert('show map');
+        	document.getElementById("loading_img").style.display = 'none';
+        	
+        	document.getElementById("trMap").style.display = '';
+        	document.getElementById("Events").style.display = '';
+        
+            var place = eventInfos[0].location.Placemark[0]; 
+            map.setCenter(new GLatLng(place.Point.coordinates[1], place.Point.coordinates[0]), 13);
+        }
+   }
+   
+}
+
+
+function addEvent(eventdesc, eventDateTime, eventLatLng, descHTML, eventno)
+{
+//alert('eventdesc = ' + eventdesc);
+var eventDiv = document.getElementById('Events');
+/*var newDiv = '<div class="divEventInfo" style="font-size:10px;" onclick="javascript: ShowMarker(' + eventno + ');">';
+newDiv += '<div style="font-weight:bold;font-size:10px;">' + eventdesc + '</div>';
+newDiv += '<b>Date/Time:&nbsp;' + '</b>' + eventDateTime + '</div><div style="height:2px;">&nbsp;</div>';
+*/
+
+var newDiv =  '<div class="divEventInfo" style="font-size:10px;" onclick="javascript: ShowMarker(' + eventno + ');">';
+newDiv += getEventHTML(eventDateTime, eventdesc, '', true);
+newDiv += '</div>';
+
+eventDiv.innerHTML += newDiv;
+//map.panTo(eventLatLng);
+}
+
+function getEventHTML(activitydatetime, desc, address, showLine)
+{
+	var descHTML = '<div style="font-size:10px;padding-top:5px;">';
+	if(showLine == null || showLine != true)
+	{
+		descHTML += '<h3>Event</h3>';
+	}
+    descHTML += '<b>Date/Time:</b>&nbsp;' + activitydatetime + '<br/>';
+    descHTML += desc;
+    if(address != '') descHTML +=  '<br/><b> Address:</b>&nbsp;' + address;
+    
+    if(showLine == true)
+    {
+    	descHTML += '<br/><div style="border-top:1px solid #dddddd; height:1px;">&nbsp;&nbsp;</div>';
+    }
+    descHTML += '</div>';
+    return descHTML;
+}
+
+function ShowMarker(eventNo)
+{
+   if(eventInfos.length >= eventNo) 
+   {
+        try
+        {
+        var place = eventInfos[eventNo].location.Placemark[0]; 
+        markpoint = new GLatLng(place.Point.coordinates[1], place.Point.coordinates[0]);
+        //map.setCenter(markPoint);
+        
+        /*var descHTML = '<div style="font-size:12px;"><h3>Event</h3>';
+        descHTML += '<b>Date/Time:</b>&nbsp;' + eventInfos[eventNo].datetime + '<br/>';
+        descHTML += '<b> Description:</b>&nbsp;' + eventInfos[eventNo].desc + '<br/>';
+        descHTML += '<b> Address:</b>&nbsp;' + eventInfos[eventNo].address + '</div>';*/
+        
+        var descHTML = getEventHTML(eventInfos[eventNo].datetime, eventInfos[eventNo].desc, eventInfos[eventNo].address);
+        
+        map.openInfoWindow(markpoint , descHTML );
+        }
+        catch(e){}
+   }
+}
+
+function loadData(address, Description, ActivityDateTime )
+{
+    if (GBrowserIsCompatible() && geocoder == null) 
+    {
+      //geocoder = new GClientGeocoder();
+    }
+    try
+    {
+        //var address = street + ", " + postalcode + ", " + city + ", " + state + ", " + country;
+        var eventInfo = new Object();
+        eventInfo.address = address;
+        eventInfo.desc = Description;
+        eventInfo.datetime = ActivityDateTime;
+        eventInfo.location = new Object;
+        eventInfos.push(eventInfo);
+        cnt1++;
+        //alert('showing location; Description = ' + Description);
+        geocoder.getLocations(
+              address,
+              function(response) {
+                if (!response || response.Status.code != 200) {
+                   // document.getElementById("map_canvas").innerHTML = address + " not found";
+                    //alert('address not found');
+                    cnt1--;
+                }
+                else 
+                {
+                    //alert('showing location; desc = ' + desc);
+                    isDataPresent = true;
+                    /*place = response.Placemark[0]; 
+                    markpoint = new GLatLng(place.Point.coordinates[1], place.Point.coordinates[0]);
+                    marker = new GMarker(markpoint); 
+                    var descHTML = '<div style="font-size:12px;"><h3>Event</h3>';
+                    descHTML += '<b>Date/Time:</b>&nbsp;' + eventDateTime + '<br/>';
+                    descHTML += '<b> Description:</b>&nbsp;' + desc + '</div>';
+                    marker.bindInfoWindowHtml(descHTML);*/ 
+                    addItems(response);
+                }
+              },
+              desc = Description,
+              eventDateTime = ActivityDateTime
+            ); 
+    }catch(e){}
+}
+
+<!-- Calling loadData to load locations for all events -->
+</script>
+
+<body onload="initialize();" onunload="GUnload()">
+<table cellpadding="2" cellspacing="2" border="0" style="padding:0; margin:0;" width="100%">
+<tr>
+	<td width="100%" colspan="2">
+		<div id="loading_img"><img src="/img/loading.gif" /> Loading...</div>	
+	</td>
+</tr>
+<tr id="trMap">
+	<td width="70%" valign="top">
+	
+    <div id="map_canvas" style="width:100%;height:400px"></div>
+    </td>
+    <td width="30%" valign="top">
+    <div><h3>Today's Appointments</h3></div>
+    <div id="Events" style="width:100%;height:350px;overflow:auto;">
+    
+    </div>
+    </td>
+</tr>
+<tr id="trNoData" style="display:none;">
+    <td colspan="2"><h3>No data available.</h3></td>
+</tr>
+</table>
+</body>
+
+</apex:page>

@@ -1,0 +1,105 @@
+<apex:page controller="WrapUpScreenController" id="pageID" tabStyle="Job__c"> 
+<script>
+function update_counter(counter, text_elem, max_len)
+{
+    var counterElem = document.getElementById(counter);
+    var textElem = document.getElementById(text_elem);
+    var len = textElem.value.length;
+    var val = max_len - textElem.value.length;
+    counterElem.innerHTML = val; 
+}
+function checkLimit(limitField, limitCount, limitNum)
+{
+   
+    var textElem = document.getElementById(limitField);
+    if (textElem.value.length > limitNum) {
+       textElem.value = textElem.value.substring(0, limitNum);
+    }else {
+        limitCount.value = limitNum - textElem.value.length;
+    }
+}
+
+</script>
+
+<apex:form id="formID">
+
+
+<apex:pagemessage severity="info" detail="{!$Label.SMRT_Group}" strength="2" rendered="{!var}" />
+<apex:pagemessages />
+
+
+
+<apex:pageBlock title="Wrap Up Screen" id="pageBlockID">
+   <apex:outputPanel rendered="{!AppointmentStatus}">
+    
+        <c:AppointViewComponent displayModeVal="1" appointViewList="{!appointments}" DisplayModeobj="{!DisplayMode}" />  
+    
+  </apex:outputPanel>    
+   <c:ContactEditViewComponentcopy displayModeVal="1" ListContactInfo="{!conList}" DisplayModeobj="{!DisplayMode}"/>    
+   <apex:outputPanel rendered="{!AppointmentStatus}">
+    
+        <c:AppointViewComponent displayModeVal="1" appointViewList="{!appointments}" DisplayModeobj="{!DisplayMode}" />  
+    
+    </apex:outputPanel>
+
+   <apex:pageblocksection title="HA Notes" columns="1">
+       <apex:pageblocksectionItem >
+           <apex:Outputlabel value="CHI Lead Num" />
+            <apex:Outputfield value="{!opportunity.CHI_Lead_Id__c}" />
+       </apex:pageblocksectionItem>
+       
+       <apex:pageblocksectionItem >
+           <apex:Outputlabel value="Lead Comments" />
+           <apex:inputTextarea id="leadCommentsField" rows="6" value="{!leadCommentsAppend}" cols="80" />
+       </apex:pageblocksectionItem>
+       
+       <apex:pageblocksectionItem >
+          <apex:outputLabel value="HA Notes "/>
+          <apex:inputTextarea id="taNotedField" value="{!leadTaNotesAppend}" onkeydown="checkLimit('{!$Component.pageID.formID.pageBlockID.taNotedField}',this.form.countdown,1000);" onkeyup="checkLimit('{!$Component.pageID.formID.pageBlockID.taNotedField}',this.form.countdown,1000);" onchange="checkLimit('{!$Component.pageID.formID.pageBlockID.taNotedField}',this.form.countdown,1000);" cols="80" rows="6" />
+       </apex:pageblocksectionItem>
+      
+       <apex:pageblocksectionItem rendered="{!NOT(DisplayRedUnAppLeadReason)}">
+          <apex:outputLabel value="Unappointed Lead Reason"/>
+          <apex:inputfield value="{!opportunity.Unappointed_Lead_Reason__c}" />
+       </apex:pageblocksectionItem>
+       
+       <apex:pageblocksectionItem rendered="{!DisplayRedUnAppLeadReason}">
+          <apex:outputLabel value="Unappointed Lead Reason" style="color:red;"/>
+          <apex:inputfield value="{!opportunity.Unappointed_Lead_Reason__c}" />
+          
+       </apex:pageblocksectionItem>
+       <apex:pageblocksectionItem >
+          <apex:outputLabel value="Landlord / Tenant / Agent lead details : " style="color:red;"/>
+            <apex:inputTextarea id="lanlordLeadDetails" value="{!opportunity.Landlord_lead_details__c}" rendered="{!isLanlordNotesRequired}" cols="80" rows="6" required="{!isLanlordNotesRequired}" />
+       </apex:pageblocksectionItem>
+    </apex:pageblocksection>
+    
+    <apex:pageblocksection title="Waste call" columns="2">
+        
+        <apex:inputfield value="{!wastecall.Who_is_taking_the_call__c}" />
+        <apex:inputfield value="{!wastecall.Campaign__c}" />
+        <apex:inputfield value="{!wastecall.Source_Of_Call__c}" />
+        <apex:pageblocksectionitem />
+        <apex:inputfield value="{!wastecall.Reason_for_Call__c}" />
+        <apex:inputfield value="{!wastecall.Call_Notes__c}" />
+     
+    </apex:pageblocksection> 
+    
+    <apex:pageblocksection title="Prospect Details" >
+        
+        <apex:inputfield value="{!opportunity.Call_Back_Date__c}"/>
+        <apex:inputfield value="{!opportunity.Do_Not_Call_Back__c}" />
+        <apex:pageblocksectionItem />
+        <apex:inputfield value="{!opportunity.Opt_Out__c}" />
+        <apex:inputfield value="{!opportunity.Reason_Code__c}" /> <!-- Change it with Reason For Call Field -->
+        <apex:inputfield value="{!opportunity.Prospect__c}" />
+        <apex:inputfield value="{!opportunity.Override_Call_Back_Date__c}" />
+        <apex:inputfield value="{!opportunity.Prospect_Notes__c}"/>
+                
+    </apex:pageblocksection>
+    <apex:pageBlockButtons location="bottom">
+         <apex:commandButton value="Close Call" action="{!closeCall}"/>
+    </apex:pageBlockButtons>
+</apex:pageBlock>
+</apex:form>
+</apex:page>

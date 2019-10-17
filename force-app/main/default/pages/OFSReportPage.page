@@ -1,0 +1,71 @@
+<apex:page controller="GetCalendersController" tabstyle="Appointment__c">
+<apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" />
+<apex:stylesheet value="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-lightness/jquery-ui.css"/>
+
+
+ <script type="text/javascript">
+ var isClicked = false;
+            function check(obj) {
+              if(isClicked) {
+                    alert('Button can only be pressed once');
+                    return false;
+                } else {
+                    isClicked = true;
+                    togglleDiv('');
+                    
+                }
+            }
+            function togglleDiv(show){
+               
+                document.getElementById('LoadingDiv').style.display = show;      
+            }  
+            
+            </script>
+ <apex:form >
+   
+ <apex:outputPanel id="panel">
+ <!--<apex:actionStatus id="actStatus">
+    <apex:facet name="start">
+    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.25; z-index: 1000; background-color: black;">
+        &nbsp;
+    </div>
+    <div style="position: fixed; left: 0; top: 0; bottom: 0; right: 0; z-index: 1001; margin: 15% 50%">
+        <div style="display: inline-block; padding: 2px; background-color: #fff; width: 125px;">
+            <img src="/img/loading.gif" style="float: left; margin: 8px;" />
+            <span style="display: inline-block; padding: 10px 0px;">Please Wait...</span>
+        </div>
+    </div>
+    </apex:facet>
+</apex:actionStatus>-->
+                
+  <apex:pageMessages />
+ </apex:outputPanel>
+ <apex:pageBlock id="pb">
+ <apex:pageblockSection title="Get Calenders for Employee" />
+  <apex:pageblockSection >
+    <apex:pageblockSectionItem >
+      <apex:outputLabel value="Start Date" /><apex:inputField value="{!quotaData.Work_Time_Start__c}"  /> 
+                   
+   </apex:pageblockSectionItem>
+     <apex:pageblockSectionItem >
+           <apex:outputLabel value="End Date" /><apex:inputField value="{!quotaData.Work_Time_End__c}"  label="Work Time End"/> 
+       </apex:pageblockSectionItem>
+  </apex:pageblockSection>
+        
+         
+  <apex:pageblockbuttons location="bottom" >
+            <apex:commandbutton value="Get Shift Patterns" action="{!getShiftPattern}"  rerender="panel" />
+            <apex:commandbutton value="Get Bucket Closure" action="{!getbucketClosure}" />
+            <apex:commandbutton value="Get HSA Unavailabilities" action="{!getInternalAct}" onclick="check(this);" />
+            <apex:commandbutton value="Automate Work Zones" action="{!automateWorkZones}" immediate="true"/>
+            <apex:commandbutton value="Get Employee Bucket Info" action="{!getbucketMapping}" />
+ </apex:pageblockbuttons>
+ </apex:pageBlock>
+ <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:600px; top:150px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> Please wait...
+            </div>
+</div>
+  </apex:form>
+  
+</apex:page>

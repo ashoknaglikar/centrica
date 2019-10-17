@@ -1,0 +1,223 @@
+<apex:component controller="ContactEditViewComponentController">
+    <apex:attribute name="displayModeVal" description="This attrribute is used to determine the display type: Edit,View,addressOnly,status" type="Integer" required="true"/>
+    <apex:attribute name="ListContact" description="This attrribute passes the contact list to the controller." type="Contact[]" />
+    <apex:attribute name="ListContactInfo" description="This attrribute passes the contactInfo list to the controller." type="ContactInfo[]" assignTo="{!ConInfoList}"/>
+    <apex:attribute name="ListNewContactInfo" description="This attrribute passes the new contactInfo list to the controller." type="ContactInfo[]" />
+    <apex:attribute name="DisplayModeobj" description="This attrribute passes the DisplayMode." type="DisplayMode"/>
+    <!--added for IPD 3653 - begin dated 28-Feb 2013-->
+    <apex:attribute name="HeaderTitle" description="Header Title for PageBlock." type="String" default="Contact"/>
+    <!--added for IPD 3653 - end dated 28-Feb 2013-->
+<!-- To Display the Contacts in Edit Mode -->   
+    <script>
+        function displayAdd(checkItem, divID)
+        {
+            if(checkItem.checked)
+            {
+                document.getElementById(divID).style.display = 'none';
+            }
+            else
+            {
+                document.getElementById(divID).style.display = '';
+            }           
+        }
+        function calldispay(contactType, divID)
+        {
+           
+            var type = contactType.value;
+            //if(type == 'Landlord' || type == 'Tenant' || type == 'Agent'|| type == 'Regulatory Body')
+            if(type == 'Tenant')
+            {
+                alert('Please capture one more contact of type Landlord/Agent/Regulatory to book an appointment.');
+                
+                document.getElementById(divID).style.display = '';
+            }else
+            {
+                document.getElementById(divID).style.display = 'none';
+            }
+            
+        }   
+    </script>
+    
+    <apex:pageBlockSection title="{!HeaderTitle}" rendered="{!IF(displayModeVal==DisplayModeobj.EDIT,true,false)}" id="pageblock" columns="1" collapsible="false">
+        
+                
+        <apex:pageBlockTable var="con" value="{!ListNewContactInfo}" id="pageblocktable">
+            <apex:column headerValue="Primary">
+                <apex:inputField style="width:20px" value="{!con.contact.Primary_Contact__c}"/>&nbsp;
+            </apex:column>  
+            <apex:column headerValue="Title">
+                <apex:inputField style="width:50px" value="{!con.contact.Salutation}"/>&nbsp;
+            </apex:column>  
+            <apex:column headerValue="First Name">
+                <apex:inputField style="width:100px" value="{!con.contact.FirstName}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Surname">
+                <apex:inputField style="width:100px" required="false" value="{!con.contact.LastName}"/>&nbsp;
+            </apex:column>
+            <!--<apex:column headerValue="Date of Birth" rendered="false">
+                <apex:inputField style="width:100px" value="{!con.contact.Birthdate}"/>&nbsp;
+            </apex:column>-->
+            <apex:column headerValue="Email">
+                <apex:inputField style="width:140px" value="{!con.contact.Email__c}"/>&nbsp;
+            </apex:column>
+            <!-- Commented for Priority Installation CR on 06/07/2012 -->
+            <!--<apex:column headerValue="Vuln Customer">
+               <apex:inputField style="width:120px" value="{!con.contact.Circumstance__c}"/>&nbsp;
+           </apex:column> -->
+            <!-- Commented for Priority Installation CR on 06/07/2012 -->
+            <apex:column headerValue="Type">
+                <apex:inputField style="width:100px" value="{!con.contact.Contact_Type__c}"  /><!--</apex:in>onchange="calldispay(this,'con{!con.Contact.ID}{!con.Contact.Description}')" /> -->
+                <apex:inputfield value="{!con.contact.Multi_Premise__c}"  required="true"/>
+            </apex:column>
+            
+            <apex:column headerValue="Home">
+                <apex:inputField style="width:100px" value="{!con.contact.HomePhone}"/>
+            </apex:column>
+            <apex:column headerValue="Mobile">
+                <apex:inputField style="width:100px" value="{!con.contact.MobilePhone}"/>
+            </apex:column>
+            <apex:column headerValue="Alternative Number">
+                <apex:inputField style="width:100px" value="{!con.contact.OtherPhone}"/>
+            </apex:column>
+           <apex:column headerValue="Billing Address" width="180px">
+                <div style="vertical-align:top;width:180px" align="left" id="divId">
+                    <apex:inputCheckbox value="{!con.AddSlct}" id="chkBox" onclick="displayAdd(this,'con{!con.Contact.ID}{!con.Contact.Description}', {!con.AddSlct})"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+                <div id="con{!con.Contact.ID}{!con.Contact.Description}" style="display:block;backgruond:#EEEEEE; width:263px; border:1px solid #222222">
+                <div id="con{!con.Contact.ID}{!con.Contact.Description}" style="display:block;backgruond:#EEEEEE; width:260px;">
+                <c:AddressLookup AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+                StreetLabel="Street" StreetField="{!con.contact.MailingStreet}" 
+                CityLabel="City" CityField="{!con.contact.MailingCity}" StateLabel="State" 
+                StateField="{!con.contact.MailingState}" PostalCodeLabel="Postcode" 
+                PostalCodeField="{!con.contact.MailingPostalCode}" CountryLabel="Country" 
+                CountryField="{!con.contact.MailingCountry}"/> 
+                </div></div>
+                <script>
+                    document.getElementById('con{!con.Contact.ID}{!con.Contact.Description}').style.display='none';
+                </script>
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlockSection>
+    
+    <!-- To Display List of Contact is Appointment Edit mode. -->
+    
+    <!--<apex:pageBlockSection title="{!HeaderTitle}" rendered="{!IF(displayMode=='appntedit',true,false)}" >
+        
+        <apex:pageBlockTable var="con" value="{!ListContact}">
+            <apex:column headerValue="Primary">
+                <apex:inputField style="width:20px" value="{!con.Primary_Contact__c}"/>
+            </apex:column>
+            <apex:column headerValue="Title">
+                <apex:inputField style="width:20px" value="{!con.contact.Salutation}"/>
+            </apex:column>
+            <apex:column headerValue="First Name">
+                <apex:inputField style="width:100px" value="{!con.FirstName}"/>
+            </apex:column>
+            <apex:column headerValue="Surname">
+                <apex:inputField style="width:100px" value="{!con.LastName}"/>
+            </apex:column>
+            <apex:column headerValue="Date of Birth">
+                <apex:inputField style="width:100px" value="{!con.Birthdate}"/>
+            </apex:column>
+            <apex:column headerValue="Email">
+                <apex:inputField style="width:140px" value="{!con.Email}"/>
+            </apex:column>
+            <apex:column headerValue="Vuln">
+                <apex:inputField style="width:100px" value="{!con.Circumstance__c}"/>
+            </apex:column>
+            <apex:column headerValue="Address">
+                <apex:outputText style="width:140px" value="{!con.MailingStreet}"/><br/>
+                <apex:outputText style="width:140px" value="{!con.MailingCity}"/><br/>
+                <apex:outputText style="width:140px" value="{!con.MailingState}"/><br/>
+                <apex:outputText style="width:140px" value="{!con.MailingCountry}"/><br/>
+                <apex:outputText style="width:140px" value="{!con.MailingPostalCode}"/>
+            </apex:column>
+            <apex:column headerValue="Home">
+                <apex:inputField style="width:100px" value="{!con.HomePhone}"/>
+            </apex:column>
+            <apex:column headerValue="Mobile">
+                <apex:inputField style="width:100px" value="{!con.MobilePhone}"/>
+            </apex:column>
+            <apex:column headerValue="Work">
+                <apex:inputField style="width:100px" value="{!con.OtherPhone}"/>
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlockSection>-->
+    
+    <!-- To Display List of Contacts in View Mode -->   
+
+    <apex:pageBlockSection title="{!HeaderTitle}" rendered="{!IF(displayModeVal==DisplayModeobj.VIEW,true,false)}" columns="1" collapsible="false">
+        <apex:pageBlockTable var="con" value="{!ListContactInfo}" width="100%" border="0">
+            <apex:column headerValue="Primary" style="width:20px">
+                <apex:outputField style="width:20px" value="{!con.Contact.Primary_Contact__c}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Title" style="width:30px">
+                <apex:outputField style="width:50px" value="{!con.contact.Salutation}" rendered="{!!con.isEditTitle}"/>
+                <!--added for IPD 3653 - begin dated 25-Feb 2013-->
+                <apex:inputField style="width:50px" value="{!con.contact.Salutation}" rendered="{!con.isEditTitle}"/>
+                <!--added for  IPD 3653 - end dated 25-Feb 2013-->
+                &nbsp;
+            </apex:column>
+            <apex:column headerValue="First Name" style="width:100px">
+                <apex:outputField style="width:100px" value="{!con.Contact.FirstName}" rendered="{!!con.isEditFirstName}"/>
+                <!--added for IPD 3653 - begin dated 25-Feb 2013-->
+                <apex:inputField style="width:100px" value="{!con.Contact.FirstName}" rendered="{!con.isEditFirstName}"/>
+                <!--added for  IPD 3653 - end dated 25-Feb 2013-->
+                &nbsp;
+            </apex:column>
+            <apex:column headerValue="Surname" style="width:100px">
+                <apex:outputField style="width:100px" value="{!con.Contact.LastName}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Date of Birth" style="width:100px"  rendered="false">
+                <apex:outputField style="width:100px" value="{!con.Contact.Birthdate}"/>&nbsp;
+            </apex:column>
+            <apex:column headerValue="Email" width="140px">
+                <apex:outputField style="width:100px" value="{!con.Contact.Email__c}" rendered="{!!con.isEditEmail}"/>
+                <!--added for IPD 3653 - begin dated 25-Feb 2013-->
+                <apex:inputField style="width:100px" value="{!con.Contact.Email__c}" rendered="{!con.isEditEmail}"/>
+                <!--added for  IPD 3653 - end dated 25-Feb 2013-->
+                &nbsp;
+            </apex:column>
+            <!-- Commented for Priority Installation CR on 06/07/2012 -->
+            <!-- <apex:column headerValue="Vuln Customer" style="width:120px">
+                <apex:outputField style="width:120px" value="{!con.Contact.Circumstance__c}"/>&nbsp;
+           </apex:column> -->
+            <!-- Commented for Priority Installation CR on 06/07/2012 -->
+            <apex:column headerValue="Type">
+                <apex:outputField style="width:100px" value="{!con.contact.Contact_Type__c}"/>
+            </apex:column>
+            <apex:column headerValue="Home" style="width:100px">
+                <apex:outputField value="{!con.Contact.HomePhone}" rendered="{!!con.isEditHome}"/>
+                <!--added for IPD 3653 - begin dated 25-Feb 2013-->
+                <apex:inputField value="{!con.Contact.HomePhone}" rendered="{!con.isEditHome}"/>
+                <!--added for  IPD 3653 - end dated 25-Feb 2013-->
+                &nbsp;
+            </apex:column>
+            <apex:column headerValue="Mobile" style="width:100px">
+                <apex:outputField value="{!con.Contact.MobilePhone}" rendered="{!!con.isEditMobile}"/>
+                <!--added for IPD 3653 - begin dated 25-Feb 2013-->
+                <apex:inputField value="{!con.Contact.MobilePhone}" rendered="{!con.isEditMobile}"/>
+                <!--added for  IPD 3653 - end dated 25-Feb 2013-->
+                &nbsp;
+            </apex:column>
+            <apex:column headerValue="Alternative Number" style="width:100px">
+                <apex:outputField value="{!con.Contact.OtherPhone}" rendered="{!!con.isEditWork}"/>
+                <!--added for IPD 3653 - begin dated 25-Feb 2013-->
+                <apex:inputField value="{!con.Contact.OtherPhone}" rendered="{!con.isEditWork}"/>
+                <!--added for  IPD 3653 - end dated 25-Feb 2013-->
+                &nbsp;
+            </apex:column>
+            <apex:column headerValue="Billing Address" style="width:140px">
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingStreet}"/>
+                <apex:outputText value="," rendered="{!IF(con.Contact.MailingStreet != null,true,false)}"/>
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingCity}"/>
+                <apex:outputText value="," rendered="{!IF(con.Contact.MailingCity != null,true,false)}"/>
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingState}"/>
+                <apex:outputText value="," rendered="{!IF(con.Contact.MailingState != null,true,false)}"/>
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingCountry}"/>
+                <apex:outputText value="," rendered="{!IF(con.Contact.MailingCountry != null,true,false)}"/>
+                <apex:outputText style="width:140px" value="{!con.Contact.MailingPostalCode}"/>&nbsp;
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlockSection>    
+</apex:component>

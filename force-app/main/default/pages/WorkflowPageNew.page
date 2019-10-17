@@ -1,0 +1,98 @@
+<apex:page controller="WorkflowPageController">
+<apex:includeScript value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryUI/js/jquery-1.2.7.min.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/js/jquery.simplemodal.js')}" />
+<apex:stylesheet value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/css/basic.css')}" />
+<apex:stylesheet value="{!URLFOR($Resource.AutoCompleteWithModal, '/JQueryModal/css/style.css')}" />    
+<script type="text/javascript" src="/soap/ajax/16.0/connection.js"/>
+<script type="text/javascript" src="/soap/ajax/16.0/ajax.js"/>
+
+<style type="text/css">
+    .popupSpan {
+    Display: none;
+    }
+    a.describe:link { 
+        color: #ff0000;
+        font: bold;
+    }
+    
+    a.describe:visited {
+        color: #0000ff;
+    }
+    
+    a.describe:hover {
+        background: #66ff66;
+    }
+    
+    #simplemodal-container{
+    background-color: #333;
+    border: 4px solid #444;
+    color: #BBB;
+    height: 480px;
+    padding: 12px;
+    width: 750px;
+    }
+    
+
+
+</style>
+    
+<script type="text/javascript">
+    $ac = jQuery.noConflict(); 
+    function invokePopUp(idOfDiv){$ac('#'+idOfDiv).modal({persist:true});}
+    
+    function ConfirmLeadCreate(obj)
+    {
+        togglleDiv('');
+        var orignalClassName = obj.className;
+        if(obj.className == 'btnDisabled'  ) {
+                 alert('Button can only be pressed once');
+                 
+                return false;
+        } else {
+                 
+                 obj.className = 'btnDisabled';
+         }
+        
+    }
+    
+    function isClickedReset(){
+                
+          togglleDiv('none');
+    }
+            
+    function togglleDiv(show){
+        //document.getElementById('darkLayer').style.display = show; 
+        document.getElementById('LoadingDiv').style.display = show;      
+    }  
+
+
+</script>
+    <div style="color:blue;font-size:20px;">
+            <apex:outputText value="{!WorkflowInfo.messageStr1}" rendered="{!WorkflowInfo.messageBool1}"/><br/>
+            <apex:outputText value="{!WorkflowInfo.messageStr2}" rendered="{!WorkflowInfo.messageBool2}"/>
+    </div>
+    <apex:pagemessages />
+    <apex:form >
+    <apex:pageblock > 
+    <a href="#" onclick="invokePopUp('CombiQues')" class="describe">Straight Swap Questionnaire</a><br/><br/>
+    <c:AccountEditViewComponent id="AccountView" rendered="{!WorkflowInfo.ShowAccountView}" DisplayModeobj="{!DisplayMode}" displayModeVal="{!WorkflowInfo.ViewModeAccountView}" accountObject="{!WorkflowInfo.CurrentAccount}" CallModeobj="{!CallMode}" callModeVal="{!WorkflowInfo.WorkflowType}" /><!--</c:AccountEditViewComponent>region="{!WorkflowInfo.region}" district="{!WorkflowInfo.district}" ListOpportunity="{!WorkflowInfo.Opportunities}"/>-->
+
+        <div id="CombiQues" class="popupSpan"> 
+            <c:StraightSwapComponent id="ViewCombiQues" CombiSwap="{!WorkflowInfo.combiSwap}" />
+            
+        </div>
+        
+        
+       <c:newCustomer ListContactInfo="{!WorkflowInfo.NewContactInfos}" displayModeVal="{!WorkflowInfo.WorkflowType}" ListOpportunity="{!WorkflowInfo.Opportunities}" accountObject="{!WorkflowInfo.CurrentAccount}" gas1="{!WorkflowInfo.gasCouncil1}" gas2="{!WorkflowInfo.gasCouncil2}" gas3="{!WorkflowInfo.gasCouncil3}" uexist="{!uexist}" categoryType="{!WorkflowInfo.customerCateogryType}"  marketingPreference="{!WorkflowInfo.PicklistValues}"/>
+   
+        <apex:pageblockButtons >
+             <apex:commandbutton action="{!BtnCreateLead_Click}" id="BtnCreateLead" rendered="{!WorkflowInfo.ShowBtnCreateLead}" value="Create Lead" onclick="return ConfirmLeadCreate(this);"/>
+        </apex:pageblockButtons>  
+    </apex:pageblock>
+    </apex:form>
+    <div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:600px; top:150px;display:none;">
+            <div style="margin-left:5px; margin-top:5px;">
+            <img src="/img/loading.gif" /> System updating......please wait...
+            </div>
+    </div>
+</apex:page>

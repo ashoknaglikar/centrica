@@ -1,0 +1,67 @@
+<apex:page controller="ELESCSA_Report_Controller" cache="true" sidebar="false" contenttype="text/Plain#ELESCSAReport.txt">
+{!ReportData}
+<!-- 
+      <apex:pageBlock title="ELESCSA Report for : {!ELESCSA.Name}" rendered="false">
+      
+        <apex:form >
+<apex:pageBlockTable value="{!ELESCSA.Name}" var="st">
+
+    <apex:column headerValue="Name">
+                       {!ELESCSA.Name}
+                    </apex:column>
+    <apex:column headerValue="YourJobReference">
+                        {!ELESCSA.YourJobReference__c}
+                    </apex:column>
+    <apex:column headerValue="ContractorAmount">
+                        {!ELESCSA.ContractorAmount__c}
+                    </apex:column>
+                    
+    <apex:column headerValue="Job">
+                        {!ELESCSA.Job__c}
+                    </apex:column>                  
+                    
+    <apex:column headerValue="YourNotes">
+                        {!ELESCSA.YourNotes__c}
+                    </apex:column>
+    <apex:column headerValue="YourCertificateNumber">
+                        {!ELESCSA.YourCertificateNumber__c}
+                    </apex:column>
+    <apex:column headerValue="Employee">
+                       {!ELESCSA.Employee__c}
+                    </apex:column>
+    <apex:column headerValue="CertificateRecipientFirstName">
+                        {!ELESCSA.CertificateRecipientFirstName__c}
+                    </apex:column>
+    <apex:column headerValue="CertificateRecipientLastName">
+                        {!ELESCSA.CertificateRecipientLastName__c}
+                    </apex:column>
+    <apex:column headerValue="ContractStartDate">
+                        {!ELESCSA.ContractStartDate__c}
+                    </apex:column>
+    <apex:column headerValue="ContractEndDate">
+                        {!ELESCSA.ContractEndDate__c}
+                    </apex:column>
+                        <apex:column headerValue="DwellingCounty">
+                        {!ELESCSA.DwellingCounty__c}
+                    </apex:column>
+    <apex:column headerValue="DwellingHouseNumberOrName">
+                        {!ELESCSA.DwellingHouseNumberOrName__c}
+                    </apex:column>
+    <apex:column headerValue="DwellingPostcode">
+                       {!ELESCSA.DwellingPostcode__c}
+                        </apex:column>
+            <apex:column headerValue="DwellingTown">
+                        {!ELESCSA.DwellingTown__c}
+                    </apex:column>
+    <apex:column headerValue="PostalPostcode">
+                       {!ELESCSA.PostalPostcode__c}
+                     </apex:column>
+
+</apex:pageBlockTable>
+    <center>
+     <apex:commandButton action="{!Save}" value="Save As" />
+     </center> 
+        </apex:form> 
+  </apex:pageBlock>
+   -->
+</apex:page>

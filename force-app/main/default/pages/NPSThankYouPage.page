@@ -1,0 +1,33 @@
+<apex:page controller="NPSScoreCardController" showHeader="false" sidebar="false" title="British Gas NPS Survey">
+<script>
+window.onload = function applyStyle(){
+ if(history.length>0)
+ history.go(+1);
+ window.moveTo(0,0);
+ window.resizeTo(1096,1096);
+ };
+function closeAndRefresh(){
+window.opener='x';
+window.close(); 
+}
+</script>
+    <apex:form >
+        <apex:outputpanel >
+            <div id="content1"
+                style="border: 3px #00CCFF solid; background-color: #D4F1FF">
+            <div style="margin: 0.25in">
+            <p>Thanks for your feedback. <br />
+            <br />
+            If you are experiencing problems with your British Gas central
+            heating installation why not contact us at:
+            installationcomplaints@britishgas.co.uk or telephone us on {!$Label.PhoneNumber_CustomerRelations}. <br />
+            <br />
+            We will be pleased to help you.
+            <center><apex:image onClick="Javascript:closeAndRefresh();"
+                url="{!$Resource.Close_Button}" title="Close this window" /></center>
+            </p>
+            </div>
+            </div>
+        </apex:outputpanel>
+    </apex:form>
+</apex:page>

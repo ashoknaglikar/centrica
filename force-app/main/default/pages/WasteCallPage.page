@@ -1,0 +1,118 @@
+<!-- BGB_CTS: WasteCallPage
+   Description : This Page is used to display the Waste Call Screen.
+   Created : 14/10/09 :By Aruna
+-->
+<apex:page controller="WasteCallController">
+<apex:form >
+<apex:pagemessages />
+<apex:pageBlock title="Waste Call" id="mypageblock1">
+     <c:AccountEditViewComponent displayModeVal="{!AccountViewMode}"  DisplayModeobj="{!DisplayMode}" accountObject="{!account}"/>
+     <!--- CTS CHI Conversion Start Ashok 23-11-10---->
+     <apex:pageBlockSection id="section1"  title="Please select type of Waste call" collapsible="false" columns="1" rendered="{!DirectEnq==false}">
+        <apex:pageblocksectionitem >
+            <apex:outputLabel value="Waste Call Type" />
+            <apex:selectlist value="{!LeadType}" size="1" id="picklist">
+                 <apex:selectoptions value="{!LeadTypeOptions}"/>
+                 <apex:actionsupport event="onchange" rerender="Panel" status="pleasewait"/>
+            </apex:selectlist>
+            </apex:pageblocksectionitem>   
+      </apex:pageBlockSection>
+      <apex:actionStatus startText="Processing...."  stoptext="" id="pleasewait"/>
+      
+     <!-- CTS CHI Conversion End -->  
+   
+     <apex:outputPanel id="Panel">
+     <apex:pageBlockSection id="section2" title="Enquiry" collapsible="false" columns="1" rendered="{!LeadType == 'Waste Call'}">
+         <apex:outputPanel id="Myoutputpanel1"> 
+            <table width="100%">
+            <tr> 
+                <td width="10%"><b><apex:outputText value="Title" /></b></td>
+                <td width="15%"><b><apex:outputText value="Firstname"/></b></td>
+                <td width="15%"><b><apex:outputText value="Surname"/></b></td>
+                <td width="25%"><b><apex:outputText value="Waste Call Category" /></b></td>
+                <!-- <td width="20%"><b><apex:outputText value="Sub Category" /></b></td>-->
+                <!-- <td width="15%"><b><apex:outputText value="Campaign" /></b></td>-->
+            </tr>
+            <tr>        
+                <td><apex:inputField value="{!lead.salutation}"/></td>
+                <td><apex:inputField value="{!lead.Firstname}"/></td>
+                <td><apex:inputField value="{!lead.Lastname}"/></td>
+                <td><apex:inputField value="{!lead.Categories__c}"/></td> 
+                <!-- <td><apex:inputField value="{!lead.Sub_Categories_of_Gas_Office_Referral__c}"/></td> -->
+                <!-- <td><apex:inputField value="{!lead.Campaign}"/></td> -->
+            </tr>
+            <tr> 
+                <td width="25%"><b><apex:outputText value="Call Notes: " /></b></td>
+                <td width="75%" colspan="5"><apex:inputTextarea cols="90" rows="5" value="{!lead.Call_Notes__c}"/></td>
+            </tr>
+            </table>
+       </apex:outputPanel>       
+    </apex:pageBlockSection>
+    <!--- CTS CHI Conversion Start Ashok 23-11-10---->
+    <apex:pageBlockSection id="section3" title="Prospect" collapsible="false" columns="1" rendered="{!LeadType == 'Prospect'}">
+        <!-- -<apex:pageblocksectionitem > -->
+            <apex:outputPanel id="Myoutputpanel2">
+                <table width="100%">
+                <tr> 
+                    <td width="10%"><b><apex:outputText value="Title" /></b></td>
+                    <td width="15%"><b><apex:outputText value="Firstname"/></b></td>
+                    <td width="15%"><b><apex:outputText value="Surname"/></b></td>
+                    <!-- <td width="25%"><b><apex:outputText value="Waste Call Category" /></b></td> -->
+                    <td width="15%"><b><apex:outputText value="Opt Out" style="color:red;"/></b></td>
+               </tr>
+                <tr>        
+                    <td><apex:inputField value="{!lead.salutation}"/></td>
+                    <td><apex:inputField value="{!lead.Firstname}"/></td>
+                    <td><apex:inputField value="{!lead.Lastname}" required="false"/></td>
+                    <!-- <td><apex:inputField value="{!lead.Categories__c}"/></td> --> 
+                    <td><apex:inputField value="{!lead.FONT_COLOR_RED_Opt_Out__c}" required="false" onclick="popupoptout()"/></td>
+                </tr>
+                <tr> 
+                    <td width="10%"><b><apex:outputText value="Phone Number" /></b></td>
+                    <td width="15%"><b><apex:outputText value="Product Interest"/></b></td>
+                    <td width="15%"><b><apex:outputText value="Reason Code"/></b></td>
+                    <td width="25%"><b><apex:outputText value="Action" /></b></td>
+                    
+                    
+                </tr>
+                <tr>        
+                    <td><apex:inputField value="{!lead.Phone}"/></td>
+                    <td><apex:inputField value="{!lead.Product_Interest__c}"/></td>
+                    <td><apex:inputField value="{!lead.Reason_Code__c}" /></td>
+                    <td><apex:inputField value="{!lead.Call_Back_Date__c}"/></td> 
+                    
+                </tr>
+               
+                <tr> 
+                    <td width="10%"><b><apex:outputText value="Do Not Call" /></b></td>
+                    <td width="15%"><b><apex:outputText value="Override Call Back Date" /></b></td>
+                    <td width="25%"><b><apex:outputText value="Call Notes: " /></b></td>
+                    
+                </tr>
+                <tr>
+                    <td><apex:inputField value="{!lead.DoNotCall}"/></td>
+                    <td><apex:inputField value="{!lead.Overridden_Call_Back_Date__c}"/></td>
+                    <td  colspan="5"><apex:inputTextarea cols="90" rows="5" value="{!lead.Call_Notes__c}"/></td>
+                </tr>
+                </table>
+           </apex:outputPanel>
+        <!-- </apex:pageblocksectionitem>  -->        
+    </apex:pageBlockSection>
+    </apex:outputPanel>       
+    <!-- CTS CHI Conversion End -->
+      <apex:outputPanel style="display:none;">
+                    <apex:inputField value="{!lead.Dummy_Date__c}" />
+      </apex:outputPanel> 
+    <apex:pageBlockButtons >
+        <apex:commandButton value="Close Call" action="{!closeCall}"/>
+    </apex:pageBlockButtons>
+</apex:pageBlock>
+</apex:form>
+<script type='text/Javascript'>
+        function popupoptout(){
+            
+            alert('Checking this box will remove this prospect from future Marketing of Britis Gas.');
+        }
+        
+    </script>
+</apex:page>

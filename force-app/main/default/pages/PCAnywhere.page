@@ -1,0 +1,42 @@
+<apex:page tabStyle="Lead" controller="myLeadExtension" showheader="false" sidebar="false">
+
+<!-- IntegratedScript changes -->
+<apex:form id="altForm">
+
+<apex:pageBlock >
+
+<apex:pageBlockSection >
+
+
+
+<c:AddressLookup AccountCode="BRITI11224" LicenseKey="HK82-EZ99-RF77-JH72" 
+
+StreetLabel="Street" StreetField="{!lead.Street}" 
+
+CityLabel="City" CityField="{!lead.City}" StateLabel="State" 
+
+StateField="{!lead.State}" PostalCodeLabel="Postcode" 
+
+PostalCodeField="{!lead.Postalcode}" CountryLabel="Country" 
+
+CountryField="{!lead.Country}"/>
+
+</apex:pageBlockSection>
+
+
+
+<apex:pageBlockButtons >
+
+<apex:commandButton id="submit" value="Save" action="{!saveEnquiry}"></apex:commandButton>
+
+</apex:pageBlockButtons>
+
+
+
+
+
+</apex:pageBlock>
+
+</apex:form>
+<!-- end IntegratedScript changes -->
+</apex:page>

@@ -1,0 +1,6 @@
+<apex:page standardController="cscfga__Product_Basket__c" extensions="CS_PdfController" showHeader="false" sidebar="false" renderAs="pdf" action="{!deleteTempAttachment}">
+    <head>
+        <apex:stylesheet value="{!$Resource.CS_pdfStyle}"></apex:stylesheet>
+    </head> 
+    <apex:outputText escape="false" value="{!pageContent}"/>
+</apex:page>

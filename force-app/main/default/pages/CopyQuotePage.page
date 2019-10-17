@@ -1,0 +1,197 @@
+<apex:page standardController="BigMachines_Quote__c" extensions="CopyQuoteExtension">
+    
+<script type="text/javascript" src="/soap/ajax/15.0/connection.js"></script>
+<script type="text/javascript" src="/soap/ajax/15.0/apex.js"></script>
+<script type="text/javascript" src="/js/functions.js"></script>
+<script>
+ 
+var isClicked = false;
+function check(obj) {
+  if(isClicked) {
+        alert('Button can only be pressed once');
+        return false;
+    } else {
+        isClicked = true;
+        obj.className = 'btnDisabled';
+        togglleDiv('');
+        
+    }
+}
+
+function isClickedReset(){
+      isClicked = false;
+      togglleDiv('none');
+}
+
+function togglleDiv(show){
+    document.getElementById('darkLayer').style.display = show; 
+    document.getElementById('LoadingDiv').style.display = show;      
+}  
+</script>
+
+    <apex:form id="myform">
+        <apex:pageMessages id="pgmsg" />
+        <apex:sectionHeader title="{!$ObjectType.BigMachines_Quote__c.Label}" subtitle="Copy & Sell BM Quote" rendered="{!bmQuote.Allow_Copy_Quote__c}"/>
+        <apex:pageBlock rendered="{!bmQuote.Allow_Copy_Quote__c}" id="pgblk">
+            <apex:pageBlockSection title="Payment Details" columns="1" id="pgsec1">
+                
+                <!--<apex:pageBlockSection columns="1" rendered="{!isShowVoucherCode}">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Voucher Code :"></apex:outputLabel>
+                    <apex:outputpanel >
+                    <apex:inputText value="{!voucherCode}"></apex:inputText>
+                    <apex:commandbutton value="Apply" action="{!applyVoucherCode}" rerender="pgsec1,pgmsg" />
+                    </apex:outputpanel>
+                </apex:pageBlockSectionItem>
+                
+                 <apex:pageBlockSectionItem rendered="{!if(voucherAmount!=null,true,false)}">
+                     <apex:outputLabel value="Allowance Amount :" ></apex:outputLabel>
+                     <apex:outputText value="{!voucherAmount}" ></apex:outputText>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem rendered="{!if(voucherName!=null,true,false)}">
+                     <apex:outputLabel value="Allowance Desc :" ></apex:outputLabel>
+                     <apex:outputText value="{!voucherName}" ></apex:outputText>
+                </apex:pageBlockSectionItem>  
+                </apex:pageBlockSection>-->
+               
+                <apex:pageBlockSection columns="2">
+                <apex:pageBlockSectionItem rendered="{!isShowVoucherCode}">
+                    <apex:outputLabel value="Voucher Code :"></apex:outputLabel>
+                    <apex:outputpanel >
+                    <apex:inputText value="{!voucherCode}"></apex:inputText>
+                    <apex:commandbutton value="Apply" action="{!applyVoucherCode}" rerender="pgblk,pgmsg"/>
+                    </apex:outputpanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:outputText rendered="{!isShowVoucherCode}"/>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Deposit Reference :"></apex:outputLabel>
+                    <apex:outputpanel layout="block" styleClass="requiredInput">
+                    <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                    <apex:inputField value="{!leadPayment.BGS_Payment_Reference_Num__c}" ></apex:inputField></apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                 <apex:pageBlockSectionItem >
+                      <apex:outputLabel value="BM Quote Net price :"></apex:outputLabel>
+                      <apex:outputText value="£{!bmQuote.finalNetQuoteTotal__c}"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Deposit Amount :"></apex:outputLabel>
+                    <apex:outputpanel layout="block" styleClass="requiredInput">
+                    <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                    <apex:inputField value="{!leadPayment.Amount__c}" >
+                        <apex:actionSupport event="onchange" action="{!dummy}" rerender="myform"/>
+                    </apex:inputField></apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem rendered="{!if(voucherAmount!=null,true,false)}">
+                      <apex:outputLabel value="Allowance Amount :"></apex:outputLabel>
+                      <apex:outputtext value=" £{!voucherAmount}" style="color:red;"/>
+                </apex:pageBlockSectionItem>
+                <apex:outputText rendered="{!if(voucherAmount!=null,false,true)}"/>
+               
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Deposit Payment Type :"></apex:outputLabel>
+                     <apex:selectList value="{!selectedDepositMethod}" size="1" multiselect="false">
+                     <apex:selectOptions value="{!depositMethod}" />
+                     <apex:actionSupport event="onchange" action="{!dummy}" rerender="pgsec1"/>
+                     </apex:selectList> 
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem rendered="{!if(voucherAmount!=null,true,false)}">
+                      <apex:outputLabel value="Total Net price :"></apex:outputLabel>
+                      <apex:outputtext value=" £{!adjustedNetValue}" />
+                </apex:pageBlockSectionItem>
+                <apex:outputText rendered="{!if(voucherAmount!=null,false,true)}"/>
+                
+                <apex:pageBlockSectionItem rendered="{!(selectedDepositMethod=='Credit Card'||selectedDepositMethod=='Debit Card')}" id="epdq1">
+                    <apex:outputLabel value="EPDQ Reference Number :"></apex:outputLabel>
+                    <apex:outputpanel layout="block" styleClass="requiredInput">
+                    <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                    <apex:inputField value="{!leadPayment.EPDQ_Authorisation__c}"></apex:inputField></apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem rendered="{!(selectedDepositMethod!='Credit Card'&& selectedDepositMethod!='Debit Card')}" id="epdq2">
+                    <apex:outputLabel value="EPDQ Reference Number :"></apex:outputLabel>
+                    <apex:inputField value="{!leadPayment.EPDQ_Authorisation__c}" ></apex:inputField>
+                </apex:pageBlockSectionItem>
+                
+                <apex:outputText />
+                
+                <apex:pageBlockSectionItem >
+                      <apex:outputLabel value="Final Payment Method :"/>
+                      <apex:outputpanel layout="block" styleClass="requiredInput">
+                      <apex:outputpanel layout="block" styleClass="requiredBlock"></apex:outputpanel>
+                      <apex:selectList value="{!selectedPaymentType}" size="1" multiselect="false">
+                      <apex:selectOptions value="{!paymentType}" />
+                      <apex:actionSupport event="onchange" action="{!dummy}" rerender="pgblk"/>
+                      </apex:selectList> </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+              </apex:pageBlockSection>  
+              </apex:pageBlockSection>  
+            
+            <apex:pageBlockSection title="Finance Section" rendered="{!selectedPaymentType=='Finance'}" id="pgsec2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Finance Amount :"></apex:outputLabel>
+                    <apex:outputField value="{!fa.Cash_Price__c}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Finance Date :"></apex:outputLabel>
+                    <apex:inputField value="{!fa.Date_From1__c}" ></apex:inputField>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Finance Lender :"></apex:outputLabel>
+                    <apex:selectList value="{!selectedFinanceLender}" size="1" multiselect="false">
+                      <apex:selectOptions value="{!financeLender}" />
+                      </apex:selectList>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Finance Acceptance Number :"></apex:outputLabel>
+                    <apex:inputField value="{!fa.Agreement_Number__c}" ></apex:inputField>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+                
+            
+            
+             <apex:pageBlockButtons location="bottom">    
+                    <apex:commandButton value="Confirm" action="{!cloneQuote}" onclick="check(this);"/>
+                    <!--<apex:commandButton value="Confirm" onclick="InsertRecord_JS();return false;"/>-->
+                    <apex:commandButton value="Cancel" action="{!cancel}" immediate="true"/>
+          </apex:pageBlockButtons> 
+          
+          <!--<apex:actionFunction action="{!InsertRecord}" name="InsertRecord_JS" oncomplete="CallWebService_JS();"/>
+          <apex:actionFunction action="{!CallWebService}" name="CallWebService_JS"/>-->
+        </apex:pageBlock>
+         
+                 <div align="center">
+                    <apex:commandButton value="Exit" action="{!cancel}" rendered="{!!bmQuote.Allow_Copy_Quote__c}"/>
+                 </div>  
+                 
+<div id="LoadingDiv" style="border:2px solid #555555; background-color:#DDDDDD;height:50px;width:300px;position:absolute;left:360px; top:320px;display:none;">
+        <div style="margin-left:5px; margin-top:5px;">
+          <img src="/img/loading.gif" /> Working in progress...please wait...
+        </div>
+</div>
+
+<div id="darkLayer" style ="background-color: white; 
+                            filter:alpha(opacity=50); /* IE */ 
+                            opacity: 0.5; /* Safari, Opera */ 
+                            -moz-opacity:0.50; /* FireFox */ 
+                            z-index: 20; 
+                            height: 100%; 
+                            width: 100%; 
+                            background-repeat:no-repeat; 
+                            background-position:center; 
+                            position:absolute; 
+                            top: 0px; 
+                            left: 0px; 
+                            display:none;">
+</div>                      
+    
+        
+    </apex:form>
+
+</apex:page>

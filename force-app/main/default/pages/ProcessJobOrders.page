@@ -1,0 +1,219 @@
+<apex:page standardController="Job__c" extensions="PurchaseOrderGenertion" title="Purchase Order" >
+<script>
+var isClicked = false;
+function check1(obj) {   
+    var v=document.getElementsByName('j_id0:j_id43:j_id44:j_id146:ConfirmOrder');
+    if(v[0].className == 'btnDisabled' || v[1].className == 'btnDisabled') {
+        alert('Button can only be pressed once.');
+        return false;
+    } else {
+        //isClicked = true;        
+        v[0].className = 'btnDisabled';
+        v[1].className = 'btnDisabled';
+        return true;
+    }
+
+}
+</script>
+<script>
+var isClicked = false;
+function check2(obj) {   
+    var v=document.getElementsByName('j_id0:j_id43:j_id44:j_id146:SaveOrder');
+    var v1=document.getElementsByName('j_id0:j_id43:j_id44:j_id146:back');
+    if(v[0].className == 'btnDisabled' || v[1].className == 'btnDisabled') {
+        alert('Button can only be pressed once.');
+        return false;
+    } else {
+        //isClicked = true;        
+        v[0].className = 'btnDisabled';
+        v[1].className = 'btnDisabled';
+        v1[0].className = 'btnDisabled';
+        v1[1].className = 'btnDisabled';
+       return true;
+    }
+
+}
+</script>
+
+<apex:sectionHeader title="Purchase Order" subtitle="{!Job__c.Name}"/>
+<apex:pageMessage summary="Orders cannot be generated." severity="error" strength="3" rendered="{!blError}"></apex:pageMessage>
+<apex:pageMessages />
+    <apex:form title="Orders for Job: {!Job__c.Name}">
+        
+        <apex:pageblock >
+            <!-- Start of After Confirmation -->
+            <apex:pageBlock rendered="{!(blConfirm)}">
+                <apex:pageBlock title="Itinerary without Supplier Information" rendered="{!blNoItMatPrice}">
+                    <apex:pageblocktable value="{!im_noPriceInformation}" var="unOrder">
+                        <apex:column headerValue="Item Code">
+                            <apex:outputText value="{!unOrder.objJobElement.Code__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Item Name">
+                            <apex:outputText value="{!unOrder.objJobElement.Description__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Units">
+                            <apex:outputText value="{!unOrder.objJobElement.Units__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Supplier">
+                            <apex:outputText value="{!unOrder.sSupplierName}"/>
+                        </apex:column>
+                        <apex:column headerValue="Status">
+                            <apex:outputText value="{!unOrder.sErrorText}"/>
+                        </apex:column>
+                    </apex:pageblocktable>
+                </apex:pageBlock>
+                <apex:pageBlock title="Material without Supplier Information" rendered="{!blNoMatPrice}">
+                    <apex:pageblocktable value="{!m_noPriceInformation}" var="unOrder">
+                        <apex:column headerValue="Item Code">
+                            <apex:outputText value="{!unOrder.objJobElement.Code__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Item Name">
+                            <apex:outputText value="{!unOrder.objJobElement.Description__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Units">
+                            <apex:outputText value="{!unOrder.objJobElement.Units__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Supplier">
+                            <apex:outputText value="{!unOrder.sSupplierName}"/>
+                        </apex:column>
+                        <apex:column headerValue="Status">
+                            <apex:outputText value="{!unOrder.sErrorText}"/>
+                        </apex:column>
+                    </apex:pageblocktable>
+                </apex:pageBlock>
+            </apex:pageBlock>
+            <!-- End of After Confirmation block -->
+            <!-- Start of before confirmation block -->
+            <apex:pageBlock rendered="{!NOT(blConfirm)}">
+                <apex:pageBlock title="Itinerary awaiting Supplier" rendered="{!blItMatUnorder}">
+                    <apex:pageblocktable value="{!im_UnOrderedItem}" var="unOrder">
+                        <apex:column headerValue="Item Code">
+                            <apex:outputText value="{!unOrder.objJobElement.Code__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Item Name">
+                            <apex:outputText value="{!unOrder.objJobElement.Description__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Units">
+                            <apex:outputText value="{!unOrder.objJobElement.Units__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Supplier">
+                            <apex:selectList value="{!unOrder.sSupplierId}" size="1">
+                                <apex:selectOptions value="{!itinerySupplierLst}"/>
+                            </apex:selectList> 
+                        </apex:column>
+                        <apex:column headerValue="Status" rendered="{!blError}">
+                            <apex:outputText value="{!unOrder.sErrorText}"/>
+                        </apex:column>
+                    </apex:pageblocktable>
+                </apex:pageBlock>
+                <apex:pageBlock title="Elements awaiting Supplier" rendered="{!blMatUnorder}">
+                    <apex:pageblocktable value="{!m_UnOrderedItem}" var="unOrder">
+                        <apex:column headerValue="Item Code">
+                            <apex:outputText value="{!unOrder.objJobElement.Code__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Item Name">
+                            <apex:outputText value="{!unOrder.objJobElement.Description__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Units">
+                            <apex:outputText value="{!unOrder.objJobElement.Units__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Supplier">
+                            <apex:selectList value="{!unOrder.sSupplierId}" size="1">
+                                <apex:selectOptions value="{!tertiarySupplierLst}"/>
+                            </apex:selectList>
+                        </apex:column>
+                        <apex:column headerValue="Status" rendered="{!blError}">
+                            <apex:outputText value="{!unOrder.sErrorText}"/>
+                        </apex:column>
+                    </apex:pageblocktable>
+                </apex:pageBlock>
+            </apex:pageBlock>
+            <!-- End of After Confirmation block -->
+            <apex:pageBlock title="Work without Supplier/Price Information" rendered="{!blNoWorkPrice}">
+                <apex:pageblocktable value="{!w_noPriceInformation}" var="unOrder">
+                    <apex:column headerValue="Item Code">
+                        <apex:outputText value="{!unOrder.objJobElement.Code__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Item Name">
+                        <apex:outputText value="{!unOrder.objJobElement.Description__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Units">
+                        <apex:outputText value="{!unOrder.objJobElement.Units__c}"/>
+                    </apex:column> 
+                    <apex:column headerValue="Supplier">
+                        <apex:outputText value="{!unOrder.sSupplierName}"/>
+                    </apex:column>
+                    <apex:column headerValue="Status">
+                        <apex:outputText value="{!unOrder.sErrorText}"/>
+                    </apex:column>
+                </apex:pageblocktable>
+            </apex:pageBlock>
+            <apex:pageBlock title="Itinary Work without Supplier/Price Information" rendered="{!blNoItWorkPrice}">
+                <apex:pageblocktable value="{!iw_noPriceInformation}" var="unOrder">
+                    <apex:column headerValue="Item Code">
+                        <apex:outputText value="{!unOrder.objJobElement.Code__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Item Name">
+                        <apex:outputText value="{!unOrder.objJobElement.Description__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Units">
+                        <apex:outputText value="{!unOrder.objJobElement.Units__c}"/>
+                    </apex:column> 
+                    <apex:column headerValue="Supplier">
+                        <apex:outputText value="{!unOrder.sSupplierName}"/>
+                    </apex:column>
+                    <apex:column headerValue="Status">
+                        <apex:outputText value="{!unOrder.sErrorText}"/>
+                    </apex:column>
+                </apex:pageblocktable>
+            </apex:pageBlock>
+            <apex:pageBlock title="{!IF(blConfirm,'Orders Ready to be Generated','Elements auto-assigned to Suppliers')}">
+                <apex:repeat value="{!purchaseOrderList}" var="mOrder">
+                    <apex:pageBlock >
+                        <apex:pageblockSection columns="1" title="Order Number: {!mOrder.sSAPNumber}" collapsible="true">
+                            <!-- Display only when Supplier is not null --> 
+                            <apex:pageblocksection >
+                                <apex:pageblocksectionItem >
+                                    <apex:outputLabel value="Supplier Name"/>
+                                    <apex:outputText value="{!mOrder.sSupplierName}" />
+                                </apex:pageblocksectionItem>
+                                <apex:pageblocksectionItem >
+                                    <apex:outputLabel value="Order Date"/>
+                                    <apex:outputText value="{!mOrder.sDispDate}" />
+                                </apex:pageblocksectionItem>
+                                <apex:pageblocksectionItem >
+                                    <apex:outputLabel value="Order Value"/>
+                                    <apex:outputText value="£ {!mOrder.dblOrderValue}" />
+                                </apex:pageblocksectionItem>
+                                <apex:pageblocksectionItem >
+                                    <apex:outputLabel value="Order Type"/>
+                                    <apex:outputText value="{!mOrder.sOrderType}" />
+                                </apex:pageblocksectionItem>
+                                
+                                <!--  -->
+                            </apex:pageblockSection>
+                            <apex:pageblockSection columns="1" collapsible="true" title="Order Elements">
+                                <apex:pageblocktable value="{!mOrder.orderLineItemLst}" var="oLineItem">
+                                    <apex:column headerValue="Item Name" value="{!oLineItem.sItemCode}" />
+                                    <apex:column headerValue="Item Name" value="{!oLineItem.sJobElementDescription}" />
+                                    <apex:column headerValue="Skill" value="{!oLineItem.sSkill}"  rendered="{!IF(CONTAINS(mOrder.sOrderType,'Material'),False,True)}"/>
+                                    <apex:column headerValue="Units" value="{!oLineItem.dblUnits}"/>
+                                    <apex:column headerValue="Units Price" value="£ {!oLineItem.dblUnitPrice}"/>
+                                    <apex:column headerValue="Total Price" value="£ {!oLineItem.dblTotalPrice}"/>
+                                     <!--<apex:column headerValue="Sap Code" value="{!oLineItem.sSAPNumberCode}"/> -->
+                                </apex:pageblocktable>
+                            </apex:pageblockSection>
+                        </apex:pageblocksection>
+                     </apex:pageBlock>                           
+                </apex:repeat>
+            </apex:pageBlock>
+            <apex:pageBlockButtons >
+                <apex:commandbutton id="SaveOrder" action="{!saveOrder}" value="Save Orders" onclick="return check2(this);" rendered="{!blConfirm}"/>
+                <apex:commandButton id="ConfirmOrder" action="{!confirmOrder}" value="Confirm Orders" onclick="return check1(this);" rendered="{!NOT(blConfirm)}"/>
+                <apex:commandButton id="back" action="{!back}" value="Back" disabled="false" rendered="{!blConfirm}"/>
+                <apex:commandbutton action="{!cancel}" value="Return to Job" />
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+    </apex:form>
+    
+</apex:page>
