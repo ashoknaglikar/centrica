@@ -93,7 +93,8 @@ global with sharing class ViewBacklog {
         //parentUserStoryRecordType = [SELECT id FROM RecordType WHERE name = 'Parent User Story' AND sobjectType = 'Work_Product__c'];   
         
         DefectRecordType = RecordTypeIdHelper.getRecordTypeId('Work_Product__c', 'Defect');
-        userStoryRecordType = RecordTypeIdHelper.getRecordTypeId('Work_Product__c', 'User Story');    
+        userStoryRecordType = RecordTypeIdHelper.getRecordTypeId('Work_Product__c', 'User Story'); 
+        lowPriorityRecordType = RecordTypeIdHelper.getRecordTypeId('Work_Product__c', 'Low Priority');   
       //  selectedProjectId = ApexPages.currentPage().getParameters().get('project');
         
         
