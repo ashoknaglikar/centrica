@@ -126,26 +126,76 @@
             </ul>
         </div>
         <div class="wp-container">
-        <div class="section-header">
-            <span class="left bold large-font med-gray">Bug Backlog</span>
-            <span class="bold">&nbsp;</span>
-            <span><a style="text-decoration: none;" href="/a5d/e?CF00Nw0000008R3eH={!currentProject.Name}&CF00Nw0000008R3eH_lkid={!currentProject.Id}&RecordType={!DefectRecordType}&ent=01Iw0000000qwRH" target="_blank"> [+] </a> </span>
-            <span class="state-filter-container">
-                <span title="No-State" class=" link filter-heading filter">B</span>
-                <span title="Defined" class=" link filter-heading filter">D</span>
-                <span title="In-Progress" class=" link filter-heading filter">I</span>
-                <span title="Completed" class=" link filter-heading filter completed">C</span>
-                <span title="Accepted" class=" link filter-heading filter">A</span>
-                <!--<span title="Blocked" class=" stopButton filter-heading filter link">B</span>-->
-            </span>
-            <div class="utilityContainer">
-                <!--<span class="estimateStats">
-                    <span class="planEstimate">Backlog Estimate: </span>
-                </span>-->
-                <span class="right link show-hide unselectable">Collapse</span>
-                <span class="right lrg-right-marg link unselectable sort">Sort Descending</span>
+            <div class="section-header">
+                <span class="left bold large-font med-gray">Low Priority Backlog</span>
+                <span class="bold">&nbsp;</span>
+                <span><a style="text-decoration: none;" href="/a5d/e?CF00Nw0000008R3eH={!currentProject.Name}&CF00Nw0000008R3eH_lkid={!currentProject.Id}&RecordType={!DefectRecordType}&ent=01Iw0000000qwRH" target="_blank"> [+] </a> </span>
+                <span class="state-filter-container">
+                    <span title="No-State" class=" link filter-heading filter">B</span>
+                    <span title="Defined" class=" link filter-heading filter">D</span>
+                    <span title="In-Progress" class=" link filter-heading filter">I</span>
+                    <span title="Completed" class=" link filter-heading filter completed">C</span>
+                    <span title="Accepted" class=" link filter-heading filter">A</span>
+                    <!--<span title="Blocked" class=" stopButton filter-heading filter link">B</span>-->
+                </span>
+                <div class="utilityContainer">
+                    <!--<span class="estimateStats">
+                        <span class="planEstimate">Backlog Estimate: </span>
+                    </span>-->
+                    <span class="right link show-hide unselectable">Collapse</span>
+                    <span class="right lrg-right-marg link unselectable sort">Sort Descending</span>
+                </div>
             </div>
-        </div>
+            <ul class="sortable connectedSortable" type="backlog" id = "{!lowPriorityRecordType}">
+                <apex:repeat value="{!lowPriority}" var="wp" id="bugBklg">
+                    <!-- <li id="{!wp.id}"
+                        rank="{!wp.rank__c}"
+                        name="{!wp.Name}"
+                        onblur="LookupHoverDetail.getHover('{!wp.id}').hide();"
+                        onfocus="LookupHoverDetail.getHover('{!wp.id}', '/{!wp.id}/m?retURL=%2F{!wp.id}&isAjaxRequest=1').show();"
+                        onmouseout="LookupHoverDetail.getHover('{!wp.id}').hide();"
+                        onmouseover="LookupHoverDetail.getHover('{!wp.id}', '/{!wp.id}/m?retURL=%2F{!wp.id}&isAjaxRequest=1').show();"> -->
+                    <li id="{!wp.id}" 
+                    class="{!wp.StyleClass__c}" 
+                    rank="{!wp.rank__c}" 
+                    release="{!wp.ss_release__c}"
+                    estimate="{!wp.plan_estimate__c}"
+                    recordType="{!wp.RecordTypeId}"
+                    name="{!wp.Name}"> 
+                        <span class="{!IF(wp.is_defect__c, 'defect left', 'left')}">{!wp.rank__c}:&nbsp;{!wp.Name}</span>
+                        <span href="/{!wp.id}" class="{!IF(wp.is_defect__c, 'as-link right defect', 'as-link right')}"
+                            onblur="LookupHoverDetail.getHover('{!wp.id}').hide();"
+                            onfocus="LookupHoverDetail.getHover('{!wp.id}', '/{!wp.id}/m?retURL=%2F{!wp.id}&isAjaxRequest=1').show();"
+                            onmouseout="LookupHoverDetail.getHover('{!wp.id}').hide();"
+                            onmouseover="LookupHoverDetail.getHover('{!wp.id}', '/{!wp.id}/m?retURL=%2F{!wp.id}&isAjaxRequest=1').show();">
+                            <span class="wpStatus">{!wp.State__c} || </span>
+                            {!wp.Work_Product_ID__c}  || {!wp.Platform_Acronym__c} 
+                        </span>
+                    </li>
+                </apex:repeat>
+            </ul>
+        </div> 
+        <div class="wp-container">
+            <div class="section-header">
+                <span class="left bold large-font med-gray">Bug Backlog</span>
+                <span class="bold">&nbsp;</span>
+                <span><a style="text-decoration: none;" href="/a5d/e?CF00Nw0000008R3eH={!currentProject.Name}&CF00Nw0000008R3eH_lkid={!currentProject.Id}&RecordType={!DefectRecordType}&ent=01Iw0000000qwRH" target="_blank"> [+] </a> </span>
+                <span class="state-filter-container">
+                    <span title="No-State" class=" link filter-heading filter">B</span>
+                    <span title="Defined" class=" link filter-heading filter">D</span>
+                    <span title="In-Progress" class=" link filter-heading filter">I</span>
+                    <span title="Completed" class=" link filter-heading filter completed">C</span>
+                    <span title="Accepted" class=" link filter-heading filter">A</span>
+                    <!--<span title="Blocked" class=" stopButton filter-heading filter link">B</span>-->
+                </span>
+                <div class="utilityContainer">
+                    <!--<span class="estimateStats">
+                        <span class="planEstimate">Backlog Estimate: </span>
+                    </span>-->
+                    <span class="right link show-hide unselectable">Collapse</span>
+                    <span class="right lrg-right-marg link unselectable sort">Sort Descending</span>
+                </div>
+            </div>
             <ul class="sortable connectedSortable" type="backlog" id = "{!DefectRecordType}">
                 <apex:repeat value="{!bugList}" var="wp" id="bugBklg">
                     <!-- <li id="{!wp.id}"

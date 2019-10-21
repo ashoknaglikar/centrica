@@ -16,6 +16,7 @@ global with sharing class ViewBacklog {
     public List<Work_Product__c> iterationBacklogList {get;set;}
     public List<Work_Product__c> productBacklogList {get;set;}
     public List<Work_Product__c> bugList {get;set;}
+     public List<Work_Product__c> lowPriority {get;set;}
     public List<Iteration__c> iterationList {get;set;}
     public List<SS_Release__c> releaseList {get;set;}
     public List<Project_Overview__c> projectList {get;set;}
@@ -53,6 +54,7 @@ global with sharing class ViewBacklog {
     private ProjectSelection__c projectSelection = new ProjectSelection__c();
     public string DefectRecordType {get;set;}
     public string userStoryRecordType {get;set;}
+    public string lowPriorityRecordType{get;set;}
     
     
     
