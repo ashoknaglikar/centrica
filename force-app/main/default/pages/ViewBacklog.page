@@ -147,7 +147,7 @@
                 </div>
             </div>
             <ul class="sortable connectedSortable" type="backlog" id = "{!lowPriorityRecordType}">
-                <apex:repeat value="{!lowPriority}" var="wp" id="bugBklg">
+                <apex:repeat value="{!lowPriority}" var="wp" id="lowPriorityBklg">
                     <!-- <li id="{!wp.id}"
                         rank="{!wp.rank__c}"
                         name="{!wp.Name}"
