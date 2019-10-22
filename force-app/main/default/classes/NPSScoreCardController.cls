@@ -321,7 +321,7 @@ public without sharing class NPSScoreCardController {
         }catch(Exception excp){
             
             Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage();        
-            String[] toAddresses1 = new String[] {'pmk.hardy@gmail.com'};                                 
+            String[] toAddresses1 = system.label.Exception_emails_for_batches.split(',');                                
             mail1.setToAddresses(toAddresses1);
             mail1.setSubject('Exception ocurred in submitting NPS form for CHI Lead : '+npsInfo.opp.CHI_Lead_Id__c);
             mail1.setPlainTextBody('Exception ocurred in submitting NPS form for CHI Lead : '+npsInfo.opp.CHI_Lead_Id__c);

@@ -17,7 +17,7 @@ global void execute(Database.BatchableContext BC, List<sObject> saps){
         if(count < 40000)
         {           
             Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage();        
-            String[] toAddresses1 = new String[] {'CHI-Salesforce.support@centrica.com','BGSAMS.Support@Centrica.com','Ashok.Nagaleekar@Centrica.com','phil.dennison@britishgas.co.uk'};                                 
+            String[] toAddresses1 = system.label.Exception_emails_for_batches.split(',');                                 
             mail1.setToAddresses(toAddresses1);
             mail1.setSubject('SAP numbers are below 40000');
             mail1.setPlainTextBody('Number of Available SAPs :' + count);
@@ -27,7 +27,7 @@ global void execute(Database.BatchableContext BC, List<sObject> saps){
          else
          {
             Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage();        
-            String[] toAddresses1 = new String[] {'CHI-Salesforce.support@centrica.com','BGSAMS.Support@Centrica.com','Ashok.Nagaleekar@Centrica.com','phil.dennison@britishgas.co.uk'};                                
+            String[] toAddresses1 = system.label.Exception_emails_for_batches.split(',');                               
             mail1.setToAddresses(toAddresses1);
             mail1.setSubject('SAP numbers are above 40000');
             mail1.setPlainTextBody('Number of Available SAPs :' + count);

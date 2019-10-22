@@ -37,7 +37,7 @@ global class EmployeeUpdate implements Database.Batchable<sObject> {
         TotalJobItems, CreatedBy.Email from AsyncApexJob where Id =:BC.getJobId()];
         // Send an email to the Apex job's submitter notifying of job completion. 
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        String[] toAddresses = new String[] {'avishek.kundu@centrica.com'};
+        String[] toAddresses = system.label.Exception_emails_for_batches.split(',');
         mail.setToAddresses(toAddresses);
         mail.setSubject('Apex Sharing Recalculation ' + a.Status);
         String sPlainText;

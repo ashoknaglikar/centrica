@@ -296,7 +296,7 @@ global class SendReplanPDFViaEmail implements Database.Batchable<sObject> {
             
                    System.debug('---Loop EXC  ----   '+e.getMessage());
                    Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage();
-                   String[] toAddresses = new String[] {'BGSAMSSupport@Centrica.com'};
+                   String[] toAddresses = system.label.Exception_emails_for_batches.split(',');
                    mail1.setToAddresses(toAddresses);
                    mail1.setSubject('Send replan notice, exception in forming an email body');
                    mail1.setPlainTextBody(e.getMessage());
@@ -335,7 +335,7 @@ global class SendReplanPDFViaEmail implements Database.Batchable<sObject> {
                 
                    System.debug('---Mail EXC  ----   '+e.getMessage());
                    Messaging.SingleEmailMessage mail2 = new Messaging.SingleEmailMessage();
-                   String[] toAddresses = new String[] {'BGSAMSSupport@Centrica.com'};
+                   String[] toAddresses = system.label.Exception_emails_for_batches.split(',');
                    mail2.setToAddresses(toAddresses);
                    mail2.setSubject('Send replan notice, exception in sending email ');
                    mail2.setPlainTextBody(e.getMessage());

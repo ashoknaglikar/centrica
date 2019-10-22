@@ -23,8 +23,8 @@ global class Housekeeping_Batch implements Database.Batchable<sObject>
     global void finish(Database.BatchableContext BC)
     {
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        mail.setToAddresses(new String[] {'BGSAMS.Support@centrica.com'});
-        mail.setReplyTo('BGSAMS.Support@centrica.com');
+        mail.setToAddresses(new String[] {'APPS-SALESFORCE-COGSupport@centrica.com'});
+        mail.setReplyTo('APPS-SALESFORCE-COGSupport@centrica.com');
         mail.setSenderDisplayName('SFDC Batch Processing : Housekeeping Batch');
         mail.setSubject('SFDC Batch Process Completed');
         mail.setPlainTextBody('&&& Batch Process has completed FOR Housekeeping Batch');

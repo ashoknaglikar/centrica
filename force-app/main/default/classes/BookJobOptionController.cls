@@ -1773,7 +1773,7 @@ public with sharing class BookJobOptionController {
                 //system.debug('An exception occured in auto-generating the orders :  '+ex.getMessage()+' Error in line number : '+ex.getLineNumber());         
                 Messaging.SingleEmailMessage email1 = new Messaging.SingleEmailMessage();      
                 email1.setSubject('Exception thrown while auto generating purchase orders');      
-                String[] toAddresses = new String[] {'BGSAMS.Support@centrica.com'};       
+                String[] toAddresses = system.label.Exception_emails_for_batches.split(',');      
                 email1.setToAddresses(toAddresses);      
                 email1.setPlainTextBody('An exception occured in auto-generating the orders :  '+ex.getMessage()+' Error in line number : '+ex.getLineNumber());      
                 Messaging.sendEmail(new Messaging.SingleEmailMessage[] {email1});       
@@ -2454,7 +2454,7 @@ public with sharing class BookJobOptionController {
                 //system.debug('An exception occured in auto-generating the orders :  '+ex.getMessage()+' Error in line number : '+ex.getLineNumber());         
                 Messaging.SingleEmailMessage email1 = new Messaging.SingleEmailMessage();      
                 email1.setSubject('Exception thrown while auto generating purchase orders');      
-                String[] toAddresses = new String[] {'BGSAMS.Support@centrica.com'};       
+                String[] toAddresses = system.label.Exception_emails_for_batches.split(',');       
                 email1.setToAddresses(toAddresses);      
                 email1.setPlainTextBody('An exception occured in auto-generating the orders :  '+ex.getMessage()+' Error in line number : '+ex.getLineNumber());      
                 Messaging.sendEmail(new Messaging.SingleEmailMessage[] {email1});       

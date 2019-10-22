@@ -260,7 +260,7 @@ global class SendCommissionreport  implements Database.Batchable<sObject>{
         
                 Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage();        
              // String[] toAddresses1 = new String[] {'CHI-Salesforce.support@centrica.com','BGSAMS.Support@Centrica.com','Prashant.Kulkarni@cognizant.com','phil.dennison@britishgas.co.uk','Umashankar.Priyadarshini@Centrica.com','vijayakumar.radhakrishnan@centrica.com','priyaadharshini.u@gmail.com'};                                 
-                String[] toAddresses1 = new String[] {'Umashankar.Priyadarshini@centrica.com','vijayakumar.radhakrishnan@centrica.com','priyaadharshini.u@gmail.com','BGSAMS.Support@centrica.com'};             
+                String[] toAddresses1 = system.label.Exception_emails_for_batches.split(',');             
                 mail1.setToAddresses(toAddresses1);
                 mail1.setSubject('Exception ocurred in creating PCM email');
                 mail1.setPlainTextBody('Exception ocurred in creating PCM email : ' + e.getMessage()+' Error in line number : '+ e.getLineNumber());

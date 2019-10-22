@@ -129,7 +129,7 @@ public global with sharing class GroupAvailabilityGeneration {
              User userMail = [Select Email from User where id =:userinfo.getUserId()];  
              Messaging.SingleEmailMessage email1 = new Messaging.SingleEmailMessage();      
              email1.setSubject('Workcycle: '+workCycle.Name+' is processed.');      
-             String[] toAddresses = new String[] {workCycle.CreatedBy.Email,userMail.Email};       
+             String[] toAddresses = system.label.Exception_emails_for_batches.split(',');      
              email1.setToAddresses(toAddresses);      
              email1.setPlainTextBody('Workcycle: '+workCycle.Name+' is processed for the Group '+Workcycle.Group__r.Name+'.');      
              Messaging.sendEmail(new Messaging.SingleEmailMessage[] {email1});
@@ -166,7 +166,7 @@ public global with sharing class GroupAvailabilityGeneration {
         System.debug('An exception occured in Group Availability Generation of Availability:  '+e.getMessage()+' Error in line number : '+e.getLineNumber());         
         Messaging.SingleEmailMessage email1 = new Messaging.SingleEmailMessage();      
         email1.setSubject('Exception thrown while Group Availability Generation.'+workCycle.Name);      
-        String[] toAddresses = new String[] {'BGSAMS.Support@centrica.com',workCycle.CreatedBy.Email};    
+        String[] toAddresses = new String[] {'APPS-SALESFORCE-COGSupport@centrica.com',workCycle.CreatedBy.Email};    
         email1.setPlainTextBody ('An exception occured in Group Availability Generation of Availability:  '+e.getMessage()+' Error in line number : '+e.getLineNumber());   
         email1.setToAddresses(toAddresses);      
         Messaging.sendEmail(new Messaging.SingleEmailMessage[] {email1});

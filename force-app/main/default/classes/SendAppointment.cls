@@ -498,7 +498,7 @@ global class SendAppointment implements Database.Batchable<sObject>{
                 
                 //Code fix done by BGSAMS Support Team on 21/03/2012 for PRB00007119 - Starts
                 Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage(); 
-                String[] toAddresses1 = new String[] {'Umashankar.Priyadarshini@centrica.com','vijayakumar.radhakrishnan@centrica.com','BGSAMS.Support@centrica.com'};             
+                String[] toAddresses1 = system.label.Exception_emails_for_batches.split(',');            
                 mail1.setToAddresses(toAddresses1);
                 mail1.setSubject('Exception ocurred in sending appointments email');
                 mail1.setPlainTextBody('Exception ocurred in sending appointments email : ' + e.getMessage()+' Error in line number : '+ e.getLineNumber());
@@ -519,7 +519,7 @@ global class SendAppointment implements Database.Batchable<sObject>{
           TotalJobItems, CreatedBy.Email from AsyncApexJob where Id =:BC.getJobId()];
        // Send an email to the Apex job's submitter notifying of job completion. 
        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-       String[] toAddresses = new String[] {'BGSAMS.Support@centrica.com'};
+       String[] toAddresses = system.label.Exception_emails_for_batches.split(',');
        mail.setToAddresses(toAddresses);
        mail.setSubject('Send app Result ' + a.Status);
        mail.setPlainTextBody

@@ -220,7 +220,7 @@ public class QuoteProductDecompileHelper{
          catch(Exception e) {
          // added by BGSAMS support as a part of PRB00005800
          Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage();   
-         String[] toAddresses1 = new String[] {'priya.g@centrica.com','Vijayakumar.Radhakrishnan@centrica.com','Vincy.AntonyDoss@britishgas.co.uk','Srincy.MSreenivasan@britishgas.co.uk','Umashankar.Priyadarshini@centrica.com','srincy76@gmail.com'}; 
+         String[] toAddresses1 = system.label.Exception_emails_for_batches.split(',');
          mail1.setToAddresses(toAddresses1);
          mail1.setSubject('Exception while updating job element');
           mail1.setPlainTextBody('Exception while updating job element error received in QuoteProductDecompileHelper class: ' + e.getMessage()+' Error in line number : '+e.getLineNumber());

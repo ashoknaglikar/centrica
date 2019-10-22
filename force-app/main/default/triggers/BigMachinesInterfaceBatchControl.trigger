@@ -132,7 +132,7 @@ integer count = 0;
 		
 		// Send an email to the SFDC admin to notify of failure.	
 		Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage();		
-		String[] toAddresses1 = new String[] {'CHI-Salesforce.support@centrica.com','BGSAMS.Support@Centrica.com'};				    				
+		String[] toAddresses1 = system.label.Exception_emails_for_batches.split(',');			    				
 		mail1.setToAddresses(toAddresses1);
 		mail1.setSubject('BM: Caught Exception: Apex Exception occurred in the SFDC to Big Machines Batch Interface');
 		mail1.setPlainTextBody('BM: A CronKit batch job sending quote information to Big Machines has failed to execute successfully. Please check that the CronKit batch job Big Machines Quote Creation is running. Error received: ' + e.getMessage());

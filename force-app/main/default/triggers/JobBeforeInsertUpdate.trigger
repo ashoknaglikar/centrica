@@ -376,14 +376,14 @@ if(Trigger.isInsert){
      
      Job__c jb = Trigger.new[0];
      
-     if(!jb.Populated_txtmail_salesman__c){
+     if(!jb.Populated_txtmail_salesman__c && !cls_IsRun.txtmailsalesman ){ 
      
        String salesmanName = jb.Quote_app_assigned_to__c;
        system.debug(LoggingLevel.INFO, 'Salesman is : '+salesmanName);
        system.debug(LoggingLevel.INFO, 'Populated_txtmail_salesman__c value is : '+jb.Populated_txtmail_salesman__c);
      
         try{
-          if(salesmanName!=null){
+          if(salesmanName!=null ){
               if(salesmanName.length()>5){
                Employee__c emp = [Select EmployeeTextMailAddress__c from Employee__c where Name  = :salesmanName limit 1];
                if(emp!=null)
@@ -391,13 +391,14 @@ if(Trigger.isInsert){
                   jb.Salesman_Textmail_Addr__c = emp.EmployeeTextMailAddress__c;
                   jb.Populated_txtmail_salesman__c = true;
                   system.debug(LoggingLevel.INFO, 'Salesman text email is : '+emp.EmployeeTextMailAddress__c);
+                      
                   }
                }
            }
          }catch(Exception excp){
             System.debug(LoggingLevel.Info,'Error occured in JobBeforeInsertUpdate : '+excp.getMessage());
          }
-         
+       cls_IsRun.txtmailsalesman=true;  
      }else{
 
        return;
