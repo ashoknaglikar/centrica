@@ -6,7 +6,8 @@
     <apex:attribute name="gas1" description="This attrribute is used to capture Gas Council No 1st part." type="string"/>
     <apex:attribute name="gas2" description="This attrribute is used to capture Gas Council No 2nd part" type="string"/>
     <apex:attribute name="gas3" description="This attrribute is used to capture Gas Council No 3rd part" type="string"/>
-    <apex:attribute name="uexist" description="This attrribute is used to determine SS Direct User" type="boolean"/>
+    <!--Commented by Ashok : 30/10/2019 : No need of this any more
+    <apex:attribute name="uexist" description="This attrribute is used to determine SS Direct User" type="boolean"/> --> 
     <apex:attribute name="categoryType" description="This attrribute is to enable the customer category indicator functionlaituy" type="string" assignTo="{!customerCateogryType}"/>
     <apex:attribute name="marketingPreference" description="Selected value for the Marketing preference field" type="PicklistWrapper[]" required="False" assignto="{!piclistValues}"/>
     <script>
@@ -676,19 +677,19 @@
                 -->
                 
                 <!--{!displayModeVal}  {!uexist}  {!Opportunities[0].Boiler_type__c}-->
-                <apex:outputpanel id="combib">
+                <!--<apex:outputpanel id="combib">
                     <apex:pageblocksection rendered="{!if(AND(OR(displayModeVal == 1,displayModeVal == 2),Opportunities[0].Boiler_type__c == 'Combi boiler', uexist),  true, false)}" columns="1"> <!-- rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}"> -->
-                        <apex:pageblocksectionitem id="NB" >
+                        <!--<apex:pageblocksectionitem id="NB" >
                             <apex:outputLabel value="Number of Bathrooms" />
                             <apex:inputfield value="{!account.Number_of_Bathrooms__c}" required="true" id="NB1"/>
                         </apex:pageblocksectionitem>
                         
                         <apex:pageblocksectionitem rendered="{!if(AND(OR(displayModeVal == 1,displayModeVal == 2),Opportunities[0].Boiler_type__c == 'Combi boiler', uexist),  true, false)}" id="BL" > <!-- rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}"> -->
-                            <apex:outputLabel value="Boiler Location" />
+                            <!--<apex:outputLabel value="Boiler Location" />
                             <apex:inputfield value="{!Opportunities[0].Location_of_Current_Boiler__c}" required="true" id="BL1"/>
                         </apex:pageblocksectionitem>
                     </apex:pageblocksection>
-                </apex:outputPanel>
+                </apex:outputPanel>-->
                 
                 <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
                     <apex:outputLabel value="Homecare"/>

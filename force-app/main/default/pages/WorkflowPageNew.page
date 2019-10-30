@@ -83,7 +83,7 @@
         </div>
         
         
-       <c:newCustomer ListContactInfo="{!WorkflowInfo.NewContactInfos}" displayModeVal="{!WorkflowInfo.WorkflowType}" ListOpportunity="{!WorkflowInfo.Opportunities}" accountObject="{!WorkflowInfo.CurrentAccount}" gas1="{!WorkflowInfo.gasCouncil1}" gas2="{!WorkflowInfo.gasCouncil2}" gas3="{!WorkflowInfo.gasCouncil3}" uexist="{!uexist}" categoryType="{!WorkflowInfo.customerCateogryType}"  marketingPreference="{!WorkflowInfo.PicklistValues}"/>
+       <c:newCustomer ListContactInfo="{!WorkflowInfo.NewContactInfos}" displayModeVal="{!WorkflowInfo.WorkflowType}" ListOpportunity="{!WorkflowInfo.Opportunities}" accountObject="{!WorkflowInfo.CurrentAccount}" gas1="{!WorkflowInfo.gasCouncil1}" gas2="{!WorkflowInfo.gasCouncil2}" gas3="{!WorkflowInfo.gasCouncil3}"  categoryType="{!WorkflowInfo.customerCateogryType}"  marketingPreference="{!WorkflowInfo.PicklistValues}"/>
    
         <apex:pageblockButtons >
              <apex:commandbutton action="{!BtnCreateLead_Click}" id="BtnCreateLead" rendered="{!WorkflowInfo.ShowBtnCreateLead}" value="Create Lead" onclick="return ConfirmLeadCreate(this);"/>
