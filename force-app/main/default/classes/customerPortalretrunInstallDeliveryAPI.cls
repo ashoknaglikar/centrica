@@ -79,7 +79,17 @@ global class customerPortalretrunInstallDeliveryAPI {
                 objResponse.deliverySlot ='13:00 - 17:00';
             }
         }
+        if(objResponse.deliveryDate != null)
+        {
+            Time dummyTime = time.newInstance(0, 0, 0, 0);
+            datetime deliveryTime = datetime.newInstance(objResponse.deliveryDate, dummyTime);
+            if(deliveryTime.format('EEE') == 'Sat' || deliveryTime.format('EEE') == 'Sun')
+            {
+                objResponse.deliveryDate= installDateSelected;
+            }
+        }
         
+
         system.debug('Same Day Delivery -->'+json.serializePretty(objResponse));
         return objResponse;
          
