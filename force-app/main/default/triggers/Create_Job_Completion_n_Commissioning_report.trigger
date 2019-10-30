@@ -55,21 +55,21 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
     */
    
     
-    if(j.Status__c=='Planned' && cls_IsRun.isJobCompletion==false && (j.Suspend_Job__c<>True ||  j.Is_Downtime_Job__c))
+    if(j.Status__c=='Planned' && cls_IsRun.isJobCompletion==false && ((j.Suspend_Job__c<>True)|| ( j.Is_Downtime_Job__c /*&& system.label.Downtime_JCD =='yes'*/ )))
     {   
         doEnter = true;
        for(Job_Element__c je : [Select Id,Job__c, Product_ID__c, Name from Job_Element__c where Product_ID__c Like 'CBLR%' and Status__c != 'Removed' and Job__c =: j.Id])
-       {
-        jobBoilerMap.put(je.Job__c, je.Product_ID__c);
-       }
-       
-       
-       
-       if(jobBoilerMap.size()>0)
-       for(Product_Order__c p: [Select id,BGC_NUMBER__c, Product_Code__c, COMPONENT_MAKE__c, COMPONENT_MODEL__c,COMPONENT_TYPE__c  from Product_Order__c where Product_Code__c in :jobBoilerMap.values()])
-       {
-            purchaseOrderMap.put(p.Product_Code__c, p);
-       }
+	   {
+	   	jobBoilerMap.put(je.Job__c, je.Product_ID__c);
+	   }
+	   
+	   
+	   
+	   if(jobBoilerMap.size()>0)
+	   for(Product_Order__c p: [Select id,BGC_NUMBER__c, Product_Code__c, COMPONENT_MAKE__c, COMPONENT_MODEL__c,COMPONENT_TYPE__c  from Product_Order__c where Product_Code__c in :jobBoilerMap.values()])
+	   {
+	   		purchaseOrderMap.put(p.Product_Code__c, p);
+	   }
     }
     
     
@@ -87,22 +87,22 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
    
    if ((jOld.Installation_Date__c !=jNew.Installation_Date__c)&&(cls_IsRun.isJobCompletion==true)&& (jNew.Status__c=='Planned' || jNew.Status__c=='Suspended'))
    {
-       List<Commissioning_Report__c> cr = [select Id,Job_Installation_Date__c,InstallerName__c from Commissioning_Report__c where Job_Number__c =: jNew.Id];
-       for(Commissioning_Report__c jcd:cr)
-       {
-            if ((jOld.Installation_Date__c !=jNew.Installation_Date__c)&&(cls_IsRun.isJobCompletion==true)&& (jNew.Status__c=='Planned'))
-            {
-               jcd.Job_Installation_Date__c = jNew.Installation_Date__c;
-               jcd.InstallerName__c=jNew.InstallerAliasName__c;
-            }
-            else if(jNew.Status__c=='Suspended')
-            {
-                jcd.Job_Installation_Date__c = null ;
-            }
-       }
+	   List<Commissioning_Report__c> cr = [select Id,Job_Installation_Date__c,InstallerName__c from Commissioning_Report__c where Job_Number__c =: jNew.Id];
+	   for(Commissioning_Report__c jcd:cr)
+	   {
+			if ((jOld.Installation_Date__c !=jNew.Installation_Date__c)&&(cls_IsRun.isJobCompletion==true)&& (jNew.Status__c=='Planned'))
+			{
+			   jcd.Job_Installation_Date__c = jNew.Installation_Date__c;
+			   jcd.InstallerName__c=jNew.InstallerAliasName__c;
+			}
+			else if(jNew.Status__c=='Suspended')
+			{
+				jcd.Job_Installation_Date__c = null ;
+			}
+	   }
    
-       // BGSAMS Support PRB00016041- code fix to remove JCD installation date when the job is suspended ends
-       Database.update(cr);
+	   // BGSAMS Support PRB00016041- code fix to remove JCD installation date when the job is suspended ends
+	   Database.update(cr);
    }
    }
    
@@ -138,16 +138,11 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
         }
     }
     if(doEnter){
-        /*String WasteID = RecordTypeIdHelper.getRecordTypeId('Commissioning_Report__c', 'Waste Disposal Report');
+        String WasteID = RecordTypeIdHelper.getRecordTypeId('Commissioning_Report__c', 'Waste Disposal Report');
         String MinorID = RecordTypeIdHelper.getRecordTypeId('Commissioning_Report__c', 'Minor Electrical Installation');
         String AsbestosID= RecordTypeIdHelper.getRecordTypeId('Commissioning_Report__c', 'Asbestos Report');
         String GasID = RecordTypeIdHelper.getRecordTypeId('Commissioning_Report__c', 'Gas Installation Works');
         String EleID = RecordTypeIdHelper.getRecordTypeId('Commissioning_Report__c', 'Electrical Installation at Risk');
-        String FodID = RecordTypeIdHelper.getRecordTypeId('Commissioning_Report__c', 'FOD - No Access Report');
-        String BuildingWorkId = RecordTypeIdHelper.getRecordTypeId('Commissioning_Report__c', 'Building Work Report');
-        
-        */
-        
         Set<String> set_JobId=new Set<String>{};
         Job__c[] job= Trigger.new;
         System.debug('Id-->'+job[0].Id);
@@ -160,14 +155,12 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
         VATchangecalculation.CalculateNewAndOldVAT(map_VAT);
         // PRB00010300 coding ends
         for (Job__c j:job) {
-            
                 blnNewRecord=true;
                 cls_IsRun.setIsJobCompletion();
-                /*
                 string homePhone = (j.Telephone_Number__c!=null && j.Telephone_Number__c.length()>20)? j.Telephone_Number__c.substring(0,20): j.Telephone_Number__c;
                 string workPhone = (j.Telephone_Number_Work__c!=null && j.Telephone_Number_Work__c.length()>20)? j.Telephone_Number_Work__c.substring(0,20): j.Telephone_Number_Work__c;
                 string telePhone = (j.Telephone_Number__c!=null && j.Telephone_Number__c.length()>15)? j.Telephone_Number__c.substring(0,15): j.Telephone_Number__c;
-                */
+              
                 if(j.Is_Downtime_Job__c==false && j.Is_Remedial_Job__c == false)
                 {
                     obj_Payment=new Payment_Collection__c();
@@ -175,25 +168,8 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                     VATchangecalculation.updatePCN(j, obj_Payment,map_VAT);
                     system.debug('After -->'+j);
                     system.debug('After -->'+obj_Payment);
-                    system.debug('After status-->'+obj_Payment.Payment_Collection_Status__c);
                     lst_Payment.add(obj_Payment);
                 }
-                
-                if(j.Secondary_Job_Type_New__c == 'Remedial' || j.Secondary_Job_Type_New__c == 'Recall')
-                {
-                    lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Remedial No Appliance Report','RN' ));
-                    lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'System','SY' )); 
-                }
-                
-                lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Asbestos Report','AS' ));
-                lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Gas Installation Works','GA' ));
-                lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Minor Electrical Installation','ME' ));
-                lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'No Access Report','NA' ));
-                
-                    
-               // }
-                /*e
-                
                 Commissioning_Report__c commissionreport = new Commissioning_Report__c();
                 commissionreport .RecordtypeId=AsbestosID;
                 commissionreport .Report_Name__c= 'Asbestos Report';
@@ -210,8 +186,8 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                 commissionreport .Job_Installation_Date__c = j.Installation_Date__c;
                 commissionreport.InstallerName__c=j.InstallerAliasName__c;
                 System.debug('Completion report: '+commissionreport );    
-                */
-                /*
+                lst_CReports1.add(commissionreport );
+                
                 Commissioning_Report__c commissionreport1 = new Commissioning_Report__c();
                 commissionreport1 .RecordtypeId=GasID;
                 commissionreport1 .Report_Name__c= 'Gas Installation Works';
@@ -229,7 +205,7 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                 commissionreport1.InstallerName__c=j.InstallerAliasName__c;
                 System.debug('Completion report1: '+commissionreport1 );    
                 lst_CReports2.add(commissionreport1 );
-                */
+                
                 /*CR: 11/11/11 BY Ashok 
               AS Business wanted to stop creating this particula document, they will be moving some of the fields 
               to Minor electrical doc and maintain these deatils there.
@@ -251,7 +227,7 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                 commissionreport2.InstallerName__c=j.InstallerAliasName__c;
                 System.debug('Completion report: '+commissionreport );    
                 lst_CReports3.add(commissionreport2 );*/
-                /*
+                
                 Commissioning_Report__c commissionreport3 = new Commissioning_Report__c();
                 commissionreport3.RecordtypeId= MinorID;
                 commissionreport3.Report_Name__c= 'Minor Electrical Installation';
@@ -267,8 +243,7 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                 commissionreport3.InstallerName__c=j.InstallerAliasName__c;
                 System.debug('Completion report: '+commissionreport3);    
                 lst_CReports4.add(commissionreport3);
-                */
-                /*
+                
                 Commissioning_Report__c commissionreport4 = new Commissioning_Report__c();
                 commissionreport4.RecordTypeId=WasteID ; 
                 commissionreport4.Report_Name__c= 'Waste Disposal Report';
@@ -284,7 +259,7 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                 commissionreport4.InstallerName__c=j.InstallerAliasName__c;
                 System.debug('Completion report: '+commissionreport4);    
                 lst_CReports5.add(commissionreport4);
-                */
+                
                 // Adding JOB ids in set
                 jobIds.add(j.Id);
                
@@ -304,31 +279,26 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
             }catch(Exception exp) {
                 System.debug('Exception'+ 'Asbestos Report is already created for this Job');
             } 
-            
             try {
-            
-                //if(lst_CReports2!= null)
-                //{
-                    //upsert lst_CReports2 Job_Special_ID__c;
+                if(lst_CReports2!= null)
+                    upsert lst_CReports2 Job_Special_ID__c;
                     /*
-                        Code changes to create the Boiler appliance record on Gas Installation Doc. 
-                        Using Job Id as reference to create/update an exsiting records. 
-                        
+                    	Code changes to create the Boiler appliance record on Gas Installation Doc. 
+                    	Using Job Id as reference to create/update an exsiting records. 
+                    	
                     */
                     system.debug(jobBoilerMap);
                     system.debug(purchaseOrderMap);
-                    if(lst_CReports2!= null && System.label.Appliance_Switch == 'on' && lst_CReports2[0].Status__c!= 'Completed' && jobBoilerMap.containskey(lst_CReports2[0].Job_Number__c) && purchaseOrderMap.containsKey(jobBoilerMap.get(lst_CReports2[0].Job_Number__c)))
+                    if(System.label.Appliance_Switch == 'on' && lst_CReports2[0].Status__c!= 'Completed' && jobBoilerMap.containskey(lst_CReports2[0].Job_Number__c) && purchaseOrderMap.containsKey(jobBoilerMap.get(lst_CReports2[0].Job_Number__c)))
                     {
-                        id jobId = lst_CReports2[0].Job_Number__c;
-                        Product_Order__c materialRecord = purchaseOrderMap.get(jobBoilerMap.get(jobId));
-                        Appliance_At_Risk__c newApplianceRecord = new Appliance_At_Risk__c(External_Id__c =jobId,   Appliance_Type__c = 'Boiler',
-                                                                                         Model__c = materialRecord.COMPONENT_MODEL__c,  Manufacturer__c =materialRecord.COMPONENT_MAKE__c,
-                                                                                          GC_Number__c = materialRecord.BGC_Number__c,  Compliance_Report__c=lst_CReports2[0].Id  );
-                        upsert newApplianceRecord External_Id__c;
+                    	id jobId = lst_CReports2[0].Job_Number__c;
+                    	Product_Order__c materialRecord = purchaseOrderMap.get(jobBoilerMap.get(jobId));
+                    	Appliance_At_Risk__c newApplianceRecord = new Appliance_At_Risk__c(External_Id__c =jobId, 	Appliance_Type__c = 'Boiler',
+                    																	 Model__c = materialRecord.COMPONENT_MODEL__c, 	Manufacturer__c =materialRecord.COMPONENT_MAKE__c,
+                    																	  GC_Number__c = materialRecord.BGC_Number__c, 	Compliance_Report__c=lst_CReports2[0].Id  );
+                    	upsert newApplianceRecord External_Id__c;
                     }
-                    
-                    
-                    System.debug('Commission Report : '+lst_CReports2);  
+                	System.debug('Commission Report : '+lst_CReports2);  
             } catch(Exception exp) {
                 System.debug('Exception'+ 'Gas Installation Works is already created for this Job');
             } 
@@ -338,15 +308,14 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                 System.debug('Commission Report : '+lst_CReports3);  
             } catch(Exception exp) {
                 System.debug('Exception'+ 'Electrical Installation at Risk report is already created for this Job');
-            } 
-            /*
+            }     */
             try {     
                 if(lst_CReports4!= null)
-                    //upsert lst_CReports4 Job_Special_ID__c;
+                    upsert lst_CReports4 Job_Special_ID__c;
                 System.debug('Completion report: '+lst_CReports4);  
             }catch(Exception exp){
                 System.debug('Exception'+ 'Minor Electrical Installation report is already created for this Job' );
-            } 
+            }  
             /*
             try {
                 if(lst_CReports5!= null)
@@ -354,8 +323,7 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                 System.debug('Completion report: '+lst_CReports5);   
             } catch(Exception exp) {
                 System.debug('Exception'+  'Waste Disposal Report is already created for this Job');
-            } 
-            */
+            } */
             
             // Inserting sharing rules for JOb completion documents and Payment Collection
             if(Createfirst){
