@@ -181,11 +181,11 @@ public class CopyQuoteExtension {
         }
         if(voucherCode!=null && voucherCode!='' )
         {
-           List<Offer__c> disAttributeList = [select id,Description__c,value__c from Offer__c where active__c=true and Offer_Code__c=:voucherCode];
+           List<Lead_Offer__c> disAttributeList = [select id,Offer__r.Description__c,Offer__r.value__c from Lead_Offer__c where Expiry_date__c >= :system.today() and Offer_Code__c=:voucherCode];
            if(disAttributeList.size()>0)
            {
-              voucherAmount= disAttributeList[0].value__c;
-              voucherName= disAttributeList[0].Description__c;
+              voucherAmount= disAttributeList[0].Offer__r.value__c;
+              voucherName= disAttributeList[0].Offer__r.Description__c;
               adjustedNetValue = bmQuote.finalNetQuoteTotal__c-(voucherAmount!=null?voucherAmount:0);
               fa.Cash_Price__c = adjustedNetValue - (leadPayment.Amount__c!=null?leadPayment.Amount__c:0);
            }
