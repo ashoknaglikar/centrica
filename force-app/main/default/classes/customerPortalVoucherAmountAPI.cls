@@ -12,25 +12,21 @@ global class customerPortalVoucherAmountAPI {
         String oppId = CustomerPortalHelper.getOpportunityId(leadId);
         
         customerportalDiscountAmountResponse response= new customerportalDiscountAmountResponse();
-        List<Offer__c> offerList = [select id,Description__c,start_date__c, end_date__c,Offer_Code__c,value__c from Offer__c where active__c=true and Offer_Code__c=:voucherCode];
-        List<Lead_Offer__c> leadOffers = [Select id from Lead_Offer__c where Offer__c  in :offerList and opportunity__c=:oppId ];
-        if(offerList.size()>0)
+        //List<Offer__c> offerList = [select id,Description__c,start_date__c, end_date__c,Offer_Code__c,value__c from Offer__c where Offer_Code__c=:voucherCode];
+        List<Lead_Offer__c> leadOffers = [Select id , Offer__r.Description__c, Offer__r.start_date__c,
+                                          Offer__r.end_date__c, Offer__r.Offer_Code__c, Offer__r.value__c from Lead_Offer__c
+                                          where Offer__r.Offer_Code__c=:voucherCode  and Offer__r.Active__c  = true 
+                                          and opportunity__c=:oppId and Expiry_Date__c >= :system.today()];
+        if(leadOffers.size()>0)
         {
             response.voucherCode=voucherCode;
-            response.voucherName=offerList[0].Description__c;
-            response.voucherAmount= offerList[0].value__c;
+            response.voucherName=leadOffers[0].Offer__r.Description__c;
+            response.voucherAmount= leadOffers[0].Offer__r.value__c;
             response.initialQuotePrice= [select finalNetQuoteTotal__c from BigMachines_Quote__c where id=:quoteId].finalNetQuoteTotal__c;
             response.netQuotePrice = response.initialQuotePrice-response.voucherAmount;
             
-            Lead_Offer__c leadoffer = new Lead_Offer__c(opportunity__c = oppId,offer__c=offerList[0].id,status__c='In progress' );
-            if(leadOffers.size()>0)
-            leadoffer.id = leadOffers[0].Id;
-            try{
-                upsert leadoffer;
-            }catch(Exception e)
-            {
-                response.errorList.add('Error in applying vouchercode.'); 
-            }
+            Lead_Offer__c leadoffer = new Lead_Offer__c(id = leadOffers[0].Id, status__c='In progress' );
+            update leadoffer;
             
         }
         else

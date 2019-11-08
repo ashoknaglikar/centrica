@@ -6,6 +6,23 @@ trigger bUPD_chkJobInstalled on Opportunity (before insert,before update) {
     Opportunity[] oldOpp = Trigger.old;
     map<id, id > oppReferralEng = new map<Id, Id> ();
     list<Opportunity> smOpportunities = new list <Opportunity>();
+    
+    set<String> OppRefNumbers = new set<String>();
+    map<String,Opportunity> oppRefNumberMap = new map<String,Opportunity>();
+    if(!cls_isRun.isUpdateDupRefNumber)
+    {
+        for(Opportunity opp : Trigger.new)
+        {
+           if(opp.Payment_Reference_Number__c !=null||opp.Payment_Reference_Number__c !='')
+           OppRefNumbers.add(opp.Payment_Reference_Number__c); 
+        }
+        
+        for(Opportunity opp :[select id,Payment_Reference_Number__c from opportunity where Payment_Reference_Number__c IN:OppRefNumbers and Payment_Reference_Number__c!=null])
+        {
+            oppRefNumberMap.put(opp.Payment_Reference_Number__c,opp);
+        }
+    }
+    
     for(Opportunity opp : Trigger.new)
     {
         if(trigger.isUpdate)
@@ -38,6 +55,20 @@ trigger bUPD_chkJobInstalled on Opportunity (before insert,before update) {
                     }
                 }
                 
+            }
+            
+            if(!cls_isRun.isUpdateDupRefNumber && opp.Payment_Reference_Number__c!=trigger.oldMap.get(opp.Id).Payment_Reference_Number__c)
+            {
+                cls_isRun.isUpdateDupRefNumber =true;
+                if(opp.Payment_Reference_Number__c !=null||opp.Payment_Reference_Number__c !='')
+                {
+                    if(oppRefNumberMap.containsKey(opp.Payment_Reference_Number__c))
+                    opp.Duplicate_Payment_Reference_Number__c=true;
+                    else
+                     opp.Duplicate_Payment_Reference_Number__c=false;
+                }
+                else
+                    opp.Duplicate_Payment_Reference_Number__c=false;
             }
         }    
         
