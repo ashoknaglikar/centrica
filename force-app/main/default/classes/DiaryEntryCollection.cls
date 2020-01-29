@@ -735,7 +735,7 @@ public with sharing class DiaryEntryCollection {
                 } else
                     break;
 
-            } while(startDT.dayOfYear() != entry.End__c.dayOfYear() + 1);
+            } while((startDT.dayOfYear() != entry.End__c.dayOfYear()+1 )&& startDT.date()<=entry.End__c.date());
         }
 
         return DECs;

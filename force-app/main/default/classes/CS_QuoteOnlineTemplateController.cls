@@ -185,6 +185,19 @@ public class CS_QuoteOnlineTemplateController {
         }
     }
     
+    public string businessType {get;set;}
+    
+    public string getBusinessType(string business)
+    {
+        businessType = 'Default';
+        if(label.regulatedBusinessType.contains(','+business+','))
+        businessType =  'Regulated';
+        /*else if(label.largeResidentialType.contains(','+business+','))
+        businessType = 'Residential';*/
+        
+        return businessType;
+    }
+    
     public class AllQuoteData {
         public String logoPng {get;set;}
         public String logoPng2 {get;set;}
@@ -238,7 +251,7 @@ public class CS_QuoteOnlineTemplateController {
         public Datetime chi_lead_created_date {get;set;}   
         public String totalPriceExcVat {get;set;}
         public string jobRole {get;set;}
-        
+
         public list<SummaryTableType> innerTopSummaryTable;
         public list<list<PDFQuoteDetailSection>> innerPdfQuoteDetail {get;set;}
         public list<allowanceClass> allowances {get;set;}
@@ -404,6 +417,7 @@ public class CS_QuoteOnlineTemplateController {
     }
 
     public CS_QuoteOnlineTemplateController(/*ApexPages.StandardController c*/) {
+        
         isSmallCommercial= false;
         aprUsed = '14.9%';
         basketId =ApexPages.currentPage().getParameters().get('Id');// c.getRecord().Id;   
@@ -440,6 +454,7 @@ public class CS_QuoteOnlineTemplateController {
                                             Opportunity__r.Account.Primary_Contact__r.MobilePhone,
                                             Opportunity__r.CreatedDate,
                                             Opportunity__r.CHI_Lead_Id__c,
+                                            opportunity__r.Business_Type__c,
                                             CS_Allowance_1__c,CS_Allowance_1__r.Quote_Description__c,
                                             CS_Allowance_2__c,CS_Allowance_2__r.Quote_Description__c,
                                             CS_Allowance_3__c,CS_Allowance_3__r.Quote_Description__c,
@@ -579,13 +594,14 @@ public class CS_QuoteOnlineTemplateController {
                                                 Appointment__r.CHI_Lead_No__c,
                                                 Appointment__r.Trading_Name__c,
                                                 Appointment__r.Assigned_To_Phone__c,
-                                                Appointment__r.Opportunity__r.Product_Interest__c
+                                                Appointment__r.Opportunity__r.Product_Interest__c,
+                                                Appointment__r.Opportunity__r.Business_Type__c
                                                 
                                                 from cscfga__Product_Basket__c 
                                                 where Id = :basketId];
                                                 
             is_ifc_active(basket.Appointment__r.Opportunity__r.CreatedDate.Date(), basket.CreatedDate.date());
-
+            getBusinessType(basket.Appointment__r.Opportunity__r.Business_Type__c);
             isSmallCommercial = basket.Appointment__r.Opportunity__r.Product_Interest__c=='Small Commercial' ? true:false;                                    
             productInterest = basket.Appointment__r.Opportunity__r.Product_Interest__c;
             Id appointmentId = basket.Appointment__c;
@@ -900,7 +916,7 @@ public class CS_QuoteOnlineTemplateController {
     
     private String returnPaymentMonthly(Decimal amount, Integer term, decimal aprDecimal) {  
         system.debug('aprDecimal-->'+aprDecimal);
-    	Decimal monthlyPayment = (amount / 24.0).setScale(2);
+    	Decimal monthlyPayment = (amount / 24.0).setScale(2, RoundingMode.HALF_UP);
     	// return payment is equally divided by 24 (months) if the term is 2 years
 
     	if (term > 2) {
@@ -919,7 +935,7 @@ public class CS_QuoteOnlineTemplateController {
 
 	        monthlyPayment = 0.00;
 	        if(value3!=0){
-	           monthlyPayment =  (value1 / value3).setScale(2);        
+	           monthlyPayment =  (value1 / value3).setScale(2, RoundingMode.HALF_UP);        
 	        }
 	    } 
 
@@ -944,7 +960,7 @@ public class CS_QuoteOnlineTemplateController {
 
 	        Decimal monthlyPayment = 0.00;
 	        if(value3!=0){
-	           monthlyPayment =  (value1 / value3).setScale(2);
+	           monthlyPayment =  (value1 / value3).setScale(2, RoundingMode.HALF_UP);
 	        }
 
 	        totalAmountRepayable = (monthlyPayment*numOfMonths*term).setScale(0);
@@ -1884,7 +1900,7 @@ public class CS_QuoteOnlineTemplateController {
             //2017
             inputQuoteData.customerName  = basket.Appointment__r.Opportunity__r.Account.Primary_Contact__r.Salutation+' '+basket.Appointment__r.Opportunity__r.Account.Primary_Contact__r.Name;
             System.debug('inputQuoteData.customerName: ' + inputQuoteData.customerName);
-            
+
             inputQuoteData.installationAddress  = basket.Appointment__r.Opportunity__r.Install_Address_Street__c;
             installationPostcode  = basket.Appointment__r.Opportunity__r.Install_Postcode__c;
             
@@ -1908,11 +1924,12 @@ public class CS_QuoteOnlineTemplateController {
             }
             totalNetPrice = totalNetPrice-totalAllowancesNet;
             
-                    
+            Decimal actualDeposit = decimal.valueOf(getAttributeValue('Actual Deposit', configAttributeList));
+            inputQuoteData.deposit  = formatPriceWithComma(String.valueOf(actualDeposit));
             inputQuoteData.totalNetPrice = formatPriceWithComma(String.valueOf(totalNetPrice));
             totalPricePayable  = formatPriceWithComma(getAttributeValue('Total Price Payable', configAttributeList));
-            inputQuoteData.deposit  = formatPriceWithComma(getAttributeValue('Actual Deposit', configAttributeList));
-            depositNumber  = getAttributeValue('Deposit Receipt Number', configAttributeList);
+            depositNumber  = formatPriceWithComma(getAttributeValue('Deposit Receipt Number', configAttributeList));
+            inputQuoteData.deposit = getAttributeValue('Actual Deposit',configAttributeList);
             inputQuoteData.depositPaidBy  = getAttributeValue('Payment Type', configAttributeList);
             inputQuoteData.balance = formatPriceWithComma(String.valueOf(returnDecimal(getAttributeValue('Total Price Payable', configAttributeList)) - returnDecimal(getAttributeValue('Actual Deposit', configAttributeList))));
             inputQuoteData.balanceToBePaidBy  = getAttributeValue('Payment Option', configAttributeList);
@@ -1922,7 +1939,7 @@ public class CS_QuoteOnlineTemplateController {
             boilerPlusReason        = getAttributeValue('Boiler Plus Reason', configAttributeList);
             inputQuoteData.quoteNumber = getAttributeValue('Quote Reference', configAttributeList);
             inputQuoteData.jobRole = 'Role: ' + getAttributeValue('Identity Job Role', configAttributeList);
-            
+
             //2017
             blueBallonPrice  = formatPriceWithComma(getAttributeValue('Total Price Payable', configAttributeList));//'£'+getAttributeValue('Total Net Price', configAttributeList);
             
@@ -2135,10 +2152,13 @@ public class CS_QuoteOnlineTemplateController {
         att.Body = Blob.valueOf(pageContent);
         att.Name = TEMP_ONLINE_QUOTE_ATT_NAME;
         upsert att;
+
+		String footerCode = summaryTableHeading == 'British Gas' ? 'BG': 'SG';
        
         PageReference pr = new PageReference('/apex/CS_QuoteOnlineActualPdf');
         pr.getParameters().put('pageAttId', att.id);
 		pr.getParameters().put('quoteRef', inputQuoteData.quoteNumber);
+		pr.getParameters().put('footerCode', footerCode);
         pr.setRedirect(true);
         return pr;
     }

@@ -613,7 +613,7 @@ public class financeApplicationController {
     
     private decimal returnPaymentMonthly(Decimal amount, Integer term, decimal aprDecimal) {  
         system.debug('aprDecimal-->'+aprDecimal);
-    	Decimal monthlyPayment = (amount / 24.0).setScale(2);
+    	Decimal monthlyPayment = (amount / 24.0).setscale(2,roundingmode.HALF_EVEN);
     	// return payment is equally divided by 24 (months) if the term is 2 years
 
     	if (term > 2) {

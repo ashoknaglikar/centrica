@@ -55,7 +55,7 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
     */
    
     
-    if(jOld.Status__c != 'Planned' &&j.Status__c=='Planned' && cls_IsRun.isJobCompletion==false && (j.Suspend_Job__c<>True ||  j.Is_Downtime_Job__c))
+    if(j.Status__c=='Planned' && cls_IsRun.isJobCompletion==false && (j.Suspend_Job__c<>True ||  j.Is_Downtime_Job__c))
     {   
         doEnter = true;
        for(Job_Element__c je : [Select Id,Job__c, Product_ID__c, Name from Job_Element__c where Product_ID__c Like 'CBLR%' and Status__c != 'Removed' and Job__c =: j.Id])

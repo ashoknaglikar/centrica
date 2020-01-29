@@ -109,12 +109,13 @@ global with sharing class customerPortalQuoteHelper {
 
 
 			integer quoteExpiryDays = Integer.valueof(IV_Vectors__c.getInstance('Quote_Expiry_Days').Key__c);
-			system.debug('Age of Qupote -->'+bq.SubmittedDate_quote__c.daysBetween(system.today()));
+			
 			system.debug('Expiry -->'+quoteExpiryDays);
+			Date expiryDateStart  = bq.SubmittedDate_quote__c;
             if(bq.Portal_Cut_Off_Time__c!=null)
             {
                 createdCutOff = bq.Portal_Cut_Off_Time__c;
-                
+                expiryDateStart = bq.Portal_Cut_Off_Time__c.date().addDays(1);
             }
             else
             {
@@ -123,9 +124,10 @@ global with sharing class customerPortalQuoteHelper {
            
 			
             system.debug('createdCutOff=='+createdCutOff);
+            system.debug('Age of Qupote -->'+expiryDateStart.daysBetween(system.today()));
 			// this will stop expired quotes. 
 			// also adds dealy to quotes 
-			if(bq.SubmittedDate_quote__c!=null && bq.SubmittedDate_quote__c.daysBetween(system.today())<= quoteExpiryDays && createdCutOff < system.now())
+			if(expiryDateStart!=null && expiryDateStart.daysBetween(system.today())<= quoteExpiryDays && createdCutOff < system.now())
 			{
 				eligibleQuotes.add(bq.Id);
 			}

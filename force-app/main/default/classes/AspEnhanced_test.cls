@@ -119,6 +119,95 @@
                 cont_asp.updateUDP();
                 
             
+                /*cont_asp.confirm();
+                cont_asp.OnChangesClick();
+                
+                pageRef.getParameters().put('cost_cust', string.valueof(cont_asp.totalVal));
+                cont_asp.addDiscount();
+                test.stopTest();
+                cont_asp.confirm();
+            
+                cont_asp.Submit();
+                cont_asp.queryASP(cont_asp.asp.Id);
+                cont_asp.asp.ASP_Type__c ='Remedial';
+                cont_asp.Submit();
+                cont_asp.asp.Approved_By__c = userinfo.getuserid();
+                cont_asp.Submit();
+                for(AspEnhanced.quoteproductClass qpc : cont_asp.FullList)
+                {
+                    qpc.Remove = true;
+                }
+                
+                cont_asp.RemovePQ();
+                asp.Status__c = 'Entered';
+                cont_asp.deleteASP();
+                
+                test.setCurrentPage(new pagereference('/apex/Aspenhanced?id='+cont_asp.asp.id));
+                cont_asp = new AspEnhanced(controller1);
+                cont_asp.OnChangesClick();
+                cont_asp.jobList.add(jb);
+                
+                cont_asp.planJob();
+                    
+                cont_asp.jobList[0].Customer_Preferred_Date__c=system.today();
+                cont_asp.planJob();*/
+     }
+     
+     static testMethod void method1_1() 
+        {
+                cls_IsRun.generalTriggerSwitch= true;
+                lock.jobTriggerSwitch = true;
+                
+                Account Acc = TestClassHelper.createAccout();
+                insert Acc;
+                                
+                Opportunity opp = TestClassHelper.createCHILead(Acc);
+                insert opp;
+                  
+                BigMachines_Quote__c bm = TestClassHelper.createBMQuote(opp);
+                insert bm ;
+               
+                
+                District__c ds = TestClassHelper.createDistrict(); 
+                insert ds;
+                
+                Job__c jb = TestClassHelper.createJob('Pending','Mismatch',opp.ID, ds.Id);
+                jb.Quote__c=bm.Id;
+                insert jb;
+                
+                ASP__c asp = new ASP__c();
+                //aspView=true;
+                
+                
+                Product2 product = new Product2(ProductCode='CBLRAS', Name='CBLRAS', BigMachines_Part_Number__c='CBLRAS',  IsActive = true); 
+                insert product;
+                
+                Product_Work_Code__c prodCode = new Product_Work_Code__c(Product__c = product.Id, Work_Code__c = 'Test', Skill_type__c = 'Mechanical', Hours__c = 3 , Active__c = true, Start_date__c = system.today().adddays(-10), End_date__c = system.today().adddays(10), Skill__c = 'Mecanical', Product_Code__c = product.name, Work_Code_Description__c = 'Test this Description');
+                insert prodCode;
+                
+                Quote_Product__c qp = TestClassHelper.createQuoteProduct(bm.id);
+                qp.Product__c=product.id;
+                insert qp; 
+               
+                ApexPages.standardController controller1 = new ApexPages.standardController(asp);
+                pagereference pageref = new pagereference('/apex/Aspenhanced?chiId='+opp.id);
+                test.setCurrentPage(pageref);
+                AspEnhanced cont_asp = new AspEnhanced(controller1);
+                
+            
+                cont_asp = new AspEnhanced(controller1);
+                cont_asp.createNew();
+                cont_asp.asp.Function__c = 'Installtion';
+                cont_asp.asp.Definition__c = 'Installtion';
+                cont_asp.asp.Picklist__c = 'Installtion';
+                cont_asp.asp.Description__c='Installtion';
+                //create Asp
+                cont_asp.createASP();
+                //update ASP
+                cont_asp.updateAsp();
+                //Add new Quote Product
+                
+                test.starttest();
                 cont_asp.confirm();
                 cont_asp.OnChangesClick();
                 
@@ -135,7 +224,7 @@
                 cont_asp.Submit();
                 for(AspEnhanced.quoteproductClass qpc : cont_asp.FullList)
                 {
-                	qpc.Remove = true;
+                    qpc.Remove = true;
                 }
                 
                 cont_asp.RemovePQ();
@@ -151,12 +240,6 @@
                     
                 cont_asp.jobList[0].Customer_Preferred_Date__c=system.today();
                 cont_asp.planJob();
-                
-                
-                
-               
-                
-
      }
      
       static testMethod void method2() 

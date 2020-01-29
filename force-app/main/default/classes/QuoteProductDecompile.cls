@@ -1294,7 +1294,7 @@ Sales_Order_Value__c,Component_Type__c, Product_Description__c  From Quote_Produ
             // Cognizant - CHI Phase III CR-005 implementation... START
             // Just added a check for User_Defined_Product__c in below if condition
             // PRB00025860 fix starts - removed the condition '!quanmap.containskey(quoteProductsRelatingToASP[x].Name)'
-            if(quoteProductsRelatingToASP[x].User_Defined_Product__c==false && quoteProductsRelatingToASP[x].ASP_Reason__c=='Added' && (quoteProductsRelatingToASP[x].ASP_Action__c=='Add Parts Only' || quoteProductsRelatingToASP[x].ASP_Action__c=='Add Parts and Hours' || quoteProductsRelatingToASP[x].ASP_Action__c=='Add Parts and Extra Hours' || quoteProductsRelatingToASP[x].ASP_Action__c=='Add Hours Only')){             
+            if((!quanmap.containskey(quoteProductsRelatingToASP[x].Name))&& quoteProductsRelatingToASP[x].User_Defined_Product__c==false && quoteProductsRelatingToASP[x].ASP_Reason__c=='Added' && (quoteProductsRelatingToASP[x].ASP_Action__c=='Add Parts Only' || quoteProductsRelatingToASP[x].ASP_Action__c=='Add Parts and Hours' || quoteProductsRelatingToASP[x].ASP_Action__c=='Add Parts and Extra Hours' || quoteProductsRelatingToASP[x].ASP_Action__c=='Add Hours Only')){             
             // Cognizant - CHI Phase III CR-005 implementation... END
             // PRB00025860 fix ends
             System.debug('+++Entered if condition+++');
