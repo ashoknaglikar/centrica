@@ -17,6 +17,7 @@ public class cls_IsRun{
     public static boolean calljob = false;
     public static boolean transferhrstrg = false; //PRB00032289
     public static boolean txtmailsalesman=false;
+    public static boolean isUpdateDupRefNumber= false;
     //CR - 1352 change by Ashok G
     private static boolean blnAlreadyDone = false; 
    

@@ -306,6 +306,14 @@ public with sharing class SearchWorker {
                         break;
                     }
                     
+                    Set<ID> AlwaysWorksWithElecIDs= employees.AlwaysWorksWithElecIDs;
+                    if(AlwaysWorksWithElecIDs.contains(SearchBlackBox.jobInfo.namedElectritian))
+                    {
+                        if((jro.employeesAlwaysWorksWithElec==null||jro.employeesAlwaysWorksWithElec.isempty())&& SearchBlackBox.jobInfo.namedEmployee==null)
+                        break;
+                    }
+                    
+                    
                     //suguna -PH Jones change
                     EmployeeInformation ei2;
                     if(SearchBlackBox.jobInfo.namedEmployee!=null)
@@ -589,12 +597,20 @@ public with sharing class SearchWorker {
                 
                 //ends
                 
-                system.debug(LoggingLevel.INFO, 'planFrom '+planFrom);
+                //Suguna- Always works with Electrician
+                Set<ID> empsWithSkill= jro.employeesAlwaysWorksWithElec;
+                if(empsWithSkill == null || empsWithSkill.isEmpty()) 
+                {
+                    empsWithSkill = employees.employeeIDsBySkill.get(skill);
+                    empsWithSkill.removeAll(employees.AlwaysWorksWithElecIDs);
+                }
+                     
                 // Get Employees with this skill - if there are none, break out of this loop (and continue with the next JRO)
-                Set<ID> empsWithSkill = employees.employeeIDsBySkill.get(skill);
+                //Set<ID> empsWithSkill = employees.employeeIDsBySkill.get(skill);
                 if(empsWithSkill == null || empsWithSkill.isEmpty()) {
                     break;
                 }
+                
                 
                 // Convert Employees into a List...
                 List<ID> empsWithSkillList = new List<ID>();
@@ -624,6 +640,7 @@ public with sharing class SearchWorker {
                     
                     // Get the Employee at this random position
                     EmployeeInformation ei = employees.getEmployee(empsWithSkillList[rdm]);
+                    system.debug('Sugu 1 '+ei);
                     
                     // If this ei have been already used in first for loop then it is ODOMJ and will not be added to any other JRO.
                     // So we dont need extra check here to make sure that ei which is already used in first loop is not assigned 
@@ -964,6 +981,8 @@ public with sharing class SearchWorker {
         for(ID sid : secondaryIDs) {
             // Get the Employee
             EmployeeInformation ei = employees.getEmployee(sid);
+            
+            
 
             // Get hours for the skills that this Employee can do and that need filling
             // CR-XXX - this should be ei.getSkillsNotODOMJ(skillsToFill), due to the data however, it gets difficult to resoruce the  
@@ -977,6 +996,8 @@ public with sharing class SearchWorker {
 
             // Do they have a suitable gap?
             ResourceOption ro = findSuitableGap(ei, jro, employeesSkills, hours);
+            
+            
             if(ro == null) {
                 // No suitable gap was found
                 continue;
@@ -1081,10 +1102,12 @@ public with sharing class SearchWorker {
         Double largestAdjustment = 0.0;
         Double largestSize = 0.0;           // Holds the numberOfHours in the Employee's largest gap
         
+       
+        
         // Loop through each of the Employee's DECs
         for(DiaryEntryCollection de : ei.availability.getDECs(businessAvailabilityFlag)) {
             adjustment = 0.0;
-          system.debug(LoggingLevel.INFO, 'diary entry : '+de );
+           system.debug(LoggingLevel.INFO, 'diary entry : '+de );
               system.debug(LoggingLevel.INFO, 'currentStart, currentEnd, de.startDT, de.finishDT' + currentStart + ', ' + currentEnd + ', ' + de.startDT + ', ' + de.finishDT);
             
             // If there was a currentEnd passed into the method and the current DEC starts after that end point,
@@ -1222,6 +1245,16 @@ public with sharing class SearchWorker {
             } else {
                 ro = removeSkillsToFitGap(largestGap, largestGap.numberOfHours - largestAdjustment, 
                                             currentStart, ei, employeesSkills, false);
+            }
+        }
+        
+        //SB fix
+        if(ro!=null)
+        {
+            if(ei.ispool && ro.startDT==ro.EndDT && ro.hoursTotal==hours && ro.hoursTotal<=adjustment)
+            {
+                List<List<String>> shifts = getShifts(ro.entry.entryInfoObjects[0].entry);
+                ro.startDT= DateTimeHelper.subtractWorkingHoursToDateTime(ro.endDT,hours,shifts);
             }
         }
         system.debug(LoggingLevel.INFO, 'returning ro: ' + ro);
@@ -1586,6 +1619,7 @@ public with sharing class SearchWorker {
         } else if(DECstartOffset > 0) {
             jobStartOffset = DECstartOffset;
         }
+       
         
         // Defect 239
         // If the jobStartOffset is greater than the hours shared, these DECs should not be considered
@@ -1748,9 +1782,7 @@ List<Diary_Entry__c> existingEmployeeslist = new List<Diary_Entry__c>([Select Em
             //Set<String> additionalSkillsCovered = ro1.skillsFullyCovered.clone();
             //additionalSkillsCovered.removeAll(skillsHoursSplit1.keySet());         
             ResourceOption ro2 = addAdditionalSkills(skillsHoursSplit2, de2, ei2, 0, null);//, additionalSkillsCovered);
-            //Sugu
-            /*if((DECstartOffset - jobStartOffset>0)&& !de1.skip_8_12_Rule)
-            return null;*/
+            
             if(ro1 == null || ro2 == null)
                 return null;
             return new List<ResourceOption> {ro1, ro2};
@@ -1766,9 +1798,7 @@ List<Diary_Entry__c> existingEmployeeslist = new List<Diary_Entry__c>([Select Em
             System.debug('skillsCoveredcheckmap else loop: '+skillsCoveredcheckmap);         
             //PRB00028301 end 
             ResourceOption ro2 = addAdditionalSkills(skillsHoursSplit1, de2, ei2, 0, null);//, additionalSkillsCovered);
-            //Sugu
-            /*if((DECstartOffset - jobStartOffset>0)&& !de1.skip_8_12_Rule)
-            return null;*/
+           
             if(ro1 == null || ro2 == null)
                 return null;
             return new List<ResourceOption> {ro2, ro1};
@@ -1853,6 +1883,8 @@ List<Diary_Entry__c> existingEmployeeslist = new List<Diary_Entry__c>([Select Em
                         ? dec.numberOfHours - hoursAssigned 
                         //: dec.workingHoursBetween(sharedEndTime, dec.finishDT); // changed as part of gapSizeTolerance fix mentioned above
                         : dec.numberOfHours - (addToStart + hoursAssigned );
+                        
+                        
         
         if(lowest == null 
             //|| (!ei.isPool && sharedEndTime == dec.finishDT // - modified as described above and shown below.

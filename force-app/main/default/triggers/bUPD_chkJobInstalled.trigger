@@ -9,17 +9,23 @@ trigger bUPD_chkJobInstalled on Opportunity (before insert,before update) {
     
     set<String> OppRefNumbers = new set<String>();
     map<String,Opportunity> oppRefNumberMap = new map<String,Opportunity>();
-    if(!cls_isRun.isUpdateDupRefNumber)
+    if(!cls_isRun.isUpdateDupRefNumber&&trigger.isUpdate)
     {
         for(Opportunity opp : Trigger.new)
         {
-           if(opp.Payment_Reference_Number__c !=null||opp.Payment_Reference_Number__c !='')
-           OppRefNumbers.add(opp.Payment_Reference_Number__c); 
+           if(opp.Payment_Reference_Number__c !=null||opp.Payment_Reference_Number__c !='') 
+           {
+               if(opp.Payment_Reference_Number__c!=trigger.oldMap.get(opp.Id).Payment_Reference_Number__c)
+               OppRefNumbers.add(opp.Payment_Reference_Number__c); 
+           }
         }
         
-        for(Opportunity opp :[select id,Payment_Reference_Number__c from opportunity where Payment_Reference_Number__c IN:OppRefNumbers and Payment_Reference_Number__c!=null])
+        if(OppRefNumbers.size()>0)
         {
-            oppRefNumberMap.put(opp.Payment_Reference_Number__c,opp);
+            for(Opportunity opp :[select id,Payment_Reference_Number__c from opportunity where Payment_Reference_Number__c IN:OppRefNumbers and Payment_Reference_Number__c!=null])
+            {
+                oppRefNumberMap.put(opp.Payment_Reference_Number__c,opp);
+            }
         }
     }
     
@@ -72,7 +78,7 @@ trigger bUPD_chkJobInstalled on Opportunity (before insert,before update) {
             }
         }    
         
-        if(opp.Id!=null && 	opp.CHI_Lead_Id__c!=null && opp.Install_Postcode__c !=null)
+        if(opp.Id!=null && 	opp.CHI_Lead_Id__c!=null && opp.Install_Postcode__c !=null && opp.Opp_Id_Encrypted__c == null)
         {
             
             

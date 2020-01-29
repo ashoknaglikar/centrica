@@ -311,9 +311,8 @@ global class SendReplanPDFViaEmail implements Database.Batchable<sObject> {
                         
     }
         
-            try{
+            try{               
                 
-                Messaging.sendEmail(mails); 
                 
                 Database.Update(orderList,true); 
                 
@@ -330,7 +329,7 @@ global class SendReplanPDFViaEmail implements Database.Batchable<sObject> {
                 	Database.Update(jobList,true); 
                 	
                 }
-                
+                Messaging.sendEmail(mails); 
             }catch(Exception e){
                 
                    System.debug('---Mail EXC  ----   '+e.getMessage());

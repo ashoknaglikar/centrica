@@ -1610,6 +1610,8 @@ public class AutoGeneratePurchaseOrders {
                     OrderLst.add(objOrder);
                 }
             }
+            system.debug('list of orders'+OrderLst);
+            OrderLst =  new list<order__c>(new set<order__c>(OrderLst));
             insert OrderLst;
             
             List<Order_Line_Item__c> orderLineItemLst=new List<Order_Line_Item__c>{};

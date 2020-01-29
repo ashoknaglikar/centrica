@@ -14,6 +14,18 @@ public class AutoScheduleDispatchOrderToEDI
     String sCron30;
     String sCron45;
     
+    //Suguna
+    /*String sNPSCron0;
+    String sNPSCron15;
+    String sNPSCron30;
+    String sNPSCron45;
+    
+    String sNPSCron0_1;
+    String sNPSCron15_1;
+    String sNPSCron30_1;
+    String sNPSCron45_1;*/
+    //ends
+    
     String sCronPO55;
     String sRenderJobInfoBlock;
     String existingJobsMessage = null;
@@ -74,6 +86,18 @@ public class AutoScheduleDispatchOrderToEDI
             sCron30 = '0 30 7-22 ? * MON-SAT *';
             sCron45 = '0 45 7-22 ? * MON-SAT *';
             
+            //Suguna - every 15 minutes between Mon – Fri 08:00 – 20:00 Sat, Sun 10:00 – 18:00. 
+            /*sNPSCron0  = '0 0 8-20 ? * MON-FRI *';
+            sNPSCron15 = '0 15 8-19 ? * MON-FRI *';
+            sNPSCron30 = '0 30 8-19 ? * MON-FRI *';
+            sNPSCron45 = '0 45 8-19 ? * MON-FRI *';
+    
+            sNPSCron0_1  = '0 0 10-18 ? * SAT-SUN *';
+            sNPSCron15_1 = '0 15 10-17 ? * SAT-SUN *';
+            sNPSCron30_1 = '0 30 10-17 ? * SAT-SUN *';
+            sNPSCron45_1 = '0 45 10-17 ? * SAT-SUN *';*/
+            //ends
+            
        // }
         
         //POPULATING COLLECTIONS.
@@ -81,6 +105,17 @@ public class AutoScheduleDispatchOrderToEDI
         cronExpressionList.add(sCron15);
         cronExpressionList.add(sCron30);
         cronExpressionList.add(sCron45);
+        
+        //Suguna
+        /* cronExpressionList.add(sNPSCron0);
+          cronExpressionList.add(sNPSCron15);
+           cronExpressionList.add(sNPSCron30);
+            cronExpressionList.add(sNPSCron45);
+             cronExpressionList.add(sNPSCron0_1);
+              cronExpressionList.add(sNPSCron15_1);
+               cronExpressionList.add(sNPSCron30_1);
+                cronExpressionList.add(sNPSCron45_1);*/
+            //ends    
         
         string testAppender = '';
         if(Lock.isTestRunner)
@@ -103,8 +138,35 @@ public class AutoScheduleDispatchOrderToEDI
         cronStringJobNameMap.put(sCron15,'FaxAndEDIJobFor15thMinute'+testAppender);
         cronStringJobNameMap.put(sCron30,'FaxAndEDIJobFor30thMinute'+testAppender);
         cronStringJobNameMap.put(sCron45,'FaxAndEDIJobFor45thMinute'+testAppender);  
-    
-       
+        
+        //Suguna
+        /*jobNameList.add('NPSTriggerFor0thMinute'+testAppender);
+        jobNameList.add('NPSTriggerFor15thMinute'+testAppender);
+        jobNameList.add('NPSTriggerFor30thMinute'+testAppender);
+        jobNameList.add('NPSTriggerFor45thMinute'+testAppender);
+        jobNameList.add('NPSTriggerFor0thMinute_1'+testAppender);
+        jobNameList.add('NPSTriggerFor15thMinute_1'+testAppender);
+        jobNameList.add('NPSTriggerFor30thMinute_1'+testAppender);
+        jobNameList.add('NPSTriggerFor45thMinute_1'+testAppender);
+        
+        nameExpressionMap.put('NPSTriggerFor0thMinute'+testAppender,sNPSCron0);
+        nameExpressionMap.put('NPSTriggerFor15thMinute'+testAppender,sNPSCron15);
+        nameExpressionMap.put('NPSTriggerFor30thMinute'+testAppender,sNPSCron30);
+        nameExpressionMap.put('NPSTriggerFor45thMinute'+testAppender,sNPSCron45);
+        nameExpressionMap.put('NPSTriggerFor0thMinute_1'+testAppender,sNPSCron0_1);
+        nameExpressionMap.put('NPSTriggerFor15thMinute_1'+testAppender,sNPSCron15_1);
+        nameExpressionMap.put('NPSTriggerFor30thMinute_1'+testAppender,sNPSCron30_1);
+        nameExpressionMap.put('NPSTriggerFor45thMinute_1'+testAppender,sNPSCron45_1);
+        
+        cronStringJobNameMap.put(sNPSCron0,'NPSTriggerFor0thMinute'+testAppender);
+        cronStringJobNameMap.put(sNPSCron15,'NPSTriggerFor15thMinute'+testAppender);
+        cronStringJobNameMap.put(sNPSCron30,'NPSTriggerFor30thMinute'+testAppender);
+        cronStringJobNameMap.put(sNPSCron45,'NPSTriggerFor45thMinute'+testAppender);
+        cronStringJobNameMap.put(sNPSCron0_1,'NPSTriggerFor0thMinute_1'+testAppender);
+        cronStringJobNameMap.put(sNPSCron15_1,'NPSTriggerFor15thMinute_1'+testAppender);
+        cronStringJobNameMap.put(sNPSCron30_1,'NPSTriggerFor30thMinute_1'+testAppender);
+        cronStringJobNameMap.put(sNPSCron45_1,'NPSTriggerFor45thMinute_1'+testAppender);*/
+        //ends
       /*       
         jobNameList.add('SAPPOandGRJobFor55thMinute');            
         nameExpressionMap.put('SAPPOandGRJobFor55thMinute',sCron55);
@@ -156,11 +218,11 @@ public class AutoScheduleDispatchOrderToEDI
                     iFlag = 2;                    
                 }                
             }
-           //if(iFlag != 2){
+           if(iFlag != 2){
                 
                 //POPULATING LIST OF TO BE SCHEDULED JOBS.
                 currentlyScheduledJobList.add(cronStringJobNameMap.get(cronExpressionList[i]));
-           //}
+           }
              
         }        
         System.debug('### STEP 4 : currentlyScheduledJobList: '+currentlyScheduledJobList );
@@ -176,9 +238,16 @@ public class AutoScheduleDispatchOrderToEDI
                 System.debug('### STEP 6 : jobExpression: '+jobExpression);
                 System.debug('### STEP 7 : jobName: '+jobName );
                 
-                
-                   System.schedule(jobName ,jobExpression , new ProcessOrderForFaxAndEDI());                
-                  // System.schedule(jobName ,jobExpression , new SendPOandItemsForGoodRcpttoSAP());
+                   //Suguna
+                   /*if(jobName.startsWith('NPS'))
+                   {
+                       System.schedule(jobName ,jobExpression , new NPSTriggerNotificationScheduler()); 
+                   }*/
+                   //else
+                   //{
+                       System.schedule(jobName ,jobExpression , new ProcessOrderForFaxAndEDI());                
+                   //}
+                   
                 
                 System.debug('### STEP 8 : job scheduled' ); 
             }

@@ -19,6 +19,7 @@ public with sharing class EmployeeInformationCollection {
     public Map<String, Set<ID>> employeeIDsBySkill {public get; private set;}
     public Map<ID, List<ID>> primaryBySupplierID {public get; private set;}
     
+    public set<ID> AlwaysWorksWithElecIDs {public get; private set;}
     // JobInformation and BlackBoxOptions objects - makes referencing easier...
     public JobInformation jobInfo = null;
     public BlackBoxOptions bo = null;
@@ -54,6 +55,7 @@ public with sharing class EmployeeInformationCollection {
         employeesWithPrimarySkill = new Set<ID>();
         employeeIDsBySkill = new Map<String, Set<ID>>();
         primaryBySupplierID = new Map<ID, List<ID>>();
+        AlwaysWorksWithElecIDs= new set<id>();
     }
 
     /* setJobInfo(JobInformation ji)
@@ -77,6 +79,8 @@ public with sharing class EmployeeInformationCollection {
             employees.put(e.ID, ei);
             //System.debug(LoggingLevel.INFO, 'employees.put: ' + e.ID + ' - ' + ei.employeeName);
             employeeIDs.add(e.ID);
+            if(e.Always_Works_with_Electrician__c!=null)
+            AlwaysWorksWithElecIDs.add(e.Always_Works_with_Electrician__c);
         }
     }
 
@@ -212,9 +216,9 @@ public with sharing class EmployeeInformationCollection {
         List<Postcode_Sector__c> sectors = new List<Postcode_Sector__c>();
         if(custsDate != null)
         {
-            sectors = 
-                            [select ID, Sub_Patch__r.District__c, Sub_Patch__r.District__r.Region__c,
-                            (select Employee__c, Employee__r.Always_Works_With__c, Type__c, Employee__r.Name, Employee__r.Inactive__c,Employee__r.Is_Active_Salesforce_User__c
+            sectors = [select ID, Sub_Patch__r.District__c, Sub_Patch__r.District__r.Region__c,
+                            (select Employee__c, Employee__r.Always_Works_With__c, Type__c, Employee__r.Name, Employee__r.Inactive__c,Employee__r.Is_Active_Salesforce_User__c,
+                                    Employee__r.Always_Works_with_Electrician__c
                             from Employee_Postcodes__r 
                             where ((Start_Date__c <= :todaysDate and End_Date__c >= :todaysDatepluswindow )
                                 or (Start_Date__c >= :todaysDate and Start_Date__c <= :todaysDatepluswindow )
@@ -250,21 +254,47 @@ public with sharing class EmployeeInformationCollection {
         // a potential candidate for this job, so we store their ID in a set            
         for(Employee_Postcode_Sectors__c[] employeePostcodes : pcSector.Employee_Postcodes__r) {
             for(Employee_Postcode_Sectors__c employeePostcode : employeePostcodes) {
-                system.debug('Exception --->'+employeePostcode.Employee__c);
+                system.debug('Exception --->'+employeePostcode.Employee__c+' '+employeePostcode.Employee__r.Name+' '+employeePostcode.Employee__r.Always_Works_With_Electrician__c);
                 //rjd - 21-12-2009 - check for the case where always works with employee is inactive(i.e. not in employees list). Don't add to the list in this case
-                if(tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With__c != null && tmpEmployees.containsKey(tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With__c)){
-                    empIDs.add(employeePostcode.Employee__c);
-                    
-                    // If this employee has an "Always Works With" link, add the employee they always work with to empIDs to 
-                    // make sure they are also extracted in the next step.
-                    if(employeePostcode.Employee__r.Always_Works_With__c != null)
+                  /*if(tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With__c != null && tmpEmployees.containsKey(tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With__c) && 
+                  (tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With_Electrician__c != null&& tmpEmployees.containsKey(tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With_Electrician__c))){
+                        empIDs.add(employeePostcode.Employee__c);
+                      // If this employee has an "Always Works With" link, add the employee they always work with to empIDs to 
+                      // make sure they are also extracted in the next step.
+                        if(employeePostcode.Employee__r.Always_Works_With__c != null)
                         empIDs.add(employeePostcode.Employee__r.Always_Works_With__c);
-                }
-         // Cognizant support fix - If employee does not have anyone who he always works with but if he does  
-         // have valid employee postcode sector for the job then add him.
-         else if(employeePostcode.Employee__r.Always_Works_With__c == null && tmpEmployees.containsKey(employeePostcode.Employee__c)){
-             empIDs.add(employeePostcode.Employee__c);
-        }
+                        
+                        if(employeePostcode.Employee__r.Always_Works_With_Electrician__c != null)
+                        empIDs.add(employeePostcode.Employee__r.Always_Works_With_Electrician__c);
+                  }
+                     // Cognizant support fix - If employee does not have anyone who he always works with but if he does  
+                     // have valid employee postcode sector for the job then add him.
+                  else if(employeePostcode.Employee__r.Always_Works_With__c == null&&employeePostcode.Employee__r.Always_Works_With_Electrician__c!=null && tmpEmployees.containsKey(employeePostcode.Employee__c)&& tmpEmployees.containsKey(tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With_Electrician__c)){
+                    empIDs.add(employeePostcode.Employee__c);
+                    empIDs.add(employeePostcode.Employee__r.Always_Works_With_Electrician__c);
+                    system.debug('Exception sugu 2--->'+employeePostcode.Employee__r.Always_Works_With_Electrician__c);
+                  }
+                  else if(employeePostcode.Employee__r.Always_Works_With__c != null&&employeePostcode.Employee__r.Always_Works_With_Electrician__c==null && tmpEmployees.containsKey(employeePostcode.Employee__c)&& tmpEmployees.containsKey(tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With__c)){
+                    empIDs.add(employeePostcode.Employee__c);
+                    empIDs.add(employeePostcode.Employee__r.Always_Works_With__c);
+                    system.debug('Exception sugu 3--->'+employeePostcode.Employee__r.Always_Works_With_Electrician__c);
+                  }
+                  else if(employeePostcode.Employee__r.Always_Works_With__c == null &&employeePostcode.Employee__r.Always_Works_With_Electrician__c==null&& tmpEmployees.containsKey(employeePostcode.Employee__c)){
+                    empIDs.add(employeePostcode.Employee__c);
+                    system.debug('Exception sugu 4--->'+employeePostcode.Employee__r.Always_Works_With_Electrician__c);
+                  }*/
+                  if(tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With__c != null && tmpEmployees.containsKey(tmpEmployees.get(employeePostcode.Employee__c).Always_Works_With__c)){
+                        empIDs.add(employeePostcode.Employee__c);
+                        if(employeePostcode.Employee__r.Always_Works_With__c != null)
+                        empIDs.add(employeePostcode.Employee__r.Always_Works_With__c);
+                        if(employeePostcode.Employee__r.Always_Works_With_Electrician__c != null)
+                        empIDs.add(employeePostcode.Employee__r.Always_Works_With_Electrician__c);
+                  }
+                  else if(employeePostcode.Employee__r.Always_Works_With__c == null && tmpEmployees.containsKey(employeePostcode.Employee__c)){
+                        empIDs.add(employeePostcode.Employee__c);
+                        if(employeePostcode.Employee__r.Always_Works_With_Electrician__c != null)
+                        empIDs.add(employeePostcode.Employee__r.Always_Works_With_Electrician__c);
+                  }
             }
         }
         
@@ -272,7 +302,7 @@ public with sharing class EmployeeInformationCollection {
         
         // Pull out IDs of employees that are already assigned on the job
         // added Is_Active_Salesforce_User__c = true as part of PRB00033753
-        for(Diary_Entry__c de : [select d.Week__r.Employee__c, d.Week__r.Employee__r.Always_Works_With__c, d.Week__r.Employee__r.Name,
+        for(Diary_Entry__c de : [select d.Week__r.Employee__c, d.Week__r.Employee__r.Always_Works_With__c, d.Week__r.Employee__r.Name,d.Week__r.Employee__r.Always_Works_With_Electrician__c,
                                  d.Start__c, d.Hours__c  , d.Week__r.Locking_User__c,d.Week__r.Category_Num__c,d.Week__r.Release_Date__c,
                                  d.Week__r.Lockers1__c from Diary_Entry__c d where Job__c = :SearchBlackBox.jobID //or Job_Travel__c =  :SearchBlackBox.jobID)
                                  and d.Week__r.Employee__r.Inactive__c = false and d.Week__r.Employee__r.Is_Active_Salesforce_User__c = 'true']) {
@@ -287,6 +317,14 @@ public with sharing class EmployeeInformationCollection {
             } else {
                 blacklist.add(de.Week__r.Employee__c);
             }
+            
+            if(empIDs.contains(de.Week__r.Employee__c) && !blacklist.contains(de.Week__r.Employee__c)
+            && de.Week__r.Employee__r.Always_Works_With_Electrician__c!= null) {
+            empIDs.add(de.Week__r.Employee__r.Always_Works_With_Electrician__c);
+            } else {
+                blacklist.add(de.Week__r.Employee__c);
+            }
+            
             // Also add the employee 
             //System.debug(LoggingLevel.INFO, 'adding employee from DE: ' + de.Week__r.Employee__c);
             empIDs.add(de.Week__r.Employee__c);
@@ -347,7 +385,7 @@ public with sharing class EmployeeInformationCollection {
                                         from Employee_Postcodes__r
                                         where Postcode_Sector__c = :pcSector.ID),
                                     e.Works_Anywhere_in_District__c, e.Works_Anywhere_in_Area__c, e.Supplier__r.Name, e.Supplier__c,
-                                    e.Region__c, e.Pool_Diary__c, e.Never_Works_With__c, e.District__r.Region__c,Postcode__c,
+                                    e.Region__c, e.Pool_Diary__c, e.Never_Works_With__c, e.District__r.Region__c,Postcode__c,e.Always_Works_with_Electrician__c,
                                     e.Name, e.Id, e.District__r.Name, e.District__c, e.Always_Works_With__c, e.Always_Works_Alone__c,e.Employee_Number__c,
                                     e.Own_Labour__c, e.Net_Promoter_Score__c, e.Contractor_Band__c, e.Inactive__c, e.Skip_Rule__c, e.Is_Active_Salesforce_User__c
                             from Employee__c e
@@ -361,11 +399,8 @@ public with sharing class EmployeeInformationCollection {
                                     and Resource_Type__c = :SearchBlackBox.EMPLOYEE_RESOURCE_TYPE
                                     and Inactive__c = false and Is_Active_Salesforce_User__c = 'true'];
                                     
-             /* PH Jones change: 
-                Get overbooking Excettion details form the employee if exists. 
-                
              
-             */
+             //PH Jones change - Get overbooking Excettion details form the employee if exists.
              map<id,decimal> empIdOverBKHousMap = new map<id,decimal>();
              if(jobInfo.job.Overbooking_Identifier__c != 'NA')
              {
@@ -742,7 +777,7 @@ public with sharing class EmployeeInformationCollection {
         
         List<Employee_Postcode_Sectors__c> empPostcodeSectors = new List<Employee_Postcode_Sectors__c>();
         String userId = Userinfo.getUserId();
-        for(Diary_Entry__c entry : [select d.ID, d.Week__c, d.Hours__c, d.Week__r.Employee__c, d.Week__r.Employee__r.Always_Works_With__c, d.Start__c, d.End__c, d.Record_Type__c,
+        for(Diary_Entry__c entry : [select d.ID, d.Week__c, d.Hours__c, d.Week__r.Employee__c, d.Week__r.Employee__r.Always_Works_With__c, d.Start__c, d.End__c, d.Record_Type__c,d.Week__r.Employee__r.Always_Works_With_Electrician__c,
                                     d.Week__r.Shift_Pattern__r.Monday_Start_Time__c, d.Week__r.Shift_Pattern__r.Monday_End_Time__c,d.Week__r.Morning_Start_Time__c,d.Week__r.Mid_day_Start_Time__c,
                                     d.Week__r.Shift_Pattern__r.Tuesday_Start_Time__c, d.Week__r.Shift_Pattern__r.Tuesday_End_Time__c,
                                     d.Week__r.Shift_Pattern__r.Wednesday_Start_Time__c, d.Week__r.Shift_Pattern__r.Wednesday_End_Time__c,
@@ -808,6 +843,14 @@ public with sharing class EmployeeInformationCollection {
                     if(employees.get(entry.Week__r.Employee__r.Always_Works_With__c)!=null)
                     if(employees.get(entry.Week__r.Employee__r.Always_Works_With__c).empJobPostcodeSectors!=null)
                     empPostcodeSectors.addAll(employees.get(entry.Week__r.Employee__r.Always_Works_With__c).empJobPostcodeSectors);
+                }
+                
+                 //Suguna - Always Works with Electrician
+                 if(empPostcodeSectors!=null && ei_ecp.alwaysWorksWithElectrician!=null){
+                    if(entry.Week__r.Employee__r.Always_Works_With_Electrician__c!=null)
+                    if(employees.get(entry.Week__r.Employee__r.Always_Works_With_Electrician__c)!=null)
+                    if(employees.get(entry.Week__r.Employee__r.Always_Works_With_Electrician__c).empJobPostcodeSectors!=null)
+                    empPostcodeSectors.addAll(employees.get(entry.Week__r.Employee__r.Always_Works_With_Electrician__c).empJobPostcodeSectors);
                 }
              
              boolean toBeConsidered = false;

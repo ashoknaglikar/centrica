@@ -153,7 +153,7 @@ global with sharing class onlineBoilersBundleReturn {
             // add extra discount for Homecare
             if(isHomeCare == 'Yes')
             {
-                CS_Allowance__c aw = [Select id,Amount__c,  Allowance_Code__c,Quote_Description__c, Name  from CS_Allowance__c where Name = 'HL - £300 HomeCare Loyalty Discount'];
+                CS_Allowance__c aw = [Select id,Amount__c,  Allowance_Code__c,Quote_Description__c, Name  from CS_Allowance__c where onlineHCDiscount__c = true limit 1];
                 if(aw!=null)
                 {
                     bundleResponseClass.Allowance allowance = new bundleResponseClass.Allowance();
@@ -162,8 +162,8 @@ global with sharing class onlineBoilersBundleReturn {
                     allowance.code = aw.Allowance_Code__c;
                     allowance.sfId = aw.Id;
                     bundleObj.allowances.add(allowance); 
-                    bundleObj.totalAllowance += aw.Amount__c;
-                    bundleObj.totalPriceAfterDiscount -= aw.Amount__c;
+                    //bundleObj.totalAllowance += aw.Amount__c;
+                    //bundleObj.totalPriceAfterDiscount -= aw.Amount__c;
                     activeallowaceTotal+=aw.Amount__c;
                 }
                 

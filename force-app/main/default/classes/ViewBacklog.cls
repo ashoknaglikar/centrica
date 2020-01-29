@@ -120,14 +120,19 @@ global with sharing class ViewBacklog {
         //query for product backlog
         productBacklogList = completeWPList = [select id, name, work_product_id__c, plan_estimate__c, iteration__c, state__c, blocked__c, iteration__r.Name, ss_release__r.Name, rank__c, is_defect__c, Record_Type_Name__c 
                               ,Platform_Acronym__c, StyleClass__c,RecordTypeId from work_Product__c 
-                              where Project_Overview__c = :selectedProjectId AND iteration__c = NULL and ss_release__c = NULL and recordtypeid <> :DefectRecordType
+                              where Project_Overview__c = :selectedProjectId AND iteration__c = NULL and ss_release__c = NULL and recordtypeid = :userStoryRecordType
                               order by rank__c asc];
                               
         bugList = completeBugList = [select id, name, work_product_id__c, plan_estimate__c, iteration__c, state__c, blocked__c, iteration__r.Name, ss_release__r.Name, rank__c, is_defect__c, Record_Type_Name__c 
                               ,Platform_Acronym__c, StyleClass__c,RecordTypeId from work_Product__c 
                               where Project_Overview__c = :selectedProjectId AND iteration__c = NULL and ss_release__c = NULL and recordtypeid = :DefectRecordType
-                              order by rank__c asc];                  
-        
+                              order by rank__c asc];   
+                            
+        lowPriority = [select id, name, work_product_id__c, plan_estimate__c, iteration__c, state__c, blocked__c, iteration__r.Name, ss_release__r.Name, rank__c, is_defect__c, Record_Type_Name__c 
+                              ,Platform_Acronym__c, StyleClass__c,RecordTypeId from work_Product__c 
+                              where Project_Overview__c = :selectedProjectId AND iteration__c = NULL and ss_release__c = NULL and recordtypeid = :lowPriorityRecordType
+                              order by rank__c asc];
+    
         hidePastReleases();
         hidePastIterations();
         hideClosedProjects();

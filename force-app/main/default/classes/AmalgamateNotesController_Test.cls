@@ -124,6 +124,7 @@ private class AmalgamateNotesController_Test {
         Note PCNNote = new Note(ParentId =p.Id, Body = 'Test', title ='test');
         insert PCNNote;
         
+        Test.startTest();
         PageReference pageRef1 = new PageReference('/apex/Amalgamatenotes?OppId='+opportunity.Id);
         Test.setCurrentPage(pageRef1);
         
@@ -133,6 +134,7 @@ private class AmalgamateNotesController_Test {
         AmalgamateNotesController.NotesInnerclass notInner=new AmalgamateNotesController.NotesInnerclass(activit);
         WIP_Header__c Qvisit=new  WIP_Header__c();
         AmalgamateNotesController.NotesInnerclass notInner1=new AmalgamateNotesController.NotesInnerclass(Qvisit);
+        test.stopTest();
         
        
         // TO DO: implement unit test

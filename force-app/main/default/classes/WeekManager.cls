@@ -743,13 +743,21 @@ public with sharing class WeekManager {
         outputWeeksEntries(weeksEntriesList, 'Entries before searching for a gap for booking');
         for(Diary_Entry__c weekEntry : weeksEntriesList)
         {
-            if(DatetimeHelper.dateGreaterThanOrEqual(startTime, weekEntry.Start__c) &&
-                    DatetimeHelper.dateLessThanOrEqual(endTime, weekEntry.End__c) &&
+            system.debug('Start time'+ startTime);
+            system.debug('endTime'+ endTime);
+            system.debug('weekEntry.Start__c'+ weekEntry.Start__c);
+            system.debug('weekEntry.End__c'+ weekEntry.End__c);
+            Double diffcheck=DatetimeHelper.SubtractDate(startTime, weekEntry.Start__c); 
+            Double diffcheck1=DatetimeHelper.SubtractDate(endTime, weekEntry.End__c);
+            if((DatetimeHelper.dateGreaterThanOrEqual(startTime, weekEntry.Start__c) || (diffcheck == -0.01 || diffcheck == -0.02|| diffcheck == -0.03 ))&&
+                    (DatetimeHelper.dateLessThanOrEqual(endTime, weekEntry.End__c) ||(diffcheck1 == 0.01 ||diffcheck1 == 0.02 ||diffcheck1 == 0.03 ))&&
                     weekEntry.RecordTypeId == ENTRY_RECTYPE_AVAIL)
             {
-                findings.add(weekEntry);
+               findings.add(weekEntry);
             }
+            
         }
+        system.debug('findings'+findings);
         if(findings.size() == 1)
         {
             system.debug(LoggingLevel.INFO, 'This is the gap which we found: '+ findings[0]);

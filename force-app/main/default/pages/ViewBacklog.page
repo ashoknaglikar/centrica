@@ -37,7 +37,8 @@
                 <apex:actionSupport event="onchange" action="{!filterWorkProducts}" />
             </apex:selectList>
             <br/><br/>
-            <apex:outputText value="Hide previous iterations" />
+            <apex:outputLink value="https://um5.salesforce.com/00O2X000007ddD2" id="theLink" target="_blank" style="color:blue;font-weight:bold;    ">Closed Changes</apex:outputLink>
+            <!--<apex:outputText value="Hide previous iterations" />
             <apex:inputCheckbox value="{!isHidePastIterations}">
                 <apex:actionSupport event="onchange" action="{!hidePastIterations}" />
             </apex:inputCheckbox>
@@ -60,7 +61,7 @@
             </apex:inputCheckbox>-->
         </div>
 
-        <div id="legend">
+        <!--<div id="legend">
           <ul>
               <li class="No-State">No State</li>
               <li class="Defined">Defined</li>
@@ -70,14 +71,14 @@
              
               
           </ul>
-        </div>  
+        </div>  -->
 
         <!-- Section on left for product backlog list -->
         <div class ="first">
         <div class="half">
         <div class="wp-container">
         <div class="section-header">
-            <span class="left bold large-font med-gray">Product Backlog</span>
+            <span class="left bold large-font med-gray">Priority Backlog</span>
             <span class="bold">&nbsp;</span>
             <span><a style="text-decoration: none;" href="/a5d/e?CF00Nw0000008R3eH={!currentProject.Name}&CF00Nw0000008R3eH_lkid={!currentProject.Id}&RecordType={!userStoryRecordType}&ent=01Iw0000000qwRH" target="_blank"> [+] </a> </span>
             <span class="state-filter-container">

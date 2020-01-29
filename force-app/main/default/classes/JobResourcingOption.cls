@@ -24,6 +24,8 @@ public with sharing class JobResourcingOption {
     public Datetime primaryEndDT = null;
     public String  Day{get;set;}
     
+    public Set<ID> employeesAlwaysWorksWithElec = new Set<ID>();
+    
     // lowestGeography - holds lowest (least best) geography amongst all primary resources on the option
     public String lowestGeography = null;
     // primaryHasSkillsRemoved - indicates is a primary resource did not have a gap big enough to
@@ -74,7 +76,7 @@ public with sharing class JobResourcingOption {
         lowestGeography = original.lowestGeography;
         primaryResourceDistanceFromJob = original.primaryResourceDistanceFromJob;
         system.debug(LoggingLevel.INFO,'-=-=-=--=-=--=PR: '+primaryResources);
-        
+        employeesAlwaysWorksWithElec = original.employeesAlwaysWorksWithElec;
          //system.debug('@@@@primaryStartDT'+primaryStartDT);
         //Day=primaryStartDT.format('EEEEE');
        // system.debug('@@@@Day'+Day);
@@ -110,6 +112,9 @@ public with sharing class JobResourcingOption {
             // If this option has a "neverWorksWith", add it to the relevant Set
             if(resource.neverWorksWith != null)
                 employeesNeverWorkWith.add(resource.neverWorksWith);
+                
+            if(resource.alwaysWorksWithElectrician!=null)
+            employeesAlwaysWorksWithElec.add(resource.alwaysWorksWithElectrician);
             // If this option has had skills removed, set the flag.
             if(resource.skillsRemoved)
                 primaryHasSkillsRemoved = true;
@@ -135,6 +140,8 @@ public with sharing class JobResourcingOption {
             addSkillsHoursBreakdown(resource.skillHoursAssigned);
             if(resource.neverWorksWith != null)
                 employeesNeverWorkWith.add(resource.neverWorksWith);
+            if(resource.alwaysWorksWithElectrician!=null)
+            employeesAlwaysWorksWithElec.add(resource.alwaysWorksWithElectrician);
         }
     }
     

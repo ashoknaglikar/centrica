@@ -101,11 +101,14 @@
                     <div id="footer-contact" class='leftRadius' style="position: relative;top:-8px;">
                         
                         
-                        <p style="font-size:67%"><span  class='boldText'>To accept this quote, the simplest way is to go online via our portal<sup>&#8224;</sup>, to discuss it further or make any changes please contact&nbsp;
-                        <apex:outputtext value="{!inputQuoteData.hsaName} on {!hsanumber} or alternatively call us on " escape="false" rendered="{!IF(hsanumber !='',true,false)}"/>{!$Label.PhoneNumber_Office1}**(option 3).</span> <br/>
+                       <p style="font-size:67%"><span  class='boldText'>To accept this quote, the simplest way is to go online via our portal<sup>&#8224;</sup>, to discuss it further or make any changes please contact&nbsp;
+                       <apex:outputtext value="{!inputQuoteData.hsaName} on {!hsanumber} or alternatively call us on " escape="false" rendered="{!IF(AND(hsanumber !='' , productInterest != 'Straight Swap', productInterest != 'Telesales Conv' ),true,false)}"/>
+                        <apex:outputtext value="{!inputQuoteData.hsaName} on " escape="false" rendered="{!IF(OR( productInterest == 'Straight Swap', productInterest == 'Telesales Conv' ),true,false)}"/> 
+                         {!$Label.PhoneNumber_Office1}**(option 3). 
+                         </span> <br/>
                             &#8224;Check your appointment confirmation text/email for the link. This quote is valid for 28 days. Page two onwards breaks down the products and prices in your quote.
                             <br/><br/>
-                        </p>
+                        </p> 
                     </div>
                     <div style="top:-34px;position:relative; width: 700px;">
                         <div class="clearfix footer-accesibility">
@@ -243,7 +246,11 @@
                     <div id="footer-contact" class='leftRadius' style="position: relative;top:-8px;">
                         
                         <p style="font-size:67%"><span  class='boldText'>To accept this quote, the simplest way is to go online via our portal<sup>&#8224;</sup>, to discuss it further or make any changes please contact&nbsp;
-                        <apex:outputtext value="{!inputQuoteData.hsaName} on {!hsanumber} or alternatively call us on " escape="false" rendered="{!IF(hsanumber !='',true,false)}"/>{!$Label.PhoneNumber_Office1}**(option 3).</span> <br/>
+                        <apex:outputtext value="{!inputQuoteData.hsaName} on {!hsanumber} or alternatively call us on " escape="false" rendered="{!IF(AND(hsanumber !='' , productInterest != 'Straight Swap', productInterest != 'Telesales Conv' ),true,false)}"/>
+                        <apex:outputtext value="{!inputQuoteData.hsaName} on " escape="false" rendered="{!IF(OR( productInterest == 'Straight Swap', productInterest == 'Telesales Conv' ),true,false)}"/>
+                         {!$Label.PhoneNumber_Office1}**(option 3).</span> <br/>
+                         <!--<apex:outputtext value="{!productInterest}" escape="false" rendered="true"/>-->
+        
                             <p style="font-size:57%">&#8224;Check your appointment confirmation text/email for the link. This quote is valid for 28 days. Page two onwards breaks down the products and prices in your quote.
                         </p></p>
                     

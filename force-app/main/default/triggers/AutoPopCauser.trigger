@@ -31,23 +31,23 @@ trigger AutoPopCauser on Case (before insert,before update) {
    }
    AMap = new Map<String,String>();
    dsmMap = new map<string, string>();
-   map<string, string> postcodeGroupMap = new map<string, string>();
-   map<string,string> accountPostcodeMap = new map<string, string>();
-   map<string,string> postcodeManagerMap = new map<string, string>();
+   //map<string, string> postcodeGroupMap = new map<string, string>();
+   //map<string,string> accountPostcodeMap = new map<string, string>();
+   //map<string,string> postcodeManagerMap = new map<string, string>();
    
    system.debug(LoggingLevel.INFO,'--------->'+casList);
    system.debug(LoggingLevel.INFO,'========>'+jobIds);
    if(AccIds.size()>0){
      List<Account> AQuery = [select id,name,Post_code_Sector__c ,Sales_Subpatch__c,Sales_Subpatch__r.District__c,Sales_Subpatch__r.District__r.DHMName__c,Sales_Subpatch__r.District__r.STMName__c,Sales_Subpatch__r.District__r.DHMName__r.Salesforce_User__c,Sales_Subpatch__r.District__r.STMName__r.Salesforce_User__c from Account Where Id=:Accids];
-     
+     /*
      for(Account  ac : AQuery)
      {
-         accountPostcodeMap.put(ac.Id , ac.Post_code_Sector__c);
-         postcodeGroupMap.put(ac.Post_code_Sector__c, null);
+         //accountPostcodeMap.put(ac.Id , ac.Post_code_Sector__c);
+         //postcodeGroupMap.put(ac.Post_code_Sector__c, null);
      }
      
      
-     
+   
     for(Postcode_sector__c p : [Select name, Area_Group__c from Postcode_sector__c where Name in :postcodeGroupMap.keyset() and Type__c = 'Installation' and Area_Group__c!=null] )
     {
         //if()
@@ -60,7 +60,7 @@ trigger AutoPopCauser on Case (before insert,before update) {
         postcodeManagerMap.put(e.Area_Group__c,e.Salesforce_User__c);
     }
     
-    
+    */
      
      if(AQuery.size()>0){
      String DHM_User='';
@@ -144,7 +144,7 @@ trigger AutoPopCauser on Case (before insert,before update) {
   
   if(casList.size()>0){
       for(case c:casList){
-          
+         /* 
          if(accountPostcodeMap.containsKey(c.AccountId))
          {
              string pc = accountPostcodeMap.get(c.AccountId);
@@ -157,6 +157,7 @@ trigger AutoPopCauser on Case (before insert,before update) {
              c.OwnerId = userinfo.getUserId();
              
          }
+         */
          system.debug(loggingLevel.INFO,'----->'+finalMap+c.Primary_Cause__c.touppercase()+causerDriverMap); 
           
           c.Primary_Cause__c = c.Primary_Cause__c!=null?c.Primary_Cause__c.toupperCase():null;

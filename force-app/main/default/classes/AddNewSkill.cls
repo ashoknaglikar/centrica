@@ -45,7 +45,7 @@ public with sharing class AddNewSkill
                                 Job_Locked__c,
                                 Remote_Heating__c,
                                 Install_Postcode__c,
-                                Latest_Customer_Category__c,
+                                Latest_Customer_Category__c,status__c,
                                 CHI_Lead__c,Is_Remedial_Job__c,Is_Downtime_Job__c,
             (select IsDeleted, Name, Order__c, Sub_Status__c, New_Supplier__c, New_Supplier_Number__c, Current_Supplier__c, Current_Supplier_Number__c, Units__c, Status__c, Skill__c, Product_ID__c, Line_Item_ID__c, ID, Description__c, Code__c from Job_Elements1__r where type__c='Work' AND Status__c='Active' AND Sub_Status__c != 'Returned' AND P5_IsItinerary__c!=TRUE order by Skill__c,Line_Item_ID__c),
             (select id,name,Week__c,week__r.Employee__c,supplier_num__c,Start__c,End__c,Employee_ID_18__c,Employee_Name__c,Sub_Type__c,Overbooked_Hours__c,Hours__c,Employee_ID__c, Job_Hours__c from Diary_Entries__r where RecordTypeId =: RecordTypeIdHelper.getRecordTypeId('Diary_Entry__c', 'Job Booking') order by sub_Type__c,Employee_ID__c )       
@@ -61,7 +61,7 @@ public with sharing class AddNewSkill
         // fetch the newly added skill in below SOQL
         // Named electritian change                
         Job__c job = [select j.ID, j.Named_Electritian__c, j.CHI_Lead__r.Install_Postcode__c, j.Total_Job_Hours__c,skip_8_12_Rule__c,Squeeze_Job__c,j.S_P_Hours__c,
-                        j.Contractors__c, j.Own_Labour__c, Customer_Preferred_Date__c, j.Double_Handed_Job__c,j.Status__c,j.Sub_Status__c,
+                        j.Contractors__c, j.Own_Labour__c, Customer_Preferred_Date__c, j.Double_Handed_Job__c,j.Status__c,j.Sub_Status__c,j.Named_Employee__r.Always_Works_With_Electrician__c,
                         j.Water_Heating_Fixing_Hours__c, j.Unvented_Hot_Water_Hours__c, j.Specialist_Building_Hours__c, 
                         j.Scaffolder_Hours__c, j.Roof_Work_Hours__c, j.PowerFlush_Hours__c, j.Payment_Collection_Hours__c,j.Named_Employee_2__c,j.Named_Employee_2__r.Supplier_Branch_Num__c, 
                         j.Mechanical_Hours__c, j.LPG_Installation_Hours__c, j.Fire_Wall_Heater_Fixing_Hours__c, j.Electrical_Hours__c,

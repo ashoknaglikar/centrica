@@ -1,6 +1,7 @@
 global class SendSurveyDataBatch implements database.batchable<sobject>,Database.AllowsCallouts,Database.Stateful{
                                                                  
-    Map<string, integer> productInterestMap = new map<string,integer>();                                                             
+    Map<string, integer> productInterestMap = new map<string,integer>(); 
+    List<String> errors = new List<String>();
     
     global SendSurveyDataBatch()
     {
@@ -18,8 +19,6 @@ global class SendSurveyDataBatch implements database.batchable<sobject>,Database
     global Database.QueryLocator start(Database.BatchableContext BC)
     {
         string query = 'Select id,Appointment__c,Appointment__r.name,job__C,job__r.name,HSA_Payroll__c,Mechanical_Engineer_1_Pay_Number__c,Mechanical_Engineer_2_Pay_Number__c,Product_Interest__c,Step1_Score_Dup__c,Step2_Score__c,Step1_Comments__c,createddate,source__c,CHI_Lead_Number__c,opportunity__c from NPS__c where Integration_Status__c=\'Ready to be Sent\' ';
-       // string query = 'Select id,Appointment__c,Appointment__r.name,job__C,job__r.name,HSA_Payroll__c,Mechanical_Engineer_1_Pay_Number__c,Mechanical_Engineer_2_Pay_Number__c,Product_Interest__c,Step1_Score_Dup__c,Step2_Score__c,Step1_Comments__c,createddate,source__c,CHI_Lead_Number__c,opportunity__c from NPS__c where source__c=\'Sales Appointment\' and integration_datetime__c=null and step2_Score__c!=null and step1_score_Dup__c!=null order by createddate desc limit 50  ';
-        //string query = 'Select id,Appointment__c,Appointment__r.name,job__C,job__r.name,HSA_Payroll__c,Mechanical_Engineer_1_Pay_Number__c,Mechanical_Engineer_2_Pay_Number__c,Product_Interest__c,Step1_Score_Dup__c,Step2_Score__c,Step1_Comments__c,createddate,source__c,CHI_Lead_Number__c,opportunity__c from NPS__c where  source__c=\'Job Installation\' and integration_datetime__c=null and step2_Score__c!=null and step1_score_Dup__c!=null order by createddate desc   ';
         return Database.getQueryLocator(query);
     }
     
@@ -30,6 +29,7 @@ global class SendSurveyDataBatch implements database.batchable<sobject>,Database
         List<NPS__c> npsListInstaller = new List<NPS__c>();
         List<NPS__c> npsListToUpdate = new List<NPS__c>();
         
+        try{
         for(NPS__c nps:lstRecords)
         {
             if(nps.source__c=='Sales Appointment')
@@ -50,16 +50,30 @@ global class SendSurveyDataBatch implements database.batchable<sobject>,Database
         
         if(!npsListToUpdate.isEmpty())
         database.update(npsListToUpdate);
+        }
+        catch(Exception e)
+        {
+            String err = 'Exception Message :' +e.getmessage() + '. \n'+
+                             'line Number :'+e.getLineNumber()+ '\n\n';
+            errors.add(err);
+        }
     }
     
     global void finish(Database.BatchableContext bc)
     {
-      AsyncApexJob a = [Select Id, Status, ExtendedStatus,NumberOfErrors,TotalJobItems from AsyncApexJob where Id = :bc.getJobId()];
+      AsyncApexJob a = [Select Id, Status, NumberOfErrors,TotalJobItems,JobItemsProcessed from AsyncApexJob where Id = :bc.getJobId()];
       list<string> toaddress = new list<string>{userinfo.getUserEmail()};
-       if(a.NumberOfErrors>0)
-       {
-           CreateEmail.CretaeSendTextEmail(toaddress, 'Error in Sending NPS data to Virtuatel.',  'NPS Survey Data to Virtuatel');
-       }
+      if(a.NumberOfErrors>0||!errors.isEmpty())
+      {
+            String plaintextbody ='Error in Sending NPS data to Virtuatell.\n\n';
+            if(!errors.isEmpty())
+               plaintextbody += errors[0];
+            plaintextbody+='Job Status : ' + a.Status + '\n'+
+           'Total Job Items processed : ' + a.TotalJobItems + '\n'+
+           'Number of Job Items processed : ' + a.JobItemsProcessed + '\n' +
+           'Number of Failures : '+ a.NumberOfErrors;
+           CreateEmail.CretaeSendTextEmail(toaddress, plaintextbody,  'NPS Survey Data to Virtuatell');
+      }
     }
     
     public List<NPS__c> processReqHSA(List<NPS__C> npsListHSA)
@@ -101,7 +115,7 @@ global class SendSurveyDataBatch implements database.batchable<sobject>,Database
                  surveyWrap.agentid = nps.Mechanical_Engineer_1_Pay_Number__c;
                  if(nps.job__c!=null)
                  {
-                    surveyQuestions sQuestions1 = new surveyQuestions(50214,nps.job__r.name,null);
+                    surveyQuestions sQuestions1 = new surveyQuestions(50226,nps.job__r.name,null);
                     sQuestionsList.add(sQuestions1);
                  }
                  if(nps.Mechanical_Engineer_2_Pay_Number__c!=null)
@@ -115,7 +129,7 @@ global class SendSurveyDataBatch implements database.batchable<sobject>,Database
                  surveyWrap.agentid = nps.HSA_Payroll__c;
                  if(nps.Appointment__c!=null)
                  {
-                     surveyQuestions sQuestions1 = new surveyQuestions(50214,nps.Appointment__r.name,null);
+                     surveyQuestions sQuestions1 = new surveyQuestions(50226,nps.Appointment__r.name,null);
                      sQuestionsList.add(sQuestions1);
                  }
              }

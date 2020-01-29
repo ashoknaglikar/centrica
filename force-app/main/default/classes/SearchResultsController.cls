@@ -85,14 +85,25 @@ public class SearchResultsController
             
             system.debug(LoggingLevel.INFO,'---------ispl-->'+isPlanner+cls_IsRun.isplanner+custDate+cls_IsRun.customerPreferredDate);
             
+        
             
              // Ashok : CR-001 12oct2010
             job = [select name,CHI_Lead__c, Latest_customer_category_indicator__c,Customer_Name__c,CHI_Lead_Name__c,CHI_Lead_Number_Text__c,Address__c, CHI_Lead__r.Install_Postcode__c , CHI_Lead__r.CreatedDate , CHI_Lead__r.Latest_customer_category__c , Customer_Preferred_Date__c, 
                           Mechanical_Hours__c,PowerFlush_Hours__c,Electrical_Hours__c,Building_Work_Hours__c,Remote_Heating__c ,Roof_Work_Hours__c,ECO_Hours__c ,Specialist_Building_Hours__c, Connect_Solar_Panel_Hours__c ,
                           Contractor_Installation_Hours__c,Fire_Wall_Heater_Fixing_Hours__c,LPG_Installation_Hours__c,Payment_Collection_Hours__c,Ecogen_Mechanical_Hours__c, 
                          Scaffolder_Hours__c ,Unvented_Hot_Water_Hours__c ,Water_Heating_Fixing_Hours__c ,Electrical_Work_ASP_Hours__c,Asbestos_Removal_Hours__c,Asbestos_Removal_Fixed_Rate_Hours__c,Heavy_Appliance__c,Override_Heavy_Appliance__c,Engineer_Workload__c,
-                         Ecogen_Electrical_Hours__c,Landlord_Check_Hours__c,Boiler_Location__c,Installation_Type__c from Job__c where ID = :jobID];
+                         Ecogen_Electrical_Hours__c,Landlord_Check_Hours__c,Boiler_Location__c,Installation_Type__c,status__c from Job__c where ID = :jobID];
                 //Added By Ashok CR- 001
+                
+                //Suguna
+                List<Order__c> orders = [select id,status__c from order__c where Job__c=:jobID and status__c='Goods Receipted' and Type__c='Work'];
+                if(!orders.isEmpty()&&job.status__c=='Installed')
+                {
+                    errorRender = true;
+                    errorMsg='Warning: Work cannot be transferred as orders are Goods Receipted. Please email Payment Control to check that the purchase order has not been paid and can be un-goods receipted.';
+                            
+                }
+                //ends
                  
                 opp = [Select AccountId,CHI_Lead_Id__c From Opportunity where Id =:job.CHI_Lead__c];
                 
@@ -134,7 +145,8 @@ public class SearchResultsController
             errorRender = true;
             resourcesRender = false;
             bestResourceRender  = false;
-            errorMsg = 'Invalid job ID.';
+            //errorMsg = 'Invalid job ID.';
+            errorMsg = ex.getmessage()+' '+ex.getlinenumber();
         }
         
         try {
@@ -157,6 +169,9 @@ public class SearchResultsController
         } catch(Exception ex) {
             // Do nothing
         }
+        
+        
+        
     }
     
     public PageReference returnToJob(){
@@ -166,6 +181,7 @@ public class SearchResultsController
     public void runSearch() {
         if(errorRender != null && errorRender)
             return;
+       
             
         if(tryCatch) {
             try {
@@ -181,7 +197,7 @@ public class SearchResultsController
                 errorRender = true;
                 resourcesRender = false;
                 bestResourceRender  = false;
-                errorMsg = ex.getMessage() + ' ' + ex.getTypeName();
+                errorMsg = ex.getMessage() + ' ' + ex.getTypeName()+' '+ex.getlinenumber();
             }
         } else {
             doSearch();

@@ -123,7 +123,16 @@
 <apex:inputfield value="{!opportunityObject.Description_of_Work_Required__c}"/>  
 </apex:outputPanel>
 </apex:pageblocksectionitem>
-	
+
+<!--
+<apex:pageblocksectionitem >
+<apex:outputLabel value="Business Type" />
+<apex:outputPanel styleClass="requiredInput" layout="block">
+<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+<apex:inputfield value="{!opportunityObject.Business_Type__c}" />  	
+</apex:outputPanel>
+</apex:pageblocksectionitem>	
+-->
 
 </apex:pageblocksection>
 

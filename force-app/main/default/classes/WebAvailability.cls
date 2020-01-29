@@ -620,4 +620,74 @@ public class WebAvailability {
         return inArray;
     }
     
+    public webservice_CHI_Online.cAppointment[] fRandomApps(webservice_CHI_Online.cAppointment[] inArray,set<id> secondaryAppt) {
+        
+        // REQUIRES BUBBLE SORT TO BE PERFORMED FIRST
+        
+        // CHANGE REQUEST: CHG00008187 - 'array_size' added so 'inArray.size()' is not calced every loop using up statements
+        integer array_size = inArray.size();
+        
+        map<string, webservice_CHI_Online.cAppointment[]> timeslotMap = new map<string,webservice_CHI_Online.cAppointment[]>();
+        
+        integer max_statements = Limits.getLimitCpuTime();
+            
+        for (integer counter = 0; counter <= (array_size-1); counter++) {
+            
+            if(timeslotMap.containsKey(String.valueof(inArray[counter].appStart)+string.valueof(inArray[counter].appEnd)))
+            {
+                webservice_CHI_Online.cAppointment[] applist= timeslotMap.get(String.valueof(inArray[counter].appStart)+string.valueof(inArray[counter].appEnd));
+                applist.add(inArray[counter]);
+                timeslotMap.put(String.valueof(inArray[counter].appStart)+string.valueof(inArray[counter].appEnd),applist);
+            }
+            else
+            {
+               timeslotMap.put(String.valueof(inArray[counter].appStart)+string.valueof(inArray[counter].appEnd),new webservice_CHI_Online.cAppointment[]{inArray[counter]});  
+            }
+            
+            integer state_num = Limits.getCpuTime();
+            system.debug('Statements executed = ' +  state_num + ' out of ' + max_statements);  
+        }
+        
+        inArray.clear();
+        
+        /*for(String key: timeslotMap.keyset())
+        {
+            webservice_CHI_Online.cAppointment[] tempAppList = timeslotMap.get(key);
+            Integer rand = (Math.random() * tempAppList.size()).intValue();
+            if(rand >= tempAppList.size())
+               rand = tempAppList.size()-1;
+               inArray.add(tempAppList[rand]);
+        }*/
+        for(String key: timeslotmap.keyset())
+        {
+            webservice_CHI_Online.cAppointment[] tempAppList = timeslotMap.get(key);
+            webservice_CHI_Online.cAppointment[] secondarytempAppList = new webservice_CHI_Online.cAppointment[]{};
+            webservice_CHI_Online.cAppointment[] primarytempAppList = new webservice_CHI_Online.cAppointment[]{};
+            
+            for(webservice_CHI_Online.cAppointment appt: tempAppList)
+            {
+              if(secondaryAppt.contains(appt.AppId))
+              secondarytempAppList.add(appt);
+              else
+              primarytempAppList.add(appt);
+            }
+            
+            if(!primarytempAppList.isEmpty())
+            {
+                 integer rand = (Math.random() * primarytempAppList.size()).intValue();
+                 if(rand >= primarytempAppList.size())
+                 rand = primarytempAppList.size()-1;
+                 inArray.add(primarytempAppList[rand]);
+            }
+            else if(!secondarytempAppList.isEmpty())
+            {
+                 integer rand = (Math.random() * secondarytempAppList.size()).intValue();
+                 if(rand >= secondarytempAppList.size())
+                 rand = secondarytempAppList.size()-1;
+                 inArray.add(secondarytempAppList[rand]);
+            }
+        }
+        return inArray;
+    }
+    
 }

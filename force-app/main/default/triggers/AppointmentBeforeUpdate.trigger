@@ -27,10 +27,32 @@ trigger AppointmentBeforeUpdate on Appointment__c (before update) {
     // of the time of the appointment
     pah.populateTimes(Trigger.new);
     
-    for(Appointment__c newApp : Trigger.new) {
-    
-       
+    set<id> apptIds = new set<Id>();
+    map<id,Appointment__c> apptMap = new map<id,appointment__c>();
+    for(Appointment__c newApp : Trigger.new)
+    { 
         Appointment__c oldApp = Trigger.oldMap.get(newApp.Id);
+        if(newApp.Status__c=='Happened'&& (newApp.Status__c != oldApp.Status__c))
+        apptIds.add(newApp.id);
+    }
+    if(!apptIds.isEmpty())
+    {
+       for(Appointment__c appt: [select id,Opportunity__r.account.Sales_Subpatch__r.District__r.NPS_Virtuatell_Trial__c from appointment__c where id=:apptIds])
+       {
+           apptMap.put(appt.id,appt);
+       }
+    }
+    
+    for(Appointment__c newApp : Trigger.new) {
+        
+        Appointment__c oldApp = Trigger.oldMap.get(newApp.Id);
+        
+        if(newApp.NPS_Notification_Sent_Date__c==null && newApp.Status__c=='Happened'&& (newApp.Status__c != oldApp.Status__c)&&apptMap.containskey(newApp.id)
+           &&apptMap.get(newApp.id).Opportunity__r.account.Sales_Subpatch__r.District__r.NPS_Virtuatell_Trial__c==true)
+        {
+            newApp.NPS_Notification_Status__c ='Ready to be Sent';
+        }
+        
         //Populate the Time to free the slot when an appointment is reserved.
         if(oldApp.Status__c != 'Reserved' && newApp.Status__c == 'Reserved' )
     	{

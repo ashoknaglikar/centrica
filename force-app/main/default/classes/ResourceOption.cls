@@ -24,6 +24,8 @@ public with sharing class ResourceOption {
     //Front & back Gap of Entry
     public Double BackGap = null;
     
+    public ID alwaysWorksWithElectrician = null;
+    
     //Google Distance finder change
     public String employeePostCode {get; set;}
     
@@ -140,6 +142,7 @@ public with sharing class ResourceOption {
         isPool = ei.isPool;
         //google distance finder change
         employeePostCode = ei.employeePostCode;
+        alwaysWorksWithElectrician = ei.alwaysWorksWithElectrician;
         
     }
     
@@ -158,7 +161,7 @@ public with sharing class ResourceOption {
       
         //Suguna - 2 men team start time to 8AM/12PM
         system.debug('SKILLS_PLANNED_FROM_END'+SearchBlackBox.SKILLS_PLANNED_FROM_END);
-        if(!skillsFullyCovered.contains('ELECTRICAL'))
+        if(skillsFullyCovered.contains('MECHANICAL')&&!ispool)
         {
                     time MidStartTime = DateTimeHelper.stringToTime(gap.entryInfoObjects[0].MidStartTime);
                     time MstartTime = DateTimeHelper.stringToTime(gap.entryInfoObjects[0].MStartTime);

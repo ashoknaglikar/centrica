@@ -216,7 +216,7 @@ private class InstallPlanningReturnTransferCont_Test {
     
     //now do the test
     //start with return work
-    
+    Test.startTest();
     //invalid standard controller
     InstallPlanningReturnTransferController con = new InstallPlanningReturnTransferController(new ApexPages.Standardcontroller(wk));
     ApexPages.CurrentPage().getParameters().put('type','Plan additional');
@@ -314,6 +314,7 @@ private class InstallPlanningReturnTransferCont_Test {
     delete Acc;
     delete e;
     delete e1;
+    Test.stoptest();
    }
       //Test class to ensure the page renders as expected
     //Test class to ensure the page renders as expected
@@ -473,7 +474,7 @@ private class InstallPlanningReturnTransferCont_Test {
     
     //now do the test
     //start with return work
-    
+    Test.starttest();
     //invalid standard controller
     InstallPlanningReturnTransferController con = new InstallPlanningReturnTransferController(new ApexPages.Standardcontroller(j));
     ApexPages.CurrentPage().getParameters().put('type','Transfer');
@@ -555,7 +556,7 @@ private class InstallPlanningReturnTransferCont_Test {
             
         }  
         hi.RemoveDiaryEntry(diaryEntries[0]);
-
+       test.stoptest();
     
    }
    //Added By Ashok G..
@@ -716,7 +717,7 @@ private class InstallPlanningReturnTransferCont_Test {
     
     //now do the test
     //start with return work
-    
+    test.starttest();
     //invalid standard controller
     InstallPlanningReturnTransferController con = new InstallPlanningReturnTransferController(new ApexPages.Standardcontroller(j));
     ApexPages.CurrentPage().getParameters().put('type','DETransfer');
@@ -770,7 +771,7 @@ private class InstallPlanningReturnTransferCont_Test {
     
     
     
-    
+    Test.stopTest();
     
 
     

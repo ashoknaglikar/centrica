@@ -834,7 +834,7 @@ private class TestJobBookingManager {
     
     static testMethod void test10b()    
     {       
-        test.startTest(); 
+       
         setGlobalBaseTime();
         Integer gapStart = 0;
         Integer gapEnd = 20;
@@ -857,6 +857,7 @@ private class TestJobBookingManager {
         }
         update emps;
         //now replan the job
+         test.startTest(); 
         JobBookingManager.planOrReplanJob(UNIQUE_NAME);
                 
         //all of the job elements on the job should have a new supplier

@@ -231,35 +231,9 @@ activity_field.add(activity_field3);
         
         
     }
-    
+    @future(callout = true)
     public static void getInternalActivity(Date startDate,Date endDate)
     {
-        startTime = system.now();
-        string now= string.valueof(startTime);
-        string CDate= now.substring(0,10);
-        string CTime= now.substring(11,19);
-        string CDT= CDate+'T'+CTime+'Z';
-        
-       /* String pswd = string.valueof(system.Label.toa_password);
-        Blob hash = Crypto.generateDigest('MD5', Blob.valueOf(pswd));
-        String uniqueString = EncodingUtil.convertToHex(hash);
-        string authstringbeforeMD5 = CDT+uniqueString;
-        Blob authBlobafterMD5 = Crypto.generateDigest('MD5', Blob.valueOf(authstringbeforeMD5));
-        auth_string1 = EncodingUtil.convertToHex(authBlobafterMD5);*/
-        
-        toaActivity.user_x user_x =new toaActivity.user_x();
-        user_x.now=CDT;
-        user_x.login=string.valueof(system.Label.toa_user);
-        user_x.company=string.valueof(system.Label.toa_company);
-        //user_x.auth_string=auth_string1;
-        user_x.auth_string = formAuth_string(CDT);
-        toaActivity.activity toaAct=new  toaActivity.activity();
-        Date date_from=startDate;
-        Date date_to= endDate;
-        String[] property_filter=new String[]{'id','resource_id', 'date','name', 'type', 'status', 'activitytype', 'duration','XA_duration', 'start_time','end_time','time_zone','time_of_assignment','time_of_booking','worktype'};
-            toaActivity.activity_response actRespList=toaAct.search_activities(user_x,'XA_internal','Internal',string.valueOf(date_from),string.valueOf(date_to),string.valueOf(1),string.valueOf(9000),'desc',property_filter);
-        system.debug('**actRespList'+actRespList);
-        
         //return actRespList;
         List<Employee__c> empIdNList=[Select id,name,Primary_role__c ,Inactive__c  from Employee__c where Primary_role__c = 'HSA' and Inactive__c = false Limit 50000];
         map<string,string> mapEmpIdName=new map<string,string>();
@@ -267,117 +241,175 @@ activity_field.add(activity_field3);
             mapEmpIdName.put(string.valueOf(emp.id),emp.name);
             system.debug('*emp.id'+emp.id);
         }
-        Set<Id> empIdList=new  Set<Id>();
+        boolean needsIterating = true;
+        integer page = 1;
         List<OFS_Quota_Data__c> listSearchAct=new List<OFS_Quota_Data__c>();
-        Id recordTypeId=   [SELECT id,Name from RecordType where Name =:recTName].Id;      
-        toaActivity.activities activityList;
-        toaActivity.activity_list actList;
-        if(actRespList!=null){
-            toaActivity.activity_response actResp =actRespList;
-            actList=actResp.activity_list;
-            if(actList!=null){
-                activityList=actList.activities;
-            }
-        }
-        system.debug('**activityList'+activityList);
-        if(activityList!=null)
+        while(needsIterating)
         {
-            if(activityList.activity!=null){
-                for(toaActivity.activity_new newActList : activityList.activity )
-                {
-                    system.debug('**newActList'+newActList);
-                    OFS_Quota_Data__c newRec = new OFS_Quota_Data__c();
-                    for(toaActivity.property property : newActList.properties)
+            startTime = system.now();
+            string now= string.valueof(startTime);
+            string CDate= now.substring(0,10);
+            string CTime= now.substring(11,19);
+            string CDT= CDate+'T'+CTime+'Z';
+            
+           /* String pswd = string.valueof(system.Label.toa_password);
+            Blob hash = Crypto.generateDigest('MD5', Blob.valueOf(pswd));
+            String uniqueString = EncodingUtil.convertToHex(hash);
+            string authstringbeforeMD5 = CDT+uniqueString;
+            Blob authBlobafterMD5 = Crypto.generateDigest('MD5', Blob.valueOf(authstringbeforeMD5));
+            auth_string1 = EncodingUtil.convertToHex(authBlobafterMD5);*/
+            
+            toaActivity.user_x user_x =new toaActivity.user_x();
+            user_x.now=CDT;
+            user_x.login=string.valueof(system.Label.toa_user);
+            user_x.company=string.valueof(system.Label.toa_company);
+            //user_x.auth_string=auth_string1;
+            user_x.auth_string = formAuth_string(CDT);
+            toaActivity.activity toaAct=new  toaActivity.activity();
+            Date date_from=startDate;
+            Date date_to= endDate;
+            String[] property_filter=new String[]{'id','resource_id', 'date','name', 'type', 'status', 'activitytype', 'duration','XA_duration', 'start_time','end_time','time_zone','time_of_assignment','time_of_booking','worktype'};
+                toaActivity.activity_response actRespList=toaAct.search_activities(user_x,'XA_internal','Internal',string.valueOf(date_from),string.valueOf(date_to),string.valueOf(page),string.valueOf(1000),'desc',property_filter);
+            system.debug('**actRespList'+actRespList);
+            
+            if((actRespList!=null && actRespList.activity_list.total < 1000)||test.isRunningTest())
+            {
+                needsIterating = false;
+            }else
+            {
+                page++;
+            }
+            
+            Set<Id> empIdList=new  Set<Id>();
+            
+            Id recordTypeId=   [SELECT id,Name from RecordType where Name =:recTName].Id;      
+            toaActivity.activities activityList;
+            toaActivity.activity_list actList;
+            if(actRespList!=null){
+                toaActivity.activity_response actResp =actRespList;
+                actList=actResp.activity_list;
+                if(actList!=null){
+                    activityList=actList.activities;
+                }
+            }
+            system.debug('**activityList'+activityList);
+            
+            
+            
+            
+            if(activityList!=null)
+            {
+                if(activityList.activity!=null){
+                    for(toaActivity.activity_new newActList : activityList.activity )
                     {
-                      
-                        newRec.recordtypeid=recordTypeId;
-                        system.debug('**Name'+property.name);
-                        system.debug('**Value'+property.value);
-                        if(property.name=='type' && property.value!=NULL){
-                            newRec.Activity_Type__c=property.value;
-                            newRec.Record_Type__c=property.value;
-                        }
-                        if(property.name=='status' && property.value!=NULL && property.value != 'cancelled'){
-                            newRec.Activity_Status__c=property.value;
-                        } if(property.name=='status' && property.value!=NULL && property.value == 'cancelled')
-                            break;
-                        if(property.name=='id' && property.value!=NULL){
-                            newRec.Activity_Id__c=string.valueOf(property.value);
-                        }
-                        if(property.name=='date' && property.value!=NULL){
-                            newRec.Date__c=date.valueOf(property.value);
-                        }
-                        if(property.name=='duration' && property.value!=NULL){
-                            newRec.AM_Internal_activities_hrs__c=Integer.valueOf(property.value);
-                        }
-                        if(property.name=='XA_duration' && property.value!=NULL){
-                            newRec.Duration_Final__c=Integer.valueOf(property.value);
-                        }
-                        if(property.name=='start_time' && property.value!=NULL){
-                            newRec.Activity_Start_Time__c=Datetime.valueOf(property.value);
-                        }
-                        if(property.name=='end_time' && property.value!=NULL){
-                            newRec.Activity_End_Time__c =Datetime.valueOf(property.value);
-                        }
-                        if(property.name=='time_of_assignment' && property.value!=NULL){
-                            newRec.time_of_assignment__c=Datetime.valueOf(property.value);
-                        }
-                        if(property.name=='time_of_booking' && property.value!=NULL){
-                            newRec.time_of_booking__c=Datetime.valueOf(property.value);
-                        }
-                        if(property.name=='worktype' && property.value!=NULL){
-                            newRec.Activity_Work_Type__c=OFSUnavailabilityReasons__c.getInstance(string.valueOf(property.value))!=null ? OFSUnavailabilityReasons__c.getInstance(string.valueOf(property.value)).Value__c:string.valueOf(property.value);
-                            
-                        }
-                        
-                        if(property.name=='resource_id' && property.value!=NULL){
-                            if(mapEmpIdName.containskey(property.value.deleteWhitespace())){
-                                newRec.Bucket_Name__c=mapEmpIdName.get(property.value.deleteWhitespace());
-                                system.debug('@@Bucket_Name__c'+newRec.Bucket_Name__c);
+                        system.debug('**newActList'+newActList);
+                        OFS_Quota_Data__c newRec = new OFS_Quota_Data__c();
+                        for(toaActivity.property property : newActList.properties)
+                        {
+                          
+                            newRec.recordtypeid=recordTypeId;
+                            system.debug('**Name'+property.name);
+                            system.debug('**Value'+property.value);
+                            if(property.name=='type' && property.value!=NULL){
+                                newRec.Activity_Type__c=property.value;
+                                newRec.Record_Type__c=property.value;
                             }
+                            if(property.name=='status' && property.value!=NULL && property.value != 'cancelled'){
+                                newRec.Activity_Status__c=property.value;
+                            } if(property.name=='status' && property.value!=NULL && property.value == 'cancelled')
+                                break;
+                            if(property.name=='id' && property.value!=NULL){
+                                newRec.Activity_Id__c=string.valueOf(property.value);
+                            }
+                            if(property.name=='date' && property.value!=NULL){
+                                newRec.Date__c=date.valueOf(property.value);
+                            }
+                            if(property.name=='duration' && property.value!=NULL){
+                                newRec.AM_Internal_activities_hrs__c=Integer.valueOf(property.value);
+                            }
+                            if(property.name=='XA_duration' && property.value!=NULL){
+                                newRec.Duration_Final__c=Integer.valueOf(property.value);
+                            }
+                            if(property.name=='start_time' && property.value!=NULL){
+                                if(property.value.contains(':'))
+                                newRec.Activity_Start_Time__c=Datetime.valueOf(property.value);
+                                else
+                                newRec.Activity_Start_Time__c=Date.valueOf(property.value);
+                            }
+                            if(property.name=='end_time' && property.value!=NULL){
+                                if(property.value.contains(':'))
+                                newRec.Activity_End_Time__c =Datetime.valueOf(property.value);
+                                else
+                                newRec.Activity_End_Time__c=Date.valueOf(property.value);
+                            }
+                            if(property.name=='time_of_assignment' && property.value!=NULL){
+                                newRec.time_of_assignment__c=Datetime.valueOf(property.value);
+                            }
+                            if(property.name=='time_of_booking' && property.value!=NULL){
+                                newRec.time_of_booking__c=Datetime.valueOf(property.value);
+                            }
+                            if(property.name=='worktype' && property.value!=NULL){
+                                newRec.Activity_Work_Type__c=OFSUnavailabilityReasons__c.getInstance(string.valueOf(property.value))!=null ? OFSUnavailabilityReasons__c.getInstance(string.valueOf(property.value)).Value__c:string.valueOf(property.value);
+                                
+                            }
+                            
+                            if(property.name=='resource_id' && property.value!=NULL){
+                                if(mapEmpIdName.containskey(property.value.deleteWhitespace())){
+                                    newRec.Bucket_Name__c=mapEmpIdName.get(property.value.deleteWhitespace());
+                                    system.debug('@@Bucket_Name__c'+newRec.Bucket_Name__c);
+                                }
+                            }
+                         }
+                        newRec.External_ID__c=Utilities.popluateExternalId(newRec);
+                        if(newRec.Activity_Status__c!='Cancelled' || newRec.Activity_Status__c!='cancelled'){
+                            listSearchAct.add(newRec);
                         }
-                     }
-                    newRec.External_ID__c=Utilities.popluateExternalId(newRec);
-                    if(newRec.Activity_Status__c!='Cancelled' || newRec.Activity_Status__c!='cancelled'){
-                        listSearchAct.add(newRec);
                     }
                 }
             }
+            
+            
+            
         }
         
-        
-        if(listSearchAct.size()>0){
-            system.debug('**listSearchAct'+listSearchAct);
-            system.debug('**listSearchAct.size'+listSearchAct.size());
-            
-            Database.UpsertResult[] upsertResult = Database.upsert(listSearchAct,OFS_Quota_Data__c.External_ID__c.getDescribe().getSObjectField(),False);
-            integer i = 0;
-            list<string> duplicateStrings = new list<string>();
-            list<OFS_Quota_Data__c> finalList  = new list<OFS_Quota_Data__c>();
-            
-            for(Database.UpsertResult e : upsertResult)
-            {
-                system.debug('Result -->'+e);
-                if(!e.isSuccess())
+        if(listSearchAct.size()>0)
+        {
+                system.debug('**listSearchAct'+listSearchAct);
+                system.debug('**listSearchAct.size'+listSearchAct.size());
+                
+                Database.UpsertResult[] upsertResult = Database.upsert(listSearchAct,OFS_Quota_Data__c.External_ID__c.getDescribe().getSObjectField(),False);
+                integer i = 0;
+                list<string> duplicateStrings = new list<string>();
+                list<OFS_Quota_Data__c> finalList  = new list<OFS_Quota_Data__c>();
+                
+                for(Database.UpsertResult e : upsertResult)
                 {
-                    duplicateStrings.add(listSearchAct[i].External_ID__c);
-                    finalList.add(listSearchAct[i]);
-                   
-
+                    system.debug('Result -->'+e);
+                    if(!e.isSuccess())
+                    {
+                        duplicateStrings.add(listSearchAct[i].External_ID__c);
+                        finalList.add(listSearchAct[i]);
+                       
+    
+                    }
+                     i++ ;
                 }
-                 i++ ;
+                system.debug('duplicateStrings -->'+duplicateStrings);
+                system.debug('finalList -->'+finalList);
+                
+                if(duplicateStrings.size()>0)
+                {
+                    delete (new list<OFS_Quota_Data__c>([select id from OFS_Quota_Data__c where External_ID__c in :duplicateStrings ]));
+                    Database.upsert(finalList,OFS_Quota_Data__c.External_ID__c.getDescribe().getSObjectField(),false);
+    
+                }
+                system.debug('**End');
+                
+                createemail.CretaeSendTextEmail(new list<string> {userinfo.getUserEmail()}, listSearchAct.size()+' Unavailabilites were fetched between ' +startDate.format() + ' and '+ endDate.format(), 'OFS Unavailabilites have been sucessfully fetched');
             }
-            system.debug('duplicateStrings -->'+duplicateStrings);
-            system.debug('finalList -->'+finalList);
             
-            if(duplicateStrings.size()>0)
-            {
-                delete (new list<OFS_Quota_Data__c>([select id from OFS_Quota_Data__c where External_ID__c in :duplicateStrings ]));
-                Database.upsert(finalList,OFS_Quota_Data__c.External_ID__c.getDescribe().getSObjectField(),false);
-
-            }
-            system.debug('**End');
-        }
+            
+            
     }
     
     public static Map<String,String> getEmployeeIDandNameMap(){

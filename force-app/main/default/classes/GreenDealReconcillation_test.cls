@@ -164,7 +164,7 @@ job.Quote__c = quote.Id;
 //job.Is_Remedial_Job__c=False; 
 //job.Is_Downtime_Job__c=False ;
 //ob.Split_Job__c=False;
-insert(job);
+//insert(job);
 
 /*Green_Deal_Reconsilliation__c gd = new Green_Deal_Reconsilliation__c(Opportunity__c=opp.Id);
 gd.BigMachine_Quote__c=quote.id;

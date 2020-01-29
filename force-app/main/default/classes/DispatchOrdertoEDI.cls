@@ -329,6 +329,7 @@ global class DispatchOrdertoEDI implements Database.Batchable<sObject>{
                 System.debug('@ batches :    @'+orderBatchList);
                 insert orderBatchList;
                 
+                
                 Map<String,String> batchIdSuppKey = new Map<String,String>();
                 
                 for(SFED7542_Batch__c tempB: orderBatchList){
@@ -387,6 +388,7 @@ global class DispatchOrdertoEDI implements Database.Batchable<sObject>{
         try{
             
             insert batchOrderList;
+            
             result = 'success';
             List<SFED7542_Order_Details__c> orderDetailsList = this.createOrderDetails(batchOrderList,batchSuppOrderMap,tran_codeMap);
             this.createOrderSubDetails(orderDetailsList,batchSuppOrderMap);
@@ -650,6 +652,7 @@ global class DispatchOrdertoEDI implements Database.Batchable<sObject>{
             result = 'success';
             System.debug('-------------imp-------'+orderDetailsList.size());
         }catch(Exception e){
+            	
                 Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage();        
                String[] toAddresses = system.label.Exception_emails_for_batches.split(',');
                 mail1 .setToAddresses(toAddresses);
@@ -832,9 +835,13 @@ system.debug('Testing3-->'+ordrItmList);
         for(SFED7542_Batch__c batch : orderBatchList){
             batch.Status__c= 'Ready to Integrate';
         }
-         try{  
+         try{
+             
             update orderBatchList;
+             
         }
+         
+         
         catch(Exception e){
         //alert mail fix start
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
@@ -871,8 +878,11 @@ system.debug('Testing3-->'+ordrItmList);
         }
         try{  
             update finalOrder;
+            
         }
-        catch(Exception e){
+         
+              catch(Exception e){
+            	   
                    Messaging.SingleEmailMessage mail1 = new Messaging.SingleEmailMessage();        
                    String[] toAddresses = system.label.Exception_emails_for_batches.split(',');
                    mail1.setToAddresses(toAddresses);
@@ -880,6 +890,16 @@ system.debug('Testing3-->'+ordrItmList);
                    mail1.setPlainTextBody('Exception ocurred in updating merchant order EDI status to confirmed processing: ' + e.getMessage());
                    Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail1 });
                    System.debug('exception: '+e);
+                  	for(SFED7542_Batch__c batch : orderBatchList){
+            			batch.Status__c= 'Failed Integration';
+        			}
+                     try{
+                         
+                        update orderBatchList;
+                         
+                    }
+                  catch(Exception ex){}
+                             
                  }
     }
 

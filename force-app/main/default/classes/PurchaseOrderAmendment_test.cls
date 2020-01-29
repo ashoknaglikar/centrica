@@ -1001,9 +1001,9 @@ private class PurchaseOrderAmendment_test {
     
     static testmethod void test_AutoPopulateSupplierChange(){
          createTestData(); 
+         Test.startTest();
          ApexPages.StandardController controller = new ApexPages.StandardController(job);
         PurchaseOrderAmendment ext = new PurchaseOrderAmendment(controller);
-        Test.startTest();
         ext.onSelectAutoPopulateSupplier();
         Test.stopTest();
     }  

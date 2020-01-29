@@ -14,6 +14,7 @@ public class OnlineQuoteHelper {
         
         inputQuoteData.hsaName  = bQuote.App_Assigned_To__c;
         inputQuoteData.allowancesApplied = '£'+string.valueof(bQuote.appliedAllowancesTotal__c);
+        inputQuoteData.deposit = string.valueof(bQuote.depositOnPricing__c);
         if(bQuote.depositOnPricing__c >0)
         inputQuoteData.depositPaidBy = 'Card';
         inputQuoteData.balance = '£'+string.valueof(bQuote.finalNetQuoteTotal__c - bQuote.depositOnPricing__c);

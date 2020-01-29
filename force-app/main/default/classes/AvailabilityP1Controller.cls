@@ -1384,15 +1384,16 @@ public class AvailabilityP1Controller {
                     
                   }
                 // appointment Converter Change : End                
-                Integer appQueryLimit;
-                if(activeURLDate == 'null')
+                Integer appQueryLimit = integer.valueof(label.appointementQueryLimit);
+                /*if(activeURLDate == 'null')
                 {
-                    appQueryLimit = 500;
+                    //appQueryLimit = 500;
+                        
                 }
                 else
                 {
-                    appQueryLimit = 1000;
-                }
+                    //appQueryLimit = 1000;
+                }*/
                 
                 //Changes done to querry No suitable appointments
                 string poolType;

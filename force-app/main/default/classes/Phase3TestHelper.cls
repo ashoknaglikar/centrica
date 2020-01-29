@@ -115,7 +115,7 @@ public with sharing class Phase3TestHelper {
                 e.Manager__c, e.Last_Name__c, e.Inactive__c, e.Id, e.Group__c,e.First_Name__c, e.End_Date__c, e.Employee_Record_ID__c, 
                 e.Employee_Number__c, e.Emp_type__c, e.Email__c, e.District__c, e.District_ID__c, e.Contractor_Band__c, 
                 e.Always_Works_With__c, e.Always_Works_Alone__c, e.District__r.Region__c , e.Supplier__r.Name, e.salesforce_user__c,e.District__r.Name,Postcode__c,
-                (select Employee__c, Employee__r.Always_Works_With__c, Type__c from Employee_Postcodes__r ) , Skip_Rule__c
+                (select Employee__c, Employee__r.Always_Works_With__c,Employee__r.Always_Works_with_Electrician__c, Type__c from Employee_Postcodes__r ) , Skip_Rule__c, e.Always_Works_with_Electrician__c 
                 From Employee__c e where e.Id = :emp.ID];
         return emp;
     }
@@ -134,8 +134,8 @@ public with sharing class Phase3TestHelper {
                 e.Region__c, e.Pool_Diary__c, e.Phone_Number_3G__c, e.Own_Labour__c, e.Never_Works_With__c, e.Net_Promoter_Score__c, e.Name, 
                 e.Manager__c, e.Last_Name__c, e.Inactive__c, e.Id, e.Group__c,e.First_Name__c, e.End_Date__c, e.Employee_Record_ID__c, 
                 e.Employee_Number__c, e.Emp_type__c, e.Email__c, e.District__c, e.District_ID__c, e.Contractor_Band__c, 
-                e.Always_Works_With__c, e.Always_Works_Alone__c, e.District__r.Region__c , e.Supplier__r.Name, e.District__r.Name,
-                (select Employee__c, Employee__r.Always_Works_With__c, Type__c from Employee_Postcodes__r ), Postcode__c, Skip_Rule__c
+                e.Always_Works_With__c, e.Always_Works_Alone__c, e.District__r.Region__c , e.Supplier__r.Name, e.District__r.Name,e.Always_Works_With_Electrician__c,
+                (select Employee__c, Employee__r.Always_Works_With__c,employee__r.Always_Works_With_Electrician__c, Type__c from Employee_Postcodes__r ), Postcode__c, Skip_Rule__c
                 From Employee__c e where e.Id = :emp.ID];
         return emp;
     }
@@ -154,8 +154,8 @@ public with sharing class Phase3TestHelper {
                 e.Region__c, e.Pool_Diary__c, e.Phone_Number_3G__c, e.Own_Labour__c, e.Never_Works_With__c, e.Net_Promoter_Score__c, e.Name, 
                 e.Manager__c, e.Last_Name__c, e.Inactive__c, e.Id, e.Group__c,e.First_Name__c, e.End_Date__c, e.Employee_Record_ID__c, 
                 e.Employee_Number__c, e.Emp_type__c, e.Email__c, e.District__c, e.District_ID__c, e.Contractor_Band__c, 
-                e.Always_Works_With__c, e.Always_Works_Alone__c, e.District__r.Region__c , e.Supplier__r.Name, e.District__r.Name,Postcode__c,
-                (select Employee__c, Employee__r.Always_Works_With__c, Type__c from Employee_Postcodes__r ), Skip_Rule__c
+                e.Always_Works_With__c, e.Always_Works_Alone__c, e.District__r.Region__c , e.Supplier__r.Name, e.District__r.Name,Postcode__c,e.Always_Works_With_Electrician__c,
+                (select Employee__c, Employee__r.Always_Works_With__c, employee__r.Always_Works_With_Electrician__c,Type__c from Employee_Postcodes__r ), Skip_Rule__c
                 From Employee__c e where e.Id = :emp.ID];
         return emp;
     }
@@ -176,7 +176,7 @@ public with sharing class Phase3TestHelper {
         Employee__c emp = new Employee__c(Name = 'testSBB1', First_Name__c = 'SBB1', Last_Name__c = 'Test1', Supplier__c = supp.ID,
                                             Employee_Number__c = '0002991', Resource_Type__c= 'Installer', Inactive__c = false,
                                             Works_Anywhere_In_District__c = true, Works_Anywhere_In_Area__c = false, Pool_Diary__c = false,
-                                            Always_Works_Alone__c = false, Always_Works_With__c = null, Never_Works_With__c = null,
+                                            Always_Works_Alone__c = false, Always_Works_With__c = null, Never_Works_With__c = null,Always_Works_With_Electrician__c=null,
                                             District__c = district.Id, Net_Promoter_Score__c = 10);
         Database.insert(emp);
         return emp;
@@ -205,7 +205,7 @@ public with sharing class Phase3TestHelper {
         Employee__c emp = new Employee__c(Name = 'testSBB1', First_Name__c = 'SBB1', Last_Name__c = 'Test1', Supplier__c = supp.ID,
                                             Employee_Number__c = '0002991', Resource_Type__c= 'Installer', Inactive__c = false,
                                             Works_Anywhere_In_District__c = false, Works_Anywhere_In_Area__c = true, Pool_Diary__c = false,
-                                            Always_Works_Alone__c = false, Always_Works_With__c = null, Never_Works_With__c = null,
+                                            Always_Works_Alone__c = false, Always_Works_With__c = null, Never_Works_With__c = null, Always_Works_With_Electrician__c=null,
                                             District__c = district.Id, Net_Promoter_Score__c = 10);
         Database.insert(emp);
         return emp;
@@ -529,8 +529,8 @@ public with sharing class Phase3TestHelper {
                 e.First_Name__c, e.Fax_No__c, e.End_Date__c, e.Employee_Record_ID__c, e.Employee_Number__c, e.Emp_type__c, e.Email__c, 
                 e.District__c, e.District_ID__c, e.Default_Pricebook_ID__c, e.CreatedDate, e.CreatedById, e.Country__c, e.Contractor_Band__c, 
                 e.City__c, e.Centrica_Asset_Tag__c, e.Always_Works_With__c, e.Always_Works_Alone__c, e.ADSL_BG_Connectivity__c,
-                e.Supplier__r.Name, e.District__r.Name, e.District__r.Region__c,Skip_rule__c, 
-                    (select Employee__c, Employee__r.Always_Works_With__c, Type__c from Employee_Postcodes__r ) 
+                e.Supplier__r.Name, e.District__r.Name, e.District__r.Region__c,Skip_rule__c, e.Always_Works_With_Electrician__c,
+                    (select Employee__c, Employee__r.Always_Works_With__c, employee__r.Always_Works_With_Electrician__c,Type__c from Employee_Postcodes__r ) 
                 From Employee__c e where e.Id = :emp.ID]; 
 
         return emp;
@@ -552,8 +552,8 @@ public with sharing class Phase3TestHelper {
                 e.First_Name__c, e.Fax_No__c, e.End_Date__c, e.Employee_Record_ID__c, e.Employee_Number__c, e.Emp_type__c, e.Email__c, 
                 e.District__c, e.District_ID__c, e.Default_Pricebook_ID__c, e.CreatedDate, e.CreatedById, e.Country__c, e.Contractor_Band__c, 
                 e.City__c, e.Centrica_Asset_Tag__c, e.Always_Works_With__c, e.Always_Works_Alone__c, e.ADSL_BG_Connectivity__c,
-                e.Supplier__r.Name, e.District__r.Name, e.District__r.Region__c, Skip_rule__c,
-                    (select Employee__c, Employee__r.Always_Works_With__c, Type__c from Employee_Postcodes__r )
+                e.Supplier__r.Name, e.District__r.Name, e.District__r.Region__c, Skip_rule__c,e.Always_Works_With_Electrician__c,
+                    (select Employee__c, Employee__r.Always_Works_With__c,employee__r.Always_Works_With_Electrician__c, Type__c from Employee_Postcodes__r )
                 From Employee__c e where e.Id = :emp.ID];
 
         return emp;
@@ -575,8 +575,8 @@ public with sharing class Phase3TestHelper {
                 e.First_Name__c, e.Fax_No__c, e.End_Date__c, e.Employee_Record_ID__c, e.Employee_Number__c, e.Emp_type__c, e.Email__c, 
                 e.District__c, e.District_ID__c, e.Default_Pricebook_ID__c, e.CreatedDate, e.CreatedById, e.Country__c, e.Contractor_Band__c, 
                 e.City__c, e.Centrica_Asset_Tag__c, e.Always_Works_With__c, e.Always_Works_Alone__c, e.ADSL_BG_Connectivity__c,
-                e.Supplier__r.Name, e.District__r.Name, e.District__r.Region__c, Skip_rule__c,
-                    (select Employee__c, Employee__r.Always_Works_With__c, Type__c from Employee_Postcodes__r )
+                e.Supplier__r.Name, e.District__r.Name, e.District__r.Region__c, Skip_rule__c,e.Always_Works_With_Electrician__c,
+                    (select Employee__c, Employee__r.Always_Works_With__c,employee__r.Always_Works_With_Electrician__c, Type__c from Employee_Postcodes__r )
                 From Employee__c e where e.Id = :emp.ID];
 
         return emp;

@@ -644,6 +644,7 @@ public class Utilities {
           string lat = BGProductHoldingServiceHelper.readXMLtemp(http_Res, 'lat', pcode);
           string lng = BGProductHoldingServiceHelper.readXMLtemp(http_Res, 'lng', pcode);
          
+          system.debug('lat lang ' +lat+' '+lng);
          return (new string[]{lat,lng});
         
     }
@@ -793,5 +794,51 @@ public class Utilities {
         
         string finalQuery  = 'Select '+selects+' from '+objectName +' '+whereCriteria;
         return finalQuery;
+    }
+    
+    public static void switchOffAllTriggers()
+    {
+        cls_IsRun.dontFireTriggers=true;
+        cls_IsRun.generalTriggerSwitch =true;
+        cls_IsRun.bigMachineSwitch=true;
+        cls_IsRun.istrg_updateOpportunityPaymentDetails=true;
+        cls_IsRun.istrg_ensurePrimary=true;
+        cls_IsRun.isAppInsertUpdate=true;
+        cls_IsRun.appointmentSwitch=true;
+        cls_IsRun.isCalculateNetCustomerPrice=true;
+        cls_IsRun.isinstUpdCustCatMasRec=true;
+        cls_IsRun.transferhrstrg =true;
+        cls_IsRun.setAlreadyDone();
+        cls_IsRun.istrg_aUPD_AutocancelAppointmentOnQuoteCancelation=true;
+        cls_IsRun.istrg_updateOpportunityPaymentDetails=true;
+        cls_IsRun.istrg_AppointmentBeforeInsert=true;
+        cls_IsRun.istrg_emailSendSingle=true;
+        cls_IsRun.istrg_CreateCustCategory=true;
+        cls_IsRun.istrg_bINS_bUPD_chkEmpSkillForItnry=true;
+        cls_IsRun.istrg_AppointmentBeforeUpdate=true;
+        cls_IsRun.istrg_AppointmentUpdate=true;
+        cls_IsRun.istrg_AppointmentBeforeInsert =true;
+        cls_IsRun.istrg_CustApptAfterInsert =true;
+        cls_IsRun.istrg_CompleteBriefs =true;
+        cls_IsRun.isBMQuoteUpdateInsertAppRun=true;
+        cls_IsRun.istrg_ensurePrimary =true;
+        cls_IsRun.istrg_aUPD_changeBillingAddress =true;
+        cls_IsRun.istrg_BigMachinesQuoteInsertJobReconciliation =true;
+        cls_IsRun.istrg_CustApptAfterInsert =true;
+        cls_IsRun.setIsJobCompletion();
+        cls_IsRun.setIsConsumReq();
+        
+        Lock.jobTriggerSwitch =true;
+        Lock.cchContactOppRecursiveStopper =true;
+        Lock.createJCD=true;
+        Lock.suspendJob=true;
+        Lock.setNetCustomerPriceOnQuote =true;
+        Lock.immediateReturn =true;
+        lock.lock =true;
+        lock.unsuspendJob =true;
+        lock.cancelJob= true;
+        lock.setNetCustomerPriceOnQuote=true;
+        Lock.callHistory=true;
+        
     }
 }

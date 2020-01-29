@@ -55,7 +55,7 @@ private class TestJobResourcingOption {
 		Employee__c emp = new Employee__c(Name = firstName + ' ' + secondName, First_Name__c = firstName, Last_Name__c = secondName,
 											Employee_Number__c = empNum, Resource_Type__c= 'Installer', Inactive__c = false,
 											Works_Anywhere_In_District__c = false, Works_Anywhere_In_Area__c = false, Pool_Diary__c = false,
-											Always_Works_Alone__c = false, Always_Works_With__c = null, Never_Works_With__c = null,
+											Always_Works_Alone__c = false, Always_Works_With__c = null, Never_Works_With__c = null,Always_Works_With_Electrician__c = null,
 											District__c = districtId, Net_Promoter_Score__c = 10, Supplier__c = supplierID,Postcode__c = 'ab1 cd1');
 		
 		return emp;
@@ -77,7 +77,7 @@ private class TestJobResourcingOption {
 				e.Manager__c, e.Last_Name__c, e.Inactive__c, e.Id, e.Group__c,e.First_Name__c, e.End_Date__c, e.Employee_Record_ID__c, 
 				e.Employee_Number__c, e.Emp_type__c, e.Email__c, e.District__c, e.District_ID__c, e.Contractor_Band__c, 
 				e.Always_Works_With__c, e.Always_Works_Alone__c, e.District__r.Region__c , e.Supplier__r.Name, e.District__r.Name,
-				(select Employee__c, Employee__r.Always_Works_With__c, Type__c from Employee_Postcodes__r ),Postcode__c , Skip_Rule__c
+				(select Employee__c, Employee__r.Always_Works_With__c,Employee__r.Always_Works_With_Electrician__c,Type__c from Employee_Postcodes__r ),Postcode__c , Skip_Rule__c,Always_Works_With_Electrician__c
 				From Employee__c e where e.Id IN :empIDs];
 		return fromDB;
 	}

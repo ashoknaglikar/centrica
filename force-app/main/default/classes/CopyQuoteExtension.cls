@@ -72,11 +72,12 @@ public class CopyQuoteExtension {
     {   
         if(voucherCode!=null && voucherCode!='' )
         {
-           List<Offer__c> disAttributeList = [select id,Description__c,value__c from Offer__c where active__c=true and Offer_Code__c=:voucherCode];
+           List<Lead_offer__c> disAttributeList = [select id,Expiry_Date__c, Offer__r.Description__c,Offer__r.value__c from Lead_Offer__c 
+                                                    where Offer__r.active__c=true and Offer__r.Offer_Code__c=:voucherCode and opportunity__c=:bmQuote.Opportunity__c and Expiry_Date__c >= :system.today()];
            if(disAttributeList.size()>0)
            {
-              voucherAmount= disAttributeList[0].value__c;
-              voucherName= disAttributeList[0].Description__c;
+              voucherAmount= disAttributeList[0].Offer__r.value__c;
+              voucherName= disAttributeList[0].Offer__r.Description__c;
            }
            else
            {
@@ -181,7 +182,8 @@ public class CopyQuoteExtension {
         }
         if(voucherCode!=null && voucherCode!='' )
         {
-           List<Lead_Offer__c> disAttributeList = [select id,Offer__r.Description__c,Offer__r.value__c from Lead_Offer__c where Expiry_date__c >= :system.today() and Offer_Code__c=:voucherCode];
+           List<Lead_Offer__c> disAttributeList = [select id,Offer__r.Description__c,Offer__r.value__c from Lead_Offer__c 
+                                                   where Offer__r.active__c=true and Offer__r.Offer_Code__c=:voucherCode and opportunity__c=:bmQuote.Opportunity__c and Expiry_Date__c >= :system.today()];
            if(disAttributeList.size()>0)
            {
               voucherAmount= disAttributeList[0].Offer__r.value__c;

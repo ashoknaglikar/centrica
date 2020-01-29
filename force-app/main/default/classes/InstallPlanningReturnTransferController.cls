@@ -214,6 +214,15 @@ public without sharing class InstallPlanningReturnTransferController {
             return;
         }
         
+        //Suguna
+        List<Order__c> orders = [select id,status__c from order__c where Job__c=:thisJob.id and status__c='Goods Receipted' and Type__c='Work'];
+        if(!orders.isEmpty()&&thisJob.status__c=='Installed')
+        {
+                    stepIndex = 'error';
+                    errorText = 'Warning: Work cannot be transferred as orders are Goods Receipted. Please email Payment Control to check that the purchase order has not been paid and can be un-goods receipted.';
+                    return;       
+        }
+        
         
         //will only gets here if the job elements list has items.
         //fill the items list with the available job_element__c items

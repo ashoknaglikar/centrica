@@ -24,6 +24,7 @@ public with sharing class EmployeeInformation {
   public Double nps {get; set;}
   public boolean skipRule {get;set;}
   public double overBookingExpHours {get;set;}
+  public ID alwaysWorksWithElectrician {get; set;}
   
   public String employeeNumber{get;set;}
   //public String status {get;set;}
@@ -67,6 +68,7 @@ public with sharing class EmployeeInformation {
     employeePostCode = e.Postcode__c;
     skipRule = e.Skip_Rule__c;
     employeeNumber = e.Employee_Number__c;
+    alwaysWorksWithElectrician = e.Always_Works_with_Electrician__c;
     //Change By Ashok G
     //status = e.Inactive__c==TRUE?'InActive':'Active';
     

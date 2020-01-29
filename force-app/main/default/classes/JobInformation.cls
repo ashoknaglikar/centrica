@@ -230,6 +230,9 @@ public with sharing class JobInformation {
          namedEmployeeAWW = job.Named_Employee_2__c;
       }else if(job.Named_Employee__r.Always_Works_With__c != null)
         namedEmployeeAWW = job.Named_Employee__r.Always_Works_With__c;
+        
+        if(job.Named_Employee__r.Always_Works_With_Electrician__c != null)
+        namedElectritian =job.Named_Employee__r.Always_Works_With_Electrician__c;
     }
     
     // Named electritian change - Starts

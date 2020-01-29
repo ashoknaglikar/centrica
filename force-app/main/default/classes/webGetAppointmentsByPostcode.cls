@@ -383,7 +383,7 @@ public class webGetAppointmentsByPostcode {
            
            List<Role_Sub_Patch__c> rle_sub_patches = new list<Role_Sub_Patch__c>();
            List<Role_District__c> rle_Districts = new list<Role_District__c>();
-             
+           set<id> secondaryHSA= new set<id>();
       if(Remote_Quote_Product__c.getInstance(productInterest) != null)
       {
           rle_Districts= [SELECT r.Role__r.Employee__c, r.start_date__c,r.end_date__c,Role__r.Employee__r.Primary_Role__c,Preference__c FROM Role_District__c r
@@ -416,6 +416,9 @@ public class webGetAppointmentsByPostcode {
                           }
                           shiftSartEndDates.add(new list<Date>{r.Start_Date__c, r.End_Date__c});
                           cEmpAvailMap.put(r.Role__r.Employee__c,shiftSartEndDates);
+                          
+                          if(r.preference__c=='Secondary')
+                          secondaryHSA.add(r.role__r.Employee__c);
                       }
                  }
              }
@@ -466,6 +469,12 @@ public class webGetAppointmentsByPostcode {
              {	if(!filteredList.contains(i))	
                 cEmpAvailMap.remove(i);		
              }
+             
+             for(id i: secondaryHSA)
+             {
+                 if(!filteredList.contains(i))
+                 secondaryHSA.remove(i);
+             }
              //ends
               
               system.debug('cEmpAvailMap---->'+cEmpAvailMap);
@@ -474,8 +483,6 @@ public class webGetAppointmentsByPostcode {
               system.debug('Visit Type--->'+visit_type);
               system.debug('earliest-->'+earliest);
               system.debug('latest--->'+latest);
-              
-              
               
               
              List<Appointment__c> apps = [SELECT Id, Start__c, End__c, Assigned_To__c, Start_Time__c, Type__c,Valid_Slot__c 
@@ -506,6 +513,7 @@ public class webGetAppointmentsByPostcode {
                  Date dt=Date.today();                            
                  Time ti=Time.newInstance(12,00,00,00);          
                  DateTime datetimeconverted=DateTime.newInstanceGMT(dt,ti);
+                 set<id> secondaryAppt = new set<id>();
                  
                   for(Appointment__c a: apps)
                   {  
@@ -515,6 +523,8 @@ public class webGetAppointmentsByPostcode {
                   {
                       continue;
                   }
+                  
+                    
                     //system.debug('I am here1');
                     if((a.Valid_Slot__c == 'Yes' || productInterest == 'Straight Swap' || (productInterest == 'Guided Sale' && a.Start__c> system.now().addMinutes(integer.valueof(label.GuidedSaleBuffer))))&& a.Start__c>= system.now())
                     {
@@ -535,6 +545,9 @@ public class webGetAppointmentsByPostcode {
                               app_at_to_add.ProductInterest = 'HSA';
                               
                               result.AppointmentSlots.add(app_at_to_add); 
+                              
+                              if(SecondaryHSA.contains(a.Assigned_To__c))
+                              secondaryAppt.add(a.id);
                           }
                         }
                       }
@@ -572,7 +585,8 @@ public class webGetAppointmentsByPostcode {
                     return result;
                   }else if(result.AppointmentSlots.size()>0)
                     {
-                        result.AppointmentSlots = fRemoveDupApps(result.AppointmentSlots);
+                        result.AppointmentSlots = objWeb.fRandomApps(result.AppointmentSlots,secondaryAppt);
+                        //result.AppointmentSlots = fRemoveDupApps(result.AppointmentSlots);
                         result.AppointmentSlots = objWeb.fBubbleSortApps(result.AppointmentSlots);
                         appsres = result.AppointmentSlots.size();
                         system.debug('Appointment size after Geo--->'+result.AppointmentSlots.size()+' Last Slot time'+result.AppointmentSlots[result.AppointmentSlots.size()-1].AppStart);

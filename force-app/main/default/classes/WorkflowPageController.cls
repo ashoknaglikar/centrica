@@ -14,7 +14,7 @@ public class WorkflowPageController
     public Boolean autoPopulate{get;set;}
     //public Static String TestData {get; set;}
     public boolean var{get;set;}
-    public boolean uexist{get;set;}
+    //public boolean uexist{get;set;}
     public Boolean showRefreshProducttHolding {get; set;} // added on May 30, 2012 Boolean to indicate whether to show the Refresh product holding data button on page
     String callID;
     
@@ -58,13 +58,16 @@ public class WorkflowPageController
         WorkflowInfo = new Workflow.WorkflowInfo();
         List<PicklistWrapper> picVal = getPicklistValues();
         WorkflowInfo.picklistValues = picVal;
-        uexist=false;
+        //uexist=false;
         acceptBttnClr=optOutBttnClr='#b3e000';
+        
+        /*
         Group g = [select id,name,(Select Id, UserOrGroupId From GroupMembers) from group where name='Straightswap Direct'];
         for(GroupMember gm:g.GroupMembers){
             if(gm.UserOrGroupId == UserInfo.getUserID())
                 uexist = TRUE;
         }
+        */
         errorMsg = new MessageConstants();
         autopopulate = false;
         //changes for IPD 3653 end   - dated 2/18/2013
@@ -339,7 +342,7 @@ return null ;
 {
 return new pagereference ('/apex/StraightSwapQuestions?oppId='+WorkflowInfo.Opportunities[0].Id+'&PID='+WorkflowInfo.Opportunities[0].Product_Interest__c+'&Ecall='+workflowInfo.ShowEngineerQues);
 }*/
-            else if(WorkflowInfo.CurrentAccount.Gas_Supply_At_Address1__c == 'Yes' && WorkflowInfo.Opportunities[0].Boiler_type__c == 'Combi boiler' && WorkflowInfo.CurrentAccount.Number_of_Bathrooms__c <= 2 /*&& WorkflowInfo.Opportunities[0].Is_the_customers_boiler_working__c == 'Yes' */&& WorkflowInfo.newInbound  && uexist &&
+            else if(WorkflowInfo.CurrentAccount.Gas_Supply_At_Address1__c == 'Yes' && WorkflowInfo.Opportunities[0].Boiler_type__c == 'Combi boiler' && WorkflowInfo.CurrentAccount.Number_of_Bathrooms__c <= 2 /*&& WorkflowInfo.Opportunities[0].Is_the_customers_boiler_working__c == 'Yes' */&& WorkflowInfo.newInbound  /*&& uexist*/ &&
                     WorkflowInfo.Opportunities[0].Location_of_Current_Boiler__c!='Bathroom' && WorkflowInfo.Opportunities[0].Location_of_Current_Boiler__c!='Loft' && WorkflowInfo.Opportunities[0].Location_of_Current_Boiler__c!='Cellar' && WorkflowInfo.Opportunities[0].Location_of_Current_Boiler__c!='Boiler room'){
                         system.debug(LoggingLevel.INFO,'I am Inside Straigh swap direct');
                         return new pagereference ('/apex/StraightSwapDirect?oppId='+WorkflowInfo.Opportunities[0].Id+'&PID='+WorkflowInfo.Opportunities[0].Product_Interest__c+'&new='+workflowInfo.newInbound);

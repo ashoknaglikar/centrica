@@ -3,6 +3,7 @@ public class CS_QuoteOnlineTemplateController {
  
     public string basketId {get; set;}
     public boolean showYourPayOptions {get;set;}
+    public string productInterest {get;set;}
      
     private static final String RADIATOR = 'Radiator_';
     private static final String ACTUAL = 'Actual_Radiator_';
@@ -455,7 +456,7 @@ public class CS_QuoteOnlineTemplateController {
                                             (select id, Name, Gross_Total__c,Quantity__c  from Quote_Products__r where ASP_Status__c not in :aspStatus)  from Bigmachines_Quote__c where id = :basketId];
             
             isSmallCommercial = bQuote.Opportunity__r.Product_Interest__c=='Small Commercial' ? true:false;
-            
+            productInterest = bQuote.Opportunity__r.Product_Interest__c;
             is_ifc_active(bQuote.Opportunity__r.CreatedDate.Date(), bQuote.CreatedDate.date());
             
             system.debug('IFC Active -->'+is_ifc_active);
@@ -586,7 +587,7 @@ public class CS_QuoteOnlineTemplateController {
             is_ifc_active(basket.Appointment__r.Opportunity__r.CreatedDate.Date(), basket.CreatedDate.date());
 
             isSmallCommercial = basket.Appointment__r.Opportunity__r.Product_Interest__c=='Small Commercial' ? true:false;                                    
-            
+            productInterest = basket.Appointment__r.Opportunity__r.Product_Interest__c;
             Id appointmentId = basket.Appointment__c;
             Id opportunityId = basket.Appointment__r.Opportunity__c;
             quoteCreatedDate = basket.CreatedDate; // created date if we have a quote

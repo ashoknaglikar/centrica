@@ -140,10 +140,6 @@ public with sharing class DateTimeHelper {
     
     public static DateTime addWorkingHoursToDateTime(DateTime dt, Double hoursToAdd, Diary_Entry__c de) {
         
-        // If there are no hours to add, don't need to do anything, return.
-        if(hoursToAdd == 0.0)
-            return dt;
-        
         // Put the shift information into a handy format...
         List<List<String>> shifts = new List<List<String>>{
                                         new List<String>{de.Week__r.Monday_Start_Time__c, de.Week__r.Monday_End_Time__c},
@@ -154,71 +150,8 @@ public with sharing class DateTimeHelper {
                                         new List<String>{de.Week__r.Saturday_Start_Time__c, de.Week__r.Saturday_End_Time__c},
                                         new List<String>{de.Week__r.Sunday_Start_Time__c, de.Week__r.Sunday_End_Time__c}};
         
-        // Get some initial information 
-        // - first, normalise the DateTime passed in (wind it forward to the start of the next shift if it occurs outside of a shift pattern)
-        DateTime newDt = normaliseDateTime(dt, shifts);
-        // - get the day of the DateTime as an Integer
-        Integer dayI = DAYS_OF_WEEK.get(newDt.format('E'));
-        // - get the shift start and end times as Time objects
-        Time startTime = Time.newInstance(newDt.hour(), newDt.minute(),0,0); 
-        Time endTime = stringToTime(shifts[dayI][1]);
-        // - set a variable that holds the number of hours left to add
-        Double leftToAdd = hoursToAdd;
-        //BGSAMS Support PRB00014431 - code fix starts
-        Time startTime1;
-        Time endTime1;
-        //BGSAMS Support PRB00014431- code fix ends
-        // Whilst there are still hours to add, loop
-        while(leftToAdd > 0) {
-            // How many hours between start and end?
-            Double hoursToday = subtractTime(endTime, startTime);
-             system.debug('&&&&&&&&&&&&&&&  endTime'+endTime);
-              system.debug('&&&&&&&&&&&&&&&  startTime'+startTime);
-            system.debug('&&&&&&&&&&&&&&&  hoursToday (Subtract time)'+hoursToday);
-            
-            // Are there more hours in the current day than we have left to add?
-            // If so, add the hours to the newDT DateTime and break.
-            if(hoursToday >= leftToAdd) {
-                system.debug('&&&&&&&&&&&&&&&  Inside if hoursToday >= leftToAdd ');
-                newDt = addHoursToDT(newDt, leftToAdd);
-                system.debug('&&&&&&&&&&&&&&&  Inside if hoursToday >= leftToAdd newDt '+newDt);
-                break;
-            }
-            
-            // Decrement leftToAdd by the number of hours in the current day. 
-            leftToAdd -= hoursToday;
-            system.debug('&&&&&&&&&&&&&&&  leftToAdd'+leftToAdd);
-            // We need to loop to the next day - get the shift start and end times for the
-            // next day, and set newDT to the start of the next day.
-            
-            dayI++;
-            if(dayI>6)
-            {
-                //newDt = addHoursToDT(newDt, leftToAdd);
-                break;
-            }
-            //BGSAMS Support PRB00014431 - code fix starts
-            if(shifts[dayI][0] != null){
-               
-               startTime = stringToTime(shifts[dayI][0]); // next day's shift start
-               endTime = stringToTime(shifts[dayI][1]); // next day's shift end
-               
-            }
-            else{
-                System.debug('Entering else loop - vincy');
-                dayI--;
-                startTime1= stringToTime(shifts[dayI][0]);
-                endTime1 = stringToTime(shifts[dayI][1]);
-                //dayI++;
-                startTime = startTime1;
-                endTime = endTime1;
-            }
-            
-            //BGSAMS Support PRB00014431- code fix ends
-            newDt = DateTime.newInstance(newDt.date().addDays(1), startTime);
-        }
         
-        return newDt;
+        return addWorkingHoursToDateTime1(dt,hoursToAdd,shifts);
     }
     
     /* normaliseDateTime(DateTime original, List<List<String>> shifts)

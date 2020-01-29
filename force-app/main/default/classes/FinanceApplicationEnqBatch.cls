@@ -122,8 +122,8 @@ global class FinanceApplicationEnqBatch implements database.batchable<sobject>,D
         
         if(updateList.size()>0)
         Database.update(updateList,false);
-        if(Subject!='')
-        CreateEmail.CretaeSendTextEmail(new list<string>{'ashokkumar.nagaleekar@centrica.com'}, Subject, 'Error on Finance Batch');
+        //if(Subject!='')
+        //CreateEmail.CretaeSendTextEmail(new list<string>{'ashokkumar.nagaleekar@centrica.com'}, Subject, 'Error on Finance Batch');
         
     }
     

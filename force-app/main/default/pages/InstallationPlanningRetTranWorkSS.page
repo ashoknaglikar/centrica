@@ -75,7 +75,7 @@
 
                 </apex:actionStatus>
 
-                <apex:pageBlock title="Transfer Hours" id="pgStart">
+                <apex:pageBlock title="Transfer Hours" id="pgStart" rendered="{!stepIndex != 'error'}">
 
                     <apex:pageBlockButtons >
 

@@ -68,6 +68,7 @@ public class searchExcessTravelClaimController_Test{
      
      static testmethod void method3(){
         createData();
+        Test.startTest();
         searchExcessTravelClaimController con = new searchExcessTravelClaimController();
         con.jb.Customer_Journey_First_Update__c = System.today();  
         con.jb.BGNE_Install_Date__c = System.today()+30;
@@ -130,10 +131,12 @@ public class searchExcessTravelClaimController_Test{
         con.searchClaims();
         con.onSelectAll();
         con.onComplete();
+        test.stopTest();
     }
     
     static testmethod void method4(){
         createData();
+        test.startTest();
         searchExcessTravelClaimController con = new searchExcessTravelClaimController();
         con.jb.Customer_Journey_First_Update__c = System.today();  
         con.jb.BGNE_Install_Date__c = System.today()+30;
@@ -143,5 +146,6 @@ public class searchExcessTravelClaimController_Test{
         con.getDisableNext();
         con.getPageNumber();
         con.getTotalPages();
+        Test.stopTest();
     }
 }

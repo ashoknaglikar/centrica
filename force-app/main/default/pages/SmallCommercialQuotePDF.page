@@ -1,4 +1,4 @@
-<apex:page standardController="cscfga__Product_Basket__c" extensions="CS_QuoteOnlineTemplateController" action="{!deleteTempAttachment}"  showHeader="false" applyHtmlTag="false" sidebar="false" >
+<apex:page Controller="CS_QuoteOnlineTemplateController" action="{!deleteTempAttachment}"  showHeader="false" applyHtmlTag="false" sidebar="false" >
 <html lang="en">     
    
 

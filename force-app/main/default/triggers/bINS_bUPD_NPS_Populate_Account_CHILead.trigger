@@ -50,7 +50,7 @@ trigger bINS_bUPD_NPS_Populate_Account_CHILead on NPS__c (before insert,before u
                 if((Trigger.new[i].CHI_Lead_Name__c != null) &&
                 ((Trigger.new[i].CHI_Lead_Name__c).trim() != null) )
                 {
-                    lstCHILeadName.add(Trigger.new[i].CHI_Lead_Name__c);                    
+                    lstCHILeadName.add(Trigger.new[i].CHI_Lead_Name__c.split('-')[0]);                    
                 }  
                 System.debug('%%%%% 4 lstCHILeadName: '+lstCHILeadName);  
             }       
@@ -167,7 +167,7 @@ trigger bINS_bUPD_NPS_Populate_Account_CHILead on NPS__c (before insert,before u
                 else if(Trigger.new[i].CHI_Lead_Name__c != null){
                     System.debug('%%%%% 7.2 inside if(CHI_Lead_Name__c not null): ');
                     System.debug('%%%%% 7.3 mapChiLeadExternalId_Id.get(Trigger.new[i].CHI_Lead_Name__c: ' + mapChiLeadExternalId_Id.get(Trigger.new[i].CHI_Lead_Name__c));
-                    Trigger.new[i].Opportunity__c = mapChiLeadExternalId_Id.get(Trigger.new[i].CHI_Lead_Name__c);
+                    Trigger.new[i].Opportunity__c = mapChiLeadExternalId_Id.get(Trigger.new[i].CHI_Lead_Name__c.split('-')[0]);
                 }           
                 System.debug('%%%%% 8 after assigning opportunity to NPS from CHI Leadname: Trigger.new[i].Opportunity__c: '+Trigger.new[i].Opportunity__c);  
                 //Set Account for NPS.
