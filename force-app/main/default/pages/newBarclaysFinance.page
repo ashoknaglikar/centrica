@@ -51,11 +51,25 @@
            changeAddProof(txtVal1);
         }
         
-     function  showGrossIncomeJS()
+        function  showGrossIncomeJS()
         {
             var txtVal1 = document.getElementById("{!$Component.page.form.block2.pgPensionDetails.incBand}").value;
             
             showGrossIncome(txtVal1);
+        }
+        
+        function incomeVariationJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block2.pgPensionDetails.incomeVariation}").value;
+            
+            incomeVariationAC(txtVal1);
+        }
+        
+        function expenseVariationJS()
+        {
+            var txtVal1 = document.getElementById("{!$Component.page.form.block2.pgPensionDetails.expenseVariation}").value;
+            
+            expenseVariationAC(txtVal1);
         }
    
         
@@ -130,9 +144,15 @@
                 </apex:actionFunction>
                  
                 <apex:actionFunction name="secondarySelection" action="{!secondarySelection}" rerender="block1" />
-                 <apex:actionFunction name="showGrossIncome" rerender="annualInc,incomeSection" immediate="true">
+                <apex:actionFunction name="showGrossIncome" rerender="annualInc,incomeSection" immediate="true">
                      <apex:param name="incomeBand" value="" assignTo="{!fa.Income_Band__c}"/>
                 </apex:actionFunction>    
+                <apex:actionFunction name="incomeVariationAC" rerender="pgPensionDetails" immediate="true">
+                     <apex:param name="incomeVariation" value="" assignTo="{!fa.Income_Variation__c}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="expenseVariationAC" rerender="pgPensionDetails" immediate="true">
+                     <apex:param name="expenseVariation" value="" assignTo="{!fa.Expense_Variation__c}"/>
+                </apex:actionFunction>  
               
                 
                 <apex:pageblocksection title="Finance Quote" id="quote" columns="1">
@@ -166,32 +186,35 @@
                     <apex:inputfield value="{!fa.Deposit__c}" required="true"/>
                     <!--  <apex:pageblockSectionitem />-->
                     <apex:outputfield value="{!fa.Cash_Price__c}" />
-                    <apex:inputField value="{!fa.Finance_Options__c}" required="true"/>
+                    <!--<apex:inputField value="{!fa.Finance_Options__c}" required="true"/>-->
+                    <apex:selectList value="{!fa.Finance_Options__c}"  required="true" size="1">
+                                <apex:selectOptions value="{!financeProductsList}"/>
+                        </apex:selectList>
                     <apex:outputField value="{!fa.Monthly_Repayments__c}" />
                     
                  </apex:pageblocksection>
                  <!--<apex:pageblocksection id="ProdPanel" rendered="{!productPanel}" columns="1">
-                   		
-        	            <apex:pageblocksectionitem id="item1" >
-        	                <apex:outputlabel value="Finance Product" />
-        	                <apex:selectList value="{!fpSelected}"  onchange="financeProductSelJS()" size="1" required="true" id="fpSelected" >
-        	                    <apex:selectOptions value="{!financeProducts}"/>
-        	                </apex:selectList>
-        	            </apex:pageblocksectionitem>  
-        	           
-        	            <apex:pageblockSectionitem rendered="{!if(CONTAINS(fpSelected , $Label.barclaysProduct), true, false)}">
-        	            	<apex:outputLabel value="Secondary Product" />
-        	                <apex:selectList size="1" value="{!fpProdValue}" required="true" onchange="secondarySelection()" id="secondaryList">
-        	                    <apex:selectOptions value="{!fpProdOptions }"/>
-        	                </apex:selectList>
-        	            </apex:pageblocksectionitem>
-        	            
-        	            <apex:outputfield value="{!fa.payment_Options__c}" rendered="{!if(CONTAINS(fpSelected , $Label.barclaysProduct), true, false)}"/>
-        	            <apex:inputfield value="{!fp.Payment_Options__c}" required="true"  rendered="{!if(!CONTAINS(fpSelected , $Label.barclaysProduct), true, false)}"/>
-        	             <!--  <apex:pageblockSectionitem />-->
-        	            <!--<apex:outputfield value="{!fp.Interest_Rate__c}"/>
-        	            
-        	            <apex:outputField value="{!fa.Monthly_Repayments__c}" />
+                        
+                        <apex:pageblocksectionitem id="item1" >
+                            <apex:outputlabel value="Finance Product" />
+                            <apex:selectList value="{!fpSelected}"  onchange="financeProductSelJS()" size="1" required="true" id="fpSelected" >
+                                <apex:selectOptions value="{!financeProducts}"/>
+                            </apex:selectList>
+                        </apex:pageblocksectionitem>  
+                       
+                        <apex:pageblockSectionitem rendered="{!if(CONTAINS(fpSelected , $Label.barclaysProduct), true, false)}">
+                            <apex:outputLabel value="Secondary Product" />
+                            <apex:selectList size="1" value="{!fpProdValue}" required="true" onchange="secondarySelection()" id="secondaryList">
+                                <apex:selectOptions value="{!fpProdOptions }"/>
+                            </apex:selectList>
+                        </apex:pageblocksectionitem>
+                        
+                        <apex:outputfield value="{!fa.payment_Options__c}" rendered="{!if(CONTAINS(fpSelected , $Label.barclaysProduct), true, false)}"/>
+                        <apex:inputfield value="{!fp.Payment_Options__c}" required="true"  rendered="{!if(!CONTAINS(fpSelected , $Label.barclaysProduct), true, false)}"/>
+                         <!--  <apex:pageblockSectionitem />-->
+                        <!--<apex:outputfield value="{!fp.Interest_Rate__c}"/>
+                        
+                        <apex:outputField value="{!fa.Monthly_Repayments__c}" />
                 </apex:pageblocksection>-->
                 </apex:pageblocksection>
                 <apex:pageblockbuttons location="bottom" id="btn1">
@@ -253,7 +276,7 @@
                     
                     <apex:inputfield value="{!fa.Marital_Status__c}" required="true"/>
                     <apex:inputfield value="{!fa.Number_Of_Dependents__c}" required="true"/>
-                    <apex:inputfield value="{!fa.Gender__c}" required="true"/>
+                    <!--<apex:inputfield value="{!fa.Gender__c}" required="true"/>-->
                 </apex:pageblockSection>
                 <apex:outputpanel id="AddressPanel">
                 <apex:pagemessages />
@@ -415,8 +438,19 @@
                            <apex:inputfield value="{!fa.Applicant_Other_Income__c}" rendered="{!OR(fa.Employment_Status__c ==  'Benefits', fa.Employment_Status__c ==  'Retired')}" required="{!OR(fa.Employment_Status__c ==  'Benefits', fa.Employment_Status__c ==  'Retired')}"/> 
                            <apex:inputfield value="{!fa.Gross_Annual_Other_Pension__c}" rendered="{!fa.Employment_Status__c ==  'Retired'}" required="{!fa.Employment_Status__c ==  'Retired'}"/> 
                            <apex:inputfield value="{!fa.Gross_Annual_additional_benefit__c}" rendered="{!OR(fa.Employment_Status__c ==  'Benefits', fa.Employment_Status__c ==  'Retired')}" required="{!fa.Employment_Status__c ==  'Benefits'}"/> -->
+                           <apex:pageBlockSectionItem />
+                            
+                           <apex:inputfield value="{!fa.Income_Variation__c}" onchange="incomeVariationJS();" required="true" id="incomeVariation"/>
+                           <apex:pageBlockSectionItem rendered="{!fa.Income_Variation__c == 'Yes'}">
+                           <apex:outputLabel value="What will be your future yearly income " for="incomeVariation" />
+                           <apex:inputfield value="{!faTemp.Income_Band__c}"  required="true"/>
+                           </apex:pageBlockSectionItem>
+                           <apex:pageBlockSectionItem rendered="{!fa.Income_Variation__c != 'Yes'}" />
                            <apex:inputfield value="{!fa.Mortgage__c}" rendered="{!OR(fa.Occupancy_Status1__c == 'Owner Occupier', fa.Occupancy_Status1__c == 'Joint Owner')}" required="true" />
                            <apex:inputfield value="{!fa.Rent__c}" rendered="{!OR(fa.Occupancy_Status1__c == 'Tenant Unfurnished', fa.Occupancy_Status1__c == 'Tenant Furnished', fa.Occupancy_Status1__c == 'Tenant', fa.Occupancy_Status1__c == 'Council Tenant')}" required="true" />
+                           <apex:inputfield value="{!fa.Monthly_Expense__c}" required="true"/>
+                           <apex:inputfield value="{!fa.Expense_Variation__c}" onchange="expenseVariationJS();" required="true" id="expenseVariation"/>
+                           <apex:inputfield value="{!fa.Expense_Variation_Value__c}" rendered="{!fa.Expense_Variation__c == 'Yes'}" required="true"/>
                            
                        </apex:pageblockSection>
                     

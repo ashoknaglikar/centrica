@@ -278,7 +278,7 @@ public with sharing class BookJobOptionController {
                            s.Diary_Entry_ID__r.Week__r.Saturday_End_Time__c,s.Diary_Entry_ID__r.Week__r.Sunday_Start_Time__c,s.Diary_Entry_ID__r.Week__r.Sunday_End_Time__c,s.Diary_Entry_ID__r.Week__c
                            From SearchResults__r s where Option_Identifier__c = :optionID 
                            order by s.Start_Date_Time__c ASC,s.Diary_Entry_ID__r.Week__r.Employee__c, s.Skill__c),                     
-                          Engineer_Working_NWD__c, CreatedDate,quote__r.closeDate__c, Bring_Forward_Job__c
+                          Engineer_Working_NWD__c, CreatedDate,quote__r.closeDate__c, Bring_Forward_Job__c,Latitude__Latitude__s,latitude__longitude__s
                           from Job__c where ID = :jobID];
                                  oldStatus = job.Status__c;
                     oldSubStatus=job.Sub_Status__c;
@@ -324,24 +324,27 @@ public with sharing class BookJobOptionController {
                      string postcode = job.SearchResults__r[0].Diary_Entry_ID__r.Week__r.Employee__r.Postcode__c;
                      instAdd = (postcode!=null ? postcode:'');   
 
-                    string street = job.Install_Street__c!=null?job.Install_Street__c.normalizeSpace().replaceall(' ','+').trim():'';
-                    string city = job.Install_City__c!=null ? job.Install_City__c.normalizeSpace().replaceall(' ','+').trim():'';
-                    string pcode = job.CHI_Lead__r.Install_Postcode__c!=null?job.CHI_Lead__r.Install_Postcode__c.normalizeSpace().replaceall(' ','+').trim():'';
-          
-                    string Address = street + '+'+city+ '+' +pcode;
-                    try{
-                        list<string> Latlang = Utilities.getLatLang(Address,pcode);
-                        if(Latlang.size()==2)
-                        {
-                            job.Latitude__Latitude__s = double.valueof(Latlang[0]);
-                            job.Latitude__Longitude__s = double.valueof(Latlang[1]);
-                            job.Longitude__Latitude__s = double.valueof(Latlang[0]);
-                            job.Longitude__Longitude__s =  double.valueof(Latlang[1]);
-                        }   
-                    }catch (Exception e)
+                    /*if(job.Latitude__Latitude__s==null)
                     {
-                        
-                    }
+                        string street = job.Install_Street__c!=null?job.Install_Street__c.normalizeSpace().replaceall(' ','+').trim():'';
+                        string city = job.Install_City__c!=null ? job.Install_City__c.normalizeSpace().replaceall(' ','+').trim():'';
+                        string pcode = job.CHI_Lead__r.Install_Postcode__c!=null?job.CHI_Lead__r.Install_Postcode__c.normalizeSpace().replaceall(' ','+').trim():'';
+              
+                        string Address = street + '+'+city+ '+' +pcode;
+                        try{
+                            list<string> Latlang = Utilities.getLatLang(Address,pcode,street,city);
+                            if(Latlang.size()==2)
+                            {
+                                job.Latitude__Latitude__s = double.valueof(Latlang[0]);
+                                job.Latitude__Longitude__s = double.valueof(Latlang[1]);
+                                job.Longitude__Latitude__s = double.valueof(Latlang[0]);
+                                job.Longitude__Longitude__s =  double.valueof(Latlang[1]);
+                            }   
+                        }catch (Exception e)
+                        {
+                            
+                        }
+                    }*/
 
                      // Green Deal Change : Start  
                      gdJob=false;
@@ -412,8 +415,8 @@ public with sharing class BookJobOptionController {
                           }
                               // in case of refresh of page. Where we already calculated Travel then dont do it one more time.
                               if(s.result.Skill__c.equalsIgnoreCase('Travel Time'))
-                              dontCaltrav = true;
-                              
+                              dontCaltrav = true;                              
+                                                           
                               if(s.result.Diary_Entry_ID__r.Week__r.Employee__r.Supplier_Branch_Num__c=='2017')
                               {
                                 string EngName = s.result.Diary_Entry_ID__r.Week__r.Employee__r.Name;
@@ -530,8 +533,22 @@ public with sharing class BookJobOptionController {
                         //system.debug(Logginglevel.INFO,'I am INSIDE');
                          Set<string> TravelJob = new set<string>();
                          try{
-                         map<string, Search_Result__c> RecalengSearhResultMap = new  map<string, Search_Result__c>();  
-                         map<string, list<string>> indayJobTime = Utilities.calcluateIndayJobTime(engSearhResultMap.values(),job.CHI_Lead__r.Install_Postcode__c,null);
+                         map<string, Search_Result__c> RecalengSearhResultMap = new  map<string, Search_Result__c>(); 
+                         
+                         //don't calculate travel time before 9 AM                         
+                         /*List<Search_Result__c> srList = engSearhResultMap.values();
+                         String starttime = '09:00';
+                         for(search_result__c s:srlist)
+                         {
+                             if(s.Start_Date_Time__c.time()<DateTimeHelper.stringToTime(starttime))
+                                 engSearhResultMap.remove(s.Diary_Entry_ID__r.Week__r.Employee__r.Name);
+                         }*/
+                         //ends
+                         String jobPostCode = job.CHI_Lead__r.Install_Postcode__c;
+                         if(system.label.Bing_Google_API=='Bing'&&job.latitude__latitude__s!=null)
+                         JobPostCode = String.valueof(job.latitude__latitude__s)+','+string.valueof(job.latitude__longitude__s);
+                         
+                         map<string, list<string>> indayJobTime = Utilities.calcluateIndayJobTime(engSearhResultMap.values(),jobPostCode,null);
                          //system.debug(Logginglevel.INFO,'Engineer in Day Travel -->'+indayJobTime);
                          /*
                                Map formet for indayJobTime:
@@ -539,6 +556,7 @@ public with sharing class BookJobOptionController {
                                Employee Name----> connecting JOB ID/Travel Time/Direction
                                
                          */
+                         system.debug('Sugu indayJobTime '+indayJobTime);
                          list<SearchResult> travelTimeSr = new list<SearchResult>();
                          map<string, datetime> engEndNew  = new map<string, datetime>();
                          //system.debug(Logginglevel.INFO,'indayJobTime--->'+indayJobTime);
@@ -567,6 +585,8 @@ public with sharing class BookJobOptionController {
                              {
                                
                              }
+                             
+                             system.debug('Sugu potentialEnd '+potentialEnd);
                               
                              Search_Result__c src = engSearhResultMap.get(s);
                               Diary_Entry__c de = [select id , Week__r.Monday_Start_Time__c,
@@ -1394,7 +1414,7 @@ public with sharing class BookJobOptionController {
                   CHI_Lead__r.Does_the_customer_have_hot_water__c,CHI_Lead__r.Is_the_customers_boiler_working__c,
                   CHI_Lead__r.Is_the_customer_vulnerable__c,CHI_Lead__r.Vulnerable_reason__c,Engineer_Spoken_To__c,
                   Split_Job__c, Is_Remedial_Job__c, Is_Downtime_Job__c,Job_Reason__c,Status__c,Sub_Status__c,Job__c.Multiple_Re_Plans__c,
-                  (Select Id,Pre_installation_call_date__c from Customer_history_cards__r),
+                  /*(Select Id,Pre_installation_call_date__c from Customer_history_cards__r),*/
                   (Select Id, Prior_Delivery_Slot__c, Type__c, Status__c, Delivery_Date_Changed__c, Send_via_email__c, 
                     CreatedDate, Order_Value_Text__c,Prior_Order_Value__c, Customer_best_phone__c, Supplier_Name__c, Job_Delivery_Date__c, Prior_Delivery_date__c, 
                     Delivery_Slot__c, Enquiry_Number__c, Job__r.Name, Job__r.PlannerName__c, Job__r.CHI_Lead__r.CHI_Lead_Id__c, 
@@ -2139,7 +2159,7 @@ public with sharing class BookJobOptionController {
                   CHI_Lead__r.Does_the_customer_have_hot_water__c,CHI_Lead__r.Is_the_customers_boiler_working__c,
                   CHI_Lead__r.Is_the_customer_vulnerable__c,CHI_Lead__r.Vulnerable_reason__c, Engineer_Spoken_To__c,
                   Split_Job__c, Is_Remedial_Job__c, Is_Downtime_Job__c,Job_Reason__c,Status__c,Sub_Status__c,Job__c.Multiple_Re_Plans__c,
-                  (Select Id,Pre_installation_call_date__c from Customer_history_cards__r),
+                  /*(Select Id,Pre_installation_call_date__c from Customer_history_cards__r),*/
                   (Select Id, Prior_Delivery_Slot__c, Type__c, Status__c, Delivery_Date_Changed__c, Send_via_email__c, 
                     CreatedDate, Order_Value_Text__c,Prior_Order_Value__c, Customer_best_phone__c, Supplier_Name__c, Job_Delivery_Date__c, Prior_Delivery_date__c, 
                     Delivery_Slot__c, Enquiry_Number__c, Job__r.Name, Job__r.PlannerName__c, Job__r.CHI_Lead__r.CHI_Lead_Id__c, 

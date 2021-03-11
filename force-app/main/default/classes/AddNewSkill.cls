@@ -46,7 +46,7 @@ public with sharing class AddNewSkill
                                 Remote_Heating__c,
                                 Install_Postcode__c,
                                 Latest_Customer_Category__c,status__c,
-                                CHI_Lead__c,Is_Remedial_Job__c,Is_Downtime_Job__c,
+                                CHI_Lead__c,Is_Remedial_Job__c,Is_Downtime_Job__c,Latitude__Latitude__s,Latitude__Longitude__s,
             (select IsDeleted, Name, Order__c, Sub_Status__c, New_Supplier__c, New_Supplier_Number__c, Current_Supplier__c, Current_Supplier_Number__c, Units__c, Status__c, Skill__c, Product_ID__c, Line_Item_ID__c, ID, Description__c, Code__c from Job_Elements1__r where type__c='Work' AND Status__c='Active' AND Sub_Status__c != 'Returned' AND P5_IsItinerary__c!=TRUE order by Skill__c,Line_Item_ID__c),
             (select id,name,Week__c,week__r.Employee__c,supplier_num__c,Start__c,End__c,Employee_ID_18__c,Employee_Name__c,Sub_Type__c,Overbooked_Hours__c,Hours__c,Employee_ID__c, Job_Hours__c from Diary_Entries__r where RecordTypeId =: RecordTypeIdHelper.getRecordTypeId('Diary_Entry__c', 'Job Booking') order by sub_Type__c,Employee_ID__c )       
             from Job__c j where j.ID =: jobID];  
@@ -70,7 +70,8 @@ public with sharing class AddNewSkill
                         j.Override_Gap_Size_Tolerance__c, j.Named_Employee__r.Resource_Type__c,Remote_Heating__c , j.ECO_Hours__c,Latest_customer_category__c, Balancing_Skill__c,
                         District__r.Contractor__c,  District__r.Contractor_Band1__c, District__r.Contractor_Band2__c, District__r.Contractor_Band3__c, District__r.Own_Labour__c,
                         District__r.Consider_Contractors__c, District__r.Consider_Own_Labour__c ,j.Finance_Expiry_Date__c,j.Installation_Date__c, Simple_Skills__c,Heavy_Appliance__c,Override_Heavy_Appliance__c,Scaffolding_Required__c,Boiler_Location__c,Installation_Type__c,
-                        (select id,Week__c,Start__c,End__c,Employee_ID_18__c,Employee_Name__c,Sub_Type__c,Hours__c,Employee_ID__c from Diary_Entries__r), Overbooking_Identifier__c      
+                        (select id,Week__c,Start__c,End__c,Employee_ID_18__c,Employee_Name__c,Sub_Type__c,Hours__c,Employee_ID__c from Diary_Entries__r), Overbooking_Identifier__c ,
+                        Latitude__Latitude__s,Latitude__Longitude__s,Longitude__Latitude__s,Longitude__Longitude__s,Opt_In_Skills__c
                         from Job__c j where j.ID = :jobID];
         
         return job;
@@ -586,13 +587,26 @@ public with sharing class AddNewSkill
 
     public list<string> setSimpleSkills (Job__c job)
     {
-
         if(job.Simple_Skills__c!=null)
         return job.Simple_Skills__c.split(';');
         else 
         return new list<string>();
-
-
+    }
+    
+    public list<string> setOptInSkills (Job__c job)
+    {
+        if(job.Opt_In_Skills__c!=null)
+        {
+        List<String> optInlist = job.Opt_In_Skills__c.split(';');
+        List<String> optinlistUpdate = new List<String>(); 
+        for(String s:optInlist)
+        {
+           optinlistUpdate.add(s.trim());
+        }
+        return optinlistUpdate;
+        }
+        else 
+        return new list<string>();
     }
     
     public void setNewSkillHours(Job__c associatedJob, BigMachines_Quote__c triggerQuote, List<Job_Element__c> workJobElementsToInsert, List<Job_Element__c> jobElementsToRemove, boolean[] hoursAffected) //QuoteProductDecompile   
@@ -648,7 +662,7 @@ public with sharing class AddNewSkill
                         Electrical_Hours = Electrical_Hours + workJobElementsToInsert[y].Units__c;
                     else if(workJobElementsToInsert[y].Skill__c.toUpperCase()=='LPG INSTALLATION')
                         LPG_Installation_Hours = LPG_Installation_Hours + workJobElementsToInsert[y].Units__c;
-                    else if(workJobElementsToInsert[y].Skill__c.toUpperCase()=='FIREWALL HEATER FIXING')
+                    else if(workJobElementsToInsert[y].Skill__c.toUpperCase()=='FIRE/WALL HEATER FIXING')
                         Fire_Wall_Heater_Fixing_Hours = Fire_Wall_Heater_Fixing_Hours + workJobElementsToInsert[y].Units__c;
                     else if(workJobElementsToInsert[y].Skill__c.toUpperCase()=='CONTRACTOR INSTALLATION')
                         Contractor_Installation_Hours = Contractor_Installation_Hours + workJobElementsToInsert[y].Units__c;
@@ -715,7 +729,7 @@ public with sharing class AddNewSkill
                         Electrical_Hours = Electrical_Hours - jobElementsToRemove[y].Units__c;
                     else if(jobElementsToRemove[y].Skill__c.toUpperCase()=='LPG INSTALLATION')
                         LPG_Installation_Hours = LPG_Installation_Hours - jobElementsToRemove[y].Units__c;
-                    else if(jobElementsToRemove[y].Skill__c.toUpperCase()=='FIREWALL HEATER FIXING')
+                    else if(jobElementsToRemove[y].Skill__c.toUpperCase()=='FIRE/WALL HEATER FIXING')
                         Fire_Wall_Heater_Fixing_Hours = Fire_Wall_Heater_Fixing_Hours - jobElementsToRemove[y].Units__c;
                     else if(jobElementsToRemove[y].Skill__c.toUpperCase()=='CONTRACTOR INSTALLATION')
                         Contractor_Installation_Hours = Contractor_Installation_Hours - jobElementsToRemove[y].Units__c;

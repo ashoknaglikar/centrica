@@ -1,5 +1,5 @@
 public class getCapacityRes{
-    public static string LastRequestTime{get;set;}
+    //public static string LastRequestTime{get;set;}
     public static boolean FirstTime;
     public static string  auth_string1;
     public static DateTime StartTime;
@@ -38,7 +38,7 @@ public class getCapacityRes{
         Boolean calculate_travel_time=true; // Not needed
         Boolean calculate_work_skill=false; // this is
         Boolean return_time_slot_info=true; // AM PM EV
-        Boolean determine_location_by_work_zone=false;
+        Boolean determine_location_by_work_zone=system.label.workZoneSwitch == 'on';
         Boolean dont_aggregate_results=true;
         Integer min_time_to_end_of_time_slot=125; // more info needed
         //Integer default_duration=60; // not needed
@@ -81,7 +81,7 @@ activity_field.add(activity_field3);
                                                                     return_time_slot_info,determine_location_by_work_zone,dont_aggregate_results,min_time_to_end_of_time_slot,
                                                                     null,null,null,activity_field);
         
-        system.debug('Response Recieved -- >'+capRes);
+        system.debug(' Sugu Response Recieved -- >'+capRes);
         return capRes;
     }
     
@@ -129,7 +129,7 @@ activity_field.add(activity_field3);
     }
     
     
-    
+    /*
     public static toatechResourcemanagement10.GetResourcesCalendarsResponseElement getCalendersResp(List<Id> empList,Date startDate,Date endDate)
     {
         system.debug('**tt'+startDate+endDate);
@@ -146,7 +146,7 @@ activity_field.add(activity_field3);
         string authstringbeforeMD5 = CDT+uniqueString;
         Blob authBlobafterMD5 = Crypto.generateDigest('MD5', Blob.valueOf(authstringbeforeMD5));
         auth_string1 = EncodingUtil.convertToHex(authBlobafterMD5);*/
-        
+        /*
         toatechResourcemanagement10.ResourceManagementPort resManPort=new toatechResourcemanagement10.ResourceManagementPort();
         toatechResourcemanagement10.AuthNodeElement user_x=new toatechResourcemanagement10.AuthNodeElement();
         user_x.now= CDT;
@@ -172,6 +172,7 @@ activity_field.add(activity_field3);
         toatechResourcemanagement10.GetResourcesCalendarsResponseElement calResp=resManPort.get_resources_calendars(user_x,resources);
         return calResp;
     }
+    */
     
     public static toaCapacity.get_quota_data_bucket_element[] getBuckClosure(List<Id> empList,Date startDate,Date endDate)
     {
@@ -235,6 +236,7 @@ activity_field.add(activity_field3);
     public static void getInternalActivity(Date startDate,Date endDate)
     {
         //return actRespList;
+        
         List<Employee__c> empIdNList=[Select id,name,Primary_role__c ,Inactive__c  from Employee__c where Primary_role__c = 'HSA' and Inactive__c = false Limit 50000];
         map<string,string> mapEmpIdName=new map<string,string>();
         for(Employee__c emp : empIdNList){
@@ -242,8 +244,64 @@ activity_field.add(activity_field3);
             system.debug('*emp.id'+emp.id);
         }
         boolean needsIterating = true;
-        integer page = 1;
+        
         List<OFS_Quota_Data__c> listSearchAct=new List<OFS_Quota_Data__c>();
+       
+        
+       
+        string url = 'searchInField=XA_internal&searchForValue=Internal';
+        string dateFrom = datetime.newinstance(startDate, time.newInstance(0,0,0,0)).format('yyyy-MM-dd');
+		string dateTo = datetime.newinstance(endDate, time.newInstance(0,0,0,0)).format('yyyy-MM-dd');
+        UnavailUpadateInOFS_Rest unavailRest = new  UnavailUpadateInOFS_Rest();
+		string jSonList = unavailRest.searchUnavail('0', dateFrom, dateTo, url);
+		searchActivityJSONClass searchActivityResponseObj = searchActivityJSONClass.parse(jSonList);
+		
+		if(searchActivityResponseObj!=null && searchActivityResponseObj.totalResults >0)
+		{
+		    Id recordTypeId=   [SELECT id,Name from RecordType where Name =:recTName].Id;
+		    //integer offset = searchActivityResponseObj.limit_x == 0;
+		    integer totalnumbers = searchActivityResponseObj.totalResults;
+		    decimal  totaliterations = (decimal.valueof(totalnumbers)/100.00);
+		    totaliterations= totaliterations.round(System.RoundingMode.CEILING);
+		    integer i = 0;
+		    while(i<totaliterations)
+		    {
+		        
+		        string newjSonList = unavailRest.searchUnavail(string.valueof(i*100), dateFrom, dateTo, url);
+		        searchActivityResponseObj = searchActivityJSONClass.parse(newjSonList);
+    		    
+    		    for(searchActivityJSONClass.cls_item item : searchActivityResponseObj.items)
+    		    {
+    		        if(item.status != 'cancelled')
+    		        {
+            		    OFS_Quota_Data__c newRec = new OFS_Quota_Data__c(recordtypeid=recordTypeId,
+            		                                                     Activity_Type__c=item.recordType,
+                                                                         Record_Type__c=item.recordType,
+                                                                         Activity_Id__c= item.activityId,
+                                                                         Activity_Status__c= item.status,
+                                                                         Date__c = item.date_x,
+                                                                         AM_Internal_activities_hrs__c= item.duration,
+                                                                         Duration_Final__c = item.XA_duration,
+                                                                         Activity_Start_Time__c = datetime.valueof(item.startTime),
+                                                                         Activity_End_Time__c = datetime.valueof(item.endTime),
+                                                                         Activity_Work_Type__c = OFSUnavailabilityReasons__c.getInstance(item.activityType)!=null?OFSUnavailabilityReasons__c.getInstance(item.activityType).Value__c:item.activityType,
+                                                                         time_of_assignment__c = datetime.valueof(item.timeOfAssignment),
+                                                                         time_of_booking__c = datetime.valueof(item.timeOfBooking),
+                                                                         Bucket_Name__c=mapEmpIdName.get(item.resourceId));
+                        
+                        newRec.External_ID__c=Utilities.popluateExternalId(newRec);
+            		    
+            		    
+            		    listSearchAct.add(newRec);
+            		    
+            		    i++;
+            		   
+    
+    		            }
+    		    } 
+		    }
+		}
+        /*
         while(needsIterating)
         {
             startTime = system.now();
@@ -258,7 +316,7 @@ activity_field.add(activity_field3);
             string authstringbeforeMD5 = CDT+uniqueString;
             Blob authBlobafterMD5 = Crypto.generateDigest('MD5', Blob.valueOf(authstringbeforeMD5));
             auth_string1 = EncodingUtil.convertToHex(authBlobafterMD5);*/
-            
+            /*
             toaActivity.user_x user_x =new toaActivity.user_x();
             user_x.now=CDT;
             user_x.login=string.valueof(system.Label.toa_user);
@@ -371,6 +429,7 @@ activity_field.add(activity_field3);
             
             
         }
+        */
         
         if(listSearchAct.size()>0)
         {

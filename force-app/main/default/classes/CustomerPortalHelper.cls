@@ -5,7 +5,7 @@ public class CustomerPortalHelper {
         String keyPrefix = r.getKeyPrefix();
         if(Sf_id!=null)
         {
-          if(!Sf_id.startswith(keyPrefix) && Sf_id.length()>=18)
+          if( Sf_id.length()>18)
           { 
               System.debug('SF_ID-->'+Sf_id);
               IV_Vectors__c  keyRecord = IV_Vectors__c.getinstance('Customer Portal');
@@ -16,7 +16,7 @@ public class CustomerPortalHelper {
               system.debug('opp id ='+oppid);
               return oppid;
           }
-          else{
+          else  if(Sf_id.startswith(keyPrefix)){
               return Sf_id ;
           }
         }else
@@ -24,6 +24,7 @@ public class CustomerPortalHelper {
             return null;
         }
         
+        return '';
         
     }
 
@@ -217,6 +218,33 @@ public class CustomerPortalHelper {
            
            system.debug(deliverySlot);
           return deliverySlot;
+    }
+    
+    public class financeProduct
+    {
+        public decimal rate;
+        public string productCode;
+        public decimal numberOfMonths;
+        public decimal repaymentDue;
+        public Finance_Product__c fProd;
+        public decimal orderNum;
+        public string financeOption;
+        public financeProduct(Finance_Product__c fProd)
+        {
+            this.fProd= fProd;
+            this.rate = fProd.Interest_Rate__c;
+            this.productCode = fProd.Code__c;
+            this.repaymentDue= fProd.Deferral_Period__c;
+            this.numberOfMonths = fProd.Tenure_in_Months__c;
+            this.orderNum = fProd.Order__c;
+            this.financeOption = fProd.Finance_Options__c;
+        }
+        
+    }
+    
+    public static list <Finance_Product__c> getEligibleFinanceProducts (date quoteCreatedDate, date leadCreatedDate  )
+    {
+        return new list<Finance_Product__c> ([Select id,Interest_Rate__c, Deferral_Period__c,Tenure_in_Months__c,Code__c,Order__c,Finance_options__c from Finance_Product__c where Start_Date__c <= :quoteCreatedDate and Final_Date__c >= : quoteCreatedDate and End_Date__c >= : leadCreatedDate and Selectable__c = true order by Tenure_in_Months__c]);
     }
 
     

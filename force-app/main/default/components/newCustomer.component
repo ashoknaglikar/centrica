@@ -428,8 +428,27 @@
                 </apex:pageblocksectionitem>
                 <apex:pageblocksectionitem >
                     <apex:outputLabel value="Reason for Quote"/>
-                    <apex:inputfield value="{!Opportunities[0].Enquiry_Reason__c}" required="true"/>
+                    <apex:actionregion >
+                        <apex:inputfield value="{!Opportunities[0].Enquiry_Reason__c}" required="true">
+                        <apex:actionsupport event="onchange" reRender="calorengi"/>  
+                        </apex:inputfield>
+                    </apex:actionregion>
                 </apex:pageblocksectionitem>
+                <apex:outputpanel id="calorengi">
+                    <apex:pageblocksectionitem rendered="{!Opportunities[0].Enquiry_Reason__c == 'Calor Gas' }" >
+                        <b>At the moment, we are unable to provide you with a boiler quote until you have arranged an LPG supply. Calor Gas Limited is the UK’s leading LPG supplier. Are you interested in BG passing your contact details onto Calor to allow them to discuss with you the possibility of them installing an LPG supply for you?</b>
+                        <apex:actionregion >
+                            <apex:inputfield value="{!Opportunities[0].Referred_to_Calor__c}" required="true" id="calor_engiField" >
+                                <apex:actionsupport event="onchange" reRender="calorfurtherMessageone"/>  
+                            </apex:inputfield>
+                        </apex:actionregion>
+                    </apex:pageblocksectionitem>
+                </apex:outputpanel>
+                <apex:outputpanel id="calorfurtherMessageone" > 
+                    <apex:pageblocksectionitem rendered="{!Opportunities[0].Referred_to_Calor__c == 'Referred to Calor'}" >
+                        <b>When I transfer your call, I'll give Calor Gas Limited your name, address, email address, and contact number, so they can quote for a tank installation. If you progress with Calor, Calor may advise us when they have completed the tank installation. If you would like more information about how Calor Gas uses your personal information, please visit www.calor.co.uk/privacy. Is that okay? 0800 389 1926</b>
+                    </apex:pageblocksectionitem>
+                </apex:outputpanel>
                 <apex:pageblocksectionitem >
                     <apex:outputLabel value="Unsafe Reason"/>
                     <apex:inputfield value="{!Opportunities[0].Unsafe_Appliance_Reason__c}" required="true"/>
@@ -634,15 +653,20 @@
                     <apex:inputfield value="{!ListContactInfo[0].contact.Occupier__c}" required="true" />
                 </apex:pageblocksectionitem>
                 
-                <apex:pageblocksectionitem >
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), false, true)}">
                     <apex:outputLabel value="Home Phone"/>
                     <apex:inputfield value="{!ListContactInfo[0].contact.HomePhone}" />
                 </apex:pageblocksectionitem>
                 
                 
-                <apex:pageblocksectionitem >
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), false, true)}">
                     <apex:outputLabel value="Mobile"/>
                     <apex:inputfield value="{!ListContactInfo[0].contact.MobilePhone}" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                    <apex:outputLabel value="Best Contact Number"/>
+                    <apex:inputfield value="{!ListContactInfo[0].contact.Phone}" />
                 </apex:pageblocksectionitem>
                 
                 <apex:pageblocksectionitem >
@@ -652,22 +676,45 @@
                 
                 <apex:pageblocksectionitem id="gs" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
                     <apex:outputLabel value="Gas Supply" />
-                    <apex:inputfield value="{!account.Gas_Supply_At_Address1__c}" required="true" id="gs1"/>
+                    <apex:actionregion >
+                        <apex:inputfield value="{!account.Gas_Supply_At_Address1__c}" required="true" id="gs1">
+                            <apex:actionsupport event="onchange" rerender="combib"/>
+                        </apex:inputfield>
+                    </apex:actionregion>
                 </apex:pageblocksectionitem>
+
+                <apex:outputpanel id="combib">
+                    <apex:pageblocksectionitem rendered="{!account.Gas_Supply_At_Address1__c == 'No' }" >
+                        <b>At the moment, we are unable to provide you with a boiler quote until you have arranged an LPG supply. Calor Gas Limited is the UK’s leading LPG supplier. Are you interested in BG passing your contact details onto Calor to allow them to discuss with you the possibility of them installing an LPG supply for you? </b>
+                        <br/>
+                        <apex:actionregion >
+                            <apex:inputfield value="{!Opportunities[0].Referred_to_Calor__c}" required="true" id="calor" >
+                                <apex:actionSupport event="onchange" rerender="calorfurtherMessagetwo"/>
+                            </apex:inputfield>    
+                        </apex:actionregion>
+                    </apex:pageblocksectionitem>
+                </apex:outputpanel>
+
+                <apex:outputpanel id="calorfurtherMessagetwo" > 
+                    <apex:pageblocksectionitem rendered="{!Opportunities[0].Referred_to_Calor__c == 'Referred to Calor'}" >
+                        <b>When I transfer your call, I'll give Calor Gas Limited your name, address, email address, and contact number, so they can quote for a tank installation. If you progress with Calor, Calor may advise us when they have completed the tank installation. If you would like more information about how Calor Gas uses your personal information, please visit www.calor.co.uk/privacy. Is that okay? 0800 389 1926</b>
+                    </apex:pageblocksectionitem>
+                </apex:outputpanel>
                 
                 <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
                     <apex:outputLabel value="Product Interest"/>
-                    <apex:inputfield value="{!Opportunities[0].Product_Interest__c}" required="true"/>
+                    <apex:inputfield value="{!Opportunities[0].Product_Interest__c}" required="true"></apex:inputfield>           
                 </apex:pageblocksectionitem>
                 
-                <apex:pageblocksectionitem id="EB" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
+                
+               <!-- <apex:pageblocksectionitem id="EB" rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)}">
                     <apex:outputLabel value="Exisiting Boiler" />
                     <apex:actionregion >
                         <apex:inputfield value="{!Opportunities[0].Boiler_type__c}" required="true" id="EB1">
                             <apex:actionsupport event="onchange" rerender="combib"/>
                         </apex:inputField>
                     </apex:actionregion>
-                </apex:pageblocksectionitem>
+                </apex:pageblocksectionitem>-->
                 
                 <!--
                 <apex:pageblocksectionitem id="bedroom">
@@ -816,15 +863,20 @@
                     <apex:inputfield value="{!ListContactInfo[1].contact.Occupier__c}" required="true"/>
                 </apex:pageblocksectionitem>
                 
-                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), false, true) &&showSecCon}">
                     <apex:outputLabel value="Home Phone"/>
                     <apex:inputfield value="{!ListContactInfo[1].contact.HomePhone}" />
                 </apex:pageblocksectionitem>
                 
                 
-                <apex:pageblocksectionitem rendered="{!showSecCon}" >
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), false, true) && showSecCon}">
                     <apex:outputLabel value="Mobile"/>
                     <apex:inputfield value="{!ListContactInfo[1].contact.MobilePhone}" />
+                </apex:pageblocksectionitem>
+                
+                <apex:pageblocksectionitem rendered="{!if(OR(displayModeVal == 1,displayModeVal == 2,displayModeVal == 5,displayModeVal == 6), true, false)&& showSecCon}">
+                    <apex:outputLabel value="Best Contact Number"/>
+                    <apex:inputfield value="{!ListContactInfo[1].contact.Phone}" />
                 </apex:pageblocksectionitem>
                 
                 

@@ -1379,6 +1379,21 @@ require(['bower_components/q/q'], function (Q) {
             }
         }
         
+         //Check if the allowance is valid lead allowance and check with the lead aloowance id associated with the Lead(Opportunity).
+         //It removes the lead allowances that are not selected in the oppotunity and keeps only the allowance that are selected in the Lead Allowance field in the CHI Lead.
+        var leadAllowanceId = CS.getAttributeValue('Lead_Allowance_0');
+		   CS.Log.warn('Filtering by Lead Allowance');
+		   for (var i = 0; i < filteredAllowancesByCategoryAvailability.length; i++) {
+		       var allowance = filteredAllowancesByCategoryAvailability[i];
+		       if(allowance.Valid_Lead_Allowance__c == true){
+		        if(leadAllowanceId.length == 0 || allowance.Id != leadAllowanceId){
+		             filteredAllowancesByCategoryAvailability.splice(i,1);
+		             i--;
+		        }
+		    }
+
+		}
+		
         CS.Log.warn('Final Allowances for next select list: ' + filteredAllowancesByCategoryAvailability.length);
         //CS.Log.warn(filteredAllowancesByCategoryAvailability);
             

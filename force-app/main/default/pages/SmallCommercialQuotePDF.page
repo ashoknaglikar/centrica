@@ -1,10 +1,39 @@
 <apex:page Controller="CS_QuoteOnlineTemplateController" action="{!deleteTempAttachment}"  showHeader="false" applyHtmlTag="false" sidebar="false" >
 <html lang="en">     
    
+    <head>
+        <style>
 
+            @page {
+                size: A4;
+                margin-top: 5mm;
+                margin-bottom: 15mm;
+                margin-left: 10mm;
+                margin-right: 10mm;
+                font-size: 70%;
+
+
+                @bottom-right {
+                    font-family: sans-serif;
+                    font-size: 60%;
+                    width: 100px;
+                    content: "Page "counter(page) " of "counter(pages);
+                }
+
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+
+            div.footer {
+                position: running(footer);
+                font-size: 9px;
+            }
+         
+        </style>
+    </head>
     <body>
         <page size="A4" id="page1">
-            
             <div class="content" style="width: 700px; margin-left: 5px; margin-right: 5px; height: 950px; ">
                 <div class="clearfix" id="logoPng">
                     <apex:image id="_theImageBG" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}" width="150" rendered="{!logoBG == true}" />
@@ -43,8 +72,8 @@
                             </p>
                         </div>
                         
-                    
-                        <div id="small-circle" class="greenBallon" style="width:140px;height:140px;margin-bottom:0px;">
+                        <apex:outputPanel rendered="{!BusinessType == 'Regulated'}">
+                              <div id="small-circle" class="greenBallon" style="width:140px;height:140px;margin-bottom:0px;">
                            <p style="padding-top: 25%;">Spread <br/>the cost over <br/>
                            2,3 or 5years <!--<br/> <span id='minMonthlyTotal' class='boldText'><apex:outputtext value="{!greenBallonPrice}" escape="false"/></span> <br/> 
                            per month&#42;-->
@@ -71,6 +100,9 @@
                                 </p>
                             </div>
                         </div>
+
+                        </apex:outputPanel>
+                        
                     </div>
                 </div>
                
@@ -89,7 +121,7 @@
                         <p style="font-size: 12px;">I confirm that I am the owner of the property or that I have secured the necessary permission from the homeowner.
                             <br/> I agree to pay the amount quoted above. I'm aware that I can cancel up to 14 days after the day the goods are delivered (the "cooling off period").
                             I give permission for the installation to start during the cooling off period. I'm aware that if I cancel I'll have 
-                            to pay for any work carried out or goods installed before I cancel.I also conﬁrm that I accept the Terms and Conditions 
+                            to pay for any work carried out or goods installed before I cancel.I also confirm that I accept the Terms and Conditions 
                             for Commercial Installations and the Business Care Essential Plan (Installation) Terms and Conditions which can both 
                             be found at https://www.britishgas.co.uk/business/energy-services/commercialboiler-installations<br/></p>
                         <p style="font-size: 8px;"> <br/></p>
@@ -127,9 +159,9 @@
                             <p>
                                 Full Terms and Conditions for Business Care Essential Plan (Installation): Our 3 Year Service and Maintenance Plan can be found at https://www.britishgas.co.uk/business/energy-services/commercial-boiler-installations
                             </p>
-                            <p><span id="company1">British Gas</span> is the trading name of British Gas New Heating Limited. 
+                            <!--<p><span id="company1">British Gas</span> is the trading name of British Gas New Heating Limited. 
                                 Registered in England and Wales(No. 06723244) Registered office: Millstream, Maidenhead Road, 
-                                Windsor, Berkshire SL4 5GD. </p>
+                                Windsor, Berkshire SL4 5GD. </p>-->
                         </div>
                     </div>
                 </div>
@@ -233,11 +265,11 @@
         <page size='A4' id="page3">
             <div class="content" style="page-break-before: always;">
                 <div class="clearfix" id="logoPng3">
-                    <apex:image id="theImageBG2_" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}" width="150"  />
-                   
+                    <apex:image id="theImageBG2_" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}" width="150" rendered="{!logoBG == true}" />
+                    <apex:image styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'SG_logo_s.resource')}" width="150" rendered="{!logoBG == false}" />
                 </div>
                 <div style ="position:relative;top:-20px">
-                    <p class="pageHeading">Your Payment Options</p>
+                      <p class="pageHeading">Your Payment Options</p>
                         <div style = "font-size:12px">
                             <span class="boldText">BACS/Credit/Debit card/cheque </span> – if you want to pay in one lump sum using your own funds or a loan you have arranged yourself.
                         </div>
@@ -253,7 +285,9 @@
                         <div style = "padding-left: 2em;font-size:12px">
                            <span class="boldText" >Cheque</span> – made payable to <span class="boldText" >British Gas New Heating Limited</span>. Please write the <span class="boldText" >Deposit Number</span> shown on the payment section of your quotation on the back of the cheque. 
                         </div>
-                        <h3 style='font-size: 15px;'>2 Year Interest Free Hire Purchase (0% APR)</h3>
+                        <apex:outputPanel rendered="{!BusinessType == 'Regulated'}">
+                        <div id = 'paymentIllustration'>
+                            <h3 style='font-size: 15px;'>2 Year Interest Free Hire Purchase (0% APR)</h3>
                         <div style = "padding-left: 2em;font-size:12px">
                             •   Available over 2 years at 0% APR
                         </div>    
@@ -376,74 +410,18 @@
                             </tr>
                             </tbody>
                         </table>
-                        <br/>
-                        <!--<table class="loanTableWithIFC" id="personalisedIllustration">
-                            
-                            <tr>
-                                <th class="boldText" style='padding-left: 1em;text-align: left;'>APR</th>
-                                <th class="boldText" style='text-align: center;'>0%</th>
-                                <th class="boldText" style='text-align: center;' colspan="2">7.9%</th>
-                            </tr>
-                            
-                            <tr>
-                                <td class="boldText" style='padding-left: 1em;text-align: left'>Length of hire purchase agreement</td>
-                                <td class="boldText" style='text-align: center'>2 years</td>
-                                <td class="boldText" style='text-align: center'>3 years</td>
-                                <td class="boldText" style='text-align: center'>5 years</td>
-                            </tr>
-                            <tr>
-                                <td style='padding-left: 1em'>Minimum monthly payment</td>
-                                <td class="centerText"><span id="mmp_8"><apex:outputtext value="{!inputQuoteData.mmp_2}" escape="false"/></span></td>
-                                <td class="centerText"><span id="mmp_3"><apex:outputtext value="{!inputQuoteData.mmp_3}" escape="false"/></span></td>
-                                <td class="centerText"><span id="mmp_5"><apex:outputtext value="{!inputQuoteData.mmp_5}" escape="false"/></span></td>
-                                
-                            </tr>
-                            <tr class="last">
-                                <td style='padding-left: 1em' class='leftRadius'>Total amount repayable over the period</td>
-                                <td class="centerText"><span id="tar_8"><apex:outputtext value="{!inputQuoteData.tar_2}" escape="false"/></span></td>
-                                <td class="centerText"><span id="tar_3"><apex:outputtext value="{!inputQuoteData.tar_3}" escape="false"/></span></td>
-                                <td class="centerText"><span id="tar_5"><apex:outputtext value="{!inputQuoteData.tar_5}" escape="false"/></span></td>
-                                
-                            </tr>
-                        </table>
-
-                        <h3 style='font-size: 15px;'>Representative Example</h3>
-                        <table class="waysToPayTable" id="representativeExample">
-                            <tbody>
-                                <tr class="boldText">
-                                    <th class="centerText">Cash Price of Installation</th>
-                                    <th class="centerText">Advance Payment (Deposit)</th>
-                                    <th class="centerText">Loan Amount</th>
-                                    <th class="centerText">Term of loan</th>
-                                    <th class="centerText">Monthly replayment</th>
-                                    <th class="centerText">Total amount payable (including deposit)</th>
-                                    <th class="centerText">Rate of interest</th>
-                                    <th class="centerText">Representative APR</th>
-                                </tr>
-                                <tr class="last">
-                                    <td class="leftRadius centerText">£3,500</td>
-                                    <td class="centerText">£0</td>
-                                    <td class="centerText">£3,500</td>
-                                    <td class="centerText">2 years</td>
-                                    <td class="centerText">£145.83</td>
-                                    <td class="centerText">£3,500</td>
-                                    <td class="centerText" style="height: 50%;">0%</td>
-                                    <td class="centerText boldText" style='font-size:115%'>0%</td>
-                                </tr>
-                            </tbody>
-                        </table>-->
+                        </div>
+                        </apex:outputpanel>
+                        <!-- <div class="footer" name="footer">
+              <p style= "font-size: 9px;margin-left: -10px;margin-right: -10px">British Gas is the trading name of British Gas New Heating Limited (No. 06723244). British Gas New Heating Limited is an appointed representative of British Gas Services Limited (No. 03141243) which is authorised and regulated by the Financial Conduct Authority (Financial Services Register no. 490568). 
+               Both companies are registered in England and Wales. Registered office: Millstream, Maidenhead Road, Windsor, Berkshire SL4 5GD. 
+               Hire Purchase is subject to status and are only available to businesses.</p>
+            </div> -->
                         
-                        
-                        
-                        <p style= "font-size: 9px;margin-left: -10px;margin-right: -10px">
-                        British Gas is the trading name of British Gas New Heating Limited (No. 06723244). British Gas New Heating Limited is an appointed representative of British Gas Services Limited (No. 03141243) which is authorised and regulated by the Financial Conduct Authority (Financial Services Register no. 490568). Both companies are registered in England and Wales. Registered office: Millstream, Maidenhead Road, Windsor, Berkshire SL4 5GD. Hire Purchase is subject to status and are only available to businesses.
-                        </p>
-                </div>
-            </div>
-            
-            
+                  </div>
+             </div>  
         </page> 
-       
+        
     </body>
    
     </html> 

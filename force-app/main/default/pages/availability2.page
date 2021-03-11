@@ -97,6 +97,9 @@ function togglleDiv(show){
                 <apex:column headerValue="HSA Employment Type" rendered="{!if(gDeal=='3', false, true)}">                        
                         <apex:outputText style="{!If(ava.IsBestResource,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!ava.hsaEmployeeType}"/>                       
                 </apex:column>
+                 <apex:column headerValue="Social Contact App" rendered="{!if(gDeal=='3', false, true)}">                        
+                    <apex:outputText style="{!If(ava.IsBestResource,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!ava.app.Assigned_to__r.Social_Contact_App__c}"/>                       
+                </apex:column>
                 <apex:column headerValue="Option">                                                                                                                     
                     <apex:commandLink action="{!onClickBook}" style="{!If(ava.IsBestResource,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="Book Now" id="theButton" onclick="check(this);" oncomplete="isClickedReset()" reRender="frm" >     
                          <apex:param name="selectedAppId" value="{!ava.appointmentId}"/>
@@ -106,7 +109,7 @@ function togglleDiv(show){
             </apex:dataTable>
         </apex:pageblocksection>
             
-        <apex:pageblocksection columns="2" title="Who will be there:" rendered="{!(if(gDeal=='3', false, true))&&!isHSA}">
+        <apex:pageblocksection columns="2" title="Who will be there:" rendered="{!(if(gDeal=='3', false, true))}">
             <apex:pageblocksectionitem >
                 <apex:outputLabel value="Appointment Attendee" />
                 <apex:selectlist value="{!apptAttendee}" size="1" id="picklist">

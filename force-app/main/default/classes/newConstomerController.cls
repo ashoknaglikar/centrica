@@ -170,10 +170,12 @@ public class newConstomerController {
     }
    public  void AgreeAndAccept(){
         Opportunities[0].Customer_Marketing_Consent__c='Yes';
+        populateNumbers();
+        
         
         optOutBttnClr='#b3e000';
         boolean atleastone = false;
-       String str='';
+        String str='';
         for(PicklistWrapper p : piclistValues)
         {
             
@@ -205,14 +207,27 @@ public class newConstomerController {
     }
     
      public  void  OptOut(){
-     Opportunities[0].Customer_Marketing_Consent__c='No';
-     for(PicklistWrapper p : piclistValues)
-     {
-         p.isSelected = false;
-     }
-      optOutBttnClr='red';
+         populateNumbers();
+         Opportunities[0].Customer_Marketing_Consent__c='No';
+         for(PicklistWrapper p : piclistValues)
+         {
+             p.isSelected = false;
+         }
+          optOutBttnClr='red';
          acceptBttnClr='#b3e000';
-    } 
+    }
+    
+    
+    public void populateNumbers()
+    {
+        if(coninfoList[0].contact.Phone!=null ){
+            if(coninfoList[0].contact.Phone.startswith('07')){
+                coninfoList[0].contact.MobilePhone = coninfoList[0].contact.Phone;
+            }else{
+                coninfoList[0].contact.HomePhone = coninfoList[0].contact.Phone;
+            }
+        }
+    }
 
     
 }

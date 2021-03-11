@@ -995,7 +995,7 @@ system.debug('Testing3-->'+ordrItmList);
         mail.setPlainTextBody(sPlainText);
         Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
          }*/
-         
+        /* 
         boolean schedule = true;
         
         fOR(CronTrigger c : [SELECT Id, CronJobDetail.Id, NextFireTime, CronJobDetail.Name, CronJobDetail.JobType  FROM CronTrigger 
@@ -1022,6 +1022,7 @@ system.debug('Testing3-->'+ordrItmList);
             }catch (exception e) {}
             
         }
+        */
    
    }
    

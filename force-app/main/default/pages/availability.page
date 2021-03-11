@@ -18,8 +18,15 @@
         alert("You are trying to book a Remote Quote Appointment! If you are looking to book a HSA Appointment than cancel  this lead and create a new lead to book a HSA Appointment.");
       }
     }*/
+    
+    window.onload = function()
+     {
+         window.scrollTo(0,0);
+     }; 
  
 </script> 
+
+
 
 <apex:form id="form">   
 
@@ -86,9 +93,13 @@
           <apex:commandButton action="{!onClickExit}" value="Exit" />
           <!-- end IntegratedScript changes -->
           <!-- <apex:commandButton action="{!onClickHours}" value="{!twoHrLabel}"/> -->
+          <apex:commandButton value="7 day View" action="{!backto7DayView}" reRender="form" rendered="{!issearchforday}"/>
           <apex:commandButton action="{!onClickNoSuitable}" value="{!NoSuitableLabel}" onclick="togglleDiv('');" oncomplete="togglleDiv('none');"  reRender="TheBlock" rendered="{!!isHSA}"/>      
-          <apex:commandButton action="{!onClickBack7}" value="Back 7 Days"/>
-          <apex:commandButton action="{!onClickForward7}" value="Forward 7 Days"/>   
+          <apex:commandButton action="{!onClickBack7}" value="Back 7 Days" rendered="{!!issearchforday}"/>
+          <apex:commandButton action="{!onClickForward7}" value="Forward 7 Days" rendered="{!!issearchforday}"/> 
+          
+          <apex:commandButton action="{!onClickBack7}" value="Back 1 Day" rendered="{!issearchforday}"/>
+          <apex:commandButton action="{!onClickForward7}" value="Forward 1 Day" rendered="{!issearchforday}"/>
           <!-- CR MC014 -->
           <apex:commandButton action="{!onClickCancel}" value="Cancel Original Appointment" rendered="{!showCancelButton}" />   
           <!-- CR MC014 -->          
@@ -131,6 +142,23 @@
                 </td>
             </tr>
         </table> 
+      </apex:outputpanel> <br/> 
+      
+      <apex:outputpanel >
+        <table>
+            <tr>
+                <td >
+                    <label><b>Search for the day :</b></label>
+                </td>
+                <td >
+                    <apex:inputField value="{!thisOpp.Actual_Call_Back_Date__c}" >
+                       <!-- <apex:inputText styleClass="cssbody" value="{!serachforDay}" size="10" id="demo" onfocus="DatePicker.pickDate(false, 'form:form:demo', false);" />-->
+                        <apex:commandButton value="Search" action="{!searchfortheDay}" reRender="form"/>
+                    </apex:inputField>
+                    
+                </td>
+            </tr>
+        </table> 
       </apex:outputpanel> <br/>  
       
       
@@ -141,37 +169,37 @@
                         <apex:facet name="header">Time</apex:facet>
                         <apex:outputText value="{!ava.timeTitle}"/>
                 </apex:column>
-                   <apex:column headerValue="{!day0Title}">         
+                   <apex:column headerValue="{!day0Title}" rendered="{!if(issearchforday,if(activedaytitle==day0Title,true,false),true)}">          
                         <!-- IntegratedScript changes -->                                       
                         <apex:outputLink style="{!If(ava.Availability0Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day0availableminutes}&var_date={!activeDate0}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability0Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day0Available}</apex:outputLink>                                       
                         <!-- endIntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day1Title}">  
+                <apex:column headerValue="{!day1Title}" rendered="{!if(issearchforday,if(activedaytitle==day1Title,true,false),true)}">  
                         <!-- IntegratedScript changes -->                       
                         <apex:outputLink style="{!If(ava.Availability1Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day1availableminutes}&var_date={!activeDate1}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability1Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day1Available}</apex:outputLink>        
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day2Title}">                       
+                <apex:column headerValue="{!day2Title}" rendered="{!if(issearchforday,if(activedaytitle==day2Title,true,false),true)}">                       
                         <!-- IntegratedScript changes -->
                         <apex:outputLink style="{!If(ava.Availability2Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day2availableminutes}&var_date={!activeDate2}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability2Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day2Available}</apex:outputLink>                        
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day3Title}">
+                <apex:column headerValue="{!day3Title}" rendered="{!if(issearchforday,if(activedaytitle==day3Title,true,false),true)}"> 
                         <!-- IntegratedScript changes -->
                         <apex:outputLink style="{!If(ava.Availability3Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day3availableminutes}&var_date={!activeDate3}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability3Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day3Available}</apex:outputLink>          
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day4Title}">
+                <apex:column headerValue="{!day4Title}" rendered="{!if(issearchforday,if(activedaytitle==day4Title,true,false),true)}">         
                         <!-- IntegratedScript changes -->                   
                         <apex:outputLink style="{!If(ava.Availability4Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day4availableminutes}&var_date={!activeDate4}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability4Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day4Available}</apex:outputLink>
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day5Title}">                       
+                <apex:column headerValue="{!day5Title}" rendered="{!if(issearchforday,if(activedaytitle==day5Title,true,false),true)}">                               
                         <!-- IntegratedScript changes -->
                         <apex:outputLink style="{!If(ava.Availability5Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day5availableminutes}&var_date={!activeDate5}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability5Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day5Available}</apex:outputLink>
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                 <apex:column headerValue="{!day6Title}">                       
+                 <apex:column headerValue="{!day6Title}" rendered="{!if(issearchforday,if(activedaytitle==day6Title,true,false),true)}">                                
                          <!-- IntegratedScript changes -->
                         <apex:outputLink style="{!If(ava.Availability6Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_min={!ava.day6availableminutes}&var_date={!activeDate6}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability6Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day6Available}</apex:outputLink>
                         <!-- end IntegratedScript changes -->
@@ -184,37 +212,37 @@
                         <apex:facet name="header">Time</apex:facet>
                         <apex:outputText value="{!ava.timeTitle}"/>
                 </apex:column>
-                   <apex:column headerValue="{!day0Title}">         
+                   <apex:column headerValue="{!day0Title}" rendered="{!if(issearchforday,if(activedaytitle==day0Title,true,false),true)}">                  
                         <!-- IntegratedScript changes -->                                       
                         <apex:outputLink style="{!If(ava.Availability0Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate0}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability0Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day0Available}</apex:outputLink>                                       
                         <!-- endIntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day1Title}">  
+                <apex:column headerValue="{!day1Title}" rendered="{!if(issearchforday,if(activedaytitle==day1Title,true,false),true)}">           
                         <!-- IntegratedScript changes -->                       
                         <apex:outputLink style="{!If(ava.Availability1Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate1}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability1Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day1Available}</apex:outputLink>        
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day2Title}">                       
+                <apex:column headerValue="{!day2Title}" rendered="{!if(issearchforday,if(activedaytitle==day2Title,true,false),true)}">                                
                         <!-- IntegratedScript changes -->
                         <apex:outputLink style="{!If(ava.Availability2Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate2}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability2Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day2Available}</apex:outputLink>                        
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day3Title}">
+                <apex:column headerValue="{!day3Title}" rendered="{!if(issearchforday,if(activedaytitle==day3Title,true,false),true)}">          
                         <!-- IntegratedScript changes -->
                         <apex:outputLink style="{!If(ava.Availability3Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate3}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability3Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day3Available}</apex:outputLink>          
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day4Title}">
+                <apex:column headerValue="{!day4Title}" rendered="{!if(issearchforday,if(activedaytitle==day4Title,true,false),true)}">        
                         <!-- IntegratedScript changes -->                   
                         <apex:outputLink style="{!If(ava.Availability4Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate4}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability4Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day4Available}</apex:outputLink>
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                <apex:column headerValue="{!day5Title}">                       
+                <apex:column headerValue="{!day5Title}" rendered="{!if(issearchforday,if(activedaytitle==day5Title,true,false),true)}">                                
                         <!-- IntegratedScript changes -->
                         <apex:outputLink style="{!If(ava.Availability5Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate5}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability5Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day5Available}</apex:outputLink>
                         <!-- end IntegratedScript changes -->
                 </apex:column>
-                 <apex:column headerValue="{!day6Title}">                       
+                 <apex:column headerValue="{!day6Title}" rendered="{!if(issearchforday,if(activedaytitle==day6Title,true,false),true)}">                                
                          <!-- IntegratedScript changes -->
                         <apex:outputLink style="{!If(ava.Availability6Color,'font-weight:bold;font=calibri;size=3;Color:blue','')}" value="{!parameterString}&var_date={!activeDate6}{!ava.timeInfo}&highestAbility={!IF(HighestSalesOrTechnicalAbility == null || !ava.Availability6Color,0,HighestSalesOrTechnicalAbility)}" >{!ava.day6Available}</apex:outputLink>
                         <!-- end IntegratedScript changes -->

@@ -237,9 +237,9 @@
                                 
                                 <!-- Added as part of customer history card change request -->
                                 
-                                <apex:pageBlockSectionItem rendered="{!v_job.displayCustHistoryCard}">
+                                <apex:pageBlockSectionItem >
                                     <apex:outputLabel value="For navigating to Installation Notes" for="custHistCardLink"></apex:outputLabel>
-                                    <apex:outputLink value="https://c.{$label.Salesforce_Server}.content.force.com/servlet/servlet.FileDownload?file={!v_job.attachmentId}" target="_blank" id="custHistCardLink">{!v_job.attachmentname}</apex:outputLink>
+                                    <apex:outputLink value="https://c.{!$Label.Salesforce_Server}.content.force.com/servlet/servlet.FileDownload?file={!v_job.attachmentId}" target="_blank" id="custHistCardLink">{!v_job.attachmentname}</apex:outputLink>
                                 </apex:pageBlockSectionItem>
                                 
                                 <apex:pageBlockSectionItem >

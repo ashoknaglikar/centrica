@@ -74,6 +74,21 @@ public class selectRateForElements{
     public void fetchWorkSupplierRate(Set<String> suppNumSet,Map<String,Map<String,List<Job_Element__c>>> w_JobElementMap,
                                                                         String postCodeSec,String Region, string District){
                                                                             
+        
+        id finalGroupId ;
+        Geography_Group_Element__c districtGroup  = new Geography_Group_Element__c();
+        Geography_Group_Element__c postcodeGroup = new Geography_Group_Element__c();
+        
+        for(Geography_Group_Element__c gElement: [Select id,District__c,Postcode_sector__c,Geography_Group__c  from Geography_Group_Element__c where (District__c!=null AND District__c = :District) OR (Postcode_sector__c != null AND Postcode_sector__c = :postCodeSec) ])
+        {
+            if(gElement.District__c !=null )
+            districtGroup = gElement;
+            else if(gElement.Postcode_sector__c!=null)
+            postcodeGroup  = gElement;
+        }
+        finalGroupId = postcodeGroup.id !=null? postcodeGroup.Geography_Group__c :districtGroup.Geography_Group__c; 
+        system.debug('fetchWorkSupplierRate DBUG 1'+finalGroupId);
+                                                                            
         postCodeSkillRateMap=new Map<String,Map<String,Post_Code_Skill_Rate__c>>{};
         Map<String,Post_Code_Skill_Rate__c> postCodeSkillMap;
         rateCardItemMap=new Map<String,Map<String,Rate_Card_Items__c>>{};
@@ -83,50 +98,110 @@ public class selectRateForElements{
         Map<String,List<String>> rateCardMap=new Map<String,List<String>>{};
         //code fix done by BGSAMS Support for too many soql - starts
         List<Post_Code_Rate_Card__c> regionandpostcodelist =[Select Postcode_Sector__c, Region__c, Rate_Card__c,NationalRate__c,District__c, Post_Code_Rate_Card_Ext_Id__c, Id,Rate_Card__r.Supplier_Num__c ,
-                                                    (Select Skill__c, Cost__c, Preference__c From Post_Code_Skill_Rates__r) 
+                                                    (Select Skill__c, Cost__c, Preference__c From Post_Code_Skill_Rates__r) ,GeoGraphy_Group__c
                                                     From Post_Code_Rate_Card__c 
-                                                    Where ((Region__c=:Region OR NationalRate__c = true) OR Postcode_Sector__c=:postCodeSec OR District__c = :District )
+                                                    Where (Region__c=:Region OR NationalRate__c = true OR Postcode_Sector__c=:postCodeSec OR District__c = :District OR 
+                                                    GeoGraphy_Group__c = : finalGroupId)
                                                     And Rate_Card__r.Supplier_Num__c In:suppNumSet];                                                   
                                
         List<Post_Code_Skill_Rate__c> rateCardSkillLst=new List<Post_Code_Skill_Rate__c>{};
-        for (Post_Code_Rate_Card__c objRegionCard:regionandpostcodelist){
-        if ((objRegionCard.Region__c==Region)|| objRegionCard.NationalRate__c == true)
+        
+        list<Post_Code_Rate_Card__c>  finalRates = new list<Post_Code_Rate_Card__c>();
+        for(string s: suppNumSet)
         {
+            system.debug('Supplier Number' +s);
+            Post_Code_Rate_Card__c regionalNational ;
+            Post_Code_Rate_Card__c districtRate;
+            Post_Code_Rate_Card__c groupRate ;
+            Post_Code_Rate_Card__c postCodeRate ;
+            for (Post_Code_Rate_Card__c objRegionCard:regionandpostcodelist){
+                system.debug('objRegionCard' +objRegionCard);
+                if(s==objRegionCard.Rate_Card__r.Supplier_Num__c)
+                {
+                   
+                    if (objRegionCard.Region__c==Region || objRegionCard.NationalRate__c == true)
+                    {
+                        system.debug('I am in Region : ');
+                        regionalNational  = new Post_Code_Rate_Card__c();
+                        regionalNational = objRegionCard;
+                    }
+                    else if(objRegionCard.District__c == District)
+                    {
+                        system.debug('I am in district : ');
+                        districtRate =  new Post_Code_Rate_Card__c();
+                        districtRate = objRegionCard;
+                    }
+                    else if(finalGroupId!=null && objRegionCard.GeoGraphy_Group__c == finalGroupId)
+                    {
+                        system.debug('I am in new Group : ');
+                        groupRate = new Post_Code_Rate_Card__c();
+                        groupRate = objRegionCard;
+                    }
+                    else if(objRegionCard.Postcode_Sector__c == postCodeSec)
+                    {
+                        system.debug('I am in new postCodeSec : ');
+                        postCodeRate = new Post_Code_Rate_Card__c();
+                        postCodeRate = objRegionCard;
+                    }
+                }
+                
+            } 
+            system.debug('FOR Supplier : '+s +': '+postCodeRate);
+            system.debug('FOR Supplier : '+s +': '+groupRate);
+            system.debug('FOR Supplier : '+s +': '+districtRate);
+            system.debug('FOR Supplier : '+s +': '+regionalNational);
+            if(postCodeRate!=null)
+            finalRates.add(postCodeRate);
+            else if(groupRate!=null)
+            finalRates.add(groupRate);
+            else if(districtRate!=null)
+            finalRates.add(districtRate);
+            else if(regionalNational!=null)
+            finalRates.add(regionalNational);
+            else
+            system.debug('Nothing got added for this supplier:'+s);
+        }
+       
+        system.debug('finalRate-- >'+finalRates);
+        if (finalRates.size()>0)
+        {
+             for(Post_Code_Rate_Card__c finalRate: finalRates)
+             {
              //code fix done by BGSAMS Support for too many soql - ends  
             //rateCardSkillLst=new List<Post_Code_Skill_Rate__c>{};
-            for (Post_Code_Skill_Rate__c objPostCodeSkillRate:objRegionCard.Post_Code_Skill_Rates__r) {
-                postCodeSkillMap=new Map<String,Post_Code_Skill_Rate__c>{};
-               
-                if (!postCodeSkillRateMap.containsKey(objRegionCard.Rate_Card__r.Supplier_Num__c)){
-                    
-                    postCodeSkillMap.put(objPostCodeSkillRate.Skill__c,objPostCodeSkillRate);
-                    postCodeSkillRateMap.put(objRegionCard.Rate_Card__r.Supplier_Num__c,postCodeSkillMap);      
-                }else{
-                        /*
-                            Change: National Contractor Rates Change. If we dont have any rates defined at region or district level then we go 
-                            for National rates. I.E Post_Code_Rate_Card__c where NationalRate__c = True.
-                              
-                        */
-                        postCodeSkillMap=postCodeSkillRateMap.get(objRegionCard.Rate_Card__r.Supplier_Num__c);
-                        if(!postCodeSkillMap.containskey(objPostCodeSkillRate.Skill__c))
-                        {
-                            postCodeSkillMap.put(objPostCodeSkillRate.Skill__c,objPostCodeSkillRate);
-                        }   
-                        else if(postCodeSkillMap.containskey(objPostCodeSkillRate.Skill__c) && objRegionCard.NationalRate__c ==false)
-                        {
-                            postCodeSkillMap.remove(objPostCodeSkillRate.Skill__c);
-                            postCodeSkillMap.put(objPostCodeSkillRate.Skill__c,objPostCodeSkillRate);
-                        }
+                for (Post_Code_Skill_Rate__c objPostCodeSkillRate:finalRate.Post_Code_Skill_Rates__r) {
+                    postCodeSkillMap=new Map<String,Post_Code_Skill_Rate__c>{};
+                   
+                    if (!postCodeSkillRateMap.containsKey(finalRate.Rate_Card__r.Supplier_Num__c)){
                         
-                        postCodeSkillRateMap.put(objRegionCard.Rate_Card__r.Supplier_Num__c,postCodeSkillMap);
-                    
+                        postCodeSkillMap.put(objPostCodeSkillRate.Skill__c,objPostCodeSkillRate);
+                        postCodeSkillRateMap.put(finalRate.Rate_Card__r.Supplier_Num__c,postCodeSkillMap);      
+                    }else{
+                            /*
+                                Change: National Contractor Rates Change. If we dont have any rates defined at region or district level then we go 
+                                for National rates. I.E Post_Code_Rate_Card__c where NationalRate__c = True.
+                                  
+                            */
+                            postCodeSkillMap=postCodeSkillRateMap.get(finalRate.Rate_Card__r.Supplier_Num__c);
+                            if(!postCodeSkillMap.containskey(objPostCodeSkillRate.Skill__c))
+                            {
+                                postCodeSkillMap.put(objPostCodeSkillRate.Skill__c,objPostCodeSkillRate);
+                            }   
+                            else if(postCodeSkillMap.containskey(objPostCodeSkillRate.Skill__c) && finalRate.NationalRate__c ==false)
+                            {
+                                postCodeSkillMap.remove(objPostCodeSkillRate.Skill__c);
+                                postCodeSkillMap.put(objPostCodeSkillRate.Skill__c,objPostCodeSkillRate);
+                            }
+                            
+                            postCodeSkillRateMap.put(finalRate.Rate_Card__r.Supplier_Num__c,postCodeSkillMap);
+                        
+                    }
                 }
+                //code fix done by BGSAMS Support for Rate card issue - starts
+                List<String> lstRateCard=new List<String>{};
+                lstRateCard.add(finalRate.Rate_Card__c);
+                rateCardMap.put(finalRate.Rate_Card__r.Supplier_Num__c,lstRateCard);
             }
-            //code fix done by BGSAMS Support for Rate card issue - starts
-            List<String> lstRateCard=new List<String>{};
-            lstRateCard.add(objRegionCard.Rate_Card__c);
-            rateCardMap.put(objRegionCard.Rate_Card__r.Supplier_Num__c,lstRateCard);
-            
            /* List<String> lstRateCard=new List<String>{};
             if (rateCardMap.containsKey(objRegionCard.Rate_Card__r.Supplier_Num__c)) {
                 lstRateCard=rateCardMap.get(objRegionCard.Rate_Card__r.Supplier_Num__c);
@@ -139,7 +214,8 @@ public class selectRateForElements{
             
             //code fix done by BGSAMS Support for Rate card issue - ends
         }
-        }
+    /*
+        
        
        for (Post_Code_Rate_Card__c objPostCodeCard:regionandpostcodelist){
             if (objPostCodeCard.District__c==District){
@@ -162,42 +238,11 @@ public class selectRateForElements{
             rateCardMap.put(objPostCodeCard.Rate_Card__r.Supplier_Num__c,lstRateCard);
             //code fix done by BGSAMS Support for Rate card issue - ends
         }
-       }        
-           //code fix done by BGSAMS Support for too many soql - starts     
+       }
+       */
+        //code fix done by BGSAMS Support for too many soql - starts     
         //List<Post_Code_Skill_Rate__c> rateCardSkillLst=new List<Post_Code_Skill_Rate__c>{};
-        for (Post_Code_Rate_Card__c objPostCodeCard:regionandpostcodelist){
-            if (objPostCodeCard.Postcode_Sector__c==postCodeSec){
-                 //code fix done by BGSAMS Support for too many soql - ends  
-            //rateCardSkillLst=new List<Post_Code_Skill_Rate__c>{};
-            for (Post_Code_Skill_Rate__c objPostCodeSkillRate1:objPostCodeCard.Post_Code_Skill_Rates__r) {
-                postCodeSkillMap=new Map<String,Post_Code_Skill_Rate__c>{};
-                if (!postCodeSkillRateMap.containsKey(objPostCodeCard.Rate_Card__r.Supplier_Num__c)){
-                    postCodeSkillMap.put(objPostCodeSkillRate1.Skill__c,objPostCodeSkillRate1);
-                    postCodeSkillRateMap.put(objPostCodeCard.Rate_Card__r.Supplier_Num__c,postCodeSkillMap);        
-                }else{
-                    postCodeSkillMap=postCodeSkillRateMap.get(objPostCodeCard.Rate_Card__r.Supplier_Num__c);
-                    postCodeSkillMap.put(objPostCodeSkillRate1.Skill__c,objPostCodeSkillRate1);
-                    postCodeSkillRateMap.put(objPostCodeCard.Rate_Card__r.Supplier_Num__c,postCodeSkillMap);
-                }
-            }
-            //code fix done by BGSAMS Support for Rate card issue - starts
-            List<String> lstRateCard=new List<String>{};
-            lstRateCard.add(objPostCodeCard.Rate_Card__c);
-            rateCardMap.put(objPostCodeCard.Rate_Card__r.Supplier_Num__c,lstRateCard);
-            
-            
-            /*List<String> lstRateCard=new List<String>{};
-            if (rateCardMap.containsKey(objPostCodeCard.Rate_Card__r.Supplier_Num__c)) {
-                lstRateCard=rateCardMap.get(objPostCodeCard.Rate_Card__r.Supplier_Num__c);
-                lstRateCard.add(objPostCodeCard.Rate_Card__c);
-                rateCardMap.put(objPostCodeCard.Rate_Card__r.Supplier_Num__c,lstRateCard);
-            } else {
-                lstRateCard.add(objPostCodeCard.Rate_Card__c);
-                rateCardMap.put(objPostCodeCard.Rate_Card__r.Supplier_Num__c,lstRateCard);
-            }*/
-            //code fix done by BGSAMS Support for Rate card issue - ends
-        }       
-        }
+        
         
         for (String sSupNum:suppNumSet){
             if (rateCardMap.containskey(sSupNum)){
@@ -232,8 +277,6 @@ public class selectRateForElements{
     public Map<String,Map<String,Rate_Card_Items__c>> fetchMaterialSupplierRate(Set<String> suppNumSet,
                                                                                 Map<String,List<Job_Element__c>> m_JobElementMap,
                                                                                 String postCodeSec,String Region,String sDistrict){
-
-        
 
         Set<String> itemCodeSet1=m_JobElementMap.keySet();
         Map<String,Rate_Card_Items__c> RateCardItemMap=new Map<String,Rate_Card_Items__c>{};
@@ -334,7 +377,7 @@ public class selectRateForElements{
         
         
         for (Rate_Card__c objRateCard:[Select Supplier_Num__c,P5_Supplier__c,Rate_Card_Type__c,
-                                        (Select Material__c,Material__r.Product_Code__c,Material__r.Rebate__c,Cost__c,Status__c
+                                        (Select Material__c,Material__r.Product_Code__c,Material__r.Rebate__c,Cost__c,Status__c,Material__r.Material_Code__c
                                         From Rate_Card_Items__r Where Status__c='Active' and Material__r.Product_Code__c In:itemCodeSet) 
                                         From Rate_Card__c Where Supplier_Num__c In:suppNumSet And Rate_Card_Type__c=0 order by Supplier_Num__c]){
             

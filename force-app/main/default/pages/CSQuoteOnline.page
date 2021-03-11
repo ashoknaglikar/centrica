@@ -4,13 +4,13 @@
 
     <body>
         <page size="A4" id="page1">
-            <div class="content" style="width: 700px; margin-left: 5px; margin-right: 5px; height: 950px; display:{!if(is_ifc_active, "none", "block")};">
+            <div class="content" style="width: 700px; margin-left: 5px; margin-right: 5px; height: 950px; display:{!if(wayToPayVersion==1, "block", "none")};">
                 <div class="clearfix" id="logoPng">
                     <apex:image id="theImageBG" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}" width="150" rendered="{!logoBG == true}" />
                     <apex:image id="theImageSG" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'SG_logo_s.resource')}" width="150" rendered="{!logoBG == false}" />
-                </div>            
+                </div>           
                 <div class="clearfix" id="summary-wrapper" style="margin-top:15px;margin-bottom:0px;">
-                     <p class="pageHeading" id="summaryTableHeading">Your&nbsp;<apex:outputtext value="{!summaryTableHeading}" escape="false"/>&nbsp;Quotation</p>
+                     <p class="pageHeading" id="summaryTableHeading">Your&nbsp;<apex:outputtext value="{!summaryTableHeading}" escape="false"/>&nbsp;quotation</p>
                      <div class="summary" style="position:relative; height: 420px; width: 450px">
                      <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'tableFullMedium.resource')}" rendered="true" style="position:absolute;top:0;left:0;right:0;bottom:0;height:100%;width:100%;" />
                      <table id="summary-table" style="position:relative;z-index:100;width:440px;border-collapse:collapse;table-layout:fixed;">
@@ -33,12 +33,12 @@
                         <apex:outputtext value="{!summaryTableFooter}" escape="false"/>
                     </table>
                 </div>    
-                    <div class="price-balloons">                  
+                     <div class="price-balloons">                  
                         <div id="balloon-total-text" class="blueBallon" style="width:200px;height:200px;position:relative;top:-67px;">
                             <p style="padding-top: 22%;">The price <br/>you'll pay is <br/>
                                 <span id="ballonTotalPrice">
                                     <apex:repeat var="a" value="{!topSummaryTable}">
-                                    <apex:outputtext value="{!totalPricePayable}" escape="false" rendered="{!a.name == 'Total gross price (inc. VAT)'}"/>
+                                    <apex:outputtext value="{!totalPriceA}" escape="false" rendered="{!a.name == 'Total gross price (inc. VAT)'}"/>
                                     </apex:repeat>
                                 </span>
                             </p>
@@ -47,7 +47,7 @@
                         <apex:outputpanel rendered="{!showYourPayOptions}">
                         <div id="small-circle" class="greenBallon" style="width:140px;height:140px;margin-bottom:0px;">
                            <p style="padding-top: 15%;">Spread <br/>the cost from <br/>
-                           as little as <br/> <span id='minMonthlyTotal' class='boldText'><apex:outputtext value="{!greenBallonPrice}" escape="false"/></span> <br/> 
+                           as little as <br/> <span id='minMonthlyTotal' class='boldText'><!--<apex:outputtext value="{!greenBallonPrice}" escape="false"/>--><apex:outputText >{!inputQuoteData.monthlyPayList[inputQuoteData.monthlyPayList.size-1]}</apex:outputText></span> <br/> 
                            per month&#42;</p>
                                
                                 
@@ -62,22 +62,37 @@
                            
                         </div>
                         </apex:outputpanel>
+                        
+                                        <!--new content-->
+                        <div id="red-circle" class="redBallon" style="width:140px;height:140px;position:relative;top:-250px;left:-30px">
+                            <div id="red-circle-text" style="text-align:center;padding-top: 34%;">
+                                <p style="color:white;">
+                                    30 Months interest-free
+                                    <br/>credit<br />
+                                    available*
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                
-                <div id="wilbur" style="position: relative;top:-196px;right:-470px;height:241px;">
-                 <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'wilbur_3Mod.resource')}" rendered="{!!inputQuoteData.wwabQuote}" />
+                <div id="wilbur" style="position:relative;top:-176px;right:500px;">
+                
+                 <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'wilbur_3Mod.resource')}" rendered="{!!inputQuoteData.wwabQuote}"   height="100%"/>
                  <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'Wilbur_Clipboard.png')}" rendered="{!AND(inputQuoteData.wwabQuote,NOT(inputQuoteData.wwabGas1YearCareExists))}" height="120%"/>
                  <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'Wilbur_Holding_1YR_Gas_App_Care.png')}" rendered="{!AND(inputQuoteData.wwabQuote,inputQuoteData.wwabGas1YearCareExists)}" height="100%"/>
                 </div>
-                   
-                <div class="clearfix leftRadius bg-green" id="green-box" style="position: relative;top:-206px;left:-5px;height:110px;width:700px;">
-                    <h3>The price we quote you is the price you'll pay...Guaranteed</h3>
+                
+                 <div class="clearfix leftRadius"  id = "green-box" style="position:relative;top:-215px;left:-5px;"> <!-- height:100px;width:700px;-->
+                    
+                    <p ><span  class='boldText' style = "font-size:150%;">The price we quote you is the price <br/>you'll pay. Guaranteed.</span><sup>&dagger;</sup></p>
                     <p>We'll carry out the work for this price, and that's a promise.</p>
+                    <!--<div id="green-box">
+                    </div>-->
                 </div>
 
-                <div class="clearfix" id="acceptance-section" style="position: relative;top:-246px;left:-5px;width:700px;">
-                    <div id="acceptance-box" class="bg-lightBlue leftRadius" style="height:140px;width: 700px;">
+                <div class="clearfix" id="acceptance-section" style="position: relative;top:-200px;left:-5px;width:700px;">
+                    <!--<div id="acceptance-box" class="bg-lightBlue leftRadius" style="height:140px;width: 700px;">
                         <h3 class='darkBlue'>Acceptance of Your Central Heating Installation Quotation</h3>
                         <p style="font-size: 12px;">I confirm that I am the owner of the property or that I have secured the necessary permission from the homeowner.
                             <br/> I agree to pay the amount quoted above. I'm aware that I can cancel up to 14 days after the day the goods are delivered (the "cooling off period").
@@ -86,59 +101,59 @@
                             Central Heating Quotation Terms and Conditions which have been given to me by the Heating Adviser.<br/></p>
                         <p style="font-size: 8px;"> <br/></p>
                         <div style="width:100%;">
-                            <div style="width:228px;float:left;height:40px;" class="signature-box">
+                            <div style="width:228px;float:left;height:30px;" class="signature-box">
                                 <p style="font-size: 12px;" class="signature-box-label">Signature</p>
                             </div>
-                            <div style="width:228px;float:left;height:40px;" class="signature-box">
+                            <div style="width:228px;float:left;height:30px;" class="signature-box">
                                 <p style="font-size: 12px;" class="signature-box-label">Print Name</p>
                             </div>
-                            <div style="width:228px;float:left;height:40px;" class="signature-box">
+                            <div style="width:228px;float:left;height:30px;" class="signature-box">
                                 <p style="font-size: 12px;" class="signature-box-label">Date</p>
                             </div>
                          </div>
-                    </div>
+                    </div>-->
                     
-                    <div id="footer-contact" class='leftRadius' style="position: relative;top:-8px;">
+                    <div id="footer-contact" class='leftRadius ' style="position:relative;top:-8px;">
                         
-                        
-                       <p style="font-size:67%"><span  class='boldText'>To accept this quote, the simplest way is to go online via our portal<sup>&#8224;</sup>, to discuss it further or make any changes please contact&nbsp;
-                       <apex:outputtext value="{!inputQuoteData.hsaName} on {!hsanumber} or alternatively call us on " escape="false" rendered="{!IF(AND(hsanumber !='' , productInterest != 'Straight Swap', productInterest != 'Telesales Conv' ),true,false)}"/>
-                        <apex:outputtext value="{!inputQuoteData.hsaName} on " escape="false" rendered="{!IF(OR( productInterest == 'Straight Swap', productInterest == 'Telesales Conv' ),true,false)}"/> 
-                         {!$Label.PhoneNumber_Office1}**(option 3). 
-                         </span> <br/>
-                            &#8224;Check your appointment confirmation text/email for the link. This quote is valid for 28 days. Page two onwards breaks down the products and prices in your quote.
-                            <br/><br/>
-                        </p> 
+                        <p style="font-size:95%"><span  >You can accept your quote online via our customer portal - check our email for the link. Or if you
+                                want to discuss your quote, please call us on 0333 202 9488**(option 3). Your quote is valid for 28 days.</span>
+                        </p>
+                    
                     </div>
                     <div style="top:-34px;position:relative; width: 700px;">
                         <div class="clearfix footer-accesibility">
                             <div style="width:50%; float:left">
                                 <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'phone.resource')}" rendered="true" />
-                                <p>If you are hard of hearing or speech impaired and use a Textphone, please call <span class='boldtext'>{!$Label.PhoneNumber_Textphone}</span></p>
+                                <p>If you are hard of hearing or speech impaired and use a textphone, please call <span class='boldtext'>{!$Label.PhoneNumber_Textphone}**.</span></p>
                             </div>
                             <div style="width:50%; float:left">
                                 <apex:image value="{!URLFOR($Resource.quoteOnlinePageRes, 'braille.resource')}" rendered="true" />
-                                <p>If you would like this quote in another format such as large print, Braille or audio, please call <span class='boldtext'>{!$Label.PhoneNumber_CustomerRelations}</span></p>
+                                <p>If you would like this quote in another format such as large print, Braille or audio, please call <span class='boldtext'>{!$Label.PhoneNumber_CustomerRelations}**.</span></p>
                             </div>
                         </div>
+                        <br/>
                         <div class="clearfix footer-tradingName">
-                            <apex:outputpanel rendered="{!showYourPayOptions}">
-                                <p style='font-size:120%'>&#42; See your payment options page for further details.</p>
-                            </apex:outputpanel>
                             <p>
-                                5 Year warranty excludes showers, water heaters, fires or fire surrounds, upgrades, multi 
-                                premise landlords, HHCRO and government schemes.
+                                5 Year Warranty is for the boiler only, not showers, water heaters, fires or their surrounds, or any other additional products. Also not available for multi premise landlords,
+                                HHCRO and commercial customers, or customers buying through government schemes. Terms and conditions apply.
                             </p>
-                             <p style='font-size:120%'>
-                                &#42;&#42;Lines are open Mon-Fri 9am-7pm, Sat 9-5pm.  We may record calls to help improve our service to you. 
+                            <p >
+                                  <span style='text-decoration: underline; color:blue;'>&dagger;Terms and conditions apply.</span>
+                            </p>
+                            <apex:outputpanel rendered="{!showYourPayOptions}">
+                            <p>&#42; See your payment options page for further details.</p>
+                            </apex:outputpanel>
+                            
+                            <p >    
+                                &#42;&#42;We may record calls to help improve our service to you. 
                                 Calls to 0800 numbers are free. Call charges to 03 numbers will cost no more than 01 or 02 numbers, please check with your phone provider.
                             </p>
-    
+                            
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="content" style="width: 700px; margin-left: 5px; margin-right: 5px; height: 950px; display:{!if(is_ifc_active, "block", "none")};">
+            <div class="content" style="width: 700px; margin-left: 5px; margin-right: 5px; height: 950px; display:{!if(OR(wayToPayVersion==2,wayToPayVersion==0), "block", "none")};">
                 <div class="clearfix" id="logoPng">
                     <apex:image id="_theImageBG" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}" width="150" rendered="{!logoBG == true}" />
                     <apex:image id="_theImageSG" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'SG_logo_s.resource')}" width="150" rendered="{!logoBG == false}" />
@@ -181,7 +196,7 @@
                         <apex:outputpanel rendered="{!showYourPayOptions}">
                         <div id="small-circle" class="greenBallon" style="width:140px;height:140px;margin-bottom:0px;">
                            <p style="padding-top: 15%;">Spread <br/>the cost from <br/>
-                           as little as <br/> <span id='minMonthlyTotal' class='boldText'><apex:outputtext value="{!greenBallonPrice}" escape="false"/></span> <br/> 
+                           as little as <br/> <span id='minMonthlyTotal' class='boldText'><!--<apex:outputtext value="{!greenBallonPrice}" escape="false"/>--><apex:outputText >{!inputQuoteData.monthlyPayList[inputQuoteData.monthlyPayList.size-1]}</apex:outputText></span> <br/> 
                            per month&#42;</p>
                                
                                 
@@ -305,7 +320,7 @@
                                         <apex:repeat var="quoteItems" value="{!quoteDetail.items}">
                                             <tr>
                                                 <td class="cellDesc">{!quoteItems.name}</td>
-                                                <td>{!quoteItems.quantity}</td>
+                                                <!---<td>{!quoteItems.quantity}</td>-->
                                                 <td align="right">{!quoteItems.price}</td>
                                             </tr>
                                         </apex:repeat>  
@@ -386,11 +401,12 @@
                     </div>
                 </div>
             </div>
-        </page>     
-        <apex:outputpanel rendered="{!showYourPayOptions}">
+        </page>    
+        
+       <!-- <apex:outputpanel rendered="{!showYourPayOptions}">
             <page size='A4' id="page3">
                 
-                <div class="content" style="page-break-before: always;display:{!if(is_ifc_active, "none", "block")};">
+              <div class="content" style="page-break-before: always;display:{!if(is_ifc_active, "none", "block")};">
                     <div class="clearfix" id="logoPng3">
                         <apex:image id="theImageBG2_" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'BG_logo_s.resource')}" width="150" rendered="{!logoBG == true}" />
                         <apex:image id="theImageSG2_" styleClass="bgLogo" value="{!URLFOR($Resource.quoteOnlinePageRes, 'SG_logo_s.resource')}" width="150" rendered="{!logoBG == false}" />
@@ -513,12 +529,6 @@
                     <div style="float:left;">
                         
                         <p style= "font-size: 9px;margin-left: -10px;margin-right: -10px">
-                            
-                            <span id='company2'>{!summaryTableHeading}</span> is a trading name of British Gas New Heating Limited. Registered in England and Wales (No. 06723244). 
-                            British Gas New Heating Limited is an Appointed Representative of British Gas Services Limited which is authorised and regulated by the Financial Conduct Authority. 
-                            Both registered at: Millstream, Maidenhead Road, Windsor, Berkshire SL4 5GD. britishgas.co.uk
-                            <br/><br/>
-                            
                         </p>
                         
                         <p style= "font-size: 9px;margin-left: -10px;margin-right: -10px">
@@ -548,7 +558,7 @@
                             <h3 style="font-size:15px;color: #00baf2;font-weight:bold;">Loans arranged through British Gas</h3>
                             <div class="boldText" style="font-size:15px">2-year interest-free loan (0% APR)</div>
                                 <ul style="font-size: 13px;">
-                                    <!--<li>Available for a limited period only&dagger;</li> -->
+                                   
                                     <li>Available over 2 years at 0%</li>
                                     <li>No deposit needed</li>
                                     <li>No interest payable during the 2 years.</li>
@@ -556,7 +566,7 @@
     
                             <div class="boldText" style="font-size:15px">3 to 10-year loan ({!aprUsed} APR)</div> 
                                 <ul style="font-size: 13px;">
-                                    <!-- <li>Available for a limited period only&dagger;</li> -->
+                                   
                                     <li>For customers who would like a variety of monthly repayments to choose from</li>
                                     <li>Available over 3, 5, 8 or 10 years</li>
                                     <li>APR {!aprUsed}</li>
@@ -566,7 +576,7 @@
                                 </ul>
     
     
-                            <!--<h3 style="font-size:15px">Loan agreement arranged through {!summaryTableHeading}</h3>-->
+                           
                                 <p style='font-size: 13px;'>
                                     <apex:outputtext value="{!summaryTableHeading}" escape="false"/>&nbsp;acts as a <span class="boldText">credit broker</span> and not the lender 
                                     and offers products from a panel of lenders. Availability of credit depends on your status and credit checks. The minimum loan amount is £1,000. 
@@ -659,9 +669,12 @@
                     </div>
                 </div>
                 
-                
+               
             </page> 
-        </apex:outputpanel>
+        </apex:outputpanel>-->
+        
+          <c:waysToPay wayToPayVersion="{!wayToPayVersion}" /> 
+          
         <page size='A4' id="page4">
             <div class="content" style="page-break-before: always;display:{!if(isShowTermsConditions, "block", "none")};">
                 <div class="clearfix" id="logoPng3">

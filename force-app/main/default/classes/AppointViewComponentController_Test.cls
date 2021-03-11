@@ -24,12 +24,12 @@ private class AppointViewComponentController_Test {
 
     static testMethod void myUnitTest() 
     {
-    	List<Appointment__c> appointList = new List<Appointment__c>();
-    	
-		AppointViewComponentController obj = new AppointViewComponentController();
-		
-		obj.setAppointments(appointList);
-		obj.getAppointments();
-		
+        List<Appointment__c> appointList = new List<Appointment__c>();
+        
+        AppointViewComponentController obj = new AppointViewComponentController();
+        
+        obj.setAppointments(appointList);
+        obj.getAppointments();
+        
     }
 }

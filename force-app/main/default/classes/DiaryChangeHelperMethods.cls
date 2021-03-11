@@ -4,7 +4,7 @@ public with sharing class DiaryChangeHelperMethods {
     public static void massDeleteRole(set<Id> RoleId , Date StartDate, Date EndDate, list<boolean> weeks, Id diaryChagId)
     {
         GeographyChangeReqController  obj = new GeographyChangeReqController();
-        obj.diaryChng = [Select id, Start__c , Week_1__c, Week_2__c,Week_3__c,Week_4__c from Diary_Change__c where id = : diaryChagId];
+        obj.diaryChng = [Select id, Start__c , Week_1__c, Week_2__c,Week_3__c,Week_4__c,RecordType.name from Diary_Change__c where id = : diaryChagId];
         system.debug('======='+obj.diaryChng);
         list<Role_Sub_Patch__c> deleteList= new list<Role_Sub_Patch__c>();
         

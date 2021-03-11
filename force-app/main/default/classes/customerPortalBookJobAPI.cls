@@ -17,7 +17,8 @@ global class customerPortalBookJobAPI {
     {
         list<Diary_Entry__c> TravelDE= new list<Diary_Entry__c>();
         system.debug('installNotes'+installNotes);
-             
+        system.debug('installDateSelected'+installDateSelected);
+        system.debug('installTimeSelected'+installTimeSelected);     
         String oppId = CustomerPortalHelper.getOpportunityId(leadId); 
         
         bookJobResponse objResponse = new bookJobResponse();
@@ -34,7 +35,7 @@ global class customerPortalBookJobAPI {
                            s.Diary_Entry_ID__r.Week__r.Thursday_End_Time__c,s.Diary_Entry_ID__r.Week__r.Friday_Start_Time__c,s.Diary_Entry_ID__r.Week__r.Friday_End_Time__c,s.Diary_Entry_ID__r.Week__r.Saturday_Start_Time__c,
                            s.Diary_Entry_ID__r.Week__r.Saturday_End_Time__c,s.Diary_Entry_ID__r.Week__r.Sunday_Start_Time__c,s.Diary_Entry_ID__r.Week__r.Sunday_End_Time__c,s.Diary_Entry_ID__r.Week__c
                            From SearchResults__r s where Option_Identifier__c = :optionIDSelected 
-                           order by s.Start_Date_Time__c ASC,s.Diary_Entry_ID__r.Week__r.Employee__c, s.Skill__c), CHI_Lead__r.Install_Postcode__c from Job__c where id = :jobId];
+                           order by s.Start_Date_Time__c ASC,s.Diary_Entry_ID__r.Week__r.Employee__c, s.Skill__c), CHI_Lead__r.Install_Postcode__c,latitude__latitude__s,latitude__longitude__s from Job__c where id = :jobId];
 
 
 
@@ -65,7 +66,11 @@ global class customerPortalBookJobAPI {
       //system.debug(Logginglevel.INFO,'I am INSIDE');
        Set<string> TravelJob = new set<string>();
        
-        indayJobTime = Utilities.calcluateIndayJobTime(engSearhResultMap.values(),jb.CHI_Lead__r.Install_Postcode__c,null);
+       String jobPostCode = jb.CHI_Lead__r.Install_Postcode__c;
+       if(system.label.Bing_Google_API=='Bing'&&jb.latitude__latitude__s!=null)
+       JobPostCode = String.valueof(jb.latitude__latitude__s)+','+string.valueof(jb.latitude__longitude__s);
+       
+        indayJobTime = Utilities.calcluateIndayJobTime(engSearhResultMap.values(),JobPostCode,null);
        //system.debug(Logginglevel.INFO,'Engineer in Day Travel -->'+indayJobTime);
        /*
              Map formet for indayJobTime:
@@ -210,6 +215,16 @@ global class customerPortalBookJobAPI {
         
        system.debug('@@book job respose '+objResponse);
        system.debug('@@JSONrespone  '+JSON.serialize(objResponse));
+       
+       String[] s= installTimeSelected.split(':');
+       integer hour =Integer.valueOf(s[0].trim()); 
+       integer minute= Integer.valueOf(s[1].trim());
+       integer second= 0;
+       integer millisecond = 0;
+       time d = time.newInstance(hour, minute, second, millisecond);
+       datetime installDatetime = datetime.newInstance(installDateSelected, d);
+
+       update (new opportunity(id=oppId, Installation_Date_Time__c=installDatetime  ));
        if(objResponse.errorList.size()>0)
        CreateEmail.CretaeSendTextEmail(new list<string>{'ashokkumar.nagaleekar@centrica.com'},JSON.serialize(objResponse), 'Error in Job Plannging' );
        return objResponse; 

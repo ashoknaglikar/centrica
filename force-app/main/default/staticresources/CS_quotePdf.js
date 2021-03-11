@@ -51,6 +51,10 @@ var IFC_DATE_START = "2018-04-03";
 var IFC_DATE_END = "2050-12-31";
 var IFC_DATE_FINAL = "2050-12-31";
 
+var IFC_NEW_FINANCE_DATE_START = "2021-01-01";
+var IFC_NEW_FINANCE_DATE_END = "2021-03-31";
+var IFC_NEW_FINANCE_DATE_FINAL = "2021-03-31";
+
 //NEW added 3 July
 require(['bower_components/q/q'], function (Q) {
 
@@ -1529,11 +1533,12 @@ require(['bower_components/q/q'], function (Q) {
 
             
             var arr=[
-                {field:'Installer_Notes_Boiler_0',title:'Installer Notes - Boiler/Controls'},
-                {field:'Installer_Notes_Flue_0',title:'Installer Notes - Flue'},
-                {field:'Installer_Notes_GasWater_0',title:'Installer Notes - Gas Water'},
-                {field:'Installer_Notes_Disruption_0', title:'Installer Notes - Disruption'},
-                {field:'Installer_Notes_Special_Customer_Requirements_0', title:'Installer Notes - Special customer requirements (including details of any planned home improvement work)'}
+                {field:'Installer_Notes_Boiler_0',title:'Boiler and controls:'},
+                {field:'Installer_Notes_Flue_0',title:'Flue:'},
+                {field:'Installer_Notes_GasWater_0',title:'Gas and water:'},
+                {field:'Installer_Notes_Disruption_0', title:'Disruption:'},
+                {field:'Installer_Notes_Customer_Agreed_Actions_0', title:'Agreed customer actions:'},
+                {field:'Installer_Notes_Special_Customer_Requirements_0', title:'Special customer requirements:'}
             ];
 
             var str="<div id='installerNotes'>";
@@ -1915,12 +1920,15 @@ require(['bower_components/q/q'], function (Q) {
                 
                 // need to pass a string instead of boolean
                 var eligIFC = isEligibleForIFC() ? "TRUE" : "FALSE";
-            
+                var eligIFCNewOptions = isEligibleForIFCNewOptions() ? "TRUE" : "FALSE";
+
                 var jsonObject = {
                     "deposit" : CS.getAttributeValue('Actual_Deposit_0', 'String') || '',
                     "installationCost" : CS.getAttributeValue('Total_Price_Payable_0', 'String') || '',
                     "tradingName" : tradingName,
-                    "eligibleForInterestFreeCredit" : eligIFC
+                    "eligibleForInterestFreeCredit" : eligIFC,
+                    "eligibleForInterestFreeCreditNewOptions" : eligIFCNewOptions
+
                 };
     
                 var jsonString = JSON.stringify(jsonObject);
@@ -1960,6 +1968,20 @@ require(['bower_components/q/q'], function (Q) {
         }
     };
 
+    window.energySavingsCalculator = function energySavingsCalculator() {
+        if(navigator.device) {
+
+            var templateName = 'Energy Saving Illustrator';
+
+                cordova.exec(function(result){
+                    CS.Log.warn(result);
+                }, 
+    
+                function(e) { 
+                    CS.Log.error(e);},
+                    "DSAHTMLTemplatePlugin", "openTemplate",[templateName,null,null,true,true]);
+        }
+    };
 
     window.populateFinanceTableInput = function populateFinanceTableInput() {
 
@@ -2164,6 +2186,42 @@ require(['bower_components/q/q'], function (Q) {
          
    
     };
+
+// helper function for determining if the client is eligible for interest free credit between May 2020 and August 2020
+// to give better finance options for COVID situation.
+
+window.isEligibleForIFCNewOptions = function() {
+    
+    var dateToTimeMillis = function(date) {
+        var day = parseInt(date.substring(8, 10));
+        var month = parseInt(date.substring(5, 7)) - 1; // minus 1 because Date() expects month to be 0-based for some reason
+        var year = parseInt(date.substring(0, 4));
+        
+        return (new Date(year, month, day)).getTime();
+    };
+    
+    // get the chi_lead_created_date
+    var chi_lead_created_date = dateToTimeMillis(CS.getAttributeValue('CHI_Lead_Created_Date_0'));
+
+    // get the quote creation date (or now())
+    var quote_creation_date = Date.now();
+
+    var date_start_ms = dateToTimeMillis(IFC_NEW_FINANCE_DATE_START);
+    var date_end_ms = dateToTimeMillis(IFC_NEW_FINANCE_DATE_END);
+    var date_final_ms = dateToTimeMillis(IFC_NEW_FINANCE_DATE_FINAL);
+    
+    // check if the chi_lead_created_date is less than End Date
+    // check if the quote creation date is greater than Start Date
+    // if former two conditions are satisfied, client is eligible
+    
+    // console.log("date_start_ms = " + date_start_ms);
+    // console.log("date_end_ms = " + date_end_ms);
+    // console.log("quote_creation_date = " + quote_creation_date);
+    // console.log("chi_lead_created_date = " + chi_lead_created_date);
+    return ( quote_creation_date >= date_start_ms &&
+             quote_creation_date <= date_final_ms &&
+         chi_lead_created_date <= date_end_ms);
+}
 
 // helper function for determining if the client is eligible for interest free credit
 
@@ -3550,10 +3608,9 @@ window.getQuoteData = function getQuoteData() {
                                         //quoteBreakDownTable +="<tr><td class='cellDesc'>Install "+alreadyAggregated[ii].description.replace(/\\r\\n/g, "<br/>")+' Radiator '+'<span style="font-style: italic">'+alreadyAggregated[ii].incValve+"</span>"+"</td><td style='white-space: nowrap;' class='cellQty'>(x "+alreadyAggregated[ii].quantity+")</td><td class='cellPrice'>"+priceItem+"</td></tr>";
                                     
                                         //quoteBreakDownTable +="<tr><td class='cellDesc'>Install "+alreadyAggregated[ii].description.replace(/\\r\\n/g, "<br/>")+' Radiator '+'<span style="font-style: italic">'+alreadyAggregated[ii].incValve+"</span>"+"</td><td style='white-space: nowrap;' class='cellQty'>"+quantityItem+"</td><td class='cellPrice'>"+priceItem+"</td></tr>";
-                                    
-                                        quoteBreakDownTable +="<tr><td class='cellDesc'>Install "+alreadyAggregated[ii].description.replace(/\\r\\n/g, "<br/>")+' Radiator '+"</td><td style='white-space: nowrap;' class='cellQty'>"+quantityItem+"</td><td class='cellPrice'>"+priceItem+"</td></tr>";
-                                    
                                         
+                                        quoteBreakDownTable +="<tr><td class='cellDesc'>Install "+alreadyAggregated[ii].description.replace(/\\r\\n/g, "<br/>")+' Radiator '+"</td><td style='white-space: nowrap;' class='cellQty'>"+quantityItem+"</td><td class='cellPrice'>"+priceItem+"</td></tr>";
+
                                     }
                                    
                                    //add shower radiator parts as allowance-label
@@ -3580,10 +3637,8 @@ window.getQuoteData = function getQuoteData() {
                                                                 //price fix - 28-7-2016
                                                                 //var priceItemSt="<div class='price-wrapper'>"+"<span class='price'>"+formatPriceComma(myParts[key]['parentPart']['priceVatIncl'])+"</span></div>";
                                                                 var priceItemSt="<div class='price-wrapper'>"+"<span class='price'>"+formatPriceComma(myParts[key]['parentPart']['priceVatIncl'] * myParts[key]['parentPart']['quantity'])+"</span></div>";
-                                                              
-                                                              
                                                                 quoteBreakDownTable +="<tr><td class='cellDesc'>"+myParts[key]['parentPart']['part']['Quote_Description__c'].replace(/\\r\\n/g, "<br/>")+"</td><td style='white-space: nowrap;' class='cellQty'>"+quantityItemSt+"</td><td class='cellPrice'>"+priceItemSt+"</td></tr>";
-                                    
+
                                                             }
                                     
                                                             
@@ -3610,10 +3665,21 @@ window.getQuoteData = function getQuoteData() {
                                         if(quantityItem == '(x 1)'){
                                             quantityItem=" ";
                                         }
-                                        //quoteBreakDownTable += "<tr><td class='cellDesc'>"+quoteObjNewTest.Details.Sections[j].Products[i].LineItems[k].Description.replace(/\\r\\n/g, "<br/>")+"</td><td style='white-space: nowrap;' class='cellQty'>"+quoteObjNewTest.Details.Sections[j].Products[i].LineItems[k].Quantity+"</td><td class='cellPrice'>"+priceItem+"</td></tr>";
                                         
-                                        quoteBreakDownTable += "<tr><td class='cellDesc'>"+quoteObjNewTest.Details.Sections[j].Products[i].LineItems[k].Description.replace(/\\r\\n/g, "<br/>")+"</td><td style='white-space: nowrap;' class='cellQty'>"+quantityItem+"</td><td class='cellPrice'>"+priceItem+"</td></tr>";
+                                        //quoteBreakDownTable += "<tr><td class='cellDesc'>"+quoteObjNewTest.Details.Sections[j].Products[i].LineItems[k].Description.replace(/\\r\\n/g, "<br/>")+"</td><td style='white-space: nowrap;' class='cellQty'>"+quoteObjNewTest.Details.Sections[j].Products[i].LineItems[k].Quantity+"</td><td class='cellPrice'>"+priceItem+"</td></tr>";
                                        
+                                        //AR - Logic to hide quantity if the quote description has the word "Pipe" in it.
+
+                                        var descriptionOfItem = quoteObjNewTest.Details.Sections[j].Products[i].LineItems[k].Description.toLowerCase();
+                                        if (descriptionOfItem.includes("pipe")){
+                                            quantityItem=" ";
+                                            quoteBreakDownTable += "<tr><td class='cellDesc'>"+quoteObjNewTest.Details.Sections[j].Products[i].LineItems[k].Description.replace(/\\r\\n/g, "<br/>")+"</td><td style='white-space: nowrap;' class='cellQty'>"+quantityItem+"</td><td class='cellPrice'>"+priceItem+"</td></tr>";
+                                        } else {
+                                            quoteBreakDownTable += "<tr><td class='cellDesc'>"+quoteObjNewTest.Details.Sections[j].Products[i].LineItems[k].Description.replace(/\\r\\n/g, "<br/>")+"</td><td style='white-space: nowrap;' class='cellQty'>"+quantityItem+"</td><td class='cellPrice'>"+priceItem+"</td></tr>";
+                                        }
+                                        
+                                       //quoteBreakDownTable += "<tr><td class='cellDesc'>"+quoteObjNewTest.Details.Sections[j].Products[i].LineItems[k].Description.replace(/\\r\\n/g, "<br/>")+"</td><td style='white-space: nowrap;' class='cellQty'>"+quantityItem+"</td><td class='cellPrice'>"+priceItem+"</td></tr>";
+
                                     }
                                 }
                             }
@@ -3630,7 +3696,6 @@ window.getQuoteData = function getQuoteData() {
                         
                         //quoteBreakDownTable+="<tr><td class='cellDesc'>"+quoteObjNewTest.Details.Sections[j].Text.replace(/\\r\\n/g, "<br/>")+"</td><td style='white-space: nowrap;' class='cellQty'>(x1)</td><td class='cellPrice'>"+priceItem+"</td></tr>";
                         quoteBreakDownTable+="<tr><td class='cellDesc'>"+quoteObjNewTest.Details.Sections[j].Text.replace(/\\r\\n/g, "<br/>")+"</td><td style='white-space: nowrap;' class='cellQty'> </td><td class='cellPrice'>"+priceItem+"</td></tr>";
-                        
                         
                             CS.Log.warn("**Section"+j+" Header="+quoteObjNewTest.Details.Sections[j].Header);
                             CS.Log.warn("Section"+j+" Product=NO");
@@ -3681,11 +3746,16 @@ window.getQuoteData = function getQuoteData() {
                var footerContactsDetails = getFooterContacts(hsaName, hsaContactNumber, quoteNumber);
                
                var eligibleForInterestFree = isEligibleForIFC() ? "TRUE" : "";
+               var eligibleForInterestFreeNewOptions = isEligibleForIFCNewOptions() ? "TRUE" : "";
                var definitionName = CS.getAttributeValue("Definition_Name_0") ? CS.getAttributeValue("Definition_Name_0") : '';
                var jobTitle = CS.getAttributeValue("Customer_Identity_Check_0:Job_Role_0") ? "Role: "+CS.getAttributeValue("Customer_Identity_Check_0:Job_Role_0") : '';
                var portalURL = CS.getAttributeValue("Portal_URL_0") ? encodeURI(CS.getAttributeValue("Portal_URL_0")) : '';
                var gasApplianceWarranty = partCodeExistsInPartsModelJS('P10006');
                var netPayableBelowThousand = CS.getAttributeValue('Total_Price_Payable_0') < 1000 ? "TRUE" : "";
+               var businessType = '';
+               if (CS.Service.config["Business_Type_0"]) {
+                    var businessType = CS.Service.config["Business_Type_0"].attr.cscfga__Display_Value__c;
+               }
                
                var jsonObject = { 
                     "logo":logoPng,
@@ -3742,6 +3812,7 @@ window.getQuoteData = function getQuoteData() {
                     "tradingName1":tradeName,
                     "tradingName2":tradeName,
                     "eligibleForInterestFree": eligibleForInterestFree,
+                    "eligibleForInterestFreeNewOptions": eligibleForInterestFreeNewOptions,
                     "productDefinition":definitionName,
                     "jobTitle":jobTitle,
                     "showEnergyTerms":showEnergyTerms,
@@ -3749,7 +3820,8 @@ window.getQuoteData = function getQuoteData() {
                     "allowanceEmail":allowanceEmail,
                     "portalURL":portalURL,
                     "gasApplianceWarranty":gasApplianceWarranty,
-                    "netPayableBelowThousand":netPayableBelowThousand
+                    "netPayableBelowThousand":netPayableBelowThousand,
+                    "businessType":businessType
 
                 }
                 
@@ -5946,7 +6018,8 @@ window.generateInstallationNotesData = function generateInstallationNotesData(lo
             var flueNotes;
             var gasWaterNotes;
             var disruptionNotes;
-            var disruptionNotes;
+            var customerAgreedActionsNotes;
+            var specialCustomerNotes;
 
             try{
                 var bExists = CS.Service.config['Installer_Notes_Boiler_0'];
@@ -5997,6 +6070,20 @@ window.generateInstallationNotesData = function generateInstallationNotesData(lo
             catch(err){
                 disruptionNotes="";
             }
+             
+            try{
+                var caaExists = CS.Service.config['Installer_Notes_Customer_Agreed_Actions_0'];
+                if(caaExists){
+                    customerAgreedActionsNotes = CS.getAttributeValue('Installer_Notes_Customer_Agreed_Actions_0','String');
+                    customerAgreedActionsNotes = addLineBreak(customerAgreedActionsNotes);
+                }
+                else{
+                    customerAgreedActionsNotes="";
+                }  
+            }
+            catch(err){
+                customerAgreedActionsNotes="";
+            }
             
             try{
                 specialCustomerNotes = CS.getAttributeValue('Installer_Notes_Special_Customer_Requirements_0','String');
@@ -6009,37 +6096,42 @@ window.generateInstallationNotesData = function generateInstallationNotesData(lo
             
             
 
-            var AllNotesString = boilerNotes + newline + newline + flueNotes + newline + newline + gasWaterNotes + newline + newline + disruptionNotes + newline + newline + specialCustomerNotes;
+            var AllNotesString = boilerNotes + newline + newline + flueNotes + newline + newline + gasWaterNotes + newline + newline + disruptionNotes + newline + newline + customerAgreedActionsNotes + newline + newline + specialCustomerNotes;
             
             var boilerHeading ="";
             if(boilerNotes!=""){
-                boilerHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Installer Notes - Boiler</div>";
+                boilerHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Boiler and controls:</div>";
             }
 
             var flueHeading ="";
             if(flueNotes!=""){
-                flueHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Installer Notes - Flue</div>";
+                flueHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Flue:</div>";
             }
 
             var gasWaterHeading ="";
             if(gasWaterNotes!=""){
-                gasWaterHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Installer Notes - Gas/Water</div>";
+                gasWaterHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Gas and water:</div>";
             }
 
             var disruptionHeading ="";
             if(disruptionNotes!=""){
-                disruptionHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Installer Notes - Disruption</div>";
+                disruptionHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Disruption:</div>";
             }
 
+            var customerAgreedActionsHeading ="";
+            if(customerAgreedActionsNotes!=""){
+                customerAgreedActionsHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Customer agreed actions:</div>";
+            }
+            
             var specialCustomerHeading ="";
             if(specialCustomerNotes!=""){
-                specialCustomerHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Installer Notes - Special customer requirements (including details of any planned home improvement work)</div>";
+                specialCustomerHeading ="<div style='padding:2px;font-size:16px;color:#091E73;'>Special customer requirements:</div>";
             }
 
 
-            AllNotesString=boilerHeading+"<p style='padding:2px;font-size:14px;'>"+boilerNotes+"</p>"+ flueHeading+"<p style='padding:2px;font-size:14px;'>"+flueNotes+"</p>"+gasWaterHeading+"<p style='padding:2px;font-size:14px;'>"+gasWaterNotes+"</p>"+disruptionHeading+"<p style='padding:2px;font-size:14px;'>"+disruptionNotes+"</p>"+ specialCustomerHeading +"<p style='padding:2px;font-size:14px;'>"+specialCustomerNotes+"</p>";
+            AllNotesString=boilerHeading+"<p style='padding:2px;font-size:14px;'>"+boilerNotes+"</p>"+ flueHeading+"<p style='padding:2px;font-size:14px;'>"+flueNotes+"</p>"+gasWaterHeading+"<p style='padding:2px;font-size:14px;'>"+gasWaterNotes+"</p>"+disruptionHeading+"<p style='padding:2px;font-size:14px;'>"+disruptionNotes+"</p>"+ customerAgreedActionsHeading+"<p style='padding:2px;font-size:14px;'>"+customerAgreedActionsNotes+"</p>"+ specialCustomerHeading +"<p style='padding:2px;font-size:14px;'>"+specialCustomerNotes+"</p>";
 
-            if((boilerNotes=="")&&(flueNotes=="")&&(gasWaterNotes=="")&&(disruptionNotes=="")&&(specialCustomerNotes=="")){
+            if((boilerNotes=="")&&(flueNotes=="")&&(gasWaterNotes=="")&&(disruptionNotes=="")&&(customerAgreedActionsNotes=="")&&(specialCustomerNotes=="")){
                 AllNotesString="--None--";
             }
 
@@ -6272,6 +6364,7 @@ window.generateInstallationNotesData = function generateInstallationNotesData(lo
                 "CHILeadNumber": chiLeadNumberString,
                 "connectedEmail":custEmail,
                 "connectedProductAdded":connectedProductAdded,
+                "customerName":CS.getAttributeValue('Customer_Name_0', 'String') || '--None--',
                 "customerAddress":instAddr,
                 "CustomerArrange" : CS.getAttributeValue('Customer_to_Arrange_0', 'String') || '--None--',
                 "productDefinition":definitionName,
@@ -6312,7 +6405,7 @@ window.generateInstallationNotesData = function generateInstallationNotesData(lo
 
 
 window.getBoilerDetailsTable = function getBoilerDetailsTable(){
-    var boilerHTML = '<h3>Boiler Details</h3>';
+    var boilerHTML = '<h3>Boiler details</h3>';
     
     var boilerTable ="<table class='shadedTable'>";
     boilerTable +="<tr>";
@@ -6369,7 +6462,7 @@ window.createRadiatorTable = function createRadiatorTable(){
         }
     }
 
-        var str ="<h3>Radiator Details</h3>"
+        var str ="<h3>Radiator details</h3>"
         str +="<table class='shadedTable'>";
         str +="<tr>";
         str +="<th>Rad</th>";
@@ -6377,9 +6470,9 @@ window.createRadiatorTable = function createRadiatorTable(){
         if(showPrice){
             str +="<th>Price&#42;</th>";
         }
-        str +="<th>Fitting Pack</th>";
-        str +="<th>Room Name</th>";
-        str +="<th>Room Location</th></tr>";
+        str +="<th>Fitting pack</th>";
+        str +="<th>Room name</th>";
+        str +="<th>Room location</th></tr>";
         
         var hlTable ='';
         

@@ -1,5 +1,6 @@
 @isTest
 private class CS_QuoteOnlineTemplateControllerTest {
+    public static cscfga__Product_Basket__c basket;
     @testsetup
     public static void testDataSetUP()
     {
@@ -140,7 +141,7 @@ private class CS_QuoteOnlineTemplateControllerTest {
         Test.startTest();
         
         // Create a Basket
-        cscfga__Product_Basket__c basket = new cscfga__Product_Basket__c();
+        basket = new cscfga__Product_Basket__c();
         basket.Name = 'CS TEST BASKET';
         insert basket;
         
@@ -246,12 +247,7 @@ private class CS_QuoteOnlineTemplateControllerTest {
         Campaign campaign = new Campaign(Source__c = 'TE', Media_Cost_Code__c = 'TEST', Group_Code__c = 'TEST', Name='Test campaign');
         insert campaign;
        
-        Appointment__c appointment = new Appointment__c();
-        appointment.Assigned_To__c = employee.id;
-        appointment.OwnerId = user.id;
-        appointment.Start__c = Datetime.newInstance(2016,5,5,12,30,0);
-        appointment.End__c = Datetime.newInstance(2016,5,5,14,30,0);
-        insert appointment;
+        
         
         
         Account account=new Account(Name='Test Account',Number_of_Bedrooms__c=1,BillingStreet='Test Street',BillingState='Test State',
@@ -268,7 +264,17 @@ private class CS_QuoteOnlineTemplateControllerTest {
         Test.stopTest();
         
         insert opportunity;
+        
+        Appointment__c appointment = new Appointment__c();
+        appointment.Assigned_To__c = employee.id;
+        appointment.OwnerId = user.id;
+        appointment.Start__c = Datetime.newInstance(2016,5,5,12,30,0);
+        appointment.End__c = Datetime.newInstance(2016,5,5,14,30,0);
+        appointment.Opportunity__c= opportunity.id;
+        insert appointment;
    
+        basket.appointment__c = appointment.id;
+        update basket;
         
         BasketInfo ret = new BasketInfo(appointment.id, opportunity.id, basket.id, basket, 'C12345678', 'BG' );
         return ret;
@@ -279,6 +285,33 @@ private class CS_QuoteOnlineTemplateControllerTest {
  
         //Create a Basket   
         BasketInfo basInf = prepareData();
+        
+        Account acc = TestclassHelper.createAccout();
+        insert acc;
+        
+        contact con = TestclassHelper.createContact(acc);
+        insert con;
+        
+        opportunity opp = TestclassHelper.createCHILead(acc);
+        insert opp;
+        
+        Employee__c emp = new Employee__c(name='Test emp',Employee_Number__c='12345');
+        insert emp;
+        
+        BigMachines_Quote__c quote = TestClassHelper.createBMQuote(opp);
+        quote.App_Assigned_To__c='Testemp - 12345';
+        quote.finalNetQuoteTotal__c=2000;
+        quote.depositOnPricing__c=200;
+        insert quote;
+        
+        CS_Promotion_Dates__c proDates = new CS_Promotion_Dates__c(name='IFC 3 Months Deferred',Start_Date__c=system.today().addyears(-1),End_Date__c=system.today().adddays(1),Final_Date__c=system.today().adddays(1));
+        insert prodates;
+        
+         CS_Promotion_Dates__c proDates1 = new CS_Promotion_Dates__c(name='30 Months IFC',Start_Date__c=system.today().addyears(-1),End_Date__c=system.today().adddays(1),Final_Date__c=system.today().adddays(1));
+        insert prodates1;
+        
+        Finance_product__c fp = new finance_product__c(deferral_period__c=0,Interest_Rate__c=9.9,Tenure_in_Months__c=36,name='test product');
+        insert fp;
         
         //String contentFile = serializedJson; //'{"FooterText":"test","LogoPng":"test","FooterText":"test","CHILeadNumber":"test","AsbestosIdentified":"test","AsbestosNotes":"test","EarthSystem":"test","VisibleEarth":"test","Voelcb":"test","CustomerArrange":"test","Rdc":"test","SocketSee":"test","EarthLocation":"test","Peb":"test","LadderWork":"test","Seb":"test","Scaffolding":"test","AccessNotes":"test","WorkAreas":"test","RemovalAssistance":"test" }';
         //Blob b = blob.valueof(contentFile); //decoded string
@@ -295,6 +328,7 @@ private class CS_QuoteOnlineTemplateControllerTest {
         //ApexPages.currentPage().getParameters().put('logoType', basInf.logoTyp);
         
         ApexPages.StandardController sc = new ApexPages.StandardController(basInf.bas);
+        ApexPages.currentPage().getParameters().put('id', quote.id);
         CS_QuoteOnlineTemplateController controller;
         
         //try {
@@ -315,6 +349,14 @@ private class CS_QuoteOnlineTemplateControllerTest {
         List<Attachment> aList = [Select Id, Name, Body, ParentId from Attachment where Id = :attId and Name = 'TEMP_Online_Quote.txt'];
         System.debug(aList);
         System.assertEquals(0, aList.size());
+        
+        try{
+        ApexPages.currentPage().getParameters().put('id', basket.id);
+        CS_QuoteOnlineTemplateController controller1 = new CS_QuoteOnlineTemplateController();
+        }catch(exception e)
+        {
+            
+        }
         
         //attId = UISupport.AttachTempFileReturnId(basInf.appId,'TEMP_Online_Quote.txt', contentFile);
        // UISupport.DeleteTempAttachment(attId);

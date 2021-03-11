@@ -148,8 +148,6 @@ public class WebAvailability {
           }
           
           result.AppointmentSlots = appList;
-          Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'Old');
-          insert o;                   
           if(result.AppointmentSlots.size() == 0)
           {
                 result.Error.Code = 6;
@@ -181,8 +179,6 @@ public class WebAvailability {
         }
         catch (Exception e){
             process_end_time = system.now();
-            Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'Old', Exception__c  = e.getmessage());
-            insert o;
             return null;
         }
     }
@@ -259,8 +255,6 @@ public class WebAvailability {
                 result.Error.Code = 6;
                 result.Error.Message = 'ERROR: No Available Appoinmnent Slots. ' + post_code_info.Name;
                 system.debug(result.Error.Message);
-                Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'New');
-                insert o;
                 return result;
            }else if(result.AppointmentSlots.size()>0)
             {
@@ -309,8 +303,6 @@ public class WebAvailability {
               result.Error.Code = 6;
               result.Error.Message = 'ERROR: No Available Appoinmnent Slots. ' + post_code_info.Name;
               system.debug(result.Error.Message);
-              Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'New');
-              insert o;
               return result;
           }
           else

@@ -78,7 +78,7 @@ private class copyConsumableOrder_Test {
          
         copyObj.conReq =cReq1;
         copyObj.continue_Btn();
-        copyConsumableOrder.conItemClass clist=new copyConsumableOrder.conItemClass(conSu);
+        copyConsumableOrder.conItemClass clist=new copyConsumableOrder.conItemClass(conSu, '');
         copyObj.conClassList =new list<copyConsumableOrder.conItemClass>();
         copyObj.conClassList.add(clist);
         copyObj.CreateCopyOrder();

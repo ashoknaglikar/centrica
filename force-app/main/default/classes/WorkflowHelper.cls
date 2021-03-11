@@ -27,7 +27,8 @@ public class WorkflowHelper
                                         Home_improvement__c,HomeImprovementCheckbox__c,Urgency__c,Boiler_Working__c,Unsafe_Appliance_Reason__c,Customer_agreed_to_appointment__c,Reason_code__c,Call_Back_Date__c,Override_Call_Back_Date__c,Do_Not_Call_Back__c, Opt_Out__c,Ecogen_Propostioned__c,Customer_Interested_In_Ecogen__c,Contact_Centre_Fast_Track__c,Fusion_Store__c,Fusion_UCRN__c,Boiler_type__c,Why_is_your_customer_considering_a_new_b__c,Current_annual_gas_spend_over_1500__c,
                                         Is_the_customers_boiler_working__c,Does_the_customer_have_hot_water__c,Customer_have_any_other_form_of_HEAT__c,Location_of_Current_Boiler__c,Location_of_new_Boiler__c,
                                         Is_the_customer_vulnerable__c,Vulnerable_reason__c,Latest_customer_category_indicator__c,No_Shower_Rooms__c,Cureent_Boiler_Location__c,
-                                        Latest_customer_category__c,GDCashBack__c , Gas_Council_Number__c,WithCustomer__c, Nectar_Number__c,WithCustReasons__c,Missing_product_holdings_reason__c,Home_Care__c,Keeping_current_boiler_in_same_place__c,Customer_Marketing_Consent__c ,Marketing_Preferences__c from Opportunities)
+                                        Latest_customer_category__c,GDCashBack__c , Gas_Council_Number__c,WithCustomer__c, Nectar_Number__c,WithCustReasons__c,Missing_product_holdings_reason__c,Home_Care__c,Keeping_current_boiler_in_same_place__c,Customer_Marketing_Consent__c ,Marketing_Preferences__c from Opportunities),
+                                        Latitude__Latitude__s,Latitude__Longitude__s
                                         From Account a where a.Id=:tempOpp.AccountId];
                                         
                 
@@ -320,17 +321,17 @@ public class WorkflowHelper
                 
                 //code added to validate contact numbers
                 /*System.debug('===contact=='+c.Contact);
-                System.debug('======Contact Numbers'+c.Contact.HomePhone+'=='+c.Contact.HomePhone.isNumeric()+'=='+c.Contact.HomePhone.length()+'=='+c.Contact.HomePhone.startsWith('0'));
+                //System.debug('======Contact Numbers'+c.Contact.HomePhone+'=='+c.Contact.HomePhone.isNumeric()+'=='+c.Contact.HomePhone.length()+'=='+c.Contact.HomePhone.startsWith('0'));
                
-                if(c.Contact.HomePhone == NULL || c.Contact.HomePhone.isNumeric() != true || c.Contact.HomePhone.length() != 11 || c.Contact.HomePhone.startsWith('0') != true){
+                if(c.Contact.HomePhone != null && (c.Contact.HomePhone.isNumeric() != true || c.Contact.HomePhone.length() != 11 || c.Contact.HomePhone.startsWith('0') != true)){
                     info = SetError(info, 'This is not a valid phone number format. Please re-enter.');
                 }
                 
-                if(c.Contact.MobilePhone== NULL || c.Contact.MobilePhone.isNumeric() != true || c.Contact.MobilePhone.length() < 11 || c.Contact.MobilePhone.startsWith('0') != true){
+                if(c.Contact.MobilePhone!= null && (c.Contact.MobilePhone.isNumeric() != true || c.Contact.MobilePhone.length() < 11 || c.Contact.MobilePhone.startsWith('0') != true)){
                     info = SetError(info, 'This is not a valid mobile number format. Please re-enter.');
                 }
                 
-                if(c.Contact.OtherPhone== NULL || c.Contact.OtherPhone.isNumeric() != true || c.Contact.OtherPhone.length() < 11 || c.Contact.OtherPhone.startsWith('0') != true){
+                if(c.Contact.OtherPhone!= null && (c.Contact.OtherPhone.isNumeric() != true || c.Contact.OtherPhone.length() < 11 || c.Contact.OtherPhone.startsWith('0') != true)){
                     info = SetError(info, 'This is not a valid other phone number format. Please re-enter.');
                 }*/
                 
@@ -564,11 +565,11 @@ public class WorkflowHelper
     //*************************************************************
     public static Workflow.WorkflowInfo CreateLeadAccountOpp(Workflow.WorkflowInfo info)
     {          
-             //CODE ADDED - Keerthi -----------------------------------------------------
+          //CODE ADDED - Keerthi -----------------------------------------------------
             //DATE:- June 8, 2018
             //DESCRIPTION:- To fetch the latitude and longitude details of the accounts
            
-        system.debug('@@'+info.combiSwap);
+        /*system.debug('@@'+info.combiSwap);
         Account acct = info.CurrentAccount;
         
         string street = acct.BillingStreet!=null?acct.BillingStreet.normalizeSpace().replaceall(' ','+').trim():'';
@@ -588,11 +589,28 @@ public class WorkflowHelper
         }catch (Exception e)
         {
             
-        }
+        }*/
         
+        //Suguna - update latitude longitude on acount
+        system.debug('@@'+info.combiSwap);
+        Account acct = info.CurrentAccount;
+        list<string> latlang= new List<String>();
         
+        if(acct.Latitude__Latitude__s==null)
+       {
+            string street = acct.BillingStreet!=null?acct.BillingStreet.normalizeSpace().replaceall(' ','+').trim():'';
+            string city = acct.BillingCity!=null ? acct.BillingCity.normalizeSpace().replaceall(' ','+').trim():'';
+            string pcode = acct.BillingPostalCode!=null?acct.BillingPostalCode.normalizeSpace().replaceall(' ','+').trim():'';
+            string Address = street + '+'+city+ '+' +pcode;
+            System.debug('address string send to utility-->'+Address);
+            try{
+                 Latlang = Utilities.getLatLang(Address,pcode,street,city);
+            }catch (Exception e)
+            {
+                
+            }
+       }
         
-        //Keerthi
         System.Savepoint sp = Database.setSavepoint();
         System.debug('=======priti Info===='+info.CurrentAccount);
         try
@@ -606,6 +624,19 @@ public class WorkflowHelper
             system.debug('Combi swap --->'+cSwap);
             CallMode objcallMode = new CallMode();
             string multiPremise ;
+            
+            //Suguna
+            for(ContactInfo c :lstcontacts)
+            {
+                    if(c.contact.phone!=null&& c.contact.mobilephone==null && c.contact.homephone==null)
+                    {
+                        if(c.contact.phone.startsWith('07'))
+                        c.contact.mobilephone=c.contact.phone;
+                        else
+                        c.contact.homephone=c.contact.phone;
+                        c.contact.phone=null;
+                    }
+            }
             //data validation
             info = ValidateContact(info);
             info = ValidateOpportunity(info);
@@ -640,7 +671,7 @@ public class WorkflowHelper
             if(count > 0)
             {
                 
-                tempAcc = [Select Id, ShippingStreet, Name, Status__c, ShippingState, ShippingPostalCode, ShippingCountry, ShippingCity, Primary_Contact__c, Number_of_Bedrooms__c, Gas_Supply_At_Address__c,Gas_Supply_At_Address1__c, Current_Heating_System__c, Current_Heating_System1__c, BillingStreet, BillingState, BillingPostalCode, BillingCountry, BillingCity, CreatedDate,  Account_Id__c, Sales_Region__c,Sales_District__c,Number_of_Bathrooms__c from Account where Name=:AccountName limit 1];
+                tempAcc = [Select Id, ShippingStreet, Name, Status__c, ShippingState, ShippingPostalCode, ShippingCountry, ShippingCity, Primary_Contact__c, Number_of_Bedrooms__c, Gas_Supply_At_Address__c,Gas_Supply_At_Address1__c, Current_Heating_System__c, Current_Heating_System1__c, BillingStreet, BillingState, BillingPostalCode, BillingCountry, BillingCity, CreatedDate,  Account_Id__c, Sales_Region__c,Sales_District__c,Number_of_Bathrooms__c,Latitude__Latitude__s,Latitude__Longitude__s from Account where Name=:AccountName limit 1];
                 
                 //PRB00033560 starts
                 if(tempAcc.Number_of_Bathrooms__c != info.CurrentAccount.Number_of_Bathrooms__c)
@@ -663,6 +694,15 @@ public class WorkflowHelper
                 //tempAcc.Id = NULL;
             }
             // asbestos change : Whenever Astebestos found is Yes then we populate with todays date.
+            
+            //Suguna - lat long update
+           if(tempAcc.Latitude__Latitude__s==null && Latlang!=null && Latlang.size()==2)
+            {
+                tempAcc.Latitude__Latitude__s = double.valueof(Latlang[0]);
+                tempAcc.Latitude__Longitude__s = double.valueof(Latlang[1]);
+                       
+            }
+            //ends
             
             System.debug('===accountWhileUpserting==='+tempAcc);            
             if( info.CurrentAccount.Asbestos_found__c == 'Yes')
@@ -1079,7 +1119,7 @@ public class WorkflowHelper
         } 
         catch(Exception ex)
         {
-            System.debug('## Exception in CreateLeadAccountOpp: '+ex);
+            System.debug('## Exception in CreateLeadAccountOpp: '+ex+ ex.getlinenumber());
             Database.rollback(sp);
             if(ex.getmessage().Contains('FIELD_CUSTOM_VALIDATION_EXCEPTION')){
                 System.debug('========first Exception in createLead======'+ex);

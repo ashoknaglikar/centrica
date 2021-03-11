@@ -18,8 +18,8 @@ public class consoleViewExtension {
     public String daysToIntallation{get;set;}    
     public BigMachines_Quote__c[] bMQWithQuoteProduct{get;set;}
     public String knowledgeSearchString{get;set;} 
-   // public List<Opportunity> recentlyViewedList{get;set;} 
-    public List<RecentlyViewed> recentlyViewedList{get;set;} 
+    //public List<Opportunity> recentlyViewedList{get;set;} 
+    //public List<RecentlyViewed> recentlyViewedList{get;set;} 
     public List<String> numbersBoxList{get;set;}
     public Map<String,Decimal> numbersBoxMap{get;set;}       
     public OpportunityContactRole[] ocrList{get;set;} 
@@ -390,11 +390,11 @@ public class consoleViewExtension {
             // Get recently viewed data from DB
             integer limitOpp = 7-(contactList.size()>0?contactList.size()+3:0);
             limitOpp = limitOpp<1?1:limitOpp;
-            recentlyViewedList = [SELECT Id, Name
+            /*recentlyViewedList = [SELECT Id, Name
                                     FROM RecentlyViewed 
                                     WHERE Type = 'Opportunity'
                                     ORDER BY LastViewedDate DESC 
-                                    LIMIT :limitOpp];     
+                                    LIMIT :limitOpp];  */   
                                     
             /*recentlyViewedList = [SELECT Id, Name, CHI_Lead_Id__c, Account.Primary_Contact__r.Name
                                     FROM Opportunity 

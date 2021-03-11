@@ -114,11 +114,18 @@ public class submitBarclaysv3{
 	class cls_outgoings {
 	    public decimal monthlyRent;
 	    //public decimal monthlyMortgage;
+	    public decimal monthlyDependentsCareCosts;
+	}
+	
+	class cls_changeInFutureCircumstances {
+	    public decimal expectedMonthlyExpenditureIncrease;
+	    public decimal expectedDecreasedAnnualIncome;
 	}
 	
 	public submitBarclaysv3(Finance_Application__c fa )
 	{
 	    this.externalApplicationReference = fa.Application_ID__c;
+	    if(userinfo.getusername().contains('portal'))
 	    this.returnURL = fa.Portal_Link__c;
 	    //barclaysIntegrationHelper helperObj = new barclaysIntegrationHelper();
 	    map<string, map<string, string>> barcalysFieldMapping = new map<string, map<string, string>>();
@@ -251,7 +258,7 @@ public class submitBarclaysv3{
 	    finObj.productCode = fa.Finance_Product__r.Product_Code__c;
 	    finObj.sellingType = fa.Finance_Product__r.Selling_Type__c;
 	    finObj.repaymentMethod = 'DIRECTDEBIT';
-	    finObj.deferralPeriod = 0;
+	    finObj.deferralPeriod = fa.Finance_Product__r.deferral_Period__c;
 	    finObj.interest = intObj;
 	    
 	    cls_bankAccount bankdetials = new cls_bankAccount();
@@ -275,12 +282,22 @@ public class submitBarclaysv3{
 		incomeObj.grossAnnualIncome = fa.Gross_Income__c;	//35000
 	    appObj.incomeDetails = incomeObj;
 	    
-	    if(fa.Rent__c != null)
+	    if(fa.Rent__c != null || fa.Monthly_Expense__c!=null)
 	    {
     	    cls_outgoings outgoingObj = new cls_outgoings();
     	    outgoingObj.monthlyRent =   fa.Rent__c;
+    	    outgoingObj.monthlyDependentsCareCosts = fa.Monthly_Expense__c;
     	    appObj.outgoings = outgoingObj;
 	    }
+	    
+	    if(fa.Expense_Variation_Value__c !=null || fa.Income_Variation_value__c!=null)
+	    {
+	        cls_changeInFutureCircumstances changeObj= new cls_changeInFutureCircumstances();
+	        changeObj.expectedMonthlyExpenditureIncrease = fa.Expense_Variation_Value__c;
+	        changeObj.expectedDecreasedAnnualIncome = fa.Income_Variation_value__c;
+	    }
+	    
+	    
 	    
         this.illustrationRequest = new cls_illustrationRequest();
 	    this.illustrationRequest.assets =  new list<cls_assets>{clsObj};

@@ -35,7 +35,8 @@ trigger trg_UpdatePayment on Payment_Collection__c (after update) {
     {
         cls_IsRun.setistrg_UpdatePayment();
     }   
-    
+    // Set the createJCD flag to true to stop the unwanted the status of PCN being set to Pending when PCN is complete while job is still planned.
+    lock.createJCD = true;
     Integer iCount=0;
     List<BGS_Payment__c> lst_OppPayment=new List<BGS_Payment__c>{};
     BGS_Payment__c obj_OppPayment;
@@ -64,7 +65,7 @@ trigger trg_UpdatePayment on Payment_Collection__c (after update) {
     
     
     for (Payment_Collection__c obj_PayCollection:Trigger.new){
-        if ((obj_PayCollection.Payment_Collection_Status__c=='Complete')) {
+        if (obj_PayCollection.Payment_Collection_Status__c=='Complete' && (obj_PayCollection.Job_Type__c==null || obj_PayCollection.Job_Type__c == '' )) {
             set_PayCollId.add(obj_PayCollection.Id);
             map_PayColl.put(obj_PayCollection.Id,obj_PayCollection);
             Set_OppId.add(obj_PayCollection.Opportunity__c);

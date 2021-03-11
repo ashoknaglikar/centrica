@@ -60,6 +60,7 @@ public class PurchaseOrderAmendment {
         //  Defect fix for EDI interface to identify this as user defined order line item.
         public boolean isUserDefinedOrderLine = false;
         public Double rebate{get;set;} {rebate = 0.0;} // PRB00029418
+        public String matCode{get;set;}
     } 
     // CR - User defined ASP - Made this class public to use in helper
     public class SupplierDetails{
@@ -82,6 +83,8 @@ public class PurchaseOrderAmendment {
         public void setSJobElementIdLst(List<Job_Element__c> value){sJobElementIdLst=value;}
         public String sErrorText{get;set;}
         public String sSupplierName{get;set;}
+        public List<SeLectoption> tertiarySuppList{get;set;}
+        public List<SeLectoption> tertiarySuppListDisplay{get;set;}
         // User defined ASP CR
         public Boolean isUserDefinedItem{get;set;}
     }
@@ -111,6 +114,9 @@ public class PurchaseOrderAmendment {
     private Map<String,List<Job_Element__c>> m_PrimaryJobElementMap=new Map<String,List<Job_Element__c>>{};
     private Map<String,List<Job_Element__c>> m_SecondaryJobElementMap=new Map<String,List<Job_Element__c>>{};
     
+     public Map<String,Rate_Card_Items__c> m_TertiaryRate=new Map<String,Rate_Card_Items__c>{};
+     public Map<String,Rate_Card_Items__c> im_itineryRate=new Map<String,Rate_Card_Items__c>{};
+     
     private List<PurchaseOrder> purchaseOrderIntermList=new List<PurchaseOrder>{};
     private Map<String,Map<String,List<Job_Element__c>>> w_SupplierJobElementMap=new Map<String,Map<String,List<Job_Element__c>>>{};
     private Map<String,Map<String,List<Job_Element__c>>> iw_SupplierJobElementMap=new Map<String,Map<String,List<Job_Element__c>>>{};
@@ -807,10 +813,33 @@ public class PurchaseOrderAmendment {
                         }           
                     }
                     objUnOrdered.objJobElement=objJobElement;
+                    objUnOrdered.tertiarySuppList=new List<SelectOption>();
                     objUnOrdered.setSJobElementIdLst(mUnOrderedLst);
                     m_UnOrderedItem.add(objUnOrdered);  
                 }//End for
                 fetchTertiarySupplier();
+                
+                //Suguna - multiple tertiary supplier change
+                 List<underOrderedItem> m_UnOrderedItemTemp=new List<underOrderedItem>{};
+                        for(underOrderedItem unOrderItem:m_UnOrderedItem)
+                        {
+                            for(String suppNum:tertiarySuppNums)
+                            {
+                                m_tertiaryRate=m_RateCard.get(suppNum);
+                                if(m_tertiaryRate!=null){
+                                if(m_tertiaryRate.containsKey(unOrderItem.objJobElement.code__c))
+                                {
+                                   //unOrderItem.sSupplierId= suppNum; 
+                                   unOrderItem.tertiarySuppList.add(new Selectoption(m_SupplierMap.get(suppNum).sSupplierNum,m_SupplierMap.get(suppNum).sSupplierName));
+                                   m_UnOrderedItemTemp.add(unOrderItem);
+                                  
+                                }
+                                }
+                                
+                            }
+                        }
+                 fetchTertiarySupplier();
+                 m_UnOrderedItem=m_UnOrderedItemTemp;
             }//End if
             
             if (im_JobElementMap!=null){
@@ -841,9 +870,32 @@ public class PurchaseOrderAmendment {
                     }
                     objUnOrdered.objJobElement=objJobElement;
                     objUnOrdered.setSJobElementIdLst(imUnOrderedLst);
+                    objUnOrdered.tertiarySuppList = new List<Selectoption>();
                     im_UnOrderedItem.add(objUnOrdered);  
                 }//End for
                 fetchitinerySupplier();
+                
+                //Suguna- Multiple itinary Suppliers to unOrderedItems
+                set<underOrderedItem> im_UnOrderedItemTemp=new set<underOrderedItem>{};
+                        for(underOrderedItem unOrderItem:im_UnOrderedItem)
+                        {
+                            for(String suppNum:itinerySuppNums)
+                            {
+                                im_itineryRate=im_RateCard.get(suppNum);
+                                if(im_itineryRate!=null){
+                                    if(im_itineryRate.containsKey(unOrderItem.objJobElement.code__c))
+                                    {
+                                       //unOrderItem.sSupplierId= suppNum; 
+                                       unOrderItem.tertiarySuppList.add(new Selectoption(im_SupplierMap.get(suppNum).sSupplierNum,im_SupplierMap.get(suppNum).sSupplierName));
+                                       im_UnOrderedItemTemp.add(unOrderItem);
+                                      
+                                    }
+                                }
+                                
+                            }
+                        }
+                        im_UnOrderedItem=new List<underOrderedItem>(im_UnOrderedItemTemp);
+                        //ends
             }//End if
             
         }
@@ -1657,8 +1709,35 @@ public class PurchaseOrderAmendment {
         update sapNumberLst;
         return null;
     }
+    
+    public List<String> tertiarySuppNums= new List<String>();
     private void fetchTertiarySupplier(){
         tertiarySupplierLst=new List<SelectOption>();
+        for (SupplierDetails objSupplier:m_SupplierMap.values()){
+            if (objSupplier.intSupplierPref==3)
+            {
+                tertiarySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));
+                tertiarySuppNums.add(objSupplier.sSupplierNum);
+            }
+        }
+        for(underOrderedItem unOrderItem:m_UnOrderedItem)
+        {
+            unOrderItem.tertiarySuppListDisplay = new List<Selectoption>();
+            if(autoPopulateSupplier)
+            {
+               unOrderItem.tertiarySuppListDisplay.addAll(unOrderItem.tertiarySuppList);
+               unOrderItem.tertiarySuppListDisplay.add(new Selectoption('','-None-'));
+            }
+            else
+            {
+                unOrderItem.tertiarySuppListDisplay.add(new Selectoption('','-None-'));
+                unOrderItem.tertiarySuppListDisplay.addAll(unOrderItem.tertiarySuppList); 
+            }
+            
+        }
+    } 
+        
+        /*
         //change to auto populate supplier
         if(autoPopulateSupplier){
          for (SupplierDetails objSupplier:m_SupplierMap.values()){
@@ -1667,6 +1746,7 @@ public class PurchaseOrderAmendment {
             //if(objSupplier.sSupplierName == 'P.T.S. Plumbing Trade Supplies Ltd')
             {
                 tertiarySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));
+                tertiarySuppNums.add(objSupplier.sSupplierNum);
             }  
             //}
         }
@@ -1680,13 +1760,14 @@ public class PurchaseOrderAmendment {
             //if(objSupplier.sSupplierName == 'P.T.S. Plumbing Trade Supplies Ltd')
             {
                 tertiarySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));
+                tertiarySuppNums.add(objSupplier.sSupplierNum);
             }
                
             //}
         }
-        }
+        }*/
         
-    }
+    //}
     
     private void fetchudp_All_Supplier_List(){
          udp_All_Supplier_List=new List<SelectOption>();
@@ -1873,6 +1954,7 @@ public class PurchaseOrderAmendment {
                             objOrderLineItemActual.Line_Item_Value__c=objOrderLineItem.dblTotalPrice;
                             objOrderLineItemActual.Skill__c=objOrderLineItem.sSkill;
                             objOrderLineItemActual.Rebate__c=objOrderLineItem.Rebate;
+                            objOrderLineItemActual.Material_code__c=objOrderLineItem.matCode;
                             orderLineItemLst.add(objOrderLineItemActual);      
                             for (Job_Element__c objJobElement:objOrderLineItem.getSJobElementLst()){
                                 objJobElement.Order__c=objOrderFinal.Id;
@@ -1961,11 +2043,13 @@ public class PurchaseOrderAmendment {
         }
     }
     public List<SelectOption> itinerySupplierLst{get;set;}
+     public List<String> itinerySuppNums= new List<String>();
     private void fetchitinerySupplier(){
         itinerySupplierLst=new List<SelectOption>();
         itinerySupplierLst.add(new Selectoption('','-None-')); 
         for (SupplierDetails objSupplier:im_SupplierMap.values()){
             itinerySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));   
+            itinerySuppNums.add(objSupplier.sSupplierNum);
         }
     }
    public PageReference cancel()

@@ -332,7 +332,7 @@ public class  AspEnhanced
         showMap = new map<string, Quote_Product__c>();
         oldRemoveMap = new map<string, Quote_Product__c>();
         asp =[Select a.Status__c, a.Quote__c, a.Picklist__c, a.Name, a.Material_Return_Info__c, a.Id, a.Function__c,Lock__c,Request_For_ASP__c, 
-                  a.Description__c, a.Definition__c, a.ASP_Type__c,Approved_By__c, a.ASP_Date__c, Charge_to_Customer__c ,ASP_Total__c, Material_Notes__c,
+                  a.Description__c, a.Definition__c, a.ASP_Type__c,Approved_By__c, a.ASP_Date__c, Charge_to_Customer__c ,ASP_Total__c, Material_Returns_Number__c, Material_Returns_Branch__c, Material_Notes__c,
                   (select Id,Materials__c ,Labour__c,Sales_Price__c, Name, Product_Description__c, Product__c, Part_Number__c,
                   Quantity__c,ASP_Reason__c,ASP_Impact__c,GrossSingle__c,ASP_Action__c,Description__c ,Unit_Price_Inc_VAT__c,Unit_Merchant_Price_Exc_VAT__c,ASP__c,Gross_Total__c , User_Defined_Description__c,Order__c,
                   Supplier__c,Product__r.Adding_Alert__c,Product__r.Removing_Alert__c,Customer_Charged_Refunded__c   from Quote_Products__r order by Order__c),Quote_ASP_Unsubmitted_Total__c,Balancing_Cost_Change__c,Person_Approved_By__c,a.Asp_Billing_Status__c From ASP__c a where id = :aspId];
@@ -717,7 +717,6 @@ public class  AspEnhanced
             addTable =true;
         else
             addTable =false;
-        
     }
     
     public void AddRemoveQty()
@@ -1207,6 +1206,10 @@ public class  AspEnhanced
                     return;
                 }
                 q.add=false;
+                if(q.qp.Product__r.Adding_Alert__c!=Null){
+                    ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.info,q.qp.Product__r.Adding_Alert__c);
+                    ApexPages.addMessage(myMsg);
+                }
                 break;
             }
             else
@@ -1376,6 +1379,10 @@ public class  AspEnhanced
                     
                 }
                 q.sub=false;
+                if(q.qp.Product__r.Removing_Alert__c!=Null){
+                    ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.info,q.qp.Product__r.Removing_Alert__c);
+                    ApexPages.addMessage(myMsg);
+                }
                 break;
                 
             }
@@ -1791,6 +1798,9 @@ public class  AspEnhanced
         string oldasp ;
         decimal oldaspimp;
         string oldact;
+        system.debug('Sugu '+addMap);
+        system.debug('Sugu '+removeMap);
+        
         for(quoteproductClass qps:FullList)
         {
             if(qps.remove)
@@ -1854,6 +1864,7 @@ public class  AspEnhanced
                 }
                 if(!removeMap.containskey(qps.qp.Name) && !addMap.containskey(qps.qp.Name) )
                 {
+                    system.debug('Sugu 3'+qps);
                     Quote_Product__c qp = qps.qp;
                     if(qp.ASP__c!=null)
                     {
@@ -2034,7 +2045,7 @@ public class  AspEnhanced
     {
         asp =[Select a.Status__c, a.Quote__c, a.Picklist__c, a.Name, a.Material_Return_Info__c, a.Id, a.Function__c,Lock__c, 
                   a.Description__c, a.Definition__c, a.ASP_Type__c, a.ASP_Date__c, Charge_to_Customer__c,Quote_ASP_Unsubmitted_Total__c,
-                  Approved_By__c,ASP_Total__c,Material_Notes__c,Balancing_Cost_Change__c,Person_Approved_By__c,Request_For_ASP__c,Asp_Billing_Status__c,Quote__r.Opportunity__c From ASP__c a where id = :aspId];
+                  Approved_By__c,ASP_Total__c,Material_Notes__c,Material_Returns_Number__c,Material_Returns_Branch__c,Balancing_Cost_Change__c,Person_Approved_By__c,Request_For_ASP__c,Asp_Billing_Status__c,Quote__r.Opportunity__c From ASP__c a where id = :aspId];
                   
         return asp;       
     }
@@ -2045,23 +2056,43 @@ public class  AspEnhanced
             list<Quote_Product__c >instingList = new list<Quote_Product__c >();
             list<Quote_Product__c >updatingList = new list<Quote_Product__c >();
             list<Quote_Product__c >deletelist = new list<Quote_Product__c >();
+            map<string,Product2> productAlertMap = new map<string,Product2>();
+            set<id> productids = new set<id>();
+            for(quoteproductClass qps: showList)
+            {
+               if(qps.qp.ASP_Reason__c != 'Removed' && qps.qp.id==null&&qps.qp.product__c!=null)
+               productids.add(qps.qp.product__c);
+            }
+            for(Product2 p:[select id,adding_Alert__c,removing_alert__c from product2 where id=:productids])
+            {
+                productAlertMap.put(p.id,p);
+            }
             
             for(quoteproductClass qps: showList)
             {
                 system.debug('add-->'+qps.add);
                 if(qps.qp.ASP_Reason__c != 'Removed')
                 {
+                    string alertMsg;
                     if(qps.qp.id==null)
                     {
                         qps.qp.Order__c = orderqp;
                         orderqp++;
                         instingList.add( qps.qp);
+                        alertMsg= productAlertMap.containsKey(qps.qp.product__c)?productAlertMap.get(qps.qp.product__c).adding_Alert__c:null;
                                     //qps.updateQp =false;
                     //break;
                     }else
                     {
                         updatingList.add( qps.qp);
+                        alertMsg=qps.qp.Product__r.adding_Alert__c;
                     }
+                    
+                     if(alertMsg!=Null){
+                         ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.info,alertMsg);
+                         ApexPages.addMessage(myMsg);
+                        }   
+                   
                 }else
                 {
                     integer remove =0;
@@ -2299,12 +2330,13 @@ public class  AspEnhanced
         }
         
     }
-    
+    Id supplierId = [Select id from Supplier__c where Available_For_User_Defined__c = true limit 1 ].Id;
+
     public void AddUDP()
     {
         
         Quote_Product__c qpNew = new Quote_Product__c(BigMachines_Quote__c=BigMachineId,Quantity__c =1, ASP__c = asp.Id, Materials__c = true, Labour__c = false, ASP_Reason__c = 'Added',ASP_Action__c = 'Add Parts Only',
-                                Product__c = '01t2000000275fK' ,Name='UDPQP', User_Defined_Product__c = true,Supplier__c = 'a0920000006Q4RQ',User_Defined_VAT_Rate__c='General VAT');
+                                Product__c = '01t2000000275fK' ,Name='UDPQP', User_Defined_Product__c = true,Supplier__c = supplierId,User_Defined_VAT_Rate__c='General VAT');
         insert qpNew;
         quoteproductClass qpClass = new quoteproductClass(qpNew);
         qpClass.updateQp = true;

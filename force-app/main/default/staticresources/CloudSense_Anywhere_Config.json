@@ -128,7 +128,7 @@
         },
         {
           "path": "cscfga__Product_Basket__c",
-          "type": "string"
+          "type": "floating"
         },
         {
           "path": "ThinConfigJson",

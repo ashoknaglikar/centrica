@@ -40,7 +40,7 @@ global class QFUVoucherFileBatch implements Database.Batchable<sObject>,Database
       
       string endCriteria;          
       endCriteria = 'Opportunity__c != null and opportunity__r.closeDate__c=null and opportunity__r.SC_Type__c!=\'Multi-Premise\' and opportunity__r.StageName IN:oppStages and opportunity__r.Finance_Process_Outcome__c=null';
-      endCriteria +=' and opportunity__r.Portal_Deposit__c=null and opportunity__r.Product_Interest__c NOT IN:productInterest and opportunity__r.Payment_Reference_Number__c=null and opportunity__r.Exclude_QFU__c=false ';
+      endCriteria +=' and opportunity__r.Portal_Deposit__c=null and opportunity__r.Product_Interest__c NOT IN:productInterest and opportunity__r.Exclude_QFU__c=false ';
       endCriteria +=' and opportunity__r.Comms_Email_Field__c!=null and opportunity__r.Customer_Email__c!=null ';
       endCriteria += subQuery;
       

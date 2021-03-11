@@ -323,7 +323,7 @@
                 <apex:iframe src="/{!iframeId}" scrolling="true" height="100%"/>
             </apex:outputPanel>           
                         
-            <div id="recentItems" class="wrap wrapCommon recentItemsBox">        
+            <!--<div id="recentItems" class="wrap wrapCommon recentItemsBox">        
                 <div class="titleBox">
                     <table>
                       <tr>
@@ -335,17 +335,17 @@
                 </div>
                 
                 <div class="recentItemsContentBox">
-                    <apex:dataTable value="{!recentlyViewedList}" var="rV"  rowClasses="even-row, odd-row">
-                        <!--<apex:column onclick="readCell('{!rV.Id}'+'?isdtp=vw');" >-->
+                   <apex:dataTable value="{!recentlyViewedList}" var="rV"  rowClasses="even-row, odd-row">
+                       
                         <apex:column >
                             <apex:outputLink value="/apex/{!$CurrentPage.Name}?id={!rV.Id}" style="color:black">
                                 {!UPPER(rV.Name)}
                             </apex:outputLink>                               
-                            <!--<apex:outputText value="{!UPPER(rV.Name)}" styleClass="hoverLink"/>-->
+                           
                         </apex:column> 
                     </apex:dataTable>
                 </div>
-            </div> 
+            </div> -->
                                    
             <div id="installation" class="wrap wrapCommon installationBox">        
                 <div class="titleBox">

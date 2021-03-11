@@ -113,6 +113,7 @@ public class PurchaseOrderAmendmentHelper {
                 isPriceFoundForOne = true;
                 decimal rebate = m_Rate.get(sTemp).Material__r.Rebate__c!= null?m_Rate.get(sTemp).Material__r.Rebate__c: 0.00;
                 objOrderLineItem.Rebate = rebate*objOrderLineItem.dblUnits;
+                objOrderLineItem.matCode = m_rate.get(sTemp).material__r.material_code__c;
             }
             // Cognizant - CHI Phase III CR-005 implementation... START
             // Added an else if block to set the unit price of orderlineitem with merchant price of user defined job element. 

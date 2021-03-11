@@ -19,6 +19,7 @@ public class CopyQuoteExtension {
     
     public Finance_Application__c fa{get;set;}
     public boolean isShowVoucherCode{get;set;}
+    public Deposit_Number__c depNum;
     
     public CopyQuoteExtension(ApexPages.StandardController controller) {
         leadPayment= new BGS_Payment__c();
@@ -27,8 +28,8 @@ public class CopyQuoteExtension {
         isShowVoucherCode=false;
         voucherCode ='';
         
-        bmQuote= [select id,name,Opportunity__c,opportunity__r.account.Primary_Contact__c,POC_Payment_Method__c,Allow_copy_Quote__c,
-                         finalPriceVisibleToCustomer__c,discountsTotalOnPricing__c,finalNetQuoteTotal__c   from BigMachines_Quote__c where id=:bmQuoteId];
+        bmQuote= [select id,name,Opportunity__c,opportunity__r.account.Primary_Contact__c,POC_Payment_Method__c,Allow_copy_Quote__c,opportunity__r.Payment_Reference_Number__c,
+                         finalPriceVisibleToCustomer__c,discountsTotalOnPricing__c,finalNetQuoteTotal__c,opportunity__r.Derived_Payment_Reference_Number__c   from BigMachines_Quote__c where id=:bmQuoteId];
         
         if(!bmQuote.Allow_Copy_Quote__c)
         {
@@ -65,6 +66,13 @@ public class CopyQuoteExtension {
             fa.Date_From1__c= fa.CreatedDate.date();
             selectedFinanceLender= fa.Finance_Lender__c;
         }
+        
+        leadPayment.BGS_Payment_Reference_Num__c=bmQuote.opportunity__r.Payment_Reference_Number__c;
+        if(bmQuote.opportunity__r.Payment_Reference_Number__c==null&&(system.label.Deposit_Reference_Number=='on'||bmQuote.opportunity__r.Derived_Payment_Reference_Number__c))
+            {
+                depNum=utilities.getAvailableRefNumber();
+                leadPayment.BGS_Payment_Reference_Num__c=depNum!=null?depNum.name:null;
+            }
     }
     
    
@@ -72,12 +80,11 @@ public class CopyQuoteExtension {
     {   
         if(voucherCode!=null && voucherCode!='' )
         {
-           List<Lead_offer__c> disAttributeList = [select id,Expiry_Date__c, Offer__r.Description__c,Offer__r.value__c from Lead_Offer__c 
-                                                    where Offer__r.active__c=true and Offer__r.Offer_Code__c=:voucherCode and opportunity__c=:bmQuote.Opportunity__c and Expiry_Date__c >= :system.today()];
+           List<Offer__c> disAttributeList = [select id,Description__c,value__c from Offer__c where active__c=true and Offer_Code__c=:voucherCode];
            if(disAttributeList.size()>0)
            {
-              voucherAmount= disAttributeList[0].Offer__r.value__c;
-              voucherName= disAttributeList[0].Offer__r.Description__c;
+              voucherAmount= disAttributeList[0].value__c;
+              voucherName= disAttributeList[0].Description__c;
            }
            else
            {
@@ -101,7 +108,7 @@ public class CopyQuoteExtension {
              ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Deposit Amount can not be more than Quote Net value £'+(bmQuote.finalNetQuoteTotal__c-(voucherAmount!=null?voucherAmount:0))));
              return null; 
         }
-        if((leadPayment.BGS_Payment_Reference_Num__c!=null||leadPayment.BGS_Payment_Reference_Num__c!='')&&(leadPayment.BGS_Payment_Reference_Num__c.length()!=11||(!leadPayment.BGS_Payment_Reference_Num__c.startsWith('8'))))
+        if((leadPayment.BGS_Payment_Reference_Num__c!=null||leadPayment.BGS_Payment_Reference_Num__c!='')&&(leadPayment.BGS_Payment_Reference_Num__c.length()>= integer.valueof(label.Billing_Reference_number_length)||(!leadPayment.BGS_Payment_Reference_Num__c.startsWith('8'))))
         {
              ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Billing Reference Number must be of 11 characters length and always start with number 8.'));
              return null;
@@ -143,10 +150,17 @@ public class CopyQuoteExtension {
             newBMQuote.balancePricing__c  = bmQuote.finalPriceVisibleToCustomer__c-bmQuote.discountsTotalOnPricing__c -newBMQuote.depositOnPricing__c-(voucherAmount!=null?voucherAmount:0);
             update newBMQuote;
             
+            if(depNum!=null && leadpayment.BGS_Payment_Reference_Num__c==depnum.name)
+            {
+                update new Deposit_Number__c(id=depNum.id,status__c='Used',opportunity__c=bmQuote.opportunity__c);
+                update new opportunity(id=bmQuote.opportunity__c,Payment_Reference_Number__c=leadpayment.BGS_Payment_Reference_Num__c);
+            }
+            
+            
             if(selectedPaymentType=='Finance')
             {
                 update new Contact(id =bmQuote.opportunity__r.Account.Primary_Contact__c,bm_fAcceptanceNumber__c = fa.Agreement_Number__c,bm_fAmountOfCredit__c = fa.Cash_Price__c,bm_fApplicationDate__c =fa.Date_From1__c,	
-                                     bm_fFinancialProduct__c =selectedFinanceLender, BM_Finance_Status_Date__c = system.today());
+                                     bm_fFinancialProduct__c =selectedFinanceLender, BM_Finance_Status_Date__c = system.today(), bm_fApplicationStatus__c = 'Approved');
             }
             
             PageReference pageRef = new PageReference('/'+response.quoteId); 
@@ -182,12 +196,11 @@ public class CopyQuoteExtension {
         }
         if(voucherCode!=null && voucherCode!='' )
         {
-           List<Lead_Offer__c> disAttributeList = [select id,Offer__r.Description__c,Offer__r.value__c from Lead_Offer__c 
-                                                   where Offer__r.active__c=true and Offer__r.Offer_Code__c=:voucherCode and opportunity__c=:bmQuote.Opportunity__c and Expiry_Date__c >= :system.today()];
+           List<Offer__c> disAttributeList = [select id,Description__c,value__c from Offer__c where active__c=true and Offer_Code__c=:voucherCode];
            if(disAttributeList.size()>0)
            {
-              voucherAmount= disAttributeList[0].Offer__r.value__c;
-              voucherName= disAttributeList[0].Offer__r.Description__c;
+              voucherAmount= disAttributeList[0].value__c;
+              voucherName= disAttributeList[0].Description__c;
               adjustedNetValue = bmQuote.finalNetQuoteTotal__c-(voucherAmount!=null?voucherAmount:0);
               fa.Cash_Price__c = adjustedNetValue - (leadPayment.Amount__c!=null?leadPayment.Amount__c:0);
            }

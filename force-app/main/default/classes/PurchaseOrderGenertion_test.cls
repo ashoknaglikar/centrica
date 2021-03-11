@@ -29,9 +29,11 @@ private class PurchaseOrderGenertion_test {
     static List<Order__c> ordlst;
     static List<Order__c>ordlst1;
     static List<Order_Line_Item__c> Ordlinelst;
+    static List<SAP_Number__c> listOfSapnumObj;
     
     static void createTestData() 
     {
+        utilities.switchOffAllTriggers();
               account=new Account(Name='Test Account',Number_of_Bedrooms__c=1,BillingStreet='Test Street',BillingState='Test State',
                                     BillingPostalCode='441111',BillingCountry='Test Country',BillingCity='Test City');
      
@@ -110,14 +112,25 @@ private class PurchaseOrderGenertion_test {
                                 Customer_Preferred_Date__c = Date.today(), Contractors__c=true, Own_Labour__c=true,
                                 Double_Handed_Job__c = true, Delivery_Date__c =Date.today(),Installation_Date__c=Date.today(),District__c=district.Id,Installer__c=UInstal1.Id);
         insert job;
+        
+        SAP_Number__c sapnumObj= new SAP_Number__c();
+        sapnumObj.Active__c=true;
+        sapnumObj.in_Use__c=false;
+        sapnumObj.SAP_Number__c='0987654';
+        //sapnumObj.SAP_Num_Ord__c=1325;
+        insert sapnumObj;
+        listOfSapnumObj= new List<SAP_Number__c>();
+        listOfSapnumObj.add(sapnumObj);
+        system.debug('-------listOfSapnumObj----.....'+listOfSapnumObj);
+        
      
         //Creating  Work Order with Active Status                         
         ord = new Order__c();
         ord.Job__c= job.Id;
-        ord.SAP_Number__c='12';
+        ord.SAP_Number__c=sapnumObj.SAP_Number__c;
         ord.Status__c='Active';
         ord.Sync__c=true;
-        ord.SAP_Number__c='1234';
+        //ord.SAP_Number__c='1234';
         ord.Supplier__c=supplier.Id;
         ord.Order_Value__c=456; 
         ord.Amendment_Number__c=678;
@@ -137,7 +150,7 @@ private class PurchaseOrderGenertion_test {
         JE2.Job__c = job.Id;
         JE2.Type__c='Work';
         JE2.New_Supplier__c=null;
-        JE2.Order__c=ord.Id;
+        JE2.Order__c=null;
         JE2.New_Supplier_Number__c= supplier2.Supplier_Num__c;
         JE2.Current_Supplier__c='CSupplier1';
         JE2.Current_Supplier_Number__c='321';
@@ -154,13 +167,13 @@ private class PurchaseOrderGenertion_test {
         // Ashok 's Cr-005 UDP JE
         Job_Element__c UDPJE = new Job_Element__c();
         UDPJE.Job__c = job.Id;
-        UDPJE.Type__c='Materail';
+        //UDPJE.Type__c='Materail';
         UDPJE.New_Supplier__c=null;
-        UDPJE.Order__c=ord.Id;
+        UDPJE.Order__c=null;
         UDPJE.New_Supplier_Number__c= supplier2.Supplier_Num__c;
         UDPJE.Current_Supplier__c=supplier2.Id;
         UDPJE.Current_Supplier_Number__c=supplier2.Supplier_Num__c;
-        UDPJE.Code__c='UDPQP';
+        UDPJE.Code__c='UDPQP1';
         UDPJE.Supplier_Order_Number__c='1212';
         UDPJE.Status__c='Active';
         UDPJE.Sub_Status__c='Awaiting Order';
@@ -174,10 +187,31 @@ private class PurchaseOrderGenertion_test {
         
         
         insert UDPJE;
+        Job_Element__c UDPJE1 = new Job_Element__c();
+        UDPJE1.Job__c = job.Id;
+        UDPJE1.New_Supplier__c=null;
+        UDPJE1.Order__c=null;
+        UDPJE1.New_Supplier_Number__c= supplier2.Supplier_Num__c;
+        UDPJE1.Current_Supplier__c=supplier2.Id;
+        UDPJE1.Current_Supplier_Number__c=supplier2.Supplier_Num__c;
+        UDPJE1.Code__c='UDPQP2';
+        UDPJE1.Supplier_Order_Number__c='1212';
+        UDPJE1.Status__c='Active';
+        UDPJE1.Sub_Status__c='Awaiting Order';
+        UDPJE1.Description__c='testDescription';
+        UDPJE1.Line_Item_ID__c='124124';
+        UDPJE1.Skill__c='Scaffolder';
+        UDPJE1.Units__c=125;
+        UDPJE1.P5_IsItinerary__c=false;
+        UDPJE1.User_Defined_Product__c = true;
+        UDPJE1.Merchant_Price__c = 100;
+        UDPJE1.Type__c = 'Material';
+        
+        insert UDPJE1;
         List<Job_Element__c> JEList_Work2 =new List<Job_Element__c>();
         JEList_Work2.add(JE2);
         JEList_Work2.add(UDPJE);
-        
+        JEList_Work2.add(UDPJE1);
         
         //Creating Order line Item with Active Status
         Order_Line_Item__c OrdLine2 = new Order_Line_Item__c();
@@ -202,7 +236,7 @@ private class PurchaseOrderGenertion_test {
         // Ashoks code CR-005 UDP order
         Order_Line_Item__c UDPOrdLine = new Order_Line_Item__c();
         UDPOrdLine.Order_Line_Item_Number__c=514;
-        UDPOrdLine.P5_Job_Element__c=UDPJE.Id;
+        //UDPOrdLine.P5_Job_Element__c=UDPJE.Id;
         UDPOrdLine.P5_Purchase_Order__c=ord.Id;
         UDPOrdLine.P5_Product__c=product.Id;
         UDPOrdLine.P5_Status_c__c='Active';
@@ -234,7 +268,7 @@ private class PurchaseOrderGenertion_test {
         Product_Materials__c ProductMaterial = new Product_Materials__c(Quantity__c=12, Material_Code__c='12');    
         insert ProductMaterial;
         
-        Product_Order__c productOrder=new Product_Order__c(Van_Stock__c=true); 
+        Product_Order__c productOrder=new Product_Order__c(Van_Stock__c=true,ORDER_FLAG__c='N'); 
         List<Product_Order__c> productOrderLst =new List<Product_Order__c>();
         insert productOrder;
         productOrderLst.add(productOrder);
@@ -296,7 +330,7 @@ private class PurchaseOrderGenertion_test {
         
         Ratecarditems=new Rate_Card_Items__c(Cost__c=100,Skill__c='Electrical');
         Ratecarditems.Rate_Card__c=Rate_card.Id;
-        Ratecarditems.Rate_Card_Item_Ext_Id__c='1526';
+        Ratecarditems.Rate_Card_Item_Ext_Id__c='1562';
         Ratecarditems.Material__c=productOrder.Id;
         Ratecarditems.Work_Order__c=workorder.Id;
         Ratecarditems.Start_Date__c= System.TODAY();
@@ -374,12 +408,13 @@ private class PurchaseOrderGenertion_test {
         postCodeSkillRateMap.put(supplier2.Supplier_Num__c, l_PostcodeSkillRate);
         
         System.debug('------ postCodeSkillRateMap = ' + postCodeSkillRateMap.get(supplier2.Supplier_Num__c));
-       
+        postCodeSkillRateMap.put(supplier2.Supplier_Num__c, l_PostcodeSkillRate);
+        
         try{
         POGen.generateWorkOrder(w_SupplierTotalJobElementMap,postCodeSkillRateMap,rateCardItemMap,supplier2.Supplier_Num__c);
         
         POGen.confirmOrder();
-        POGen.back();
+        //POGen.back();
         POGen.confirmOrder();
         POGen.saveOrder();
         POGen.cancel();
@@ -403,7 +438,7 @@ private class PurchaseOrderGenertion_test {
         JE3.Job__c = job.Id;
         JE3.Type__c='Work';
         JE3.New_Supplier__c=null;
-        JE3.Order__c=ord.Id;
+        JE3.Order__c=null;
         JE3.New_Supplier_Number__c= supplier.Supplier_Num__c;
         JE3.Current_Supplier__c='CSupplier1';
         JE3.Current_Supplier_Number__c='321';
@@ -463,7 +498,7 @@ private class PurchaseOrderGenertion_test {
         
         POGen.confirmOrder();
         POGen.saveOrder();
-        POGen.back();
+        //POGen.back();
         }catch(Exception e){}
         Test.stopTest();
     }
@@ -473,13 +508,13 @@ private class PurchaseOrderGenertion_test {
     {
         createTestData();
         
-        Test.startTest(); 
+        //Test.startTest(); 
         
         Job_Element__c JE3 = new Job_Element__c();
         JE3.Job__c = job.Id;
         JE3.Type__c='Material';
         JE3.New_Supplier__c=null;
-        JE3.Order__c=ord.Id;
+        JE3.Order__c=null;
         JE3.New_Supplier_Number__c= supplier2.Supplier_Num__c;
         JE3.Current_Supplier__c='CSupplier1';
         JE3.Current_Supplier_Number__c='321';
@@ -500,6 +535,8 @@ private class PurchaseOrderGenertion_test {
         w_JobElementIndividualMap.put(s9job,JEList_Work_9);
         w_SupplierTotalJobElementMap.put(supplier2.Supplier_Num__c,w_JobElementIndividualMap);
         
+        ord.Type__c='Material';
+        update ord;
         
         //Creating Order line Item with Active Status
         Order_Line_Item__c OrdLine3 = new Order_Line_Item__c();
@@ -519,7 +556,7 @@ private class PurchaseOrderGenertion_test {
         OrdLine3.Supplier__c=supplier2.Id;
         
         insert OrdLine3;
-        //Test.startTest();
+        Test.startTest();
         ApexPages.StandardController stdCancelController = new ApexPages.StandardController(job);
         job=(Job__c)stdCancelController.getRecord();
         PurchaseOrderGenertion POGen =new PurchaseOrderGenertion(stdCancelController);
@@ -538,9 +575,7 @@ private class PurchaseOrderGenertion_test {
         m_Rate.put(strCode, Ratecarditems);
         
         POGen.generateMaterialOrder(m_SelectedJobElementMap, supplier2.Supplier_Num__c, m_Rate);
-        POGen.confirmOrder();
-        POGen.back();
-        POGen.confirmOrder();
+        //POGen.confirmOrder();
         POGen.saveOrder();
         Test.stopTest();
     }
@@ -563,8 +598,6 @@ private class PurchaseOrderGenertion_test {
         try{
         POGen.generateWorkOrder(w_SupplierTotalJobElementMap,postCodeSkillRateMap,rateCardItemMap,supplier2.Supplier_Num__c);
         POGen.confirmOrder();
-        POGen.back();
-        POGen.confirmOrder();
         POGen.saveOrder();
         Test.stopTest();
         }catch (exception e){}
@@ -576,7 +609,7 @@ private class PurchaseOrderGenertion_test {
     static testmethod void test_for_materialItinerary_orders()
     {
         createTestData();
-        Test.startTest();
+        //Test.startTest();
         //supplier2.Type__c='Material-Itinery';
         //update supplier2;
         
@@ -601,6 +634,8 @@ private class PurchaseOrderGenertion_test {
         List<Job_Element__c> JEList_Work_9 =new List<Job_Element__c>();
         JEList_Work_9.add(JE3);
         
+        ord.Type__c='Itinerary';
+        update ord;
         
         w_JobElementIndividualMap.put(s9job,JEList_Work_9);
         w_SupplierTotalJobElementMap.put(supplier2.Supplier_Num__c,w_JobElementIndividualMap);
@@ -624,7 +659,7 @@ private class PurchaseOrderGenertion_test {
         OrdLine3.Supplier__c=supplier2.Id;
         
         insert OrdLine3;
-        //Test.startTest();
+        Test.startTest();
         ApexPages.StandardController stdCancelController = new ApexPages.StandardController(job);
         job=(Job__c)stdCancelController.getRecord();
         PurchaseOrderGenertion POGen =new PurchaseOrderGenertion(stdCancelController);
@@ -653,11 +688,284 @@ private class PurchaseOrderGenertion_test {
        
         POGen.generateItineryMaterialOrder(m_SelectedJobElementMap, supplier2.Supplier_Num__c, m_Rate);
         //POGen.generateItineryMaterialOrder(m_SelectedJobElementMap, supplier2.Supplier_Num__c,l_RateCardItems );
-        POGen.confirmOrder();
-        POGen.back();
-        POGen.confirmOrder();
+        //POGen.confirmOrder();
         POGen.saveOrder();
        Test.stopTest();
                 
     }
+    
+    static testmethod void test_for_orders_with_cancelledlineitems()
+    {
+        createTestData();
+        
+        //supplier2.Type__c='Material-Itinery';
+        //update supplier2;
+        
+        Job_Element__c JE3 = new Job_Element__c();
+        JE3.Job__c = job.Id;
+        JE3.Type__c='Material';
+        JE3.New_Supplier__c=null;
+        JE3.Order__c=ord.Id;
+        JE3.New_Supplier_Number__c= supplier2.Supplier_Num__c;
+        JE3.Current_Supplier__c='CSupplier1';
+        JE3.Current_Supplier_Number__c='321';
+        JE3.Code__c='345';
+        JE3.Supplier_Order_Number__c='1212';
+        JE3.Status__c='Active';
+        JE3.Sub_Status__c='Awaiting Order';
+        JE3.Description__c='testDescription';
+        JE3.Line_Item_ID__c='124';
+        JE3.Skill__c='Scaffolder';
+        JE3.Units__c=125;
+        JE3.P5_IsItinerary__c=true;
+        insert JE3;
+        List<Job_Element__c> JEList_Work_9 =new List<Job_Element__c>();
+        JEList_Work_9.add(JE3);
+        
+        ord.Type__c='Itinerary';
+        update ord;
+        
+        w_JobElementIndividualMap.put(s9job,JEList_Work_9);
+        w_SupplierTotalJobElementMap.put(supplier2.Supplier_Num__c,w_JobElementIndividualMap);
+        
+        
+        //Creating Order line Item with Active Status
+        Order_Line_Item__c OrdLine3 = new Order_Line_Item__c();
+        OrdLine3.Order_Line_Item_Number__c=714;
+        OrdLine3.P5_Job_Element__c=JE3.Id;
+        OrdLine3.P5_Purchase_Order__c=ord.Id;
+        OrdLine3.P5_Product__c=product.Id;
+        OrdLine3.P5_Status_c__c='Cancelled';
+        OrdLine3.Units__c=10;
+        OrdLine3.Quantity_Returned__c=100;
+        OrdLine3.Skill__c='Scaffolder';
+        OrdLine3.P5_Type__c='Material';
+        OrdLine3.Description__c='testdescription';
+        OrdLine3.Line_Item_Value__c = 89.90;
+        OrdLine3.Code__c='345'; 
+        OrdLine3.P5_Unit_Price_c__c=100;
+        OrdLine3.Supplier__c=supplier2.Id;
+        
+        insert OrdLine3;
+        Test.startTest();
+        ApexPages.StandardController stdCancelController = new ApexPages.StandardController(job);
+        job=(Job__c)stdCancelController.getRecord();
+        //AutoGeneratePurchaseOrders POGen =new AutoGeneratePurchaseOrders(stdCancelController);
+        PurchaseOrderGenertion POAmend =new PurchaseOrderGenertion(stdCancelController);
+        
+        String strCode = 'asd';
+        
+        m_SelectedJobElementMap=new Map<String,List<Job_Element__c>>(); 
+        m_Rate = new Map<String,Rate_Card_Items__c>();
+        m_SelectedJobElementMap.put(strCode, JEList_Work_9);
+        m_Rate.put(strCode, Ratecarditems);
+        
+        System.debug('------ JEList_Work_9 = ' + JEList_Work_9);
+        System.debug('------ Ratecarditems = ' + Ratecarditems);
+        System.debug('------ m_SelectedJobElementMap = ' + m_SelectedJobElementMap);
+        System.debug('------ m_Rate = ' + m_Rate);
+        
+        
+        
+        List<Rate_Card__c> ratecards = [Select P5_Supplier__r.Type__c, P5_Supplier__r.Fax_Setup__c, P5_Supplier__r.Van_Stock__c, P5_Supplier__r.Fax__c, 
+                                            P5_Supplier__r.Status_code__c, P5_Supplier__r.Supplier_Num__c, P5_Supplier__r.Name, P5_Supplier__r.Id, 
+                                            P5_Supplier__c, Rate_Card_Type__c From Rate_Card__c Where P5_Supplier__r.id = :supplier2.id];
+                                            
+        System.debug('------ ratecards = ' + ratecards);
+        System.debug('------ ratecards[0].P5_Supplier__r = ' + ratecards[0].P5_Supplier__r);
+        
+        //POAmend.autoGenerateOrders(job); 
+        POAmend.generateItineryMaterialOrder(m_SelectedJobElementMap, supplier2.Supplier_Num__c, m_Rate);
+        //POGen.generateItineryMaterialOrder(m_SelectedJobElementMap, supplier2.Supplier_Num__c,l_RateCardItems );
+        //POAmend.back();
+        //POAmend.confirmOrder();
+        POAmend.saveOrder();
+        
+        Test.stopTest();
+    }
+    
+    static testmethod void test_for_orders_with_no_price()
+    {
+        createTestData();
+        
+        Job_Element__c JE3 = new Job_Element__c();
+        JE3.Job__c = job.Id;
+        JE3.Type__c='Work';
+        JE3.New_Supplier__c=null;
+        JE3.Order__c=ord.Id;
+        JE3.New_Supplier_Number__c= supplier.Supplier_Num__c;
+        JE3.Current_Supplier__c='CSupplier1';
+        JE3.Current_Supplier_Number__c='321';
+        JE3.Code__c='345';
+        JE3.Supplier_Order_Number__c='1212';
+        JE3.Status__c='Active';
+        JE3.Sub_Status__c='Awaiting Order';
+        JE3.Description__c='testDescription';
+        JE3.Line_Item_ID__c='124';
+        JE3.Skill__c='Scaffolder';
+        JE3.Units__c=125;
+        JE3.P5_IsItinerary__c=true;
+        insert JE3;
+        //Ashok - test class
+        Job_Element__c JE4 = new Job_Element__c();
+        JE4.Job__c = job.Id;
+        JE4.Type__c='Work';
+        JE4.New_Supplier__c=null;
+        JE4.Order__c=ord.Id;
+        JE4.New_Supplier_Number__c= supplier.Supplier_Num__c;
+        JE4.Current_Supplier__c='CSupplier1';
+        JE4.Current_Supplier_Number__c='321';
+        JE4.Code__c='345';
+        JE4.Supplier_Order_Number__c='1212';
+        JE4.Status__c='Active';
+        JE4.Sub_Status__c='Awaiting Order';
+        JE4.Description__c='testDescription';
+        JE4.Line_Item_ID__c='124';
+        JE4.Skill__c='Scaffolder';
+        JE4.Units__c=125;
+        JE4.P5_IsItinerary__c=true;
+        insert JE4;
+        List<Job_Element__c> JEList_Work_9 =new List<Job_Element__c>();
+        JEList_Work_9.add(JE3);
+        JEList_Work_9.add(JE4);
+        
+        
+        
+        w_JobElementIndividualMap.put(s9job,JEList_Work_9);
+        w_SupplierTotalJobElementMap.put(supplier2.Supplier_Num__c,w_JobElementIndividualMap);
+        
+        
+        //Creating Order line Item with Active Status
+        Order_Line_Item__c OrdLine3 = new Order_Line_Item__c();
+        OrdLine3.Order_Line_Item_Number__c=714;
+        OrdLine3.P5_Job_Element__c=JE3.Id;
+        OrdLine3.P5_Purchase_Order__c=ord.Id;
+        OrdLine3.P5_Product__c=product.Id;
+        OrdLine3.P5_Status_c__c='Active';
+        OrdLine3.Units__c=10;
+        OrdLine3.Quantity_Returned__c=100;
+        OrdLine3.Skill__c='Scaffolder';
+        OrdLine3.P5_Type__c='Work';
+        OrdLine3.Description__c='testdescription';
+        OrdLine3.Line_Item_Value__c = 89.90;
+        OrdLine3.Code__c='345'; 
+        OrdLine3.P5_Unit_Price_c__c=100;
+        OrdLine3.Supplier__c=supplier.Id;
+        
+        insert OrdLine3;
+        
+        supplier2.Type__c='Work-Itinery';
+        update supplier2; 
+        
+        //postCodeSkillRateMap.put(OrdLine3.Skill__c,l_PostcodeSkillRate);
+        //postCodeSkillRateMap.put(supplier.Supplier_Num__c, l_PostcodeSkillRate);
+        Test.startTest();
+        ApexPages.StandardController stdCancelController = new ApexPages.StandardController(job);
+        job=(Job__c)stdCancelController.getRecord();
+        //AutoGeneratePurchaseOrders POGen =new AutoGeneratePurchaseOrders(stdCancelController);
+        PurchaseOrderGenertion POAmend =new PurchaseOrderGenertion(stdCancelController);
+       
+        w_SupplierTotalJobElementMap.clear();
+        w_SupplierTotalJobElementMap.put(supplier.Supplier_Num__c,w_JobElementIndividualMap);
+        
+        System.debug('------ postCodeSkillRateMap = ' + postCodeSkillRateMap.get(supplier.Supplier_Num__c));
+        //POAmend.autoGenerateOrders(job); 
+       
+        POAmend.generateItineryWorkOrder(w_SupplierTotalJobElementMap,postCodeSkillRateMap,rateCardItemMap,supplier.Supplier_Num__c);
+        
+        POAmend.confirmOrder();
+        POAmend.saveOrder();
+        Test.stopTest();
+    }
+    
+    
+    static testmethod void test_for_orders_with_unordered_job_element()
+    {
+        createTestData();
+        
+        //supplier2.Type__c='Material-Itinery';
+        //update supplier2;
+        
+        Job_Element__c JE3 = new Job_Element__c();
+        JE3.Job__c = job.Id;
+        JE3.Type__c='Material';
+        JE3.New_Supplier__c=null;
+        JE3.Order__c=ord.Id;
+        JE3.New_Supplier_Number__c= supplier2.Supplier_Num__c;
+        JE3.Current_Supplier__c='CSupplier1';
+        JE3.Current_Supplier_Number__c='321';
+        JE3.Code__c='345';
+        JE3.Supplier_Order_Number__c='1212';
+        JE3.Status__c='Active';
+        JE3.Sub_Status__c='Awaiting Order';
+        JE3.Description__c='testDescription';
+        JE3.Line_Item_ID__c='124';
+        JE3.Skill__c='Scaffolder';
+        JE3.Units__c=125;
+        JE3.P5_IsItinerary__c=true;
+        insert JE3;
+        List<Job_Element__c> JEList_Work_9 =new List<Job_Element__c>();
+        JEList_Work_9.add(JE3);
+        
+        ord.Type__c='Itinerary';
+        update ord;
+        
+        w_JobElementIndividualMap.put(s9job,JEList_Work_9);
+        w_SupplierTotalJobElementMap.put(supplier2.Supplier_Num__c,w_JobElementIndividualMap);
+        
+        
+        //Creating Order line Item with Active Status
+        Order_Line_Item__c OrdLine3 = new Order_Line_Item__c();
+        OrdLine3.Order_Line_Item_Number__c=714;
+        OrdLine3.P5_Job_Element__c=JE3.Id;
+        OrdLine3.P5_Purchase_Order__c=ord.Id;
+        OrdLine3.P5_Product__c=product.Id;
+        OrdLine3.P5_Status_c__c='Cancelled';
+        OrdLine3.Units__c=10;
+        OrdLine3.Quantity_Returned__c=100;
+        OrdLine3.Skill__c='Scaffolder';
+        OrdLine3.P5_Type__c='Material';
+        OrdLine3.Description__c='testdescription';
+        OrdLine3.Line_Item_Value__c = 89.90;
+        OrdLine3.Code__c='345'; 
+        OrdLine3.P5_Unit_Price_c__c=100;
+        OrdLine3.Supplier__c=supplier2.Id;
+        
+        //insert OrdLine3;
+        
+        ApexPages.StandardController stdCancelController = new ApexPages.StandardController(job);
+        job=(Job__c)stdCancelController.getRecord();
+        //AutoGeneratePurchaseOrders POGen =new AutoGeneratePurchaseOrders(stdCancelController);
+        PurchaseOrderGenertion POAmend =new PurchaseOrderGenertion(stdCancelController);
+        
+        String strCode = 'asd';
+        
+        m_SelectedJobElementMap=new Map<String,List<Job_Element__c>>(); 
+        m_Rate = new Map<String,Rate_Card_Items__c>();
+        m_SelectedJobElementMap.put(strCode, JEList_Work_9);
+        //m_Rate.put(strCode, Ratecarditems);
+        
+        System.debug('------ JEList_Work_9 = ' + JEList_Work_9);
+        System.debug('------ Ratecarditems = ' + Ratecarditems);
+        System.debug('------ m_SelectedJobElementMap = ' + m_SelectedJobElementMap);
+        System.debug('------ m_Rate = ' + m_Rate);
+        
+        
+        
+        List<Rate_Card__c> ratecards = [Select P5_Supplier__r.Type__c, P5_Supplier__r.Fax_Setup__c, P5_Supplier__r.Van_Stock__c, P5_Supplier__r.Fax__c, 
+                                            P5_Supplier__r.Status_code__c, P5_Supplier__r.Supplier_Num__c, P5_Supplier__r.Name, P5_Supplier__r.Id, 
+                                            P5_Supplier__c, Rate_Card_Type__c From Rate_Card__c Where P5_Supplier__r.id = :supplier2.id];
+                                            
+        System.debug('------ ratecards = ' + ratecards);
+        System.debug('------ ratecards[0].P5_Supplier__r = ' + ratecards[0].P5_Supplier__r);
+        test.startTest();
+        try{
+        //POAmend.autoGenerateOrders(job); 
+        POAmend.generateItineryMaterialOrder(m_SelectedJobElementMap, supplier2.Supplier_Num__c, m_Rate);
+        
+        POAmend.saveOrder();
+        POAmend.confirmOrder();}catch(exception e){}
+        test.stoptest();
+                
+    } 
 }

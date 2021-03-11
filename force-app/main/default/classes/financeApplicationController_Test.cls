@@ -1,5 +1,5 @@
 @isTest
-Private class financeApplicationController_Test{
+Public class financeApplicationController_Test{
   static Account acc;
   static contact con;
   static opportunity opp;
@@ -267,15 +267,15 @@ Private class financeApplicationController_Test{
   }
   
   public static finance_Product__c createFproduct(){
-    Finance_Product__c fp= new Finance_Product__c(Name='BarclaysIBCTerm',Interest_Rate__c=14.9,Selling_Type__c='Off Trade',
+    Finance_Product__c fp= new Finance_Product__c(Name='BarclaysIBCTerm',Interest_Rate__c=14.9,Selling_Type__c='Off Trade',Finance_options__c='0% - 2 Years',
                                                   Active__c=TRUE,Product_Code__c='FTSTDO',Asset_Type__c='CH1',Asset_Type_Description__c='Boiler',Selectable__c=true);
     insert fp;
                                                   
-    Finance_Product__c fp1= new Finance_Product__c(Name='BarclaysIBCTerm',Interest_Rate__c=14.9,Selling_Type__c='Off Trade',
+    Finance_Product__c fp1= new Finance_Product__c(Name='BarclaysIBCTerm',Interest_Rate__c=14.9,Selling_Type__c='Off Trade',Finance_options__c='0% - 2 Years',
                                                   Active__c=TRUE,Product_Code__c='FTSTDO',Asset_Type__c='CH1',Asset_Type_Description__c='Boiler',Selectable__c=true,Min_Loan__c=1000,Max_Loan__c=1500,Parent_Product__c=fp.id);
     insert fp1;
     
-    Finance_Product__c fp2 = [SELECT Name,Id,Interest_Rate__c, Payment_Options__c, Selling_Type__c,Asset_Type__c,Asset_Type_Description__c,Product_Code__c,Promotional_period__c FROM Finance_Product__c where id=:fp.id LIMIT 1];
+    Finance_Product__c fp2 = [SELECT Name,Id,Interest_Rate__c, Payment_Options__c,Finance_options__c, Selling_Type__c,Asset_Type__c,Asset_Type_Description__c,Product_Code__c,Promotional_period__c FROM Finance_Product__c where id=:fp.id LIMIT 1];
     return fp2;                                           
   }
   

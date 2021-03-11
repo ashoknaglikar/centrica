@@ -29,6 +29,8 @@ public class AvailabilityP1Controller {
     public List<availDataSet> SummaryView {get; set;}
     public List<availDataSet> TwoHrView {get; set;}
     public boolean isHSA{get;set;}
+    
+    public string activedaytitle{get;set;}
     //Changes done for No suitable appointments
     boolean NoSuitable=null;
     
@@ -62,6 +64,9 @@ public class AvailabilityP1Controller {
     
     String productInt = System.currentPageReference().getParameters().get('productInt');
     boolean existingLead = System.currentPageReference().getParameters().get('existingLead')=='true'?true:false;
+    
+    string searchFordayString = System.currentPageReference().getParameters().get('searchForDay');
+    public boolean issearchforday{get;set;}
      
     Date activeDate;   
     Integer colNo;
@@ -127,11 +132,17 @@ public class AvailabilityP1Controller {
     date bestApptDate {get; set;}
     map<string, list<string>> displayController; 
     map<string, list<string>> displayRestricter; 
+    
+    
+    
     /////////////////////
     //Constructor class//
     /////////////////////
     
     public AvailabilityP1Controller() {
+        
+     
+        issearchforday=false;
       isHSA=false;
       if(system.label.CHI_HSA_ProfileId.contains(userinfo.getProfileId()))
       {
@@ -171,6 +182,8 @@ public class AvailabilityP1Controller {
       // -- GD change start.
       
         thisOpp = new Opportunity();
+        /*if(searchFordayString!='null'&&searchFordayString!=null)
+        thisopp.Actual_Call_Back_Date__c=date.valueof(searchFordayString);*/
         //System.debug('Getting opportunity with ID: ' + chiLeadID);
         
         // HSA allocation CR - Starts
@@ -188,12 +201,25 @@ public class AvailabilityP1Controller {
             activeDate = date.valueOf(activeURLDate).toStartOfWeek();
             }
         
+            
+        if(searchFordayString!='null'&&searchFordayString!=null)
+        {
+            activeDate=date.valueOf(searchFordayString); 
+            activedaytitle = getdaytitle(0);
+            issearchforday=true;
+        }
+        
         thisOpp = [Select o.id , o.Name , o.AccountID, o.CHI_Lead_Type__c, o.Referral_Employee__r.Salesforce_User__c , o.Referral_Employee__r.Resource_Type__c , o.Account.BillingPostalCode, o.Account.Primary_Contact__r.Name , o.Account.Primary_Contact__c , o.Visit_Type__c, o.Urgency__c,Product_Interest__c , o.Timeline_Options__c , o.Timeline_Reason__c , 
-                   CreatedDate , Latest_customer_category__c ,customer_category_controller__c, CHI_Lead_Id__c, Latest_customer_category_indicator__c,Secondary_Product_Interest__c, Account.Landlord_Account__c, Landlords_permission__c From Opportunity o where Id = :chiLeadID];
+                   CreatedDate , Latest_customer_category__c ,customer_category_controller__c, CHI_Lead_Id__c, Actual_Call_Back_Date__c,Latest_customer_category_indicator__c,Secondary_Product_Interest__c, Account.Landlord_Account__c, Landlords_permission__c From Opportunity o where Id = :chiLeadID];
         
         if(productInt!=null)
         {
             thisOpp.product_interest__c = productInt;
+        }
+       
+        if(searchFordayString!='null'&&searchFordayString!=null)
+        {
+           thisopp.Actual_Call_Back_Date__c=date.valueof(searchFordayString);
         }
         
         if(thisOpp.Account.Landlord_Account__c )
@@ -491,16 +517,36 @@ public class AvailabilityP1Controller {
    
     //View availabilty for the next week (7 days forward)
     public PageReference onClickForward7() {
+        String searchfordayF;
+        PageReference pageRef;
         // IntegratedScript changes
-        PageReference pageRef = new PageReference('/apex/availability'+ffParameters+'var_OpptyId='+chiLeadID+'&var_view=null'+'&var_contactId='+contactId+'&var_Source='+source+'&var_date='+string.valueOf(activeDate.addDays(noDays))+'&var_cancelledapp='+currentApp+'&var_CallId=' + callID+'&gDeal='+gDeal+'&var_NoSuitable='+NoSuitable);                                                                                                   
+        if(ffParameters!=null)
+        pageRef = new PageReference('/apex/availability'+ffParameters+'var_OpptyId='+chiLeadID+'&var_view=null'+'&var_contactId='+contactId+'&var_Source='+source+'&var_date='+string.valueOf(activeDate.addDays(noDays))+'&var_cancelledapp='+currentApp+'&var_CallId=' + callID+'&gDeal='+gDeal+'&var_NoSuitable='+NoSuitable);                                                                                                   
+        else
+        pageRef = new PageReference('/apex/availability?var_OpptyId='+chiLeadID+'&var_view=null'+'&var_contactId='+contactId+'&var_Source='+source+'&var_date='+string.valueOf(activeDate.addDays(noDays))+'&var_cancelledapp='+currentApp+'&var_CallId=' + callID+'&gDeal='+gDeal+'&var_NoSuitable='+NoSuitable);                                                                                                   
+        if(issearchforday)
+        {
+            searchfordayF=string.valueOf(date.valueof(searchForDayString).addDays(1));
+            pageRef =  new pagereference('/apex/availability?var_OpptyId='+chiLeadID+'&var_Source='+source+'&view=null&var_date=null&var_NoSuitable=0&var_contactId='+contactId+'&var_cancelledapp=null&view=null&&gDeal='+gdeal+'&ProductInt='+productInt+'&var_CallId='+callID+'&existingLead='+existingLead+'&new='+newInbound+'&searchForDay='+searchfordayF);
+        }
         // end IntegratedScript changes
         pageRef.setRedirect(true);      
         return pageRef;                            
     }
     //View availabilty for the previous week (7 days backwards)
     public PageReference onClickBack7() {
-        // IntegratedScript changes
-        PageReference pageRef = new PageReference('/apex/availability'+ffParameters+'var_OpptyId='+CHIleadId+'&var_view=null'+'&var_contactId='+contactId+'&var_Source='+source+'&var_date='+string.valueOf(activeDate.addDays(-noDays))+'&var_cancelledapp='+currentApp+'&var_CallId=' + callID+'&gDeal='+gDeal+'&var_NoSuitable='+NoSuitable);                                                                                                 
+        String searchfordayB;
+        PageReference pageRef;
+        
+        if(ffParameters!=null)
+        pageRef = new PageReference('/apex/availability'+ffParameters+'var_OpptyId='+CHIleadId+'&var_view=null'+'&var_contactId='+contactId+'&var_Source='+source+'&var_date='+string.valueOf(activeDate.addDays(-noDays))+'&var_cancelledapp='+currentApp+'&var_CallId=' + callID+'&gDeal='+gDeal+'&var_NoSuitable='+NoSuitable);                                                                                                 
+        else
+        pageRef = new PageReference('/apex/availability?var_OpptyId='+chiLeadID+'&var_view=null'+'&var_contactId='+contactId+'&var_Source='+source+'&var_date='+string.valueOf(activeDate.addDays(-noDays))+'&var_cancelledapp='+currentApp+'&var_CallId=' + callID+'&gDeal='+gDeal+'&var_NoSuitable='+NoSuitable);                                                                                                   
+        if(issearchforday)
+        {
+            searchfordayB=string.valueOf(date.valueof(searchFordayString).addDays(-1));
+            pageRef =  new pagereference('/apex/availability?var_OpptyId='+chiLeadID+'&var_Source='+source+'&view=null&var_date=null&var_NoSuitable=0&var_contactId='+contactId+'&var_cancelledapp=null&view=null&&gDeal='+gdeal+'&ProductInt='+productInt+'&var_CallId='+callID+'&existingLead='+existingLead+'&new='+newInbound+'&searchForDay='+searchfordayB);
+        }
         // end IntegratedScript changes
         pageRef.setRedirect(true);      
         return pageRef;                                   
@@ -1037,6 +1083,18 @@ public class AvailabilityP1Controller {
                   queryEndDate = date.newInstance(activeDate.year(), activeDate.month(), activeDate.day()+retList1[0].getnoDays()-1);
             }
         }
+        
+        
+        
+        /*if(thisopp.product_interest__c=='Straight Swap'&& thisOpp.Latest_customer_category__c == 4)
+        {
+            if(queryStartTime<=system.now().addhours(48))
+            {
+             queryStartTime = system.now().addhours(48);
+             queryStartDate = date.newInstance(queryStartTime.year(), queryStartTime.month(), queryStartTime.day());
+            }
+        }*/
+        
         /*
               Moved above to reuce If condition. 
         date queryEndDate;
@@ -1125,15 +1183,36 @@ public class AvailabilityP1Controller {
                             
                             while(ofsStartDate<=ofsEndDate)
                             {
-                            	//ofsStartDate =ofsStartDate.adddays(2);
-                            	appointmentWindow.add(ofsStartDate);
-                            	ofsStartDate =ofsStartDate.adddays(1);
+                              //ofsStartDate =ofsStartDate.adddays(2);
+                              appointmentWindow.add(ofsStartDate);
+                              ofsStartDate =ofsStartDate.adddays(1);
                                 //break;
                             }
                             //Send OFS API Request
                             system.debug('appointmentWindow-->'+appointmentWindow);
                             availDataSet[] tempList = availabiltyP1ControllerHelper.callOFSAPI(appointmentWindow,postCodeSector, BucketName,thisOpp,queryStartDate  );
                             SummaryView =tempList;
+                            
+                            if(issearchForDay)
+                            {
+                                integer diff= activedate.toStartOfWeek().daysBetween(date.valueof(searchForDayString));
+                                activedate=activedate.toStartOfWeek();
+                                activedaytitle = getdaytitle(diff);
+                                for(availDataSet a:SummaryView)
+                                {
+                                  for(integer i=0; i<7; i++)
+                                  {
+                                     if(i==diff)
+                                     {
+                                       //do nothing
+                                     }
+                                     else
+                                     {
+                                        a.daysAvailable[i]=false;
+                                     }
+                                  }
+                                }
+                            }
                             
                         }
                         
@@ -1384,16 +1463,15 @@ public class AvailabilityP1Controller {
                     
                   }
                 // appointment Converter Change : End                
-                Integer appQueryLimit = integer.valueof(label.appointementQueryLimit);
-                /*if(activeURLDate == 'null')
+                Integer appQueryLimit;
+                if(activeURLDate == 'null')
                 {
-                    //appQueryLimit = 500;
-                        
+                    appQueryLimit = 500;
                 }
                 else
                 {
-                    //appQueryLimit = 1000;
-                }*/
+                    appQueryLimit = 1000;
+                }
                 
                 //Changes done to querry No suitable appointments
                 string poolType;
@@ -1415,7 +1493,7 @@ public class AvailabilityP1Controller {
                                  ORDER BY Start__c limit : appQueryLimit
                                  ];
                 
-                
+                system.debug('sevenDayAppts '+sevenDayAppts.size());
                 system.debug('AppType-->'+appType);
                 
                 boolean displayMessageFlag1 = true;
@@ -1453,6 +1531,14 @@ public class AvailabilityP1Controller {
                                 {
                                     continue;
                                 }
+                            }
+                            system.debug('I am here --');
+                            system.debug(sevenDayAppts[i].Start__c);
+                            system.debug(system.now().addMinutes(integer.valueof(label.GuidedSaleBuffer)));
+                            // 
+                            if(thisOpp.Product_Interest__c == 'Guided Sale' && sevenDayAppts[i].Start__c< system.now().addMinutes(integer.valueof(label.GuidedSaleBuffer)))
+                            {
+                                continue;
                             }
                             
                             
@@ -1797,10 +1883,55 @@ public class AvailabilityP1Controller {
       string gdeal = '0'; 
       if(productInt == 'Straight Swap' || productInt == 'Telesales Conv' || productInt == 'Straight Swap - Direct') 
       gdeal = '3';
-       pagereference p =  new pagereference('/apex/availability?var_OpptyId='+chiLeadID+'&var_Source='+source+'&view=null&var_date=null&var_NoSuitable=0&var_contactId='+contactId+'&var_cancelledapp=null&view=null&&gDeal='+gdeal+'&ProductInt='+productInt+'&var_CallId='+callID+'&existingLead='+existingLead+'&new='+newInbound);
+      
+       string searchforday = thisopp.Actual_Call_Back_Date__c!=null?string.valueOf(thisopp.Actual_Call_Back_Date__c):null;
+       pagereference p =  new pagereference('/apex/availability?var_OpptyId='+chiLeadID+'&var_Source='+source+'&view=null&var_date=null&var_NoSuitable=0&var_contactId='+contactId+'&var_cancelledapp=null&view=null&&gDeal='+gdeal+'&ProductInt='+productInt+'&var_CallId='+callID+'&existingLead='+existingLead+'&new='+newInbound+'&searchForDay='+searchforday);
         p.setRedirect(true);
         //getAvailability();
         return p;
+  }
+  
+  public pagereference searchfortheDay()
+  {
+      string productInt = thisOpp.Product_Interest__c;
+      system.debug('productInt'+productInt);
+      string gdeal = '0'; 
+      if(productInt == 'Straight Swap' || productInt == 'Telesales Conv' || productInt == 'Straight Swap - Direct') 
+      gdeal = '3';
+      
+      string searchforday = thisopp.Actual_Call_Back_Date__c!=null?string.valueOf(thisopp.Actual_Call_Back_Date__c):null;
+      pagereference p =  new pagereference('/apex/availability?var_OpptyId='+chiLeadID+'&var_Source='+source+'&view=null&var_date=null&var_NoSuitable=0&var_contactId='+contactId+'&var_cancelledapp=null&view=null&&gDeal='+gdeal+'&ProductInt='+productInt+'&var_CallId='+callID+'&existingLead='+existingLead+'&new='+newInbound+'&searchForDay='+searchforday);
+      p.setRedirect(true);
+     /* String timeTitle='Any Time';
+      integer timeTitleStartHour = 7;
+      integer timeTitleEndHour =21;
+      integer timeTitleStartMinute=0;
+      integer timeTitleEndMinute=0;
+      if(gDeal == '3')
+      timeTitleStartHour=6;
+           
+           
+      string timeinfo ='&var_period='+timeTitle+'&var_starttime='+timeTitleStartHour+'&var_endtime='+timeTitleEndHour
+                   +'&var_start_min='+timeTitleStartMinute
+                   +'&var_end_min='+timeTitleEndMinute;
+       pagereference p =  new pagereference('/apex/'+getparameterString()+'&var_date='+String.valueOf(thisopp.Actual_Call_Back_Date__c)+timeinfo+'&highestAbility=0');*/
+      
+      return p;
+  }
+  
+  public pagereference backto7DayView()
+  {
+      
+      string productInt = thisOpp.Product_Interest__c;
+      system.debug('productInt'+productInt);
+      string gdeal = '0'; 
+      if(productInt == 'Straight Swap' || productInt == 'Telesales Conv' || productInt == 'Straight Swap - Direct') 
+      gdeal = '3';
+      
+      string searchforday = null;
+      pagereference p =  new pagereference('/apex/availability?var_OpptyId='+chiLeadID+'&var_Source='+source+'&view=null&var_date=null&var_NoSuitable=0&var_contactId='+contactId+'&var_cancelledapp=null&view=null&&gDeal='+gdeal+'&ProductInt='+productInt+'&var_CallId='+callID+'&existingLead='+existingLead+'&new='+newInbound+'&searchForDay='+searchforday);
+      p.setRedirect(true);
+      return p;
   }
  
 

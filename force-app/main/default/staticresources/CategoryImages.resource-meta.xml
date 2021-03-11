@@ -2,5 +2,5 @@
 <StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
     <cacheControl>Private</cacheControl>
     <contentType>application/zip</contentType>
-    <description>mages for customer category - P1 to P4 &#39;Image_P1.png&#39;</description>
+    <description>mages for customer category - P1 to P4 &apos;Image_P1.png&apos;</description>
 </StaticResource>

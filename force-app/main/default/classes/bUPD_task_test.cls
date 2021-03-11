@@ -21,7 +21,7 @@
  */
 @isTest
 public class bUPD_task_test {
-
+/*
     public static testMethod void bUPD_tasTest() {
         Task task = new task();
         Account account=new Account(Name='Test Account',Number_of_Bedrooms__c=1,BillingStreet='Test Street',BillingState='Test State',
@@ -89,7 +89,8 @@ public class bUPD_task_test {
         insert quoteProduct;
 
         
-        District__c district = [Select id from District__c limit 1];
+        District__c district = TestClassHelper.createDistrict();
+        insert district;
                 
        
        
@@ -181,4 +182,5 @@ public class bUPD_task_test {
         
         
     }
+    */
 }

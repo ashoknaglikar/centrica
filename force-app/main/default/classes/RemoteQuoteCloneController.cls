@@ -16,9 +16,13 @@ public with sharing class  RemoteQuoteCloneController {
     public string getcustomerCateogryType(){
        return customerCateogryType;
     }
+    public List<Appointment__c> cancelOldApt{get;set;}
+    
+    public Appointment__c tempApp {get;set;}
     
  public RemoteQuoteCloneController (ApexPages.StandardController controller) {
-     
+        
+        tempApp  = new Appointment__c();
         opportunityId = ApexPages.currentPage().getParameters().get('id');
         this.opp = (Opportunity)controller.getRecord();
         opp = [select id,name,Product_Interest__c,ta_notes__c,Vulnerable_category__c,Customer_Category_Record_Modified_By__c,Customer_Category_Modified_Datetime__c,Latest_customer_category_indicator__c,
@@ -50,6 +54,11 @@ public with sharing class  RemoteQuoteCloneController {
            rMap.put(cmap.reason__c,res);
          }
        }
+       
+       cancelOldApt = [Select id from Appointment__c where Type__c = 'Sales' and Start__c  >= :system.now() and Status__c = 'Appointed' and Opportunity__c= :opportunityId];
+       
+       
+      
     }
   
   public PageReference bookAppointment() {
@@ -59,6 +68,16 @@ public with sharing class  RemoteQuoteCloneController {
         ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR,'Product Interest:You must enter a value')); 
         return null;
       }
+      
+      for(Appointment__c appt: cancelOldApt)
+      {
+           appt.status__c = 'Cancelled';
+           appt.Primary_Cancellation_Reason__c = tempApp.Primary_Cancellation_Reason__c;
+           appt.Secondary_Cancellation_Reason__c = tempApp.Secondary_Cancellation_Reason__c;
+           
+      }
+      
+      update cancelOldApt;
       
       /*Opportunity cloneLead = new Opportunity();
       Opportunity existingLead = database.query(makeQueryWithAllFields('Opportunity', 'Where id =\''+opportunityId+'\''));
@@ -93,8 +112,8 @@ public with sharing class  RemoteQuoteCloneController {
        existingLead.Stage_Reason_CHICR__c = 'Moved to HSA Journey';
        update existingLead;*/
        
-      
-       try{
+       
+       //try{
              
             opp.Product_Interest__c =selectedProduct;
             populateCustCategoryDetails();
@@ -103,12 +122,13 @@ public with sharing class  RemoteQuoteCloneController {
             /*insert cloneLead;*/
             return new PageReference('/apex/availability?existingLead=true&gDeal=0&new=true&var_cancelledapp=null&var_contactId='+opp.account.Primary_Contact__c+'&var_date=null&var_OpptyId='+opp.id+'&var_Source=SF&view=null');
             
-       }
+       /*}
        catch(Exception ex)
        {  
           ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR,ex.getmessage()));
           return null;
        }
+       */
     }
     
     
@@ -133,10 +153,11 @@ public with sharing class  RemoteQuoteCloneController {
       subreason = (subreason=='-- NONE --' || subreason == '')?null:subreason;
       
       string vul = ApexPages.currentPage().getParameters().get('vul');
-      system.debug(LoggingLevel.info,'all values:==='+heat+''+hotWater+' '+oHeat+' '+vul+' '+subReason+' '+Reason);
+      
+      system.debug(LoggingLevel.info,'all values:==='+heat+' '+hotWater+' '+oHeat+' '+vul+' '+Reason+' '+subReason+' '+customerCateogryType);
       
       catInd = [select id,name,Reason__c,Sub_Reason__c,Heating__c,Hot_Water__c,Other_Heat__c,Vunerable__c,Category__c,Category_Indicator__c from category_Indicator__c 
-                where Customer_Category_Logic__c = :customerCateogryType and Heating__c = :heat and Hot_Water__c = :hotWater and Reason__c = :subreason and  Sub_Reason__c = :reason and Other_Heat__c = :oHeat];
+                where Customer_Category_Logic__c = :customerCateogryType and Heating__c = :heat and Hot_Water__c = :hotWater and Reason__c = :reason and  Sub_Reason__c = :subreason and Other_Heat__c = :oHeat];
      
       system.debug(logginglevel.info,'return values:----'+catInd);   
          if(catInd.size()>0)
@@ -144,8 +165,8 @@ public with sharing class  RemoteQuoteCloneController {
              
              opp.Latest_customer_category__c = catInd[0].Category__c;
              catIndicator = catInd[0].Category_Indicator__c;
-             opp.Vulnerable_reason__c = reason;
-             opp.Vulnerable_category__c = subreason;
+             opp.Vulnerable_reason__c = subreason;
+             opp.Vulnerable_category__c = reason;
              system.debug('customer ca if '+opp.Latest_customer_category__c);
              
          }else{

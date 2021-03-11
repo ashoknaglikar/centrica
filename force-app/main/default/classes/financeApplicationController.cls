@@ -2,6 +2,7 @@ public class financeApplicationController {
 
     
     public Finance_Application__c fa {get;set;}
+    public Finance_Application__c faTemp {get;set;}
     public static final String paymentsFrequency = '12';
     public string fpSelected {get;set;}
     
@@ -23,6 +24,7 @@ public class financeApplicationController {
     public Finance_Product__c fp {get;set;}
     public string fpProdValue { get;set; }
     public List<SelectOption> fpProdOptions { get;set; }
+    public List<SelectOption> financeProductsList { get;set; }
     opportunity opp;
     public boolean productPanel {get;set;}
     
@@ -57,6 +59,14 @@ public class financeApplicationController {
     
     public financeApplicationController( ApexPages.StandardController controller)
     {
+        faTemp = new Finance_Application__c();
+        financeProductsList = new list<SelectOption>();
+        financeProductsList.add(new selectoption('', '--None--'));
+        for(Finance_Product__c financeProd : [Select Finance_options__c from Finance_Product__c where Selectable__c = true order by Order__c])
+        {
+            financeProductsList.add(new selectoption(financeProd.Finance_options__c,financeProd.Finance_options__c ));
+        }
+        
         domestic = true; 
 
         ErrMsg='';err=false;
@@ -96,7 +106,8 @@ public class financeApplicationController {
         fpSelected = '';
          
         string FromDetail= ApexPages.currentPage().getParameters().get('FromDetail');
-        
+        barclaysIntegrationHelper barcInst = new barclaysIntegrationHelper();
+        /*
         faList = [SELECT Id, Name, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp, LastActivityDate, CHI_Lead__c, Signature_Proof_of_Id__c, 
                  Title__c, First_Name__c, Last_Name__c, Middle_Name__c, Alias__c, Home_Phone__c, Work_Phone__c, Mobile__c, Alias_Title__c, Alias_First_Name__c, Alias_Last_Name__c, 
                  Alias_Middle_Name__c, Date_Of_Birth__c, Nationality__c, Marital_Status__c, Number_Of_Dependents__c, Gender__c, Street1__c, City1__c, Post_Code1__c, State1__c, Country1__c, 
@@ -109,8 +120,10 @@ public class financeApplicationController {
                  Building_Name1__c, Building_Name2__c, Building_Name3__c, Employer_Phone__c,Year1__c, Year2__c,Year3__c,YearB__c, Month1__c ,  Month2__c ,  Month3__c ,  Add1_date__c ,  Add2_date__c,
                  Type_of_Finance__c,HSA__c,Email__c,Confirm_Email__c,Add3_date__c,YearE__c,MonthE__c,Finance_Product__c,payment_Options__c,Job_total__c,
                  Security_Question__c,Security_Answer__c,Agreement_Number__c ,X2nd_Lended_Soft_Search__c,Quote_Number__c,
-                 Lender_Code__c, X2nd_Lender_Name__c, Applicant_Net_Monthly_income__c, Applicant_Other_Income__c, Partner_Income__c, Partner_Employment_Status__c,  Referral_Reason__c,Income_Band__c, Portal_Quote__c FROM Finance_Application__c Where Id = :fa.Id];
-                
+                 Lender_Code__c, X2nd_Lender_Name__c, Applicant_Net_Monthly_income__c, Applicant_Other_Income__c, Partner_Income__c, Partner_Employment_Status__c,  Referral_Reason__c,Income_Band__c, Portal_Quote__c FROM Finance_Application__c Where Id = :fa.Id];*/
+                 
+                 
+       faList = barcInst.getFinanceApplication(new list<id>{fa.Id});            
        if(faList.size()>0 & FromDetail=='T')
        {
            system.debug(Logginglevel.INFO,'-----INSIDE DETAIL------>');
@@ -316,7 +329,7 @@ public class financeApplicationController {
         string financeOption = fa.Finance_Options__c;
         IV_Vectors__c fo = IV_Vectors__c.getInstance(financeOption);
         decimal apr = decimal.valueof(fo.Key__c)*0.01;
-        integer tenure = integer.valueof(fo.Key2__c);
+        decimal tenure = decimal.valueof(fo.Key2__c);
         fa.Monthly_Repayments__c = returnPaymentMonthly(fa.Cash_Price__c,tenure,apr );
         fa.Total_Amount_Repayable__c = apr == 0.00 ? fa.Cash_Price__c: fa.Monthly_Repayments__c *tenure*12;
         /*
@@ -555,6 +568,8 @@ public class financeApplicationController {
             fa.Time_at_Address1__c = fa.Year1__c +' Years '+ fa.Month1__c +' Months';
             fa.Time_at_Address2__c = fa.Year2__c +' Years '+ fa.Month2__c +' Months'; 
             fa.Time_at_Address3__c = fa.Year3__c +' Years '+ fa.Month3__c +' Months';
+            if(fa.Income_Variation__c == 'Yes')
+            fa.Income_Variation_value__c = decimal.valueof(faTemp.Income_Band__c);  
             if(fa.Time_At_Bank__c!=null)
             fa.YearB__c = integer.valueof(fa.Time_At_Bank__c);
             upsert fa;
@@ -611,12 +626,12 @@ public class financeApplicationController {
         return null;
     }
     
-    private decimal returnPaymentMonthly(Decimal amount, Integer term, decimal aprDecimal) {  
+    private decimal returnPaymentMonthly(Decimal amount, decimal term, decimal aprDecimal) {  
         system.debug('aprDecimal-->'+aprDecimal);
-    	Decimal monthlyPayment = (amount / 24.0).setscale(2,roundingmode.HALF_EVEN);
+    	Decimal monthlyPayment = (amount / (term*12)).setscale(2,roundingmode.HALF_EVEN);
     	// return payment is equally divided by 24 (months) if the term is 2 years
 
-    	if (term > 2) {
+    	if (aprDecimal >0) {
 	        Integer numOfMonths = 12;
 	        //Decimal annualInterestRate = 0.149;
             Decimal annualInterestRate = aprDecimal;

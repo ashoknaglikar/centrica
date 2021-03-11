@@ -40,22 +40,22 @@ private class bUPD_chkJobInstalled_Test {
         
         //inserting opportunity with different employee
         Opportunity opportunity = new Opportunity(Name = 'Test1 Opp', StageName ='Quote Finalised - Accepted',CloseDate=System.today(),isSystem__c=false,                                                
-                                                  AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[1].id,Override_Billing_checks__c=false);
+                                                  AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[1].id,Override_Billing_checks__c=false,Payment_Reference_Number__c='812345678912');
                                                     
         Opportunity opportunity1 = new Opportunity(Name = 'Test2 Opp', StageName ='Quote Finalised - Accepted',CloseDate=System.today(),isSystem__c=false,
-                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true);
+                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true,Payment_Reference_Number__c='812345678910');
         Opportunity opportunity3 = new Opportunity(Name = 'Test2 Opp', StageName ='Prospect',CloseDate=System.today(),isSystem__c=false,Call_Back_Date__c = 'After 1 Week',
-                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true);
+                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true,Payment_Reference_Number__c='812345678911');
         Opportunity opportunity4 = new Opportunity(Name = 'Test2 Opp', StageName ='Prospect',CloseDate=System.today(),isSystem__c=false,Call_Back_Date__c = 'After 2 Week',
-                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true);
+                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true,Payment_Reference_Number__c='812345678913');
         Opportunity opportunity5 = new Opportunity(Name = 'Test2 Opp', StageName ='Prospect',CloseDate=System.today(),isSystem__c=false,Call_Back_Date__c = 'After 1 Month',
-                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true);
+                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true,Payment_Reference_Number__c='812345678914');
         Opportunity opportunity6 = new Opportunity(Name = 'Test2 Opp', StageName ='Prospect',CloseDate=System.today(),isSystem__c=false,Call_Back_Date__c = 'After 2 Months',
-                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true);
+                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true,Payment_Reference_Number__c='812345678915');
         Opportunity opportunity7 = new Opportunity(Name = 'Test2 Opp', StageName ='Prospect',CloseDate=System.today(),isSystem__c=false,Call_Back_Date__c = 'After 3 Months',
-                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true); 
+                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true,Payment_Reference_Number__c='812345678916'); 
         Opportunity opportunity8 = new Opportunity(Name = 'Test2 Opp', StageName ='Prospect',CloseDate=System.today(),isSystem__c=false,Call_Back_Date__c = 'Over Ride Call Back Date',Override_Call_Back_Date__c = system.today(),
-                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true);                                                                                                                                              
+                                                AccountId=account.Id, LeadSource='Engineer', Product_Interest__c = 'Solar', Referral_Employee__c =employees[0].id,Override_Billing_checks__c=true,Payment_Reference_Number__c='812345678917');                                                                                                                                              
         Opportunity[] opp = new Opportunity[]{opportunity, opportunity1, opportunity3, opportunity4, opportunity5, opportunity6, opportunity8, opportunity7};                                                 
         insert opp;
         

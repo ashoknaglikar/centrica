@@ -12,6 +12,7 @@ public with sharing class EmployeeInformationCollection {
     
     // Maps and Sets that hold the employees and associated information in a number of
     // useful ways
+    public map<id, set<string>> employeeIdWithOptInSkill = new map<id, set<string>>();
     public map<id, set<string>> employeeIdWithOptOutSkill = new map<id, set<string>>();
     public Map<ID, EmployeeInformation> employees {public get; private set;}
     public Set<ID> employeeIDs {public get; private set;}
@@ -20,6 +21,7 @@ public with sharing class EmployeeInformationCollection {
     public Map<ID, List<ID>> primaryBySupplierID {public get; private set;}
     
     public set<ID> AlwaysWorksWithElecIDs {public get; private set;}
+    public set<ID> alwaysWorksWithInstallerElecIds{public get;private set;}
     // JobInformation and BlackBoxOptions objects - makes referencing easier...
     public JobInformation jobInfo = null;
     public BlackBoxOptions bo = null;
@@ -56,6 +58,7 @@ public with sharing class EmployeeInformationCollection {
         employeeIDsBySkill = new Map<String, Set<ID>>();
         primaryBySupplierID = new Map<ID, List<ID>>();
         AlwaysWorksWithElecIDs= new set<id>();
+        alwaysWorksWithInstallerElecIds= new set<id>();
     }
 
     /* setJobInfo(JobInformation ji)
@@ -74,13 +77,23 @@ public with sharing class EmployeeInformationCollection {
         Adds an Employee to the collection if they are not already in it. */
     public void addEmployee(Employee__c e, decimal overBookingExpHours) {
         if(!employees.containsKey(e.ID)) {
-            EmployeeInformation ei = new EmployeeInformation(e);
-            ei.overBookingExpHours = overBookingExpHours;
-            employees.put(e.ID, ei);
-            //System.debug(LoggingLevel.INFO, 'employees.put: ' + e.ID + ' - ' + ei.employeeName);
-            employeeIDs.add(e.ID);
-            if(e.Always_Works_with_Electrician__c!=null)
-            AlwaysWorksWithElecIDs.add(e.Always_Works_with_Electrician__c);
+            EmployeeInformation ei;
+                if(e.Always_Works_with_Electrician__c!=null){
+                  if(e.Always_Works_with_Electrician__r.inactive__c==false &&e.Always_works_with_Electrician__r.Is_Active_Salesforce_User__c=='true'){
+                  ei = new EmployeeInformation(e);
+                }
+                }
+                else
+                ei = new EmployeeInformation(e);
+            if(ei!=null){
+                ei.overBookingExpHours = overBookingExpHours;
+                employees.put(e.ID, ei);
+                employeeIDs.add(e.ID);
+                if(ei.alwaysWorksWithInstallerElec!=null)
+                alwaysWorksWithInstallerElecIds.add(ei.alwaysWorksWithInstallerElec);
+                if(ei.alwaysWorksWithElectrician!=null)
+                AlwaysWorksWithElecIDs.add(ei.alwaysWorksWithElectrician);
+            }
         }
     }
 
@@ -374,6 +387,15 @@ public with sharing class EmployeeInformationCollection {
         jobInfo.jobDistrict = pcSector.Sub_Patch__r.District__c;
         jobInfo.jobArea = pcSector.Sub_Patch__r.District__r.Region__c;
         
+         for(Employee__c anywhereList : [Select id, Always_Works_with_Electrician__c,Always_Works_With__c from Employee__c
+                            where (District__c = :pcSector.Sub_Patch__r.District__c and Works_Anywhere_In_District__c = true )          
+                            or (District__r.Region__c = :pcSector.Sub_Patch__r.District__r.Region__c 
+                                and Works_Anywhere_In_Area__c = true)]){     
+                                
+            empIDs.add(anywhereList.Always_Works_with_Electrician__c);
+            empIDs.add(anywhereList.Always_Works_With__c);
+        }
+        
         // Select out Employees that either:
         //      a. cover this Job's Postcode Sector (determined in the above SOQL query and therefore with an ID in empIDs)
         //      b. cover this district and work anywhere in the district
@@ -383,18 +405,20 @@ public with sharing class EmployeeInformationCollection {
         
         List<Employee__c> employeeList =  [select (select Type__c,Start_Date__c,End_Date__c 
                                         from Employee_Postcodes__r
-                                        where Postcode_Sector__c = :pcSector.ID),
+                                        where Postcode_Sector__c = :pcSector.ID),(select id from Employees3__r),
                                     e.Works_Anywhere_in_District__c, e.Works_Anywhere_in_Area__c, e.Supplier__r.Name, e.Supplier__c,
                                     e.Region__c, e.Pool_Diary__c, e.Never_Works_With__c, e.District__r.Region__c,Postcode__c,e.Always_Works_with_Electrician__c,
+                                    e.Always_Works_with_Electrician__r.inactive__c,e.Always_works_with_Electrician__r.Is_Active_Salesforce_User__c,
                                     e.Name, e.Id, e.District__r.Name, e.District__c, e.Always_Works_With__c, e.Always_Works_Alone__c,e.Employee_Number__c,
-                                    e.Own_Labour__c, e.Net_Promoter_Score__c, e.Contractor_Band__c, e.Inactive__c, e.Skip_Rule__c, e.Is_Active_Salesforce_User__c
+                                    e.Own_Labour__c, e.Net_Promoter_Score__c, e.Contractor_Band__c, e.Inactive__c, e.Skip_Rule__c, e.Is_Active_Salesforce_User__c,
+                                    e.latitude__latitude__s,e.latitude__longitude__s
                             from Employee__c e
                             where   (e.ID IN :empIDs
-                  or (e.District__c = :pcSector.Sub_Patch__r.District__c and Works_Anywhere_In_District__c = true)  
+                 /* or (e.District__c = :pcSector.Sub_Patch__r.District__c and Works_Anywhere_In_District__c = true)  
                     //Cognizant support fix - If employee works anywhere in district
                     //rjd - 2010-01-06 - changing to allow filtering on employee_postcodes__r.type=primary - Not required.
                                     or (e.District__r.Region__c = :pcSector.Sub_Patch__r.District__r.Region__c 
-                                        and Works_Anywhere_In_Area__c = true)
+                                        and Works_Anywhere_In_Area__c = true)*/
                                     )
                                     and Resource_Type__c = :SearchBlackBox.EMPLOYEE_RESOURCE_TYPE
                                     and Inactive__c = false and Is_Active_Salesforce_User__c = 'true'];
@@ -430,11 +454,20 @@ public with sharing class EmployeeInformationCollection {
       //Cognizant support fix - Geography fix.
       if(e.Works_Anywhere_In_Area__c && e.District__r.Region__c == jobInfo.jobArea){
                 //System.debug(LoggingLevel.INFO, 'Works_Anywhere_In_Area__c adding '+e.Name);
+                 if(e.Always_Works_With__c != null)
+                empIDs.add(e.Always_Works_With__c);
+                if(e.Always_Works_With_Electrician__c != null)
+                empIDs.add(e.Always_Works_With_Electrician__c);
                 
                 addEmployee(e, overBookingExpHours);
             }
       //Cognizant support fix - Geography fix.
       else if(e.Works_Anywhere_In_District__c && e.District__c == jobInfo.jobDistrict){
+                if(e.Always_Works_With__c != null)
+                empIDs.add(e.Always_Works_With__c);
+                if(e.Always_Works_With_Electrician__c != null)
+                empIDs.add(e.Always_Works_With_Electrician__c);
+                
                 System.debug(LoggingLevel.INFO, 'Works_Anywhere_In_District__c adding '+e.Name);
                 addEmployee(e, overBookingExpHours);
             }
@@ -532,12 +565,42 @@ public with sharing class EmployeeInformationCollection {
         
         set<id> employeesTobeRemoved = new set<Id>();
         system.debug('testing installer'+employeeIDs.contains('a0Aw000002WGKkhEAH'));
+        
        
+        List<Employee_Skills__c> empJobSkillList = new List<Employee_Skills__c>();
+        
+        for(Employee_Skills__c skill : [select Employee__c, Skill_Name__c, Skill_Type__c, Own_Jobs_Only__c, ID 
+                                        from Employee_Skills__c 
+                                        where Employee__c IN :employeeIDs
+                                        and (Skill_Name__c IN :jobSkills OR Skill_Name__c IN:jobinfo.optInSkills)])
+        {
+                if(jobinfo.optInSkills.contains(skill.Skill_Name__c))
+                {
+                    if(!employeeIdWithOptInSkill.containskey(skill.Employee__c))
+                    employeeIdWithOptInSkill.put(skill.Employee__c, new set<string>{skill.Skill_Name__c});
+                    else
+                    employeeIdWithOptInSkill.get(skill.Employee__c ).add(skill.Skill_Name__c);
+                }
+                else
+                    empJobSkillList.add(skill);
+        }
+        
+        /*for(Employee_Skills__c skill : [select Employee__c, Skill_Name__c
+                                        from Employee_Skills__c where Skill_Name__c IN :jobinfo.simpleSkills and
+                                        Employee__c IN :employeeIDs]) {
+            if(!employeeIdWithSimpleSkill.containskey(skill.Employee__c))
+            employeeIdWithSimpleSkill.put(skill.Employee__c, new set<string>{skill.Skill_Name__c});
+            else
+            employeeIdWithSimpleSkill.get(skill.Employee__c ).add(skill.Skill_Name__c);
+
+        }
+        
 
         for(Employee_Skills__c skill : [select Employee__c, Skill_Name__c, Skill_Type__c, Own_Jobs_Only__c, ID 
                                         from Employee_Skills__c 
                                         where Employee__c IN :employeeIDs
-                                        and Skill_Name__c IN :jobSkills]) 
+                                        and Skill_Name__c IN :jobSkills]) */
+        for(Employee_Skills__c skill :empJobSkillList )
         {
             // Get the EmployeeInformation object for the Employee this skill belongs to 
             // and the number of hours for the skill on the job.
@@ -623,6 +686,33 @@ public with sharing class EmployeeInformationCollection {
                         }
                     }
                 }
+                
+                //Suguna - check Opt In Skill against employee skill if not there they will be removed 
+               if(jobInfo.optInSkills.size()>0 )
+                {
+                    boolean employeetoRemove= true;
+                    for(string s: jobInfo.optInSkills)
+                    {   
+                        if(employeeIdWithOptInSkill.containsKey(ei.employeeID)&&employeeIdWithOptInSkill.get(ei.employeeID).contains(s))
+                        {
+                            employeetoRemove=false;
+                            //break;
+                        }
+                        else
+                        {
+                           employeetoRemove=true;
+                           break;
+                        }
+                    }
+                    
+                    if(employeetoRemove)
+                     employeesTobeRemoved.add(ei.employeeID);
+                }
+                
+                
+                
+                
+                
                 if(employeesTobeRemoved.contains(ei.employeeID))
                 continue;
                 
@@ -1033,7 +1123,7 @@ public with sharing class EmployeeInformationCollection {
      
       Postcode_Sector__c[] sectors = 
               [select ID, 
-               (select Employee__c, Employee__r.Id, Start_Date__c, End_Date__c, Postcode_Sector__r.Name
+               (select Type__c, Employee__c, Employee__r.Id, Start_Date__c, End_Date__c, Postcode_Sector__r.Name
                  from Employee_Postcodes__r 
                  where ((Start_Date__c <= :todaysDate and End_Date__c >= :todaysDatepluswindow)
                      or (Start_Date__c >= :todaysDate and Start_Date__c <= :todaysDatepluswindow)

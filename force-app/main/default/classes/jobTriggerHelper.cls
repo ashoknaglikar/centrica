@@ -11,7 +11,7 @@ global class jobTriggerHelper {
     
     webservice static string btnClickUpdateBlancingMecanical(id[] jobId)
     {
-        list<Job__c> jobList =[Select id,Installation_Type__c, Boiler_Location__c,  Total_Hours__c,Balancing_Skill__c, District__r.Premier_Ready__c , District__r.Before_Trial__c from Job__c where Id in: jobId];
+        list<Job__c> jobList =[Select id,Installation_Type__c, Boiler_Location__c,  Total_Hours__c,Balancing_Skill__c/*,  District__r.Premier_Ready__c , District__r.Before_Trial__c */ from Job__c where Id in: jobId];
         list<Job__c> finalList = new list<Job__c>();
         for(Job__c j: jobList)
         {
@@ -19,17 +19,17 @@ global class jobTriggerHelper {
             {
                 return('Installation Type & Boiler location can not be blank.');
             }
-            if(j.District__r.Before_Trial__c== true)
-            {
+            //if(j.District__r.Before_Trial__c== true)
+            //{
                 finalList.add(j);
-            }else{
+            //}else{
                 
-                continue;
-            }
+               // continue;
+            //}
         }
         if(finalList.size()>0){
             try{
-                calculateBalancingMechanicalHours(finalList);
+                calculateBalancingMechanicalHours(finalList, true);
                 
                 update finalList;
                 return('Sucessfully Calcluated.');
@@ -43,10 +43,15 @@ global class jobTriggerHelper {
         
     }
     
-    public  static void calculateBalancingMechanicalHours(list<Job__c> JobList)
+    public static void calculateBalancingMechanicalHours(list<Job__c> JobList,  boolean recalSPhours)
+    {
+        calculateBalancingMechanicalHoursReturnJobs(JobList, recalSPhours);
+    }
+    
+    public  static list<Job__c> calculateBalancingMechanicalHoursReturnJobs(list<Job__c> JobList,  boolean recalSPhours )
     {
         //Search_Parameter__c searchParam = [Select  Double_Handed_Threshold__c  from Search_Parameter__c Where Type__c  = 'DEFAULT'];
-        
+        //list<Job__c> returnList = new list<Job__c>();
         decimal x2MenBoundry = decimal.valueof(system.label.X2_Men_Boundry);
         
         for(string s: system.label.Boiler_Location_Map.split(';'))
@@ -54,8 +59,9 @@ global class jobTriggerHelper {
             string[] innerStrin = s.split('=>');
             bolierLocationMap.put(innerStrin[0],innerStrin[1]);
         }
-        
-        For(Job__c j :JobList)
+        list<PHS_Data__c> halfDayLookUpData = [Select Calculation_Method__c, Premier_Hour_Equivalent__c, Lower_Boundry__c, Upper_Boundry__c from PHS_Data__c  
+                                                  where Data_Type__c = 'Half Day Lookup'];
+        for(Job__c j :JobList)
         {
             //jobHourAdjustment.put(j.Id, j);
             jobInstallationType.add( j.Installation_Type__c);                                        // add Installation type like A1, A2 etc
@@ -137,18 +143,18 @@ global class jobTriggerHelper {
             decimal revisedTime = j.Total_Hours__c + initalAdjutment;
             system.debug('revisedTime---->'+revisedTime);
             jobHourAdjustment.add(revisedTime);
-            j.Balancing_Skill__c = revisedTime;
-        }
-        //Query Halfday look up data
-        list<PHS_Data__c> halfDayLookUpData = [Select Calculation_Method__c, Premier_Hour_Equivalent__c, Lower_Boundry__c, Upper_Boundry__c from PHS_Data__c where  Lower_Boundry__c < :jobHourAdjustment AND Upper_Boundry__c >= :jobHourAdjustment 
-                                              AND Data_Type__c = 'Half Day Lookup'];
-        system.debug('half Day look up-->'+halfDayLookUpData);
-        for(Job__c j :JobList)
+            j.GPS_Hours__c = initalAdjutment;
+            //j.Balancing_Skill__c = revisedTime;
+        
+        if(recalSPhours)
         {
+            //Query Halfday look up data
+            
+            system.debug('half Day look up-->'+halfDayLookUpData);
             PHS_Data__c rightOne = new PHS_Data__c(); 
             for(PHS_Data__c p : halfDayLookUpData)
             {
-                if(p.Lower_Boundry__c <= j.Balancing_Skill__c && p.Upper_Boundry__c >= j.Balancing_Skill__c)
+                if(p.Lower_Boundry__c <= revisedTime && p.Upper_Boundry__c >= revisedTime)
                 {
                     rightOne = p;
                     break;
@@ -163,10 +169,12 @@ global class jobTriggerHelper {
             else{
                 j.Balancing_Skill__c = j.Balancing_Skill__c - J.Total_Hours__c;
             }
-            j.Balancing_Skill__c = j.Balancing_Skill__c.setScale(2).doubleValue(); //PRB00028115
-        }
-                                  
+                j.Balancing_Skill__c = j.Balancing_Skill__c.setScale(2).doubleValue(); //PRB00028115
             
-    }
+        }
+    }    
+    return JobList;                              
+            
+    }  
 
 }

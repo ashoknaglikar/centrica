@@ -76,6 +76,8 @@ public class SearchResultsController
                 cls_IsRun.customerPreferredDate = date.parse(customerPreferedDate);
                 custDate = customerPreferedDate;
             }
+            
+            
             // -- Added for Next 7 days employee search change end
             
             if(isPlanner == 'N')
@@ -92,22 +94,40 @@ public class SearchResultsController
                           Mechanical_Hours__c,PowerFlush_Hours__c,Electrical_Hours__c,Building_Work_Hours__c,Remote_Heating__c ,Roof_Work_Hours__c,ECO_Hours__c ,Specialist_Building_Hours__c, Connect_Solar_Panel_Hours__c ,
                           Contractor_Installation_Hours__c,Fire_Wall_Heater_Fixing_Hours__c,LPG_Installation_Hours__c,Payment_Collection_Hours__c,Ecogen_Mechanical_Hours__c, 
                          Scaffolder_Hours__c ,Unvented_Hot_Water_Hours__c ,Water_Heating_Fixing_Hours__c ,Electrical_Work_ASP_Hours__c,Asbestos_Removal_Hours__c,Asbestos_Removal_Fixed_Rate_Hours__c,Heavy_Appliance__c,Override_Heavy_Appliance__c,Engineer_Workload__c,
-                         Ecogen_Electrical_Hours__c,Landlord_Check_Hours__c,Boiler_Location__c,Installation_Type__c,status__c from Job__c where ID = :jobID];
+                         Ecogen_Electrical_Hours__c,Landlord_Check_Hours__c,Boiler_Location__c,Installation_Type__c,status__c,Install_Postcode__c,CHI_Lead__r.Account.Dummy_Data__c from Job__c where ID = :jobID];
                 //Added By Ashok CR- 001
+            if(isPlanner == 'N')
+            {
+                string postCodeSector = job.Install_Postcode__c.substring(0, job.Install_Postcode__c.length()-2);
+                list<Postcode_Sector__c> postcode = [select id, Operational_Date__c, Non_Operational_Date__c  from Postcode_Sector__c where Type__c = 'Installation' and Name = :postCodeSector];
+                if(postcode.size()>0)
+                {
+                    if(job.CHI_Lead__r.Latest_customer_category__c<=3 && postcode[0].Non_Operational_Date__c!=null && postcode[0].Non_Operational_Date__c > cls_IsRun.customerPreferredDate)
+                    {
+                        cls_IsRun.customerPreferredDate = postcode[0].Non_Operational_Date__c;
+                        custDate = postcode[0].Non_Operational_Date__c.format();
+                    }
+                    else if(job.CHI_Lead__r.Latest_customer_category__c>3 && postcode[0].Operational_Date__c!=null && postcode[0].Operational_Date__c > cls_IsRun.customerPreferredDate)
+                    {
+                         cls_IsRun.customerPreferredDate = postcode[0].Operational_Date__c;
+                         custDate = postcode[0].Operational_Date__c.format();
+                    }
+                }
+            }
                 
                 //Suguna
                 List<Order__c> orders = [select id,status__c from order__c where Job__c=:jobID and status__c='Goods Receipted' and Type__c='Work'];
-                if(!orders.isEmpty()&&job.status__c=='Installed')
+                /*if(!orders.isEmpty()&&job.status__c=='Installed')
                 {
                     errorRender = true;
                     errorMsg='Warning: Work cannot be transferred as orders are Goods Receipted. Please email Payment Control to check that the purchase order has not been paid and can be un-goods receipted.';
                             
-                }
+                }*/
                 //ends
                  
-                opp = [Select AccountId,CHI_Lead_Id__c From Opportunity where Id =:job.CHI_Lead__c];
+                //opp = [Select AccountId,CHI_Lead_Id__c From Opportunity where Id =:job.CHI_Lead__c];
                 
-                rparameters = 'lead='+opp.CHI_Lead_Id__c+'/'+'M='+job.Mechanical_Hours__c+'/'+'PF='+job.PowerFlush_Hours__c+'/'+'E='+job.Electrical_Hours__c+'/'+'B='+job.Building_Work_Hours__c+'/'+'RHC='+job.Remote_Heating__c+'/'+'R='+job.Roof_Work_Hours__c+'/'+'ECO='+job.ECO_Hours__c+'/'+'SB='+job.Specialist_Building_Hours__c+'/'+'MSL='+job.Connect_Solar_Panel_Hours__c+'/'+'CI='+job.Contractor_Installation_Hours__c+'/'+
+                rparameters = 'lead='+Job.CHI_Lead_Number_Text__c+'/'+'M='+job.Mechanical_Hours__c+'/'+'PF='+job.PowerFlush_Hours__c+'/'+'E='+job.Electrical_Hours__c+'/'+'B='+job.Building_Work_Hours__c+'/'+'RHC='+job.Remote_Heating__c+'/'+'R='+job.Roof_Work_Hours__c+'/'+'ECO='+job.ECO_Hours__c+'/'+'SB='+job.Specialist_Building_Hours__c+'/'+'MSL='+job.Connect_Solar_Panel_Hours__c+'/'+'CI='+job.Contractor_Installation_Hours__c+'/'+
                               'FF='+job.Fire_Wall_Heater_Fixing_Hours__c+'/'+'LP='+job.LPG_Installation_Hours__c+'/'+'PC='+job.Payment_Collection_Hours__c+'/'+'MEG='+job.Ecogen_Mechanical_Hours__c+'/'+'S='+job.Scaffolder_Hours__c+'/'+'UV='+job.Unvented_Hot_Water_Hours__c+'/'+'WF='+job.Water_Heating_Fixing_Hours__c+'/'+'EA='+job.Electrical_Work_ASP_Hours__c+'/'+'A='+job.Asbestos_Removal_Hours__c+'/'+'AF='+job.Asbestos_Removal_Fixed_Rate_Hours__c+'/'+
                               'EG='+job.Ecogen_Electrical_Hours__c+'/'+'LC='+job.Landlord_Check_Hours__c;
                 if(job.Boiler_Location__c!=null)
@@ -118,28 +138,25 @@ public class SearchResultsController
                 
                 
                 
-                DummyAcc = [Select Dummy_Data__c from Account where Id =:opp.AccountId];
-                DummyFlag = DummyAcc.Dummy_Data__c;
+                //DummyAcc = [Select Dummy_Data__c from Account where Id =:opp.AccountId];
+                DummyFlag = Job.CHI_Lead__r.Account.Dummy_Data__c;
                 // CR:001 ends
                 
                 //++ Priority Installation CR start 
-                if((job.CHI_Lead__r.CreatedDate).date() >= Date.valueOf(System.Label.Priority_Install_Release_Date))
+                //if((job.CHI_Lead__r.CreatedDate).date() >= Date.valueOf(System.Label.Priority_Install_Release_Date))
                 {
                     include_priority_install = true;
                 }
-                else
+                /*else
                 {
                     include_priority_install = false;
-                }
-                if(include_priority_install && (job.CHI_Lead__r.Latest_customer_category__c == 1 || job.CHI_Lead__r.Latest_customer_category__c == 2 || job.CHI_Lead__r.Latest_customer_category__c == 3))
+                }*/
+                customerCategoryMessage = false;
+                if(include_priority_install && (job.CHI_Lead__r.Latest_customer_category__c <= 3))
                 {
                     customerCategoryMessage = true;
                 }
-                else
-                {
-                    customerCategoryMessage = false;
-                }
-                //-- Priority Installation CR end   
+               
         
         } catch(Exception ex) {
             errorRender = true;

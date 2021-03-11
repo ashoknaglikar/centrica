@@ -133,7 +133,7 @@ if(Trigger.isafter && Trigger.isupdate)
         System.debug('Exception  : '+ex.getMessage());
     }
  }// Added as part of customer history card change request. 
-  else if(Trigger.isInsert)
+  /*else if(Trigger.isInsert)
   {
      try{
         Set<Id> set_JobId=new Set<Id>{};
@@ -161,6 +161,6 @@ if(Trigger.isafter && Trigger.isupdate)
     }catch(Exception ex){
         System.debug('Exception  : '+ex.getMessage());
     }
- }
+ }*/
  
 }

@@ -239,7 +239,37 @@ public class Utilities {
     // https://developers.google.com/maps/documentation/business/webservices#digital_signatures
     static integer check = 1;
     static list<Google_Reporting__c> glist = new list<Google_Reporting__c>();
-    public static List<List<String>> findDistanceBetweenPostcodes(String origin, String destination,Date jobStartDate){
+    
+   
+    
+public static List<List<String>> findDistanceBetweenPostcodes(String origin, String destination,Date jobStartDate){
+    
+    system.debug('Sugu origin '+origin);
+    system.debug('Sugu destination '+destination);
+    system.debug('Sugu date '+jobStartDate);
+   
+    /*String originlatlong='';
+    string destinationlatlong ='';
+    List<String> originList = origin.split('%7C');
+    for(String ori:originList)
+    {
+       List<string> orilisttemp= utilities.getLatLang_bing(null, ori, null, null);
+       originlatlong+=orilisttemp[0]+','+orilisttemp[1]+';';
+      
+    }
+    if(originlatlong!='' && originlatlong.endsWith(';'))
+    {
+        originlatlong = originlatlong.substring(0,originlatlong.length()-1);
+    }
+    
+    List<string> destinationlatlongtemp = utilities.getLatLang_bing(null, destination, null, null);
+    for(string s:destinationlatlongtemp)
+    {
+        destinationlatlong=destinationlatlongtemp[0]+','+destinationlatlongtemp[1];
+    }*/
+    
+    if(system.label.Bing_Google_API=='Google')
+    {
       if(system.label.Google_Switch=='on') 
       {
           
@@ -247,44 +277,59 @@ public class Utilities {
           List<List<String>> distancesAndTimesForAll = new List<List<String>>();
           List<String> distanceAndTimeForOne = new List<String>();
           // Google Base Url
-          string GoogleBaseUrl = 'http://maps.googleapis.com';  
+          string GoogleBaseUrl = 'https://maps.googleapis.com';  
           // Actual API Domain URL. 
           string domain = '/maps/api/distancematrix/json?sensor=false&units=imperial';
-            
-          // Google Unique Client Id for CHI 
-          string clientid = system.label.Google_Client_Id;
-          DateTime dt = DateTime.newInstance(jobStartDate.year(), jobStartDate.month(), jobStartDate.day(), 08, 0, 0);
-          Long departure_time = dt.getTime();
-       //  String  departure_time=date.getTime() / 1000;
-          String traffic_model ='best_guess';
-          String mode='driving';
+          String mode='driving';            
+          
          // This part contains Source and Destination Poscodes, Get rid of spaces and replace them with +. or else request fails.
-         string query = '&origins='+origin.replaceall(' ', '')+'&destinations='+destination.replaceall(' ', '')+'&departure_time='+departure_time+'&traffic_model='+traffic_model.replaceall(' ', '')+'&mode='+mode.replaceall(' ', '')+'&client='+clientid;
+          string query = '&origins='+origin.replaceall(' ', '')+'&destinations='+destination.replaceall(' ', '')+'&mode='+mode.replaceall(' ', '');
           //  string query = '&origins='+origin.replaceall(' ', '')+'&destinations='+destination.replaceall(' ', '')+'&client='+clientid;
           system.debug('Query---->'+query);
-          
-          // Google Unique Crypto Private Key this is used to Generate the Signature but not sent on Requesting API.
-          string privateKey = system.label.Google_Crypto_Key;
-          
-          //Decoding Process of cryptoKey
-          privateKey = privateKey.replace('-', '+');
-          privateKey = privateKey.replace('_', '/');
-          Blob privateKeyBlob = EncodingUtil.base64Decode(privateKey);
-        
-          // Add Domain + CLient Id to create the signing URL
           string Requeststring = domain+query;
-          //HMAC-SHA1 algorithm
-          String algorithmName = 'hmacSHA1';
-          //Generate Singaute using private key and Signing URL using HMAC-SHA1 algorithm.
-          Blob signatureBlob = Crypto.generateMac(algorithmName,  Blob.valueOf(Requeststring), privateKeyBlob);
-         
-          // Encode signature to base64
-          String signature =EncodingUtil.base64Encode(signatureBlob);
-          signature = signature.replace('+', '-');
-          signature = signature.replace('/', '_');
+          string finalUrl = GoogleBaseUrl + Requeststring ;
           
-          //Add the signature to the requesting URL.
-          string finalUrl = GoogleBaseUrl + Requeststring + '&signature='+signature;
+          if(label.trafficSwitch == 'on')
+          {
+              DateTime dt = DateTime.newInstance(jobStartDate.year(), jobStartDate.month(), jobStartDate.day(), 08, 0, 0);
+              Long departure_time = dt.getTime();
+           //  String  departure_time=date.getTime() / 1000;
+              String traffic_model ='best_guess';
+              
+              finalUrl+='&departure_time='+departure_time+'&traffic_model='+traffic_model.replaceall(' ', '');
+          }
+          
+          if(label.googleAPIKey == 'off')
+          {
+              // Google Unique Client Id for CHI 
+              string clientid = system.label.Google_Client_Id;
+          
+              // Google Unique Crypto Private Key this is used to Generate the Signature but not sent on Requesting API.
+              string privateKey = system.label.Google_Crypto_Key;
+              finalUrl+='&client='+clientid;
+              //Decoding Process of cryptoKey
+              privateKey = privateKey.replace('-', '+');
+              privateKey = privateKey.replace('_', '/');
+              Blob privateKeyBlob = EncodingUtil.base64Decode(privateKey);
+            
+              // Add Domain + CLient Id to create the signing URL
+              
+              //HMAC-SHA1 algorithm
+              String algorithmName = 'hmacSHA1';
+              //Generate Singaute using private key and Signing URL using HMAC-SHA1 algorithm.
+              Blob signatureBlob = Crypto.generateMac(algorithmName,  Blob.valueOf(Requeststring), privateKeyBlob);
+             
+              // Encode signature to base64
+              String signature =EncodingUtil.base64Encode(signatureBlob);
+              signature = signature.replace('+', '-');
+              signature = signature.replace('/', '_');
+              
+              //Add the signature to the requesting URL.
+              finalUrl  += '&signature='+signature;
+          }else
+          {
+               finalUrl  += '&key='+label.googleAPIKey;
+          }
           
           system.debug('Final Url-->'+finalUrl);
           Http obj_Http = new Http();
@@ -305,6 +350,28 @@ public class Utilities {
           // default response for the test class..Dummy data
            responseBody = '{"destination_addresses" : [ "Neville Cl, Bolton BL1 2XR, UK" ],"origin_addresses" : [ "Caistor St, Stockport SK1 2LG, UK" ],"rows" : [{"elements" : [{"distance" : { "text" : "22.8 mi","value" : 36753 },"duration" : {"text" : "32 mins","value" : 1924},"duration_in_traffic" : {"text" : "36 mins","value" : 2178},"status" : "OK"}]}],"status" : "OK"}';
          }
+
+         googleTravelResponse responseObj = new googleTravelResponse();
+         responseObj = googleTravelResponse.parse(responseBody);
+         if(responseObj.status !='OK')
+         {
+            distancesAndTimesForAll.add(new list<string>{'PC Error', '0', 'PC Error', '0','PC Error','0'});
+         }else {
+             for(googleTravelResponse.Rows row : responseObj.rows)
+             {
+                 for(googleTravelResponse.Elements ele : row.elements)
+                 {
+                     list <string> distanceForOne = new list<string>{ele.distance.text, string.valueof(ele.distance.value), ele.duration.text, string.valueof(ele.duration.value)};
+                     if(label.trafficSwitch == 'on')
+                     {
+                        distanceForOne.add(ele.duration_in_traffic.text);
+                        distanceForOne.add(string.valueof(ele.duration_in_traffic.value));
+                     }
+                    distancesAndTimesForAll.add(distanceForOne);
+                 }
+             }
+         }
+         /*
           //system.debug('##debug http_res body'+http_Res.getBody());
           JSONParser parser = JSON.createParser(responseBody);
           system.debug('responseBody='+responseBody);
@@ -340,10 +407,138 @@ public class Utilities {
           insert glist;
           else
           check ++;
+          */
           return distancesAndTimesForAll;
-      }else
-      return null;  
+      }
+      else
+      return null;
     }
+    
+    else if(system.label.Bing_Google_API=='Bing')
+    {
+          List<String> originList= origin.split(';');
+          system.debug('Origin list size '+originList.size());
+          List<String> finalOriginList = new List<String>();
+          destination=destination.replaceAll('%7C',';');
+          
+          
+          string destinationlatlong ='';
+          List<String> desList = destination.split(';');
+          for(String ori:desList)
+              {
+                  if(ori.isAlphanumericSpace())
+                  {
+                    List<string> orilisttemp= utilities.getLatLang(null, ori, null, null);
+                    destinationlatlong+=orilisttemp[0]+','+orilisttemp[1]+';';
+                  }else
+                  destinationlatlong+=ori+';'; 
+              }
+          system.debug('Sugu '+destinationlatlong);
+          if(destinationlatlong.endsWith(';'))
+          destinationlatlong=destinationlatlong.substring(0,destinationlatlong.length()-1);
+          destination=destinationlatlong;
+          
+          if(originList.size()>10 && label.trafficSwitch=='on' )
+          {
+                integer count = 0;
+                string ori='';
+                for(integer i=0;i<originList.size();i++)
+                {
+                    ori+=originList[i]+';';
+                    count++;
+                    
+                    if(count==10||i==originList.size()-1)
+                    {
+                      finalOriginList.add(ori);
+                      count =0;
+                      ori='';
+                    }
+                }
+          }
+          else
+          finalOriginList.add(origin);
+          
+          List<List<String>> distancesAndTimesForAll = new List<List<String>>();
+          
+          for(string innerOrigin : finalOriginList)
+          {
+                  if(innerOrigin!='' && innerOrigin.endsWith(';'))
+                  {
+                    innerOrigin = innerOrigin.substring(0,innerOrigin.length()-1);
+                  }
+                  
+                  
+                  
+                  List<String> distanceAndTimeForOne = new List<String>();
+                  string bingBaseUrl='https://dev.virtualearth.net/REST/v1/Routes/DistanceMatrix?';
+                  String mode='driving';          
+                  
+                  //origin and destination should be in lattitude & longitude not in postcodes.
+                  string query = 'origins='+innerOrigin.replaceall(' ', '')+'&destinations='+destination.replaceall(' ', '')+'&travelMode='+mode.replaceall(' ', '');
+                  string finalUrl = bingBaseUrl + query ;
+                  
+                  if(label.trafficSwitch == 'on')
+                  {
+                      DateTime dt = DateTime.newInstance(jobStartDate.year(), jobStartDate.month(), jobStartDate.day(), 08, 0, 0);
+                      string departure_time = dt.format('yyyy-MM-dd HH:mm:ss');
+                      finalUrl+='&startTime='+departure_time.replaceall(' ','+' );
+                  }
+                  string bingKey = system.label.BingAPIKey;
+                  if(userinfo.getUserName().contains('orckid.portal'))
+                  bingKey = system.label.BingAPIKey_PortalUser;
+                  
+                  finalUrl+='&key='+bingKey+'&distanceUnit=mi';
+                  
+                  
+                  system.debug('bing url '+finalURL);
+                  
+                  Http obj_Http = new Http();
+                  HttpRequest http_Req = new HttpRequest();
+                  http_Req.setEndpoint(finalUrl);
+                  http_Req.setMethod('GET');
+                  http_Req.setTimeout(60000);  
+                  string responseBody;
+                  if(!Test.isRunningTest()){
+                  HttpResponse http_Res = obj_Http.send(http_Req);
+                  responseBody = http_Res.getBody();}
+                  else{
+                      responseBody='';
+                  }
+                  system.debug('bing response ' +responseBody);
+                  
+                  BingTravelResponse responseObj = new BingTravelResponse();
+                  responseObj = BingTravelResponse.parse(responseBody);
+                  if(responseObj.statusCode ==200)
+                  {
+                    for(BingTravelResponse.cls_resourceSets row : responseObj.resourceSets)
+                     {
+                         for(BingTravelResponse.cls_resources ele : row.resources)
+                         {
+                             for(BingTravelResponse.cls_results result: ele.results)
+                             {
+                                 list <string> distanceForOne = new list<string>{String.valueof(decimal.valueof(result.travelDistance).setscale(1))+' mi', '0', String.valueof(result.travelDuration.intValue())+' mins', string.valueof(result.travelduration*60)};
+                                 if(label.trafficSwitch == 'on')
+                                 {
+                                    distanceForOne.add(String.valueof(result.travelDuration.intvalue())+' mins');
+                                    distanceForOne.add(string.valueof(result.travelduration*60));
+                                 }
+                                distancesAndTimesForAll.add(distanceForOne);
+                             }
+                         }
+                     }
+                  }else {
+                      distancesAndTimesForAll.add(new list<string>{'PC Error', '0', 'PC Error', '0','PC Error','0'});
+                     
+                 }
+         }
+         
+         return distancesAndTimesForAll;
+    }
+    
+  return null;
+}
+   
+   
    public void setErrorMsg(boolean flag, string message)
     {
         ApexPages.Message msg;
@@ -351,8 +546,7 @@ public class Utilities {
         msg = new ApexPages.Message(Apexpages.Severity.error, message);
         else
         msg = new ApexPages.Message(Apexpages.Severity.info, message);
-        ApexPages.addMessage(msg);
-    }
+        ApexPages.addMessage(msg);    }
     
     public static map<double, string> categoryMap = new map<double, string>{1=>'1-Vulnerable', 2=>'2-Emergency Non-op',3=>'3-Non-op',4=>'4-Operational',99=>''};
     // ++ Added for Dialler CR start
@@ -388,8 +582,22 @@ public class Utilities {
         string Destination ='';
         string sorucePc = JobPostCode.replaceall(' ', '');
         date jobStartDate;
+        
+        //don't calculate travel time if start time < 09:00 AM
+        List<Search_Result__c> searchlisttemp = new List<Search_Result__c>();
+        String starttime = '09:00';
         for(Search_Result__c s : SearchList)
         {
+           if(s.Start_Date_Time__c.time()<DateTimeHelper.stringToTime(starttime))
+             continue;
+          else
+             searchlisttemp.add(s);
+        }
+        //ends
+        
+        for(Search_Result__c s : searchlisttemp)
+        {
+            
             
             Shift_Pattern__c sf = new Shift_Pattern__c(Monday_Start_Time__c= s.Diary_Entry_ID__r.Week__r.Monday_Start_Time__c, Monday_End_Time__c = s.Diary_Entry_ID__r.Week__r.Monday_End_Time__c,
                                                         Tuesday_Start_Time__c= s.Diary_Entry_ID__r.Week__r.Tuesday_Start_Time__c, Tuesday_End_Time__c = s.Diary_Entry_ID__r.Week__r.Tuesday_End_Time__c,
@@ -422,7 +630,7 @@ public class Utilities {
             
             map<string, set<Diary_Entry__c>> individualPostCodeEngineerMap = new map<string, set<Diary_Entry__c>>(); 
             
-            for(Diary_Entry__c de : [select id,Start__c,End__c,Job__c, Job__r.Install_Postcode__c,Week__r.Employee__r.Name, Job__r.Installation_date__c from Diary_Entry__c where Week__c = :week and RecordTypeId = '012200000009ipQ' and ((Start__c< : nextday and End__c >= : inday) or (Start__c< : nextEndDay and End__c >= : EndDay)) order by Start__c])
+            for(Diary_Entry__c de : [select id,Start__c,End__c,Job__c, Job__r.Install_Postcode__c,Week__r.Employee__r.Name, Job__r.Installation_date__c,job__r.latitude__latitude__s,job__r.latitude__longitude__s from Diary_Entry__c where Week__c = :week and RecordTypeId = '012200000009ipQ' and ((Start__c< : nextday and End__c >= : inday) or (Start__c< : nextEndDay and End__c >= : EndDay)) order by Start__c])
             {
                 
                 jobStartDate = de.Job__r.Installation_date__c;
@@ -431,14 +639,43 @@ public class Utilities {
                 system.debug('IN day Job-->'+de.Job__r.Install_Postcode__c);
                 system.debug('jobStartDate=='+jobStartDate);
                 string destinationPc = de.Job__r.Install_Postcode__c.replaceall(' ', '');
-               
+                string prevent_despc;
+                if(prevEntry.Id != null)
+                prevent_despc = prevEntry.Job__r.Install_Postcode__c.replaceAll(' ','');
+                if(system.label.Bing_Google_API=='Bing')
+                {
+                    string destinationlatlong='';
+                    if(de.job__r.latitude__latitude__s!=null)
+                          destinationlatlong =String.valueof(de.job__r.latitude__latitude__s)+','+string.valueof(de.job__r.latitude__longitude__s);
+                    /*if(destinationlatlong=='')
+                    {
+                        List<string> destinationlatlongList = utilities.getLatLang(null, destinationPc, null, null);
+                        if(destinationlatlongList.size()==2)
+                            destinationlatlong=destinationlatlongList[0]+','+destinationlatlongList[1];
+                        
+                    }*/
+                    
+                    if(destinationlatlong!='')
+                    destinationPc = destinationlatlong;
+                    
+                    if(prevent_despc!=null)
+                    {
+                        if(prevEntry.job__r.latitude__latitude__s!=null)
+                            prevent_despc=String.valueof(prevEntry.job__r.latitude__latitude__s)+','+string.valueof(prevEntry.job__r.latitude__longitude__s);
+                       /* else
+                        {
+                            List<string> destinationlatlongList = utilities.getLatLang(null, prevent_despc, null, null);
+                            if(destinationlatlongList.size()==2)
+                               prevent_despc=destinationlatlongList[0]+','+destinationlatlongList[1];
+                        }*/
+                    }
+                }
                 
                 if(destinationPc==sorucePc)
                 {   
                     if(prevEntry.Id != null)
-                    individualPostCodeEngineerMap.put(prevEntry.Job__r.Install_Postcode__c.replaceall(' ', ''),new set<Diary_Entry__c> {prevEntry});
+                    individualPostCodeEngineerMap.put(prevent_despc,new set<Diary_Entry__c> {prevEntry});
                     continue;
-                    
                 }   
                 
                 diarySearchResult.put(de.Id, s);
@@ -448,16 +685,14 @@ public class Utilities {
                     system.debug('I am here----> 1');
                     set<Diary_Entry__c> prevoiusEntries = new set<Diary_Entry__c>();
                     // PRB00030533
-                    if(prevEntry.Id!=null){
-                    string prevent_despc = prevEntry.Job__r.Install_Postcode__c.replaceAll(' ','');
-                    if(prevent_despc != destinationPc)
-                    individualPostCodeEngineerMap.put(prevent_despc,new set<Diary_Entry__c> {prevEntry});
-                    else{
-                    prevoiusEntries.add(prevEntry);
-                    }
+                    if(prevEntry.Id!=null)
+                    {
+                        if(prevent_despc != destinationPc)
+                        individualPostCodeEngineerMap.put(prevent_despc,new set<Diary_Entry__c> {prevEntry});
+                        else
+                        prevoiusEntries.add(prevEntry);
                     }
                     // PRB00030533
-                    
                     prevoiusEntries.add(de);
                     individualPostCodeEngineerMap.put(destinationPc, prevoiusEntries);
                     break;
@@ -494,13 +729,24 @@ public class Utilities {
         
         for(string s: PostCodeEngineerMap.keyset())
         {
-            Destination+=s+'|';
+            Destination+=s+'%7C';
             postcodeList.add(s);
             
+        }
+        if(Destination!=null && Destination.endsWith('%7C'))
+        {
+            Destination = Destination.substring(0,Destination.length()-3);
+        }
+
+        if(sorucePc!=null && sorucePc.endsWith('%7C'))
+        {
+            sorucePc = sorucePc.substring(0,sorucePc.length()-3);
         }
         
         Destination = Destination.trim();
         system.debug('Job Address--->'+sorucePc);
+        
+        
         
         
         system.debug('  '+Destination);
@@ -512,6 +758,8 @@ public class Utilities {
         system.debug('postcodeList---->'+postcodeList);
         for(Integer i = 0; i < postcodeList.size(); i++){
         {
+            decimal totalsec = decimal.valueof(distanceTime[i][3]);
+            /*
             decimal hrs =0.0;
             string timeString = distanceTime[i][2];
             string hrString, minString;
@@ -546,6 +794,9 @@ public class Utilities {
             min = secString.contains(minString)? decimal.valueof(secString.split(minString)[0].trim()): 0.00;
             system.debug(minString +' ' +min);
             decimal totaltime = hrs+ (min/60);
+            */
+            
+            decimal totaltime = totalsec/60/60;
             
             if(totaltime>0.1)
             PostCodeTimeMap.put(postcodeList[i],totaltime.setscale(2));
@@ -587,15 +838,17 @@ public class Utilities {
         }catch(exception e)
         {
             system.debug('Exception while calculating the travel Time : '+e.getMessage() + ' Line number:'+e.getLineNumber());
-            CreateEmail.CretaeSendTextEmail(new list<string>{'ashokkumar.nagaleekar@centrica.com'}, JSON.serializePretty(e) +'\n\n\n'+JSON.serializePretty(SearchList), 'Exception while calculating Travel time');
+            CreateEmail.CretaeSendTextEmail(new list<string>{'ashokkumar.nagaleekar@centrica.com'}, JSON.serialize(e) +'\n\n\n'+JSON.serialize(SearchList), 'Exception while calculating Travel time');
             
         }
         return null;
     }
     
-    public static list<string> getLatLang (string Address, string pcode)
+   
+    
+    public static list<string> getLatLang(string Address, string pcode,string street,string city)
     {
-        
+        if(system.label.Bing_Google_API=='Google'){
          // Google Base Url
           string GoogleBaseUrl = 'http://maps.googleapis.com';  
           // Actual API Domain URL. 
@@ -646,8 +899,67 @@ public class Utilities {
          
           system.debug('lat lang ' +lat+' '+lng);
          return (new string[]{lat,lng});
+        }
         
+        
+        
+         
+        else if(system.label.Bing_Google_API=='Bing'){
+         if(street.containsIgnorecase('flat')||street.containsIgnorecase('apartment')||street.containsIgnorecase('apt'))
+         street= null;
+         
+         
+         
+          //string bingBaseUrl = 'http://dev.virtualearth.net/REST/v1/Locations?countryRegion={countryRegion}&adminDistrict={adminDistrict}&locality={locality}&postalCode={postalCode}&addressLine={addressLine}&userLocation={userLocation}&userIp={userIp}&key={BingMapsKey}';
+           string bingKey = system.label.BingAPIKey;
+           if(userinfo.getUserName().contains('orckid.portal'))
+           bingKey = system.label.BingAPIKey_PortalUser;
+          
+          string bingBaseUrl = 'http://dev.virtualearth.net/REST/v1/Locations?countryRegion=UK&locality='+city+'&postalCode='+pcode+'&addressLine='+street+'&key='+bingKey;  
+         
+          Http obj_Http = new Http();
+          HttpRequest http_Req = new HttpRequest();
+          http_Req.setEndpoint(bingBaseUrl);
+          http_Req.setMethod('GET');
+    
+          http_Req.setTimeout(60000);  
+          HttpResponse http_Res = obj_Http.send(http_Req);
+          System.debug('Response --->'+http_Res.getBody());
+          
+          String lat='';
+          string lng='';
+          
+         if(http_Res.getStatusCode() == 200)
+          {
+            latlongResponse resp = latlongResponse.parse(http_Res.getBody());
+            
+            for(latlongResponse.cls_resourceSets rsets:resp.resourceSets)
+            {
+                for(latlongResponse.cls_resources re:rsets.resources)
+                {
+                    for(string mcode:re.matchCodes)
+                    {
+                        if(mcode.contains('Good'))
+                        {
+                          lat = string.valueof(re.point.coordinates[0]);
+                          lng = string.valueof(re.point.coordinates[1]);
+                        }
+                    }
+                }
+            }
+          }
+            
+         
+          system.debug('lat lang ' +lat+' '+lng);
+          if(lat!='')
+          return (new string[]{lat,lng});
+          else 
+          return null;
+        }
+        return null;
     }
+    
+    
     
      // ++ CSI00003709 - Send consumable batch should not run on bank holidays changes starts
     public boolean isTodayBankHoliday(date holidayDate)
@@ -841,4 +1153,94 @@ public class Utilities {
         Lock.callHistory=true;
         
     }
+    
+    public static Deposit_number__c assignReferenceNumberToLead(string oppid)
+    {
+        Deposit_Number__c refNumber = getAvailableRefNumber();
+        if(refNumber!=null)
+        {
+            refNumber.status__c='Used';
+            refNumber.opportunity__c=oppid;
+            opportunity opp= new opportunity(id=oppid,payment_reference_number__c=refNumber.name);
+            
+            update refNumber;
+            update opp;
+            
+        }
+        
+        return refNumber;
+    }
+    
+    /*public static Deposit_number__c getAvailableRefNumber()
+    {
+        Deposit_Number__c refNumber;
+        List<Deposit_Number__c> depositNumberList = new List<Deposit_Number__c>();
+        datetime currentTime = system.now();
+        integer minute = currentTime.minute();
+        String oddEven='';
+        if(minute!=null && math.mod(minute,2) == 0)
+            oddEven ='0';
+        else
+           oddEven='1';
+           
+         system.debug('Sugu '+oddeven);
+        
+        depositNumberList = [select id,status__c,Opportunity__c,name,unique_key__c from Deposit_Number__c where status__c='Available' and name!=null and odd_even__c=:oddEven limit 1000];
+    
+            if(!depositNumberList.isempty())
+            {
+                   Integer rand = (Math.random() * depositNumberList.size()).intValue();
+                   if(rand >= depositNumberList.size())
+                   rand = depositNumberList.size()-1;
+                   refNumber= depositNumberList[rand];
+            }
+        return refNumber;
+    }*/
+    
+   /* public static Deposit_number__c getAvailableRefNumber()
+    {
+        Deposit_Number__c refNumber;
+        List<Deposit_Number__c> depositNumberList = new List<Deposit_Number__c>();
+        //depositNumberList = [select id,status__c,Opportunity__c,name from Deposit_Number__c where status__c='Available' order by name limit 200];
+        depositNumberList = (List<Deposit_Number__c>)[FIND '858*' IN ALL FIELDS RETURNING Deposit_Number__c (id,status__c,Opportunity__c,name where status__c='Available') limit 200][0];
+        system.debug('Sugu '+depositNumberList);
+            if(!depositNumberList.isempty())
+            {
+                   Integer rand = (Math.random() * depositNumberList.size()).intValue();
+                   if(rand >= depositNumberList.size())
+                   rand = depositNumberList.size()-1;
+                   refNumber= depositNumberList[rand];
+            }
+        return refNumber;
+    }*/
+    
+     public static Deposit_number__c getAvailableRefNumber()
+    {
+        Deposit_Number__c refNumber;
+        List<Deposit_Number__c> depositNumberList = new List<Deposit_Number__c>();        
+        //depositNumberList = [select id,status__c,Opportunity__c,name from Deposit_Number__c where status__c='Available' order by name limit 200];
+        String query = 'Select id,status__c,Opportunity__c,name from Deposit_Number__c where status__c=\'Available\' and lastmodifieddate>='+system.label.DepositNumber_LastmodifiedDate+' limit 200';
+        depositNumberList =database.query(query);
+        
+            if(!depositNumberList.isempty())
+            {
+                   Integer rand = (Math.random() * depositNumberList.size()).intValue();
+                   if(rand >= depositNumberList.size())
+                   rand = depositNumberList.size()-1;
+                   refNumber= depositNumberList[rand];
+            }
+        return refNumber;
+    }
+    
+    @TestVisible private static List<items_SharepointVia360__x> mockedRequests = new List<items_SharepointVia360__x>();
+    
+    public static  List<items_SharepointVia360__x> sharepointImageFetcher(list<string> nameList)
+    {
+        
+       List<items_SharepointVia360__x> requests = (!mockedRequests.isEmpty()) ? mockedRequests : [select  DownloadUrl__c, Name__c from items_SharepointVia360__x where name__c in :nameList];
+       return requests;
+       
+    }
+   
+  
 }

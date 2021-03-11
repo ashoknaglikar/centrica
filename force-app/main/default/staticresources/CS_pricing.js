@@ -301,17 +301,23 @@ function onAllowanceButtonClick(id) {
     if (id === "applyAll") {
         if (jQuery("#" + id).hasClass("allowancesClicked")) {
             jQuery(".allowanceButton").addClass("allowancesClicked");
+            jQuery("#applyAll").attr('style', 'background: #09A93A');
         } else {
             jQuery(".allowanceButton").removeClass("allowancesClicked");
+            jQuery("#applyAll").attr('style', 'background: #e8e8e9');
         }
+  
+
     }
 
     for (var i = 1; i < 7; i++) {
         // if the button is clicked set the CS Is_Applied flag to TRUE
         if (jQuery("#allowance" + i).hasClass("allowancesClicked")) {
+            jQuery("#allowance" + i).attr('style', 'background: #09A93A');
             CS.setAttributeField('Allowance' + i + '_0', 'Is_Applied', 'TRUE');
         } else {
             CS.setAttributeField('Allowance' + i + '_0', 'Is_Applied', 'FALSE');
+            jQuery("#allowance" + i).attr('style', 'background: #e8e8e9');
         }
     }
     // save the button values and css so that the configurator doesn't overwrite them
@@ -384,7 +390,7 @@ function onSelectListChange(selectListId, allowanceId) {
     actualInputField2.defaultValue = '';
     jQuery('#allowanceNumber' + idx).val('');
 
-    grayInOut("validateAllowance" + idx, false);
+    grayInOut("validateAllowance" + idx, false,true);
     // disable reference number text input if not needed
     if (jQuery('#discount' + idx).find(':selected').attr('requires-refnumber') == 'false') {
         jQuery("#allowanceNumber" + idx).prop('disabled', true);
@@ -588,7 +594,7 @@ function populateNextSelectListsFrom(idx) {
         allowanceInput.prop('readonly', false); //enable the input field if it was disabled
         var allowanceInputField = document.getElementById('discountAllowance' + i);
         allowanceInputField.defaultValue = 0;
-        grayInOut("validateAllowance" + i, false);
+        grayInOut("validateAllowance" + i, false. true);
         jQuery('#allowanceNumber' + idx).val('');
 
         var maxSpan = jQuery('#maxAllowance' + i);
@@ -608,6 +614,8 @@ function populateNextSelectListsFrom(idx) {
 
         populateSelectList('discount' + i);
     }
+        /*Aravind*/
+    grayInOut("discountDone", false, false);
 }
 
 /**
@@ -684,7 +692,7 @@ function lockAllowanceField(idx) {
 
     var allowanceInput = jQuery("#discountAllowance" + idx);
     allowanceInput.prop('readonly', true);
-    grayInOut("validateAllowance" + idx, true);
+    grayInOut("validateAllowance" + idx, true,true);
 
     populateNextSelectListsFrom(idx + 1);
 
@@ -761,7 +769,8 @@ function onAllowancesDoneClick() {
     }
     
     CS.Log.warn('*** Allowances have been saved and are ready to be applied.');
-    
+    /*To change the Allowances Configured button to green when pressed */
+    grayInOut("discountDone", true, false);
     clearCustomerSignature(); //added 20 Jun
 
     unbindAndSetHsaAllowances();
@@ -770,6 +779,7 @@ function onAllowancesDoneClick() {
     calculatePricingScreenTotals();
     createPricingTables();
     createCustomerTotalsTable();
+   
 }
 
 /**
@@ -1400,7 +1410,8 @@ require(['bower_components/q/q'], function (Q) {
                     if(bundleChildren && bundleChildren.length > 0) {
                         hsaPricingTable.addAccordionParent(bundleId, description, quantity, formatPrice(price / quantity), formatPrice(price));
                         _.each(bundleChildren, function(item) {
-                            description = item.part.Quote_Description__c ? item.part.Quote_Description__c : (item.part.Description__c ? item.part.Description__c : (item.part.Name ? item.part.Name : ''));
+                            //description = item.part.Quote_Description__c ? item.part.Quote_Description__c : (item.part.Description__c ? item.part.Description__c : (item.part.Name ? item.part.Name : ''));
+                            description = item.part.Description__c ? item.part.Description__c : (item.part.Name ? item.part.Name : '');
                             quantity = item.quantity ? item.quantity : 1;
                             contentVersionId = item.part.ContentVersionId__c;
                             price = item.priceVatIncl * quantity;
@@ -1410,7 +1421,8 @@ require(['bower_components/q/q'], function (Q) {
                         hsaPricingTable.addRow(description, quantity, formatPrice(price / quantity), formatPrice(price));
                     }
                 } else if (item.isPart) {
-                    description = item.parentPart.part.Quote_Description__c ? item.parentPart.part.Quote_Description__c : (item.parentPart.part.Description__c ? item.parentPart.part.Description__c : (item.parentPart.part.Name ? item.parentPart.part.Name : ''));
+                    // description = item.parentPart.part.Quote_Description__c ? item.parentPart.part.Quote_Description__c : (item.parentPart.part.Description__c ? item.parentPart.part.Description__c : (item.parentPart.part.Name ? item.parentPart.part.Name : ''));
+                    description = item.parentPart.part.Description__c ? item.parentPart.part.Description__c : (item.parentPart.part.Name ? item.parentPart.part.Name : '');
                     quantity = item.parentPart.quantity ? item.parentPart.quantity : 1;
                     contentVersionId = item.parentPart.part.ContentVersionId__c;
                     if(item.parentPart.part.Show_Parts__c) {
@@ -1422,7 +1434,8 @@ require(['bower_components/q/q'], function (Q) {
                     hsaPricingTable.addRow(description, quantity, formatPrice(price / quantity), formatPrice(price));
                 } else if(item.part) {
                     // it's an associated part 
-                    description = item.part.Quote_Description__c ? item.part.Quote_Description__c : (item.part.Description__c ? item.part.Description__c : (item.part.Name ? item.part.Name : ''));
+                    //description = item.part.Quote_Description__c ? item.part.Quote_Description__c : (item.part.Description__c ? item.part.Description__c : (item.part.Name ? item.part.Name : ''));
+                    description = item.part.Description__c ? item.part.Description__c : (item.part.Name ? item.part.Name : '');
                     quantity = item.quantity ? item.quantity : 1;
                     contentVersionId = item.part.ContentVersionId__c;
                     price = item.priceVatIncl * quantity;
@@ -1942,19 +1955,22 @@ jQuery(document).on('change', '#Asbestos_and_Stores\\:Asbestos_Identified_0', fu
     }, 350); 
 });
 
-function grayInOut(buttonId, grayOut) {
+function grayInOut(buttonId, grayOut,changeTitle) {
     var btnElement = jQuery("#" + buttonId);
-
     if (btnElement && btnElement.length > 0) {
         if (grayOut) {
             //btnElement[0].style.opacity = ".2";
             btnElement.attr('style', 'background: #09A93A !important');
-            btnElement.html('Applied');
+            if(changeTitle) {
+                 btnElement.html('Applied');
+            }
             document.getElementById(buttonId).disabled = true;
         } else {
             //btnElement[0].style.opacity = "1";
             btnElement.attr('style', 'background: #1e9dcb !important');
-            btnElement.html('Validate');
+            if(changeTitle) {
+                 btnElement.html('Validate');
+            }
             document.getElementById(buttonId).disabled = false;
         }
     }

@@ -322,12 +322,14 @@ private class createBundleLeadHelper_Test {
         req.bundle = bun;
         String myJSON = JSON.serialize(req);
 
+        Test.starttest();
         RestRequest request = new RestRequest();
         request.requestUri ='/services/apexrest/createBundleLead';
         request.httpMethod = 'POST';
         request.requestBody = Blob.valueof(myJSON);
         RestContext.request = request;
         createBundleLeadResponse repl = OnlineBoilerCreateBundleLeadAPI.createBundleLeadMethod();
+        test.stoptest();
     }
     
     static testMethod void testmethod10()

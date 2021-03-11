@@ -154,7 +154,14 @@
                         customerPortal.Employer_Phone__c=result.EmployerAddress.employerPhone;
                         customerPortal.YearE__c=result.EmployerAddress.timeatEmployerYear;
                         customerPortal.MonthE__c=result.EmployerAddress.timeatEmployerMonth;
-                    }    
+                    }
+                    
+                    customerPortal.Income_Variation__c = result.incomeVariation;
+                    customerPortal.Income_Variation_Value__c = result.incomeVariationValue;
+                    customerPortal.Monthly_Expense__c = result.monthlyExpense;
+                    customerPortal.Expense_Variation__c = result.expenseVariation;
+                    customerPortal.Expense_Variation_Value__c = result.expenseVariationValue;
+                   
                     //search for the finance product 
                     Finance_Product__c fp = [Select id, Payment_Options__c , Name, Interest_Rate__c From Finance_Product__c /*where Code__c = :result.typeOfFinance*/ limit 1];
                     // if finance product doesn't exist
@@ -176,7 +183,7 @@
                 customerPortal.CHI_Lead__c = opportunityId;
                 
                 // populate the external Lead refernce number
-                customerPortal.Lead_Ext_Ref_No__c = CustomerPortalHelper.getExternalReference(opportunityId);
+                //customerPortal.Lead_Ext_Ref_No__c = CustomerPortalHelper.getExternalReference(opportunityId);
                 
                 // All Constants
                 

@@ -35,7 +35,7 @@ public class CustomerPortalAppointmentHelperTest {
     CustomerPortalAppointmentHelper.getAppointmentsByPostcodeFunc(string.valueof(opp.id),startTime,EndTime);
     
     getAppointmentsJSON.ManageAppointment reservedAppt=new getAppointmentsJSON.ManageAppointment();
-    CustomerPortalAppointmentHelper.ManageReservation('test1',reservedAppt);
+    //CustomerPortalAppointmentHelper.ManageReservation('test1',reservedAppt);
    
     
     }
@@ -73,7 +73,7 @@ public class CustomerPortalAppointmentHelperTest {
     CustomerPortalAppointmentHelper.getAppointmentsByPostcodeFunc(string.valueof(opp.id),startTime,EndTime);
     
     getAppointmentsJSON.ManageAppointment reservedAppt=new getAppointmentsJSON.ManageAppointment();
-    CustomerPortalAppointmentHelper.ManageReservation('test1',reservedAppt);
+    //CustomerPortalAppointmentHelper.ManageReservation('test1',reservedAppt);
     List<opportunity> oppList=eClass.getOpportunity(string.valueof(opp.id));
     CustomerPortalAppointmentHelper.cancelAppointment(string.valueof(opp.id),'Reason1','I’m moving house');
   
@@ -113,7 +113,7 @@ public class CustomerPortalAppointmentHelperTest {
   insert app;
    CustomerPortalAppointmentHelper.cancelAppointment(string.valueof(opp.id),'Reason1',null);
   getAppointmentsJSON.ManageAppointment reservedAppt;
-  CustomerPortalAppointmentHelper.ManageReservation('',reservedAppt);
+  //CustomerPortalAppointmentHelper.ManageReservation('',reservedAppt);
   CustomerPortalAppointmentHelper.getAppointmentsByPostcodeFunc('',startTime,EndTime);
     
    CustomerPortalAppointmentHelper.manageAppointmentBooking(string.valueof(opp.id),string.valueof(app.id));

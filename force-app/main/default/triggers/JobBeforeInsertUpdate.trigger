@@ -229,7 +229,7 @@ if(Trigger.isInsert){
         
         if( Lock.calBalancingSkill)
         {
-            jobTriggerHelper.calculateBalancingMechanicalHours(new List<Job__c> {newJob});
+            jobTriggerHelper.calculateBalancingMechanicalHours(new List<Job__c> {newJob}, true);
             Lock.calBalancingSkill = false;
         }
         

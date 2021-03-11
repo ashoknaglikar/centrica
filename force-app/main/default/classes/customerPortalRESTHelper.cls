@@ -20,7 +20,8 @@ global with sharing class customerPortalRESTHelper {
         
         list<Bigmachines_Quote__c> quoteList = new list<Bigmachines_Quote__c>();
         Bigmachines_Quote__c bestQuote = new Bigmachines_Quote__c();
-       
+        list<job_element__c> jobelementList = new List<job_element__c>();
+        List<attachment> attachmentlist = new list<attachment>();
         
         list<Job__c> jobList = new list <Job__c>();
         Job__c bestJob = new Job__c();
@@ -40,14 +41,18 @@ global with sharing class customerPortalRESTHelper {
         String keyPrefix = r.getKeyPrefix();
         
         String oppId = CustomerPortalHelper.getOpportunityId(Sf_id);
-
+        list<id> parentIds = new list<id> {oppId};
+        
         boolean callBackScenario = false;
        
-        
+        dynamicCustomerPortalJSONClass.cls_outstandingFinance outBalance = new dynamicCustomerPortalJSONClass.cls_outstandingFinance();
         string notEligiblePI = system.label.PINotEligibleForPortal;
         dateTime leadCreatedDate ;
         list<Opportunity> result = [SELECT Id, Name, StageName, CHI_Lead_Id__c,Customer_Name__c, Install_Address_Street__c, Install_Address_County__c, Install_Address_City__c, Install_Postcode__c, Product_Interest__c, CreatedDate, Customer_Email__c , Account.Primary_Contact__r.FirstName,  
-                                    Account.Primary_Contact__r.LastName, Account.Primary_Contact__r.Salutation,Portal_Deposit__c, Payment_Reference_Number__c  FROM Opportunity WHERE id = :oppId   ];
+                                    Account.Primary_Contact__r.LastName, Account.Primary_Contact__r.Salutation,Portal_Deposit__c, Payment_Reference_Number__c,Derived_Payment_Reference_Number__c,
+                                    Balance_Outstanding__c,Original_Quote_Value__c,AllowFinalPayment__c,AllowPortalPayment__c,discountsTotalOnPricing__c,Net_Contract_Price__c,Sum_of_Payments__c,ASP_Outcome__c  ,Sum_of_Deposits__c,
+                                    Landlord__c, Latest_customer_category__c
+                                    FROM Opportunity WHERE id = :oppId   ];
         
         if(result.size()>0)
         {
@@ -81,24 +86,60 @@ global with sharing class customerPortalRESTHelper {
                     leadCreatedDate                         =  o.CreatedDate;
                     vaildOpportunity.add(o);
                     
+                    outBalance.allowFinalPaymentCollection = false;
+                    //returnResponse.paymentReferenceNumber = outBalance.paymentReferenceNumber      = o.Payment_Reference_Number__c;
+                    outBalance.paymentReferenceNumber      = o.Payment_Reference_Number__c;
+                    outBalance.originalQuoteValue          = o.Original_Quote_Value__c;
+                    outBalance.totalAllowance              = o.discountsTotalOnPricing__c;
+                    outBalance.netContractPrice            = o.Net_Contract_Price__c;
+                    outBalance.totalPayments               = o.Sum_of_Deposits__c;
+                    outBalance.finalBalanceOutstanding     = o.Balance_Outstanding__c;
+                    outBalance.changesToQuote              = o.ASP_Outcome__c;
+                    outBalance.totalPriceYouWillPay        = o.Net_Contract_Price__c+o.ASP_Outcome__c;
+                    
                     break;
                 }
             }
+            
+            
             returnResponse.keyInformationList = new list<dynamicCustomerPortalJSONClass.keyValue>();
+            
+            
+            
+           if(vaildOpportunity[0].Payment_Reference_Number__c==null&&(system.label.Deposit_Reference_Number=='on'||vaildOpportunity[0].Derived_Payment_Reference_Number__c))
+            {
+                Deposit_Number__c depNum= utilities.assignReferenceNumberToLead(vaildOpportunity[0].id);
+                vaildOpportunity[0].Payment_Reference_Number__c= depNum!=null?depNum.name:null;
+            }
+            if(vaildOpportunity[0].Payment_Reference_Number__c!=null)
+            returnResponse.paymentReferenceNumber=vaildOpportunity[0].Payment_Reference_Number__c;
             
             
             if(vaildOpportunity.size()>0)
             {
+               outBalance.balancePaid = 0;
+               try{   
+               AggregateResult[] groupedResults   = [Select SUM(Amount__c)Amount   From BGS_Payment__c where Opportunity__c = :vaildOpportunity[0].id and Payment_Type__c = 'Balance Payment' ];
+               system.debug(groupedResults);
+               outBalance.balancePaid =  groupedResults[0].get('Amount')!=null ? (decimal)groupedResults[0].get('Amount'):0 ;
+               }catch (exception e)
+               {
+                   outBalance.balancePaid =0;
+               }
 
                 //returnResponse.customerDocs.addAll();
 
-                appointmentList = [Select id, Status__c, Visit_Date__c,SFDC_Customer_Commited_Window__c, Start_Time__c, End_Time__c, EmployeeName__c, Assigned_To__r.Phone_No__c from Appointment__c where Opportunity__c in :vaildOpportunity and Status__c!= 'Cancelled' order by Start__c ASC];
+                appointmentList = [Select id, Assigned_To__c, Status__c, Visit_Date__c,SFDC_Customer_Commited_Window__c, Start_Time__c, End_Time__c, EmployeeName__c, Assigned_To__r.Phone_No__c from Appointment__c where Opportunity__c in :vaildOpportunity and Status__c!= 'Cancelled' order by Start__c ASC];
                 
-                quoteList = [Select id, Stage__c, Is_Primary__c, quote_Finish_Time__c, CreatedDate, App_Assigned_To__c,Portal_Status__c,bmStatusReason__c,Portal_Call_Back_Time__c,Portal_Substatus__c,   Portal_Call_Back_Date__c , FinalNetQuoteTotal__c from Bigmachines_Quote__c where Opportunity__c in :vaildOpportunity   order by Is_Primary__c , CreatedDate asc];
+                quoteList = [Select id, Stage__c, Is_Primary__c, quote_Finish_Time__c, CreatedDate, App_Assigned_To__c,Portal_Status__c,bmStatusReason__c,Portal_Call_Back_Time__c,Portal_Substatus__c,   Portal_Call_Back_Date__c , FinalNetQuoteTotal__c from Bigmachines_Quote__c where Opportunity__c in :vaildOpportunity and stage__c !=null   order by Is_Primary__c , CreatedDate asc];
                 
-                jobList = [Select id,Quote__c, Status__c, Installation_Date__c, Delivery_Date__c, Delivery_Slot__c, Start_Data_Time__c, Maximum_End_Date__c,Mechanical_Installer__c,Quote__r.Max_Lead_Time__c,simple_complex_job__c,District__r.C_P_Planning_lead_time__c,Portal_Installation_Time__c,Portal_Call_Back_Date__c,Portal_Call_Back_Time__c from Job__c where CHI_Lead__c in :vaildOpportunity and Is_Remedial_Job__c = false and Is_Downtime_Job__c = false ];
+                jobList = [Select id,Quote__c, Install_Postcode__c, Status__c, Installation_Date__c,  Count_Own_labour_orders__c, Delivery_Date__c, Delivery_Slot__c, Start_Data_Time__c, Maximum_End_Date__c,Mechanical_Installer__c,Quote__r.Max_Lead_Time__c,simple_complex_job__c,District__r.C_P_Planning_lead_time__c,Portal_Installation_Time__c,Portal_Call_Back_Date__c,Portal_Call_Back_Time__c from Job__c where CHI_Lead__c in :vaildOpportunity and Is_Remedial_Job__c = false and Is_Downtime_Job__c = false ];
                 
                 faApplication = cobj.returnValidFinanceApplication(vaildOpportunity[0].Id);
+                
+                jobelementList=[SELECT ID,Description__c FROM JOB_ELEMENT__C WHERE Product_ID__c LIKE 'cblr%' AND job__r.chi_lead__c=:vaildOpportunity];
+                
+                attachmentlist = [select id from attachment where parentid =:vaildOpportunity and name like '%Installation notes%'];
                 
                
                 system.debug('appointmentList---->'+appointmentList);
@@ -109,6 +150,41 @@ global with sharing class customerPortalRESTHelper {
               
               returnResponse.leadOffers.addAll(customerPortalQuoteHelper.buildLeadOfferJSON(vaildOpportunity[0].id));
               returnResponse.showVoucherCode = returnResponse.leadOffers.size()>0;
+              
+              //Suguna
+              
+              
+              IF(!attachmentlist.isempty())
+              returnResponse.installnotesId= attachmentlist[0].id;
+              set<String> quoteIds= new set<string>();
+              map<string,string> BMQuotePDFMap = new map<string,string>();
+              if(!quoteList.isempty())
+              {
+                  for(Bigmachines_Quote__c b:quoteList)
+                  {
+                      quoteIds.add(b.id);
+                      parentIds.add(b.id);
+                  }
+                  
+                  for(Attachment att: [select id,parentId from Attachment where parentId IN:quoteIds])
+                  {
+                      BMQuotePDFMap.put(att.parentId,att.id);
+                  }
+                  
+              }
+              
+              if(jobelementList.size()>0)
+                  outBalance.boilerName = jobelementList[0].Description__c;
+                  
+              /*    
+              if(!faApplication.isempty())
+              {
+                  outBalance.allowFinalPaymentCollection=false;
+              }*/
+              
+              returnResponse.outstandingFinance = outBalance;
+              
+              //ends
               
               if(JobList.size()>0)
               {
@@ -126,6 +202,20 @@ global with sharing class customerPortalRESTHelper {
                         {
                             tempJobList.add(j);
                         }
+                        
+                        if(label.allowedJobsForFinalPaymentOnPOrtal.contains(','+j.status__c+',') )
+                        {
+                            outBalance.allowFinalPaymentCollection = true;
+                            
+                            if(j.Installation_Date__c <=system.today() && j.Count_Own_labour_orders__c> decimal.valueof(label.ownlabourCount) )
+                            outBalance.allowFinalPaymentCollection = false;
+                        }
+
+                        if(vaildOpportunity[0].AllowPortalPayment__c == 'No') {
+                            outBalance.allowFinalPaymentCollection = false; 
+                        }
+                        
+                        
                   }
                   JobList.clear();
                   JobList.addAll(tempJobList);
@@ -159,6 +249,8 @@ global with sharing class customerPortalRESTHelper {
                     
                     if(bestAppointment!=null)
                     {
+                        
+                        
                         if(bestAppointment.Visit_Date__c>= system.today())
                         {
                             // future Appointment Scenario
@@ -170,11 +262,19 @@ global with sharing class customerPortalRESTHelper {
                             appointmentEvent = cobj.createEvent(true, bestAppointment.Visit_Date__c, bestAppointment.Visit_Date__c, bestAppointment.Start_Time__c, bestAppointment.End_Time__c, 
                                                            'Sales Appointment' , '20.1' , 'Appointment / Quote complete', bestAppointment.EmployeeName__c, bestAppointment.Assigned_To__r.Phone_No__c);
                         }
+                        
+                       
+                        List<Attachment> hsaPic = [Select id from Attachment where ParentId = : bestAppointment.Assigned_To__c and Name LIKE '%HSA_PIC%'];
+                        
+                        if(hsaPic.size()>0)
+                        appointmentEvent.employeePictureId = hsaPic[0].Id;
                     }else
                     {
                         // no Appoinment Scenario
                         appointmentEvent = cobj.createEvent(false, null, null, null, null, 'No Sales Appointment' , '10.1' , 'CHI Lead with No future or past Appointment.', null, null);
                     }
+                    
+                    //returnResponse.keyInformationList.add(new dynamicCustomerPortalJSONClass.keyValue('paymentRefNumber', string.valueof(vaildOpportunity[0].Payment_Reference_Number__c)));
                      
                 }
                 /* Appointment Event ends*/
@@ -196,7 +296,12 @@ global with sharing class customerPortalRESTHelper {
                         returnResponse.StageId= '30.2';
                         returnResponse.aprChange = false;
                         returnResponse.StageDecription= 'Appointment / Quote complete';
-                        
+                        DateTime quoteDate = b.quote_Finish_Time__c!=null? b.quote_Finish_Time__c: b.CreatedDate;
+                        returnResponse.financeProductList = new list<CustomerPortalHelper.financeProduct>();
+                        for(Finance_Product__c fp: CustomerPortalHelper.getEligibleFinanceProducts (date.valueof(quoteDate),date.valueof(leadCreatedDate)))
+                        {
+                            returnResponse.financeProductList.add(new CustomerPortalHelper.financeProduct(fp));
+                        }
                         
                         if( !b.Is_Primary__c && b.Portal_Substatus__c == 'Deposit Collected' && b.Portal_Status__c =='Accepted')
                         {
@@ -213,7 +318,7 @@ global with sharing class customerPortalRESTHelper {
                         } 
                         else if( !b.Is_Primary__c && b.Portal_Substatus__c == 'Payment On Completion' && b.Portal_Status__c =='Accepted')
                         {
-                            if(label.planningPortalLive != 'on')
+                           /* if(label.planningPortalLive != 'on')
                             {
                                 returnResponse.StageId= '30.3';
                                 returnResponse.StageDecription= 'Portal Accepted Cash';
@@ -223,7 +328,7 @@ global with sharing class customerPortalRESTHelper {
                                 callBackScenario = true;
                                 break;
                             
-                            }else
+                            }else*/
                             {
                                 returnResponse.StageId= '30.4';
                                 returnResponse.StageDecription= 'Portal Deosit Collected';
@@ -236,7 +341,7 @@ global with sharing class customerPortalRESTHelper {
                                 break;
                             }
                             
-                        } else if( label.planningPortalLive != 'on' && !b.Is_Primary__c && (b.Portal_Status__c =='Interested' ||  b.Portal_Status__c =='Accepted') && b.Portal_Substatus__c == 'Finance' )
+                        }/* else if( label.planningPortalLive != 'on' && !b.Is_Primary__c && (b.Portal_Status__c =='Interested' ||  b.Portal_Status__c =='Accepted') && b.Portal_Substatus__c == 'Finance' )
                         {
                             
                             returnResponse.StageId= '30.3';
@@ -247,23 +352,38 @@ global with sharing class customerPortalRESTHelper {
                             callBackScenario = true;
                             break;
                             
-                        } else if(!b.Is_Primary__c &&( faApplication == null || faApplication.size() == 0 ))
+                        } */else if(!b.Is_Primary__c &&( faApplication == null || faApplication.size() == 0 ))
                         {
                             returnResponse.StageId= '30.1';
                             returnResponse.StageDecription= 'UnSold Quote';
                             bestQuote = b;
-                            DateTime quoteDate = b.quote_Finish_Time__c!=null? b.quote_Finish_Time__c: b.CreatedDate;
+                            
+                            /*
+                            
                             CS_Promotion_Dates__c dp = CS_Promotion_Dates__c.getInstance('IFC');
                             Date dp_date_start = dp.Start_Date__c;
                             Date dp_date_end = dp.End_Date__c;
                             Date dp_date_final = dp.Final_Date__c;
-                            
+                            returnResponse.aprChange = false;
                             if(quoteDate >= dp_date_start && 
                                quoteDate <= dp_date_final &&
                                leadCreatedDate <= dp_date_end)
                             {
                               returnResponse.aprChange = true;   
                             }
+                            
+                            dp = CS_Promotion_Dates__c.getInstance('IFC 3 Months Deferred');
+                            dp_date_start = dp.Start_Date__c;
+                            dp_date_end = dp.End_Date__c;
+                            dp_date_final = dp.Final_Date__c;
+                            returnResponse.showDeferredFinanceOption = false;
+                            if(quoteDate >= dp_date_start && 
+                               quoteDate <= dp_date_final &&
+                               leadCreatedDate <= dp_date_end)
+                            {
+                              returnResponse.showDeferredFinanceOption = true;   
+                            }
+                            */
                             
                             bmQuoteEvent = cobj.createEvent(true, bestQuote.CreatedDate.Date(), bestQuote.CreatedDate.Date(), null, null, 
                                                            'Unsold Quote' , '30.1' , 'UnSold Quote', bestQuote.App_Assigned_To__c, null);
@@ -278,13 +398,15 @@ global with sharing class customerPortalRESTHelper {
                             string allAcceptedValues = IV_Vectors__c.getInstance('Finance_Accepted_Statuses').Key__c;
                             string allRefferredValues = IV_Vectors__c.getInstance('Finance_Reffered_Statuses').Key__c;
                             string allDeclinedValues   = IV_Vectors__c.getInstance('Finance_Declined_Statuses').Key__c;
-                            
+                            string allParkedValues = IV_Vectors__c.getInstance('Finance_Parked_Statuses').Key__c;
                             if(allAcceptedValues.contains(faApplication[0].Application_Status__c))
                             status = 'Accepted'; 
                             else if(allDeclinedValues.contains(faApplication[0].Application_Status__c))
                             status = 'Declined';
                             else if(allRefferredValues.contains(faApplication[0].Application_Status__c))
                             status = 'Referred';
+                            else if(allParkedValues.contains(faApplication[0].Application_Status__c))
+                            status = 'Parked';
                             
                             
                             returnResponse.StageDecription= 'Unsold quote with Finance Application with :'+ status+' Status';
@@ -306,15 +428,18 @@ global with sharing class customerPortalRESTHelper {
                             returnResponse.keyInformationList.add(new dynamicCustomerPortalJSONClass.keyValue('financeDuration', string.valueof(faApplication[0].Payment_Options__c)));
                             returnResponse.keyInformationList.add(new dynamicCustomerPortalJSONClass.keyValue('financeId', string.valueof(faApplication[0].Id)));
                             returnResponse.keyInformationList.add(new dynamicCustomerPortalJSONClass.keyValue('financeProdId', string.valueof(faApplication[0].Finance_Product__r.Code__c)));
+                            returnResponse.keyInformationList.add(new dynamicCustomerPortalJSONClass.keyValue('financeOption', faApplication[0].Finance_Options__c));
                             
-                            if(faApplication.size() > 0 )
-                            {
-                                returnResponse.financeRecords = new list<dynamicCustomerPortalJSONClass.financeClass>();
-                                returnResponse.financeRecords.add(new dynamicCustomerPortalJSONClass.financeClass(faApplication[0], vaildOpportunity[0]));
-                            }
+                            
                             
                         }
                         
+                        
+                    }
+                    if(faApplication.size() > 0 )
+                    {
+                        returnResponse.financeRecords = new list<dynamicCustomerPortalJSONClass.financeClass>();
+                        returnResponse.financeRecords.add(new dynamicCustomerPortalJSONClass.financeClass(faApplication[0], vaildOpportunity[0]));
                     }
                     
                     returnResponse.keyInformationList.add(new dynamicCustomerPortalJSONClass.keyValue('depositAmount', string.valueof(vaildOpportunity[0].Portal_Deposit__c)));
@@ -356,6 +481,7 @@ global with sharing class customerPortalRESTHelper {
                         
                         returnResponse.maximumDay = Integer.valueOf(System.Label.maximumDayCustomerPortal);
                         returnResponse.quoteId = j.Quote__c;
+                        returnResponse.bigMachineQuotePDFId=BMQuotePDFMap.containsKey(j.Quote__c)?BMQuotePDFMap.get(j.Quote__c):null;
                         if(j.Simple_Complex_Job__c=='Complex')
                         {
                         returnResponse.complexJob= true;
@@ -385,9 +511,24 @@ global with sharing class customerPortalRESTHelper {
                         {
                             minday = minDayCheck2;
                         } 
-                        returnResponse.minimumDay = minday;
-                         
-                         system.debug('childEventEndDate---->'+childEventEndDate); 
+                       
+                        system.debug('childEventEndDate---->'+minday +' '+vaildOpportunity[0].Latest_customer_category__c ); 
+                        String postCodeSector = j.Install_Postcode__c.substring(0, j.Install_Postcode__c.length()-2);
+                        list<Postcode_Sector__c> postcode = [select id, Operational_Date__c, Non_Operational_Date__c  from Postcode_Sector__c where Type__c = 'Installation' and Name = :postCodeSector];
+                        if(postcode.size()>0)
+                        {
+                            if(vaildOpportunity[0].Latest_customer_category__c<=3 && postcode[0].Non_Operational_Date__c!=null && postcode[0].Non_Operational_Date__c>system.today() && minday < system.today().daysBetween(postcode[0].Non_Operational_Date__c))
+                            {
+                                minday = system.today().daysBetween(postcode[0].Non_Operational_Date__c);
+                            }
+                            else if(vaildOpportunity[0].Latest_customer_category__c>3 && postcode[0].Operational_Date__c!=null && postcode[0].Operational_Date__c>system.today() && minday < system.today().daysBetween(postcode[0].Operational_Date__c) )
+                            {
+                                minday = system.today().daysBetween(postcode[0].Operational_Date__c);
+                            }
+                        }
+                        
+                         returnResponse.minimumDay = minday; 
+                         system.debug('childEventEndDate---->'+childEventEndDate+ '' +minday +' '+vaildOpportunity[0].Latest_customer_category__c ); 
                          system.debug('childEventEndTime---->'+childEventEndTime); 
                          system.debug('childEventStartTime---->'+childEventStartTime); 
                         if(label.planningPortalLive == 'on' && j.Status__c == 'Pending' && j.Portal_Call_Back_Date__c!= null && j.Portal_Call_Back_Time__c!=null)
@@ -472,7 +613,7 @@ global with sharing class customerPortalRESTHelper {
                 }
                 //eventList = new list<customerPortalEventClass>{appointmentEvent, bmQuoteEvent, jobEvent};
                 returnResponse.evenList = eventList;
-                returnResponse.customerDocs = getCustomerDocs(oppId);
+                //returnResponse.customerDocs = getCustomerDocs(parentIds);
                 
             }else
             {
@@ -513,37 +654,41 @@ global with sharing class customerPortalRESTHelper {
         string allDeclinedCalues = IV_Vectors__c.getInstance('Finance_Declined_Statuses').Key__c;
         list<Finance_Application__c> localApp; 
         list<Finance_Application__c> decApp = new list<Finance_Application__c>(); 
+        integer offset = integer.valueof(IV_Vectors__c.getInstance('Quote_Expiry_Days').Key__c);
         for(Finance_Application__c f: faList)
         {
-            localApp = new list<Finance_Application__c>();
-            
-            
-            if(f.Application_Status__c!=null && !allOtherValues.contains(','+f.Application_Status__c+','))
+            if(f.CreatedDate >= system.today().addDays(-(offset)))
             {
-                localApp.add(f);
+                localApp = new list<Finance_Application__c>();
                 
-                if(allParkedValues.contains(','+f.Application_Status__c +','))
-                    return localApp;
-                else if(allAcceptedValues.contains(','+f.Application_Status__c+','))
+                
+                if(f.Application_Status__c!=null && !allOtherValues.contains(','+f.Application_Status__c+','))
                 {
-                    return localApp;
-                }else if(allRefferredValues.contains(','+f.Application_Status__c+','))
-                {
-                    // run the update status 
-                    localApp.clear();
-                    f = CustomerPortalHelper.applicationStatusUpdate(f);
                     localApp.add(f);
-                    return localApp;
-                }else if(allDeclinedCalues.contains(','+f.Application_Status__c+','))
-                {
                     
-                    decApp.add(f);
-                    //return localApp;
-                }else
-                {
-                    return localApp;
+                    if(allParkedValues.contains(','+f.Application_Status__c +','))
+                        return localApp;
+                    else if(allAcceptedValues.contains(','+f.Application_Status__c+','))
+                    {
+                        return localApp;
+                    }else if(allRefferredValues.contains(','+f.Application_Status__c+','))
+                    {
+                        // run the update status 
+                        localApp.clear();
+                        f = CustomerPortalHelper.applicationStatusUpdate(f);
+                        localApp.add(f);
+                        return localApp;
+                    }else if(allDeclinedCalues.contains(','+f.Application_Status__c+','))
+                    {
+                        
+                        decApp.add(f);
+                        //return localApp;
+                    }else
+                    {
+                        return localApp;
+                    }
+                    
                 }
-                
             }
             
             
@@ -593,20 +738,43 @@ global with sharing class customerPortalRESTHelper {
         
     }
 
-    public static list<ContentVersion> getCustomerDocs(id OpportunityId)
+    public static list<dynamicCustomerPortalJSONClass.ContentVersionJSON> getCustomerDocs(list<id> parentIds)
     {
         system.debug('I am inside Customer docs');
         list<string> docIdList = new list<string>();
-        for(Portal_Document__c p : [select id,Document__c from Portal_Document__c where  CHI_Lead__c = : OpportunityId])
+        for(Portal_Document__c p : [select id,Document__c from Portal_Document__c where  CHI_Lead__c in : parentIds])
         {
             docIdList.add(p.Document__c);
         }
         
-        list<ContentVersion> contentlist  = [select   Title, ContentSize, FileExtension, FileType, Id, UserFriendly_Name__c, ContentDocumentId  from ContentVersion  where (Id  in :docIdList or ContentDocumentId in :docIdList) /*and IsLatest = true*/ limit 50];
-        return contentlist;
+        list<dynamicCustomerPortalJSONClass.ContentVersionJSON> docs= new list<dynamicCustomerPortalJSONClass.ContentVersionJSON>();
+        for(ContentVersion con  : [select   Title, ContentSize, FileExtension, FileType, Id, ContentDocumentId  from ContentVersion  where (Id  in :docIdList or ContentDocumentId in :docIdList) /*and IsLatest = true*/ limit 50])
+        {
+            docs.add(new dynamicCustomerPortalJSONClass.ContentVersionJSON('ContentVersion/'+string.valueof(con.Id), 'content' ,con.Title,con.ContentSize,con.FileExtension,con.FileType,con.Id, con.ContentDocumentId));
+        }
+        
+        
+        try{
+                list<Attachment> attachments = [select id,BodyLength,name  from Attachment where ParentId in :parentIds and (Name like '%Installation Notes%' OR Name like '%Energy Saving Illustrator%')order by createdDate];
+                boolean installNotes = false;
+                for(Attachment a : attachments)
+                {
+                    if(!installNotes || a.name.contains('Energy Saving Illustrator'))
+                    docs.add(new dynamicCustomerPortalJSONClass.ContentVersionJSON('Attachment/'+string.valueof(a.Id)+'/body', 'attachment',a.name, a.BodyLength,'pdf','PDF',a.Id, a.id));
+                    
+                    if(a.name.contains('Installation Notes'))
+                    installNotes= true;
+                    
+                }
+                
+        }catch(Exception e)
+        {
+            
+        }
+        system.debug('contentlist -->'+docs);
+        return docs;
         
     }
-    
-    
+
     
 }

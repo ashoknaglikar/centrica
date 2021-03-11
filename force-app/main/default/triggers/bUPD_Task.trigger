@@ -12,79 +12,75 @@ trigger bUPD_Task on Task (before update) {
     
     */
     
-     // Disable Trigger if required
-	if (Label.Disable_PCN_Task_Allocation_Logic.toUpperCase() == 'TRUE')
-	{
-		return;
-	}
     
     // Changes for copying post installation call related details on CHC - Starts
+    /*
    
    try{ 
-      	
+        
       if(Trigger.new.size() == 1 && Trigger.New[0].Is_post_installation_call_task__c && Trigger.New[0].Status == 'Completed' && Trigger.old[0].Status != 'Completed' && Trigger.New[0].Post_installation_call_completed_by__c == null){
-      	
-      	  Customer_history_card__c chc = [Select Id, Any_issues_post_installation__c, Date_of_post_call_check_completion__c,
-      	                                         Post_installation_call_notes__c from Customer_history_card__c where Payment_Collection__r.Id = :Trigger.New[0].WhatId limit 1];
-      	  
-      	  if(chc != null){
-      	  	
-      	  	   System.debug('------1---------'+chc);
-      	  	   
-      	  	   chc.Any_Issues_with_Installation__c = Trigger.New[0].Any_Issues_with_Installation__c;
-      	  	   chc.Date_of_post_call_check_completion__c = Trigger.New[0].Date_of_post_call_check_completion__c;
-      	  	   chc.Post_installation_call_notes__c = Trigger.New[0].Post_installation_call_notes__c;
-      	  	   chc.Issue_description__c = Trigger.New[0].Issue_description__c;
-      	  	   
-      	  	   if(Trigger.New[0].Date_of_post_call_check_completion__c == null){
-      	  	   	 
-      	  	   	  chc.Date_of_post_call_check_completion__c = Datetime.now();
-      	  	   	  Trigger.New[0].Date_of_post_call_check_completion__c = Datetime.now();
-      	  	   	  
-      	  	   }
-      	  	
-      	  	Trigger.New[0].Post_installation_call_completed_by__c = Userinfo.getFirstName() + ' ' + Userinfo.getLastName();
-      	  	
-      	  	chc.Post_installation_call_completed_by__c = Trigger.New[0].Post_installation_call_completed_by__c;
-      	  	
-      	  	List<Task> restOfTheTasks = [Select id from Task where WhatId = :Trigger.New[0].WhatId];
-      	  	
-      	  	List<Task> taskToUpdate = new List<Task>();
-      	  	
-      	  	for(Task t : restOfTheTasks){
-      	  		
-      	  		if(t.Id != Trigger.New[0].Id && t.Is_post_installation_call_task__c == true){
-      	  		
-		      	  		t.Date_of_post_call_check_completion__c = Trigger.New[0].Date_of_post_call_check_completion__c;
-		      	  		t.Any_Issues_with_Installation__c = Trigger.New[0].Any_Issues_with_Installation__c;
-		      	  		t.Post_installation_call_notes__c = Trigger.New[0].Post_installation_call_notes__c;
-		      	  		t.Post_installation_call_completed_by__c = Trigger.New[0].Post_installation_call_completed_by__c;
-		      	  		t.Issue_description__c = Trigger.New[0].Issue_description__c;
-		      	  		t.Status = Trigger.New[0].Status;
-		      	  		taskToUpdate.add(t);
-		      	  		
-      	  		}
-      	  		
-      	  	}
-      	  	 
-      	  	 System.debug('------1---------'+chc);
-      	  	 
-      	  	 Database.update(chc);
-      	  	 
-      	  	 if(taskToUpdate != null && taskToUpdate.size() > 0){
-      	  	 	
-      	  	 	Database.update(taskToUpdate);
-      	  	 	
-      	  	 }
-      	  	
-      	  }
-      	
+        
+          Customer_history_card__c chc = [Select Id, Any_issues_post_installation__c, Date_of_post_call_check_completion__c,
+                                                 Post_installation_call_notes__c from Customer_history_card__c where Payment_Collection__r.Id = :Trigger.New[0].WhatId limit 1];
+          
+          if(chc != null){
+            
+               System.debug('------1---------'+chc);
+               
+               chc.Any_Issues_with_Installation__c = Trigger.New[0].Any_Issues_with_Installation__c;
+               chc.Date_of_post_call_check_completion__c = Trigger.New[0].Date_of_post_call_check_completion__c;
+               chc.Post_installation_call_notes__c = Trigger.New[0].Post_installation_call_notes__c;
+               chc.Issue_description__c = Trigger.New[0].Issue_description__c;
+               
+               if(Trigger.New[0].Date_of_post_call_check_completion__c == null){
+                 
+                  chc.Date_of_post_call_check_completion__c = Datetime.now();
+                  Trigger.New[0].Date_of_post_call_check_completion__c = Datetime.now();
+                  
+               }
+            
+            Trigger.New[0].Post_installation_call_completed_by__c = Userinfo.getFirstName() + ' ' + Userinfo.getLastName();
+            
+            chc.Post_installation_call_completed_by__c = Trigger.New[0].Post_installation_call_completed_by__c;
+            
+            List<Task> restOfTheTasks = [Select id from Task where WhatId = :Trigger.New[0].WhatId];
+            
+            List<Task> taskToUpdate = new List<Task>();
+            
+            for(Task t : restOfTheTasks){
+                
+                if(t.Id != Trigger.New[0].Id && t.Is_post_installation_call_task__c == true){
+                
+                        t.Date_of_post_call_check_completion__c = Trigger.New[0].Date_of_post_call_check_completion__c;
+                        t.Any_Issues_with_Installation__c = Trigger.New[0].Any_Issues_with_Installation__c;
+                        t.Post_installation_call_notes__c = Trigger.New[0].Post_installation_call_notes__c;
+                        t.Post_installation_call_completed_by__c = Trigger.New[0].Post_installation_call_completed_by__c;
+                        t.Issue_description__c = Trigger.New[0].Issue_description__c;
+                        t.Status = Trigger.New[0].Status;
+                        taskToUpdate.add(t);
+                        
+                }
+                
+            }
+             
+             System.debug('------1---------'+chc);
+             
+             Database.update(chc);
+             
+             if(taskToUpdate != null && taskToUpdate.size() > 0){
+                
+                Database.update(taskToUpdate);
+                
+             }
+            
+          }
+        
       }
       
    }catch(Exception excp){
-   	
-   	  System.debug('Could not copy data from task to chc due to an error : '+excp.getMessage());
-   	
+    
+      System.debug('Could not copy data from task to chc due to an error : '+excp.getMessage());
+    
    }  
     // Changes for copying post installation call related details on CHC - Ends
     
@@ -140,4 +136,5 @@ trigger bUPD_Task on Task (before update) {
     } catch (Exception emailEx) {
         System.debug(emailEx.getMessage());
     }
+    */
 }

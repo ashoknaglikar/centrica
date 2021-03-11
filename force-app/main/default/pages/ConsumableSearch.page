@@ -223,6 +223,18 @@ function invokePopUp(idOfDiv){$ac('#'+idOfDiv).modal({persist:false});}
               <apex:outputText value="{!BasketTotalString}" style="font-weight:bold;color:red" rendered="{!redValue}"/>
          </td>     
       </tr>
+      
+      <!-- Link added to feedback form on MS Forms -->         
+      <tr>
+          <td>
+              <br/><br/>
+              <button onclick=" window.open('https://forms.office.com/Pages/ResponsePage.aspx?id=j4kDpuJ9ukW2fdNftRmyzxg45GcmEQ1PttADELdYwrxUMUJXWkY3VFhJSTlHTUZZWlI5VjRaSExNVyQlQCN0PWcu','_blank')">Catalogue Feedback Form</button>
+              <br/>
+              <!--<a target="_blank" href="https://forms.office.com/Pages/ResponsePage.aspx?id=j4kDpuJ9ukW2fdNftRmyzxg45GcmEQ1PttADELdYwrxUMUJXWkY3VFhJSTlHTUZZWlI5VjRaSExNVyQlQCN0PWcu">
+                  Feedback Form
+              </a>-->
+          </td>
+      </tr>
      
       </table>
       </apex:outputPanel>
@@ -284,9 +296,9 @@ function invokePopUp(idOfDiv){$ac('#'+idOfDiv).modal({persist:false});}
                 
                 <apex:column headerValue="Image">
                     <a href="#" onclick="openImage('{!con.consu.Id}')">
-                        <!--<apex:image url="{!con.consu.Image_URL__c}"  alt="No image" width="50" height="50"/>-->
+                        <apex:image url="{!con.consu.Sharepoint_URL__c}"  alt="No image" width="50" height="50"/>
                         
-                        <apex:image url="{!URLFOR($Resource[con.resourceName] , con.Static_Resource_Location)}" width="50" height="50"/>
+                        <!--<apex:image url="{!URLFOR($Resource[con.resourceName] , con.Static_Resource_Location)}" width="50" height="50"/>-->
                     </a>
                 </apex:column>
                 
@@ -301,6 +313,8 @@ function invokePopUp(idOfDiv){$ac('#'+idOfDiv).modal({persist:false});}
                 </apex:column>
                 
                <apex:column headerValue="Cost Price" value="{!con.consu.CostPrice__c}"/>
+               
+               <apex:column headerValue="Max Quantity" value="{!con.consu.Max_Quantity__c}"/>
                
                <apex:column headerValue="Quantity">
                    <apex:inputText value="{!con.Quantity}" style="width:30px;"/>
@@ -347,7 +361,7 @@ function invokePopUp(idOfDiv){$ac('#'+idOfDiv).modal({persist:false});}
               <apex:column headerValue="Name" value="{!selcon.consu.Name}"/> 
               <!--<apex:column headerValue="Code" value="{!selcon.consu.Product_Code__c}"/>-->
               <apex:column headerValue="Image">
-                <apex:image url="{!selcon.consu.Image_URL__c}"  alt="No image" title="Other" width="50" height="50"/>
+                <apex:image url="{!selcon.consu.Sharepoint_URL__c}"  alt="No image" title="Other" width="50" height="50"/>
               </apex:column> 
               <apex:column headerValue="Unit Quantity" value="{!selcon.consu.Unit_Quantity__c}"/>
               <apex:column headerValue="Unit Price" value="{!selcon.consu.CostPrice__c}"/>

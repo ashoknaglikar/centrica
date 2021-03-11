@@ -4,10 +4,12 @@
 *
 *
 */
-trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert) {
+trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert, before update) {
 
 //PRB00032289 - transferhrstrg
- if(cls_IsRun.generalTriggerSwitch || cls_IsRun.transferhrstrg)
+
+
+ if(cls_IsRun.generalTriggerSwitch || cls_IsRun.transferhrstrg || Lock.jobAfterInsertSetDistrict)
     {
         return;
     }   
@@ -23,7 +25,8 @@ trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert) {
     for(Job__c theJob : allJobs)
     {   
         // Added as part of customer history card change request.  
-        if(theJob.District__c == null || (System.Label.Customer_Journey_Flag == 'TRUE' && theJob.Customer_manager_email_address__c == null)){ // Added by Cognizant
+        if(theJob.District__c == null)// || (System.Label.Customer_Journey_Flag == 'TRUE' && theJob.Customer_manager_email_address__c == null)){ // Added by Cognizant
+        {
             oppIds.add(theJob.CHI_Lead__c);
         }
         // End of customer history card change request.
@@ -70,6 +73,7 @@ trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert) {
         for(Postcode_Sector__c postSector : postSectors)
         {
             postcodeSectorMap.put(postSector.name, postSector);
+            if(postSector.Area_Group__c!=null)
             areaGroupEmpMap.put(postSector.Area_Group__c, null);
             /*
             postcodeSectorNameToDistrictIdMap.put(postSector.name, postSector.Sub_Patch__r.District__c);
@@ -81,7 +85,7 @@ trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert) {
             */
         }
         
-        
+        if(areaGroupEmpMap.keyset().size()>0)
         for(Employee__c emp : [Select id, Area_Group__c from Employee__c where Area_Group__c in:areaGroupEmpMap.keySet() and Area_Group__c!=null])
         {
             areaGroupEmpMap.put(emp.Area_Group__c, emp.Id);
@@ -113,9 +117,9 @@ trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert) {
             }
             
         }
-        if(premierJobs.size()>0)
+        if(premierJobs.size()>0 && trigger.isInsert)
         {
-            jobTriggerHelper.calculateBalancingMechanicalHours(premierJobs);
+            jobTriggerHelper.calculateBalancingMechanicalHours(premierJobs,true);
         }
     }
     
@@ -138,7 +142,7 @@ trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert) {
             }   
                 
         }
-        
+        /*
         if(ChiLeads.keyset().size()>0)
         {
             list<Green_Deal_Questions__c> needsUpdating = new list<Green_Deal_Questions__c>();
@@ -162,11 +166,12 @@ trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert) {
             update needsGDUpdating;
             
         }
+        */
    if(System.Label.Customer_Journey_Flag == 'TRUE'){
       
       try{
         
-        
+        /*
         List<Customer_history_card__c> lstCustHistCard = new List<Customer_history_card__c>();
         Customer_history_card__c custHistCard;
         Map<Id,Job__c> jobIdAndJobMap = new Map<Id,Job__c>();
@@ -210,7 +215,7 @@ trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert) {
         }
         
         Database.Insert(custJourneyEventHistList,false);
-        
+        */
         //Populate Primary Job's Status & Sub-Status on CHI Lead, when Job is created.
         if(lst_Opp.size()>0)
         update lst_Opp;
@@ -226,5 +231,5 @@ trigger JobAfterInsertSetDistrict on Job__c (before insert,after insert) {
     
    }
  // End of customer history card change request.
-
+ Lock.setJobAfterInsertSetDistrict();
 }

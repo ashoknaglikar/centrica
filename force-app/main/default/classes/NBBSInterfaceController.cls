@@ -759,7 +759,7 @@ public class NBBSInterfaceController
                 {
                     newInstallationBillingList.add(newInstallationBilling);
                 }
-                
+   
                 //for Quote Editable  
                 checksystem=true;
                 if(checksystem==true){
@@ -773,6 +773,9 @@ public class NBBSInterfaceController
                 }
                 else if(newInstallationBilling.Bill_Total__c > 0.0){
                     checkBillTotalMap.put(Quote.Id, '1');
+                }
+                else if(newInstallationBilling.Bill_Total__c == 0){
+                    checkBillTotalMap.put(Quote.Id, '3');
                 }
                 else{
                     checkBillTotalMap.put(Quote.Id, '0');
@@ -849,6 +852,18 @@ public class NBBSInterfaceController
                                 setMessage(true, 'No valid Quote Product associated with current Quote.');
                                 //installationBillMap.remove(objQuote.id);
                                 //bmQuoteMap.remove(objQuote.id);
+                            }
+                            installationBillMap.remove(objQuote.id);
+                            bmQuoteMap.remove(objQuote.id);
+                        }
+                        else if(s_status == '3'){
+                            if (blMultiple){    
+                                billingStatus.add('Error');
+                                billingStatus.add('The Quote value is 0, so system cant bill this Job. ');
+                                billingOutputList.put(objQuote.Opportunity__c,billingStatus);
+                            } 
+                            else {
+                                setMessage(true, 'The Quote value is 0, so system cant bill this Job. ');
                             }
                             installationBillMap.remove(objQuote.id);
                             bmQuoteMap.remove(objQuote.id);

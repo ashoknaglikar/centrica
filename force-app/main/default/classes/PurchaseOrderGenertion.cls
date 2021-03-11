@@ -36,6 +36,7 @@ public class PurchaseOrderGenertion {
         public boolean isUserDefinedOrderLine = false;
         // rebate
         double Rebate = 0.00;
+        public String matCode{get;set;}
         
     } 
     private class SupplierDetails{
@@ -114,6 +115,8 @@ public class PurchaseOrderGenertion {
     private Map<String,SupplierDetails> l_SupplierMap=new Map<String,SupplierDetails>{};
     private Map<String,SupplierDetails> im_SupplierMap=new Map<String,SupplierDetails>{};
     private Map<String,SupplierDetails> il_SupplierMap=new Map<String,SupplierDetails>{};
+    public Map<String,Rate_Card_Items__c> m_TertiaryRate=new Map<String,Rate_Card_Items__c>{};
+     public Map<String,Rate_Card_Items__c> im_itineryRate=new Map<String,Rate_Card_Items__c>{};
 
     private String sPrimarySuppNum;
     private String sSecondarySuppNum;
@@ -496,6 +499,26 @@ public class PurchaseOrderGenertion {
                             m_UnOrderedItem.add(objUnOrdered);  
                         }//End for
                         fetchTertiarySupplier();
+                        //Suguna- Multiple tertiary Suppliers to unOrderedItems
+                        List<underOrderedItem> m_UnOrderedItemTemp=new List<underOrderedItem>{};
+                        for(underOrderedItem unOrderItem:m_UnOrderedItem)
+                        {
+                            for(String suppNum:tertiarySuppNums)
+                            {
+                                m_tertiaryRate=m_RateCard.get(suppNum);
+                                if(m_tertiaryRate!=null){
+                                    if(m_tertiaryRate.containsKey(unOrderItem.objJobElement.code__c))
+                                    {
+                                       unOrderItem.sSupplierId= suppNum; 
+                                       m_UnOrderedItemTemp.add(unOrderItem);
+                                       break;
+                                    }
+                                }
+                                
+                            }
+                        }
+                        m_UnOrderedItem=m_UnOrderedItemTemp;
+                        
                     }//End if
                     
                       
@@ -532,6 +555,26 @@ public class PurchaseOrderGenertion {
                     im_UnOrderedItem.add(objUnOrdered);  
                 }//End for
                 fetchitinerySupplier();
+                
+                 //Suguna- Multiple itinary Suppliers to unOrderedItems
+                set<underOrderedItem> im_UnOrderedItemTemp=new set<underOrderedItem>{};
+                        for(underOrderedItem unOrderItem:im_UnOrderedItem)
+                        {
+                            for(String suppNum:itinerySuppNums)
+                            {
+                                im_itineryRate=im_RateCard.get(suppNum);
+                                if(im_itineryRate!=null){
+                                    if(im_itineryRate.containsKey(unOrderItem.objJobElement.code__c))
+                                    {
+                                       unOrderItem.sSupplierId= suppNum; 
+                                       im_UnOrderedItemTemp.add(unOrderItem);
+                                       break;
+                                    }
+                                }
+                                
+                            }
+                        }
+                        im_UnOrderedItem=new List<underOrderedItem>(im_UnOrderedItemTemp);
             }//End if
                     
             
@@ -1009,6 +1052,7 @@ public class PurchaseOrderGenertion {
                 decimal rebate = m_Rate.get(sTemp).Material__r.Rebate__c!= null?m_Rate.get(sTemp).Material__r.Rebate__c: 0.00;
                 objOrderLineItem.Rebate = rebate*objOrderLineItem.dblUnits;
                 isPriceFoundForOne = true;
+                objOrderLineItem.matCode=m_Rate.get(sTemp).Material__r.material_Code__c;
             }
             // Cognizant - CHI Phase III CR-005 implementation... START
             // Added an else if block to set the unit price of orderlineitem with merchant price of user defined job element. 
@@ -1653,6 +1697,7 @@ public class PurchaseOrderGenertion {
                             objOrderLineItemActual.Line_Item_Value__c=objOrderLineItem.dblTotalPrice;
                             objOrderLineItemActual.Skill__c=objOrderLineItem.sSkill;
                             objOrderLineItemActual.Rebate__c = objOrderLineItem.Rebate;
+                            objOrderLineItemActual.material_Code__c=objOrderLineItem.matCode;
                             orderLineItemLst.add(objOrderLineItemActual);      
                             for (Job_Element__c objJobElement:objOrderLineItem.getSJobElementLst()){
                                 objJobElement.Order__c=objOrderFinal.Id;
@@ -1718,24 +1763,29 @@ public class PurchaseOrderGenertion {
             return null;
         }
     }
-        public List<SelectOption> tertiarySupplierLst{get;set;}
-
+        
+    public List<SelectOption> tertiarySupplierLst{get;set;}
+     public List<String> tertiarySuppNums= new List<String>();
+     
     private void fetchTertiarySupplier(){
         tertiarySupplierLst=new List<SelectOption>();
         tertiarySupplierLst.add(new Selectoption('','-None-'));
         for (SupplierDetails objSupplier:m_SupplierMap.values()){
             if (objSupplier.intSupplierPref==3){
-                tertiarySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));   
+                tertiarySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));  
+                 tertiarySuppNums.add(objSupplier.sSupplierNum);
             }
         }
         
     }
     public List<SelectOption> itinerySupplierLst{get;set;}
+    public List<String> itinerySuppNums= new List<String>();
     private void fetchitinerySupplier(){
         itinerySupplierLst=new List<SelectOption>();
         itinerySupplierLst.add(new Selectoption('','-None-')); 
         for (SupplierDetails objSupplier:im_SupplierMap.values()){
-            itinerySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));   
+            itinerySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));  
+            itinerySuppNums.add(objSupplier.sSupplierNum);
         }
         
     }

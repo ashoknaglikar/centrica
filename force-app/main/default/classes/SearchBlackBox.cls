@@ -98,85 +98,28 @@ public with sharing class SearchBlackBox {
         List<List<JobResourcingOption>> results = worker.doSearch();
         System.debug('Results-->'+results);
         JobResourcingOption bestBusiness = null;
-        
-        /*
-        try{
-        if(results[0] != null && !results[0].isEmpty()) {
-            bestBusiness = getBestBusinessOption(results[0]);
-            ResourceOption ro = (bestBusiness.primaryResources.size() == 2 && bestBusiness.primaryResources[1].hoursTotal > bestBusiness.primaryResources[0].hoursTotal) 
-                                    ? bestBusiness.primaryResources[1]
-                                    : bestBusiness.primaryResources[0];
-            List<List<String>> distancesAndTimesForAll = new List<List<String>>();
-            distancesAndTimesForAll = Utilities.findDistanceBetweenPostcodes(ro.employeePostCode.trim().replaceAll(' ',''), SearchBlackBox.jobInfo.job.CHI_Lead__r.Install_Postcode__c.trim().replaceAll(' ',''));
-            bestBusiness.primaryResourceDistanceFromJob = distancesAndTimesForAll[0][0];
-            bestBusiness.primaryResourceTravelTimeFromJob = distancesAndTimesForAll[0][2];
-        }
-        }catch (exception excp)
-        {
-            System.debug('Exception occured in finding distance buisness best option ---> '+excp.getMessage());
-        }
-        */
-        
-        
-        //google distance finder change
-        String origin = '';
-        Date jobStartDate ;
-        List<List<String>> distancesAndTimesForAll = new List<List<String>>();
+        List<JobResourcingOption> rankedCustomerOptions = new List<JobResourcingOption>();
+       
         System.debug('Results[0]-->'+results[0]);
         try{
-            
-                for(JobResourcingOption jro : results[0]){
-                    ResourceOption ro = (jro.primaryResources.size() == 2 && jro.primaryResources[1].hoursTotal > jro.primaryResources[0].hoursTotal) 
-                                        ? jro.primaryResources[1]
-                                        : jro.primaryResources[0];
-                    origin+=(ro.employeePostCode!=null ||ro.employeePostCode == '')?ro.employeePostCode.trim().replaceAll(' ','+')+'|' : SearchBlackBox.jobInfo.job.CHI_Lead__r.Install_Postcode__c.trim().replaceAll(' ','+')+'|';
-                    jobStartDate=SearchBlackBox.jobInfo.job.Customer_Preferred_Date__c;
-                }
-                /*
-                  system.debug('origin --- >'+origin);
-                  distancesAndTimesForAll=  Utilities.findDistanceBetweenPostcodes(origin, (SearchBlackBox.jobInfo.job.CHI_Lead__r.Install_Postcode__c).trim().replaceAll(' ','+'),jobStartDate);
-                
-                  if(results[0].size() == distancesAndTimesForAll.size()){
-                    for(Integer i = 0; i < results[0].size(); i++){
-                        ResourceOption ro = (results[0][i].primaryResources.size() == 2 && results[0][i].primaryResources[1].hoursTotal > results[0][i].primaryResources[0].hoursTotal) 
-                                        ? results[0][i].primaryResources[1]
-                                        : results[0][i].primaryResources[0];
-                        if(ro.employeePostCode!=null &&  distancesAndTimesForAll[i].size()==6)
-                        {
-                            results[0][i].primaryResourceDistanceFromJob = distancesAndTimesForAll[i][0];
-                            results[0][i].primaryResourceTravelTimeFromJob = distancesAndTimesForAll[i][2];
-                            results[0][i].primaryTravelTime = decimal.valueof(distancesAndTimesForAll[i][3]);
-                            results[0][i].primaryResourceTrafficTravelTimeFromJob = distancesAndTimesForAll[i][4];
-                        }else if(ro.employeePostCode==null)
-                        {
-                            results[0][i].primaryResourceDistanceFromJob = 'No Home PC';
-                            results[0][i].primaryResourceTravelTimeFromJob = 'No Home PC';
-                            results[0][i].primaryTravelTime =0;
-                            results[0][i].primaryResourceTrafficTravelTimeFromJob ='No Home PC';
-                        }else
-                        {   
-                        	results[0][i].primaryResourceDistanceFromJob = 'PC Error';
-                            results[0][i].primaryResourceTravelTimeFromJob = 'PC Error';
-                            results[0][i].primaryTravelTime =0; 
-                        	results[0][i].primaryResourceTrafficTravelTimeFromJob ='PC Error';
-                        }
+                if(system.label.Bing_Google_API=='Google')
+                {
+                    bestBusiness = getBestBusinessOption(rankOptions(results[0]));
+                    if(results[1] != null && !results[1].isEmpty()) {
+                        rankedCustomerOptions = rankOptions(results[1]);
                     }
+                }else
+                {
+                    RankOptions rank = new RankOptions();
+                    results= rankOptions(results);
+                    bestBusiness= getBestBusinessOption(rank.rankOptions(results[0]));
+                    rankedCustomerOptions= rank.rankOptions(results[1]);
                 }
-                */
-                bestBusiness = getBestBusinessOption(rankOptions(results[0]));
+        
         }catch(Exception excp){
-            
             System.debug('Exception occured in finding distance customer preferred options ---> '+excp.getMessage());
-            
         }
         system.debug(LoggingLevel.INFO, 'After customer options: ' + Limits.getScriptStatements());
-        
-        
-        
-        List<JobResourcingOption> rankedCustomerOptions = new List<JobResourcingOption>();
-        if(results[1] != null && !results[1].isEmpty()) {
-            rankedCustomerOptions = rankOptions(results[1]);
-        }
         
         serializeOptions(new List<List<JobResourcingOption>> { new List<JobResourcingOption> {bestBusiness}, rankedCustomerOptions});
         system.debug(LoggingLevel.INFO, 'Time started: ' + starts);
@@ -207,32 +150,45 @@ public with sharing class SearchBlackBox {
         RankOptions rank = new RankOptions();
         //google distance finder change
         String origin = '';
+        string destination='';
         Date jobStartDate;
         List<List<String>> distancesAndTimesForAll = new List<List<String>>();
         try{
+            destination = SearchBlackBox.jobInfo.job.CHI_Lead__r.Install_Postcode__c.trim().replaceAll(' ','+');
             
-                for(JobResourcingOption jro : options){
+            for(JobResourcingOption jro : options){
                     ResourceOption ro = (jro.primaryResources.size() == 2 && jro.primaryResources[1].hoursTotal > jro.primaryResources[0].hoursTotal) 
                                         ? jro.primaryResources[1]
                                         : jro.primaryResources[0];
-                    origin+=(ro.employeePostCode!=null ||ro.employeePostCode == '')?ro.employeePostCode.trim().replaceAll(' ','+')+'|' : SearchBlackBox.jobInfo.job.CHI_Lead__r.Install_Postcode__c.trim().replaceAll(' ','+')+'|';
+                    origin+=(ro.employeePostCode!=null ||ro.employeePostCode == '')?ro.employeePostCode.trim().replaceAll(' ','+')+'%7C' : SearchBlackBox.jobInfo.job.CHI_Lead__r.Install_Postcode__c.trim().replaceAll(' ','+')+'%7C';
                     jobStartDate=SearchBlackBox.jobInfo.job.Customer_Preferred_Date__c!=null?SearchBlackBox.jobInfo.job.Customer_Preferred_Date__c:system.today();
                 }
                   system.debug('origin --- >'+origin);
-                  distancesAndTimesForAll=  Utilities.findDistanceBetweenPostcodes(origin, (SearchBlackBox.jobInfo.job.CHI_Lead__r.Install_Postcode__c).trim().replaceAll(' ','+'),jobStartDate);
-                
+                  if(origin!='' && origin.endsWith('%7C'))
+                  {
+                    origin = origin.substring(0,origin.length()-3);
+                  }
+                  
+                  if(label.TravelOptimisationSwitch == 'on')
+                  distancesAndTimesForAll= Utilities.findDistanceBetweenPostcodes(origin, destination,jobStartDate);
+                  system.debug('distancesAndTimesForAll '+distancesAndTimesForAll);
+                  
                   if(options.size() == distancesAndTimesForAll.size()){
                     for(Integer i = 0; i < options.size(); i++){
                         ResourceOption ro = (options[i].primaryResources.size() == 2 && options[i].primaryResources[1].hoursTotal > options[i].primaryResources[0].hoursTotal) 
                                         ? options[i].primaryResources[1]
                                         : options[i].primaryResources[0];
-                        if(ro.employeePostCode!=null  && distancesAndTimesForAll[i].size()==6)
+                        if(ro.employeePostCode!=null  && distancesAndTimesForAll[i].size()>=4 )
                         {
                             options[i].primaryResourceDistanceFromJob = distancesAndTimesForAll[i][0];
-                            options[i].primaryResourceTravelTimeFromJob = distancesAndTimesForAll[i][2];
+                            options[i].primaryResourceTrafficTravelTimeFromJob= options[i].primaryResourceTravelTimeFromJob = distancesAndTimesForAll[i][2];
                             options[i].primaryTravelTime = decimal.valueof(distancesAndTimesForAll[i][3]);
-                            options[i].primaryResourceTrafficTravelTimeFromJob = distancesAndTimesForAll[i][4];
-                        }else if(ro.employeePostCode==null )
+                            if(label.trafficSwitch == 'on'&&distancesAndTimesForAll[i].size()>=6)
+                            {
+                                options[i].primaryResourceTravelTimeFromJob=options[i].primaryResourceTrafficTravelTimeFromJob = distancesAndTimesForAll[i][4];
+                                options[i].primaryTravelTime = decimal.valueof(distancesAndTimesForAll[i][5]);
+                            }
+                        }else if(ro.employeePostCode==null)
                         {
                             options[i].primaryResourceDistanceFromJob = 'No Home PC';
                             options[i].primaryResourceTravelTimeFromJob = 'No Home PC';
@@ -257,6 +213,123 @@ public with sharing class SearchBlackBox {
         
         return rank.rankOptions(options);
     }
+    
+    
+     private List<List<JobResourcingOption>> rankOptions(List<List<JobResourcingOption>> results) {
+        string destination ='';
+        string originlatlong ='';
+        string destinationlatlong ='';
+        Date jobStartDate;
+        
+        List<string> destinationlatlongList;
+        List<List<String>> distancesAndTimesForAll = new List<List<String>>();
+        
+        try{
+            
+            destination = SearchBlackBox.jobInfo.job.CHI_Lead__r.Install_Postcode__c.trim().replaceAll(' ','+');
+            if(jobinfo.job.Latitude__Latitude__s!=null)
+            destinationlatlong= String.valueof(jobinfo.job.Latitude__Latitude__s)+','+string.valueof(jobinfo.job.Latitude__Longitude__s);
+            
+            if(destinationlatlong=='')
+            {
+                destinationlatlongList= utilities.getLatLang(null, destination, null, null);
+                if(destinationlatlongList!=null)
+                for(string s:destinationlatlongList)
+                {
+                    destinationlatlong=destinationlatlongList[0]+','+destinationlatlongList[1];
+                }
+            }
+            
+            set<string> emplatlongs = new set<string>();
+            for(List<JobResourcingOption> jrolist: results)
+            {
+                for(JobResourcingOption jro : jrolist){
+                    ResourceOption ro = (jro.primaryResources.size() == 2 && jro.primaryResources[1].hoursTotal > jro.primaryResources[0].hoursTotal) 
+                                        ? jro.primaryResources[1]
+                                        : jro.primaryResources[0];
+                                        
+                    if(ro.employeelatlong!=null&&ro.employeelatlong!='')
+                    emplatlongs.add(ro.employeelatlong);
+                }
+            }
+            
+            jobStartDate=SearchBlackBox.jobInfo.job.Customer_Preferred_Date__c!=null?SearchBlackBox.jobInfo.job.Customer_Preferred_Date__c:system.today();
+                
+                for(string ell: emplatlongs )
+                {
+                    originlatlong+=ell+';';
+                }
+                  
+                  if(label.TravelOptimisationSwitch == 'on'&& originlatlong!='')
+                  {
+                      distancesAndTimesForAll= Utilities.findDistanceBetweenPostcodes(originlatlong, destinationlatlong,jobStartDate);
+                  }
+                  system.debug('distancesAndTimesForAll '+distancesAndTimesForAll);
+                  
+                  if(jobinfo.job.Latitude__Latitude__s==null && destinationlatlongList.size()==2)
+                  {
+                          jobinfo.job.Latitude__Latitude__s=double.valueof(destinationlatlongList[0]);
+                          jobinfo.job.Latitude__Longitude__s=double.valueof(destinationlatlongList[1]);
+                          update jobinfo.job;
+                  }
+                  
+                  
+                  Map<string, List<string>> emplatlongTravelTimeMap = new Map<string, list<string>>();
+                  if( emplatlongs.size()==distancesAndTimesForAll.size())
+                  {
+                      List<string> emplatlongsList = new List<string>(emplatlongs);
+                      for(integer i=0; i<emplatlongs.size();i++)
+                      {
+                          emplatlongTravelTimeMap.put(emplatlongsList[i],distancesAndTimesForAll[i]);
+                      }
+                  
+                      for(integer i=0; i<results.size();i++)
+                      {
+                          for(integer j=0;j<results[i].size();j++)
+                          {
+                               ResourceOption ro = (results[i][j].primaryResources.size() == 2 && results[i][j].primaryResources[1].hoursTotal > results[i][j].primaryResources[0].hoursTotal) 
+                                            ? results[i][j].primaryResources[1]
+                                            : results[i][j].primaryResources[0];
+                                            
+                                if(ro.employeelatlong!=null  && emplatlongTravelTimeMap.containskey(ro.employeelatlong)&&emplatlongTravelTimeMap.get(ro.employeelatlong).size()>=4 )
+                                {
+                                    results[i][j].primaryResourceDistanceFromJob = emplatlongTravelTimeMap.get(ro.employeelatlong)[0];
+                                    results[i][j].primaryResourceTrafficTravelTimeFromJob= results[i][j].primaryResourceTravelTimeFromJob = emplatlongTravelTimeMap.get(ro.employeelatlong)[2];
+                                    results[i][j].primaryTravelTime = decimal.valueof(emplatlongTravelTimeMap.get(ro.employeelatlong)[3]);
+                                    if(label.trafficSwitch == 'on'&&distancesAndTimesForAll[i].size()>=6)
+                                    {
+                                        results[i][j].primaryResourceTravelTimeFromJob=results[i][j].primaryResourceTrafficTravelTimeFromJob = emplatlongTravelTimeMap.get(ro.employeelatlong)[4];
+                                        results[i][j].primaryTravelTime = decimal.valueof(emplatlongTravelTimeMap.get(ro.employeelatlong)[5]);
+                                    }
+                                }else if(ro.employeelatlong==null||ro.employeelatlong=='')
+                                {
+                                    results[i][j].primaryResourceDistanceFromJob = 'No Home PC';
+                                    results[i][j].primaryResourceTravelTimeFromJob = 'No Home PC';
+                                    results[i][j].primaryTravelTime =0; 
+                                    results[i][j].primaryResourceTrafficTravelTimeFromJob ='No Home PC';
+                                }else
+                                {   
+                                	results[i][j].primaryResourceDistanceFromJob = 'PC Error';
+                                    results[i][j].primaryResourceTravelTimeFromJob = 'PC Error';
+                                    results[i][j].primaryTravelTime =0;
+                                    results[i][j].primaryResourceTrafficTravelTimeFromJob ='PC Error';
+                                }   
+                          }
+                     }
+                  }
+                
+        }catch(Exception excp){
+            
+            System.debug('Exception occured in finding distance customer preferred options ---> '+excp.getMessage());
+            
+        }
+        system.debug(LoggingLevel.INFO, 'After customer options: ' + Limits.getScriptStatements());
+        return results;
+    }
+    
+    
+    
+    
 
     /* getBestBusinessOption(List<JobResourcingOption> businessOptions)
         Takes a list of JobResourcingOptions and returns the one that occurs earliest. */

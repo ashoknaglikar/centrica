@@ -28,6 +28,7 @@ public with sharing class ResourceOption {
     
     //Google Distance finder change
     public String employeePostCode {get; set;}
+    public string employeelatlong{get;set;}
     
     /* ResourceOption(Set<String> skills, DiaryEntryCollection gap, EmployeeInformation ei, JobInformation jobInfo)
         Constructor. Takes a Set of skills that this employee is being assigned on a job,
@@ -142,6 +143,7 @@ public with sharing class ResourceOption {
         isPool = ei.isPool;
         //google distance finder change
         employeePostCode = ei.employeePostCode;
+        employeelatlong= ei.employeelatlong;
         alwaysWorksWithElectrician = ei.alwaysWorksWithElectrician;
         
     }

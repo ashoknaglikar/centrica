@@ -616,7 +616,7 @@ public class barclaysIntegrationHelper {
 			string applicationQuery  = Utilities.makeQueryWithAllFields('Finance_Application__c', 'Where id in :FinanceApplicaitionId');
 			applicationQuery = applicationQuery.replace('from Finance_Application__c' , ',Finance_Product__r.X2nd_Lender_Product__c,Finance_Product__r.Product_Code__c,Finance_Product__r.Asset_Type__c ,CHI_Lead__r.Product_Interest__c,CHI_Lead__r.ExternalRef__c,'+ 
 			'Finance_Product__r.Not_Available_For__c, CHI_Lead__r.CHI_Lead_Id__c, Finance_Product__r.Parent_Product__r.Name, Finance_Product__r.Name, Finance_Product__r.Code__c,Finance_Product__r.Asset_Type_Description__c,'+
-			'Finance_Product__r.New_Product__c, Finance_Product__r.Selling_Type__c from Finance_Application__c');
+			'Finance_Product__r.New_Product__c, Finance_Product__r.Selling_Type__c, Finance_Product__r.Deferral_Period__c from Finance_Application__c');
 			system.debug(applicationQuery);
 			list<Finance_Application__c> fApplication = database.query(applicationQuery);
 			/*
@@ -653,7 +653,7 @@ public class barclaysIntegrationHelper {
         string applicationQuery  = Utilities.makeQueryWithAllFields('Finance_Application__c', 'Where CHI_Lead__c =:chiLeadId');
 		applicationQuery = applicationQuery.replace('from Finance_Application__c' , ',Finance_Product__r.Product_Code__c,Finance_Product__r.Asset_Type__c ,CHI_Lead__r.Product_Interest__c,CHI_Lead__r.ExternalRef__c,'+ 
 		'Finance_Product__r.Not_Available_For__c, CHI_Lead__r.CHI_Lead_Id__c, Finance_Product__r.Parent_Product__r.Name, Finance_Product__r.Name, Finance_Product__r.Code__c,Finance_Product__r.Asset_Type_Description__c,'+
-		'Finance_Product__r.New_Product__c, Finance_Product__r.Selling_Type__c from Finance_Application__c');
+		'Finance_Product__r.New_Product__c, Finance_Product__r.Selling_Type__c, Finance_Product__r.deferral_Period__c from Finance_Application__c');
 		system.debug(applicationQuery);
 		list<Finance_Application__c> fApplication = database.query(applicationQuery);
 		return  fApplication;

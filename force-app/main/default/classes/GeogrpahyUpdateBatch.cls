@@ -38,7 +38,7 @@ global class GeogrpahyUpdateBatch implements Database.Batchable<sObject> {
          else if(system.label.GeographyBatchContext == 'Appointment BackUp' || system.label.GeographyBatchContext == 'Appointment Derive')
          qurey = 'Select o.StageName, o.Last_Installation_Date__c, o.Id, o.CreatedDate, o.Account.Old_District_ID__c, o.Account.Old_Region_ID__c, o.Account.Sales_Subpatch__c, o.Account.Sales_Region__c, o.Account.Sales_District__c, o.Account.ShippingPostalCode, o.Account.Id, o.AccountId, Account.BillingPostalCode From Opportunity o where StageName != \'Closed Lost\' AND StageName != \'Closed Won\' AND StageName != \'Expired\' AND CreatedDate >= :StartDate And CreatedDate <= :EndDate';
          else if(system.label.GeographyBatchContext == 'Job BackUP' || system.label.GeographyBatchContext == 'Job Derive')
-         qurey='Select District__c, District_Name__c,Region__c,Install_Postcode__c,CHI_Lead__c, Account_Id__c From Job__c where (Status__c = \'Pending\' or Status__c = \'Planned\' or Status__c = \'Allocated\' or Status__c = \'Suspended\') and CreatedDate >= :StartDate And CreatedDate <= :EndDate and CHI_Lead__r.Billed_Status__c = false and Install_Postcode__c != null';
+         qurey='Select District__c, District_Name__c,Region__c,Install_Postcode__c,CHI_Lead__c, Account_Id__c From Job__c '+label.jobGeogrphyQuery+' CreatedDate >= :StartDate And CreatedDate <= :EndDate and Install_Postcode__c != null';
          if(system.label.GeographyBatchContext == 'Appointment BackUp' || system.label.GeographyBatchContext == 'Appointment Derive')
          {
 	     	 if(system.label.inculdePreDerived == 'yes')
@@ -166,11 +166,11 @@ global class GeogrpahyUpdateBatch implements Database.Batchable<sObject> {
 		}
 		try{
 			if(updatingJobs.size()>0)
-				update updatingJobs;
+				database.update( updatingJobs,false);
 			if(updatingAccount.size()>0)	
-				update (new list<Account>(updatingAccount));
+				database.update (new list<Account>(updatingAccount),false);
 			if(updatingOppos.size()>0)	
-				update (new list<Opportunity>(updatingOppos));
+				database.update (new list<Opportunity>(updatingOppos),false);
 		}catch(Exception e)
 		{
 			system.debug('Exception occured in updating job with new geo  :'+e);
@@ -244,9 +244,9 @@ global class GeogrpahyUpdateBatch implements Database.Batchable<sObject> {
 		}
 		try{
 			if(updatingAccount.size()>0)	
-				update (new list<Account>(updatingAccount));
+				database.update (new list<Account>(updatingAccount), false);
 			if(updatingOppos.size()>0)	
-				update (new list<Opportunity>(updatingOppos));
+				database.update (new list<Opportunity>(updatingOppos), false);
 		}catch(Exception e)
 		{
 			system.debug('Exception occured in deriving new geo for Appt  :'+e);

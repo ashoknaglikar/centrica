@@ -3,21 +3,51 @@ public class ConsumableSearch {
     
   private String soql {get;set;}
   
+  map<string, string> codeImageURLMap;// = new map<string, string>();
   public List<genericClass> getconsumables()
   {
     
     if(stdcon.getrecords().size()>0)
     {
+        codeImageURLMap = new map<string, string>();
     	consumables = new list<genericClass>();
+    	for(Sobject c :stdcon.getrecords())
+	    {
+	        Consumables__c con = (Consumables__c) c;
+	        codeImageURLMap.put(con.ImageName__c, null);
+	       
+	    }
+	    
+	    //buildImageMap(codeImageURLMap);
 	    for(Sobject c :stdcon.getrecords())
 	    {
-	        genericClass genObj = new genericClass(c);
+	        Consumables__c con = (Consumables__c) c;
+	        system.debug('Map contains -->'+con.ImageName__c);
+	        system.debug('Map contains -->'+codeImageURLMap.containskey(con.ImageName__c));
+	        string url = codeImageURLMap.containskey(con.ImageName__c)?codeImageURLMap.get(con.ImageName__c):'';
+	        genericClass genObj = new genericClass(c,url);
 	        consumables.add(genObj);
 	    }
 	    consumables=checkForPreFav( consumables, favlist);
+	    system.debug('consumables -->'+consumables);
     }
     return  consumables;  
    }
+  /* 
+  public void buildImageMap(map<string, string> codeImageURLMap)
+  {      
+      try{
+          if(!test.isrunningTest() && label.sharepointswitch == 'on'){      
+          for(items_SharepointVia360__x item : [select id, DisplayUrl,DownloadUrl__c, Name__c from items_SharepointVia360__x where name__c in :codeImageURLMap.keyset()])
+            {
+                codeImageURLMap.put(item.Name__c, item.DownloadUrl__c);   
+            }
+          }
+      }catch(Exception e){}
+    system.debug('-->'+codeImageURLMap);
+      
+  }
+  */
   public boolean bln_error{get;set;}     
   public list<genericClass> selectedConsumables{get;set;}
   public string consumableId{get;set;}
@@ -75,6 +105,7 @@ public class ConsumableSearch {
   {
   	string CategoryQuery= 'Select p.Name, p.IsActive__c, p.Id, p.Code__c From ProductDescription__c p where IsActive__c = true';
   	string Criteria = ' AND Group__c=\'Operations\'';
+  	
   	if(userMode==0)
   	{
   	CategoryQuery+=Criteria;
@@ -84,6 +115,7 @@ public class ConsumableSearch {
   		Criteria = ' AND Group__c=\'Sales\'';
   		CategoryQuery+=Criteria;
   	}
+  	CategoryQuery+=' order by name ASC';
   	return (Database.query(CategoryQuery));
   }
   
@@ -100,10 +132,12 @@ public class ConsumableSearch {
   		Criteria = ' AND Group__c=\'Sales\'';
   		CategoryQuery+=Criteria;
   	}
+  	CategoryQuery+=' order by name ASC';
     return (Database.query(CategoryQuery));
   	
       //return([Select p.Name, p.IsActive__c, p.Id, p.Code__c From Sub_Product_Description__c p where IsActive__c = true and Product_Description__c= :category]);
   }
+  string subGroupCriteria = '';
   
   public void populateSubcategory() {
         SubcategoryList = new list<selectoption>();
@@ -131,7 +165,8 @@ public class ConsumableSearch {
   	shoppingMode = 'Installer Catalogue';
   	//Change: HSA Consumable Change
   	
-  	soql = 'Select c.Image_location__c, c.Sub_Product_Description__c,Sub_Product_Description__r.Name, c.Sub_Product_Code_Description__c,Image_URL__c,Static_Resource_Location__c, c.SubProductGroup__c, c.Status__c, c.Short_Name__c, c.ShortDescription__c, c.Product_Group__c, c.Product_Code__c, c.Name, c.Id,ProductGroupDescription__c,Product_Group_Lookup__c,CostPrice__c,Size__c,Unit_Quantity__c From Consumables__c c where Status__c = \'Active\'';
+  	soql = 'Select ImageName__c,c.Image_location__c, c.Sub_Product_Description__c,Sub_Product_Description__r.Name, c.Sub_Product_Code_Description__c,Image_URL__c,Static_Resource_Location__c, c.SubProductGroup__c, c.Status__c, c.Short_Name__c, c.ShortDescription__c, c.Product_Group__c, c.Product_Code__c, c.Name, c.Id,ProductGroupDescription__c,Product_Group_Lookup__c,CostPrice__c,Size__c,Unit_Quantity__c,Max_Quantity__c, Sharepoint_URL__c From Consumables__c c where Status__c in :consumableStatuses';
+  	subGroupCriteria = '';
     redValue = false;
     bln_info = false;
     id userid = userinfo.getUserId();
@@ -141,14 +176,24 @@ public class ConsumableSearch {
     consumables = new list<genericClass>();
     try
     {
-        empDetails = [Select id,Employee_Number__c, Primary_Role__c,	Business_Group__c,Salesforce_User__r.EmployeeNumber,Fav_Consumable_Count__c,District__r.Authorisation_Value__c from Employee__c where Salesforce_User__c = :userid limit 1];
-        
+        empDetails = [Select id,Consumable_Subgroup__c, Employee_Number__c, Primary_Role__c,Business_Group__c,Salesforce_User__r.EmployeeNumber,Fav_Consumable_Count__c,District__r.Authorisation_Value__c from Employee__c where Salesforce_User__c = :userid limit 1];
+        system.debug(empDetails.Consumable_Subgroup__c);
+        if(empDetails.Consumable_Subgroup__c!=null)
+        {
+            subGroupCriteria =+ ' AND Consumable_Sub_Group__c includes (\''+empDetails.Consumable_Subgroup__c+'\') ';
+            soql+=subGroupCriteria;
+        }else
+        {
+            subGroupCriteria =+ ' AND CreatedDate =null ';
+            soql+=subGroupCriteria;
+        }
+        system.debug(soql);
         //Change: HSA Consumable Change
         if(empDetails.Primary_Role__c=='Selling Installer')
         {
         	userMode = 2;
         	shoppingMode = 'Installer & Sales catalogue';
-        	
+        	soql= soql.replace(subGroupCriteria, ' ');
         }
         
         else if(empDetails.Business_Group__c!=null && empDetails.Business_Group__c.contains(IV_Vectors__c.getInstance('Sales Consumable').Key__c))
@@ -156,6 +201,8 @@ public class ConsumableSearch {
         	userMode = 1;
         	shoppingMode = 'Sales catalogue';
         	soql+=' and Group__c =\'Sales\'';
+        	soql= soql.replace(subGroupCriteria, ' ');
+        	
         }else
         {
         	soql+=' and Group__c =\'Operations\'';
@@ -169,23 +216,30 @@ public class ConsumableSearch {
             try
             {
                     conReq = [Select c.IsShoppingBasket__c, c.Employee__c,Item_Count__c, c.Employee_ID__c, c.District__c, c.Callidus_Patch_Id__c,Request_Total_Value__c,Capital_Item_Count__c, 
-                                     (Select Id, Request__c, Cost_Each__c, Item_Requested__c, Line_Total__c, Quantity__c, Product_Code__c From Consumable_Items__r)
+                                     (Select Id, Request__c, Cost_Each__c, Item_Requested__c, Line_Total__c, Quantity__c, Product_Code__c,Item_Requested__r.Max_Quantity__c,Item_Requested__r.ImageName__c From Consumable_Items__r)
                                      From Consumables_Requests__c c where Employee__c = :empDetails.Id and IsShoppingBasket__c = true and Status__c = 'In Progress' limit 1];
                 if(conReq != null)
                     {
                         list<id> consuIdList = new list<id>();
                         list<Consumables__c> consuList = new list<Consumables__c>();
+                        map<string,string> codeImageURLMapIntermediate = new map<string,string>(); 
                         for(Consumable_Items__c c: conReq.Consumable_Items__r)
                         {
                             consuIdList.add(c.Item_Requested__c);
                             if(!ItemConsMap.containsKey(c.Item_Requested__c))
                             {
                                 ItemConsMap.put(c.Item_Requested__c, c);
+                                codeImageURLMapIntermediate.put(c.Item_Requested__r.ImageName__c,null);
                             }
+                            
                         }
-                        for(Consumables__c c :[Select c.Image_Location__c, c.Sub_Product_Description__c,Sub_Product_Description__r.Name,Image_URL__c,Static_Resource_Location__c, c.Sub_Product_Code_Description__c, c.SubProductGroup__c, c.Status__c, c.Short_Name__c, c.ShortDescription__c, c.Product_Group__c, c.Product_Code__c, c.Name, c.Id,ProductGroupDescription__c,Product_Group_Lookup__c,CostPrice__c,Size__c ,Unit_Quantity__c From Consumables__c c where  Status__c = 'Active' and Id in :consuIdList])
+                        
+                        //buildImageMap(codeImageURLMapIntermediate);
+                        
+                        for(Consumables__c c :[Select c.Image_Location__c,ImageName__c, c.Sub_Product_Description__c,Sub_Product_Description__r.Name,Image_URL__c,Static_Resource_Location__c, c.Sub_Product_Code_Description__c, c.SubProductGroup__c, c.Status__c, c.Short_Name__c, c.ShortDescription__c, c.Product_Group__c, c.Product_Code__c, c.Name, c.Id,ProductGroupDescription__c,Product_Group_Lookup__c,CostPrice__c,Size__c ,Unit_Quantity__c,Max_Quantity__c,Sharepoint_URL__c From Consumables__c c where  Status__c = 'Active' and Id in :consuIdList])
                         {
-                            genericClass gen =  new genericClass((sobject)c);
+                            string url = codeImageURLMap.containskey(c.ImageName__c)?codeImageURLMap.get(c.ImageName__c):''; 
+                            genericClass gen =  new genericClass((sobject)c, url);
                             gen.Quantity =   ItemConsMap.get(c.id).Quantity__c.intvalue();
                             gen.LineCost = ItemConsMap.get(c.id).Line_Total__c;
                             gen.lineCostStng = gen.LineCost.toplainstring();
@@ -255,7 +309,7 @@ public class ConsumableSearch {
    
     if(consuIdList.size()>0)
     {
-        stdcon = new ApexPages.StandardSetController(Database.getQueryLocator([Select c.Image_location__c, c.Sub_Product_Description__c,Sub_Product_Description__r.Name,Image_URL__c,Static_Resource_Location__c, c.Sub_Product_Code_Description__c, c.SubProductGroup__c, c.Status__c, c.Short_Name__c, c.ShortDescription__c, c.Product_Group__c, c.Product_Code__c, c.Name, c.Id,ProductGroupDescription__c,Product_Group_Lookup__c,CostPrice__c,Size__c ,Unit_Quantity__c From Consumables__c c where  Status__c = 'Active' and id in :consuIdList ]));  
+        stdcon = new ApexPages.StandardSetController(Database.getQueryLocator([Select c.Image_location__c, c.Sub_Product_Description__c,Sub_Product_Description__r.Name,Image_URL__c,Static_Resource_Location__c, c.Sub_Product_Code_Description__c, c.SubProductGroup__c, c.Status__c, c.Short_Name__c, c.ShortDescription__c, c.Product_Group__c, c.Product_Code__c, c.Name, c.Id,ProductGroupDescription__c,Product_Group_Lookup__c,CostPrice__c,Size__c ,Unit_Quantity__c,Max_Quantity__c,ImageName__c,Sharepoint_URL__c From Consumables__c c where  Status__c = 'Active' and id in :consuIdList ]));  
        
                 // sets the number of records in each page set  
         stdcon.setPageSize(pageSize);
@@ -279,7 +333,7 @@ public class ConsumableSearch {
     }
  
   }
- 
+  list<string> consumableStatuses =new list<string>{'Active','Superceded'};
   // runs the search with parameters passed via Javascript
   public PageReference runSearch() {
  
@@ -287,7 +341,9 @@ public class ConsumableSearch {
     
     system.debug('mode--->'+mode+'---'+Name);
    
-    soql = 'Select c.Sub_Product_Description__c,Sub_Product_Description__r.Name, c.Sub_Product_Code_Description__c,Image_URL__c,Image_Location__c,Static_Resource_Location__c , c.SubProductGroup__c, c.Status__c, c.Short_Name__c, c.ShortDescription__c, c.Product_Group__c, c.Product_Code__c, c.Name, c.Id,ProductGroupDescription__c,Product_Group_Lookup__c,CostPrice__c,Size__c,Unit_Quantity__c  From Consumables__c c where Status__c = \'Active\'';
+    soql = 'Select c.Sub_Product_Description__c,Sub_Product_Description__r.Name, c.Sub_Product_Code_Description__c,Image_URL__c,Image_Location__c,Static_Resource_Location__c , c.SubProductGroup__c, c.Status__c, c.Short_Name__c, c.ShortDescription__c, c.Product_Group__c, c.Product_Code__c, c.Name, c.Id,ProductGroupDescription__c,Product_Group_Lookup__c,CostPrice__c,Size__c,Unit_Quantity__c,Max_Quantity__c,ImageName__c,Sharepoint_URL__c  From Consumables__c c where Status__c in :consumableStatuses';
+    
+    
     if (Name != null && !Name.equals(''))
     soql += ' and Name LIKE \'%'+String.escapeSingleQuotes(Name)+'%\'';
     if(category !=null)
@@ -296,7 +352,10 @@ public class ConsumableSearch {
     soql += ' and Sub_Product_Description__c= \''+String.escapeSingleQuotes(Subcategory)+'\'';
     // run the query again
     if(userMode==0)
-    soql += ' and Group__c=\'Operations\'';
+    {
+        soql += ' and Group__c=\'Operations\'';
+        soql+=subGroupCriteria;
+    }
     else if(userMode==1)
     soql += ' and Group__c=\'Sales\'';
     runQuery();
@@ -362,7 +421,6 @@ public class ConsumableSearch {
   
   public pagereference addBasket()
   {
-        //system.debug('conreq--->'+conReq);
     integer  count1 =0;
     if(conReq == null)
     {
@@ -377,15 +435,16 @@ public class ConsumableSearch {
     list<Consumable_Items__c> upsertlist = new list<Consumable_Items__c>();
     double TempBasketTotal = 0.0;
    
+    
     for(genericClass c : consumables)
     {
-   
         if(c.isSelected)
         {
-            system.debug('1st debug-->'+c);    
-            genericClass consumableItem  = new genericClass((sobject)c.consu);
+            system.debug('Sugu 1st debug-->'+c);    
+            genericClass consumableItem  = new genericClass((sobject)c.consu, c.url);
             integer previousQuan = 0;
-            if(previousAddedItems.containskey(c.consu.Id))
+           //if(previousAddedItems.containskey(c.consu.Id))
+            if(previousAddedItems.containskey(c.consu.Id)&&ItemConsMap.containsKey(c.consu.Id))
            {
                         system.debug('In if');
                   genericClass consumableItem1 = previousAddedItems.get(c.consu.Id);
@@ -394,6 +453,7 @@ public class ConsumableSearch {
                   consumableItem.lineCostStng = consumableItem.LineCost.toPlainString();
                   consumableItem.Quantity = previousQuan+c.Quantity;
                   system.debug('~~~~~'+consumableItem.Quantity);
+                   
                   upsertlist.add(new Consumable_Items__c(Id= ItemConsMap.get(c.consu.Id).Id,  Quantity__c = consumableItem.Quantity));
                   
            }else
@@ -404,9 +464,10 @@ public class ConsumableSearch {
                 consumableItem.Quantity = c.Quantity;
                 upsertlist.add(new Consumable_Items__c( Request__c = conReq.Id, Item_Requested__c = c.consu.Id,  Quantity__c = c.Quantity));
            }
-           system.debug('@@@@@-->'+upsertlist);
+           system.debug('Sugu upsertlist@@@@@-->'+upsertlist);
            c.isSelected = false;
            previousAddedItems.put(consumableItem.consu.Id,consumableItem);
+           system.debug('Sugu previousAddedItems-->'+previousAddedItems);
            
            c.Quantity = 1;
         }   
@@ -502,10 +563,12 @@ public class ConsumableSearch {
     public boolean isalreadyfav {get;set;}
     public string Static_Resource_Location {get;set;}
     public string resourceName {get;set;}
-    public genericClass(sobject sobj)
+    public string url{get;set;}
+    public genericClass(sobject sobj, string url)
     {
         
             consu = new Consumables__c();
+            this.url = url;
             consu = (Consumables__c)sobj;
             if(consu.Static_Resource_Location__c==null)
             Static_Resource_Location = 'Consumables_1';

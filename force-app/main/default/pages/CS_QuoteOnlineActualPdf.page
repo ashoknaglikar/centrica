@@ -620,14 +620,25 @@
         *{
             font-family: sans-serif;
         }
-       
-        @page {
-            @bottom-right {
-                font-family: sans-serif;
-                font-size: 60%;
-                content: "{!quoteRef} Page " counter(page) " of " counter(pages);
+
+            @page {
+                margin-bottom: 50px;
+
+                @bottom-right {
+                    font-family: sans-serif;
+                    font-size: 60%;
+                    width: 130px;
+                    content: "{!quoteRef} Page " counter(page) " of " counter(pages);
+                }
+
+                @bottom-left {
+                    font-family: sans-serif;
+                    font-size: 9px;
+                    display: inline-block;
+                    content: "{!pageFooter}";
+                }
             }
-        }
+
         
         #smallCommercialWilbur{
             height: 40px;

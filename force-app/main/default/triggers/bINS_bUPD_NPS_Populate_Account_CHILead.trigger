@@ -13,8 +13,8 @@ trigger bINS_bUPD_NPS_Populate_Account_CHILead on NPS__c (before insert,before u
     Map<Id,Id> mapCHILeadIdAccount = new Map<Id,Id>();
     List<NPS__c> lstNPS = new List<NPS__c>();
     set<String> lstCHILeadName = new set<String>();
-    set<Id> lstAllOpportunities = new set<Id>();
-    Map<string,NPS__c> mapCHILeadNps = new Map<string,NPS__c>();
+    //set<Id> lstAllOpportunities = new set<Id>();
+    //Map<string,NPS__c> mapCHILeadNps = new Map<string,NPS__c>();
     Map<Id,Opportunity> mapOpportunityIdOpportunity = new Map<Id,Opportunity>();
     Map<String,Id> mapChiLeadExternalId_Id = new Map<String,Id>();
     
@@ -78,7 +78,7 @@ trigger bINS_bUPD_NPS_Populate_Account_CHILead on NPS__c (before insert,before u
                     mapChiLeadExternalId_Id.put(opportunityRecord.CHI_Lead_Id__c,opportunityRecord.Id);
                 }
                 System.debug('%%%%% 5.2 mapChiLeadExternalId_Id: '+mapChiLeadExternalId_Id); 
-                lstAllOpportunities.add(opportunityRecord.Id);
+                //lstAllOpportunities.add(opportunityRecord.Id);
                 mapOpportunityIdOpportunity.put(opportunityRecord.Id, opportunityRecord);
                 mapCHILeadIdAccount.put( opportunityRecord.Id, opportunityRecord.AccountId );
             }
@@ -89,7 +89,7 @@ trigger bINS_bUPD_NPS_Populate_Account_CHILead on NPS__c (before insert,before u
         /**
         Retrieving all the NPS records to check if NPS already exists
         for the CHI Lead.
-        */
+        
            
         for(NPS__c nps : [select Id, Name, Account__c, Opportunity__c,source__c,appointment__c,job__c from NPS__c
                            where Opportunity__c in : lstAllOpportunities])
@@ -105,7 +105,7 @@ trigger bINS_bUPD_NPS_Populate_Account_CHILead on NPS__c (before insert,before u
         /**
         Validating the condition:Whether NPS already exists for CHI Lead
         or not and displaying error if NPS already exists.
-        */  
+        
         for(integer i = 0; i < Trigger.new.size(); i++)
         {
             NPS__c existingNPS = null;
@@ -122,6 +122,7 @@ trigger bINS_bUPD_NPS_Populate_Account_CHILead on NPS__c (before insert,before u
                 Trigger.new[i].addError('Cannot create new NPS as one already exists for this CHI Lead.');
             }
         }
+        */
         
         /*map<id,String> installerIdsMap= new map<id,String>();
         for(Job__c jb:[select id,InstallerAliasName__c from job__c where id IN:jobIds])

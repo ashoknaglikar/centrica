@@ -1,4 +1,4 @@
-@isTest
+@isTest(SeeAllData=false)
 private class dispatchOrdertoEDI_test 
 {
     
@@ -91,7 +91,9 @@ private class dispatchOrdertoEDI_test
         insert product;
         insert quoteProduct;
 
-        District__c district = [Select id from District__c limit 1];
+        district__c district= TestClassHelper.createDistrict();
+        insert district;
+       // district = [Select id from District__c limit 1];
         
         job = new Job__c();
 

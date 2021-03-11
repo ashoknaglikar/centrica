@@ -25,11 +25,13 @@ public with sharing class EmployeeInformation {
   public boolean skipRule {get;set;}
   public double overBookingExpHours {get;set;}
   public ID alwaysWorksWithElectrician {get; set;}
+  public ID alwaysWorksWithInstallerElec{get; set;}
   
   public String employeeNumber{get;set;}
   //public String status {get;set;}
   //Google Distance Finder Change
   public String employeePostCode {get; set;}
+  public string employeelatlong{get;set;}
   
   // Information about the skills (and hours) this employee can do on this job.
   public Set<String> skills = new Set<String>(); // ONLY contains skills planned from start
@@ -66,11 +68,17 @@ public with sharing class EmployeeInformation {
     districtName  = e.District__r.Name;
     nps = e.Net_Promoter_Score__c;
     employeePostCode = e.Postcode__c;
+    if(e.latitude__latitude__s!=null)
+    employeelatlong= String.valueof(e.latitude__latitude__s)+','+string.valueof(e.latitude__longitude__s);
     skipRule = e.Skip_Rule__c;
     employeeNumber = e.Employee_Number__c;
     alwaysWorksWithElectrician = e.Always_Works_with_Electrician__c;
     //Change By Ashok G
     //status = e.Inactive__c==TRUE?'InActive':'Active';
+    if(e.Employees3__r!=null&&e.Employees3__r.size()>0)
+    {
+        alwaysWorksWithInstallerElec=e.id;
+    }
     
     /*System.debug(LoggingLevel.INFO, 'EmployeeInformation >>');
     System.debug(LoggingLevel.INFO, 'e.District__c: ' + e.District__c);

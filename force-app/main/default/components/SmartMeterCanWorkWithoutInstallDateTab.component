@@ -1,226 +1,226 @@
-<apex:component controller="SmartMeterInstallReport" allowDML="true"
-	access="global">
-	<apex:attribute name="Cancelled_work_without_install_date"
-		description="All smart meter cancelled or suspended jobs without install date..."
-		type="SmartMeterListViews" required="true"
-		assignTo="{!Cancelled_work_without_install_date}" access="global" />
-	<apex:attribute name="ReportData"
-		description="All smart meter cancelled or suspended jobs without install date report data..."
-		type="SmartMeterListViews" required="true" assignTo="{!ReportData}"
-		access="global" />
-	<br />
+<!--<apex:component controller="SmartMeterInstallReport" allowDML="true"
+    access="global">
+    <apex:attribute name="Cancelled_work_without_install_date"
+        description="All smart meter cancelled or suspended jobs without install date..."
+        type="SmartMeterListViews" required="true"
+        assignTo="{!Cancelled_work_without_install_date}" access="global" />
+    <apex:attribute name="ReportData"
+        description="All smart meter cancelled or suspended jobs without install date report data..."
+        type="SmartMeterListViews" required="true" assignTo="{!ReportData}"
+        access="global" />
+    <br />
 
-	<a href="#" onclick="invokePopUp('EEEE')" class="describe">Suspended
-	or canceled jobs without smart meter install date tab. Click here to
-	read the criteria....</a>
-	<div id="EEEE" class="popupSpan"><font face='calibri'
-		color='#D8F6CE' size='4'><b> All the jobs where : <br />
-	<br />
-	<ul>
-		<li>Smart meter installation is required and Smart meter
-		installation date is blank..</li>
-		<br />
-		<li>Smart meter install status is canceled or suspended...</li>
-		<br />
-		<li>Not yet acknowledged...</li>
-		<br />
-		<li>Once acknowledged these jobs will disappear from this
-		report...</li>
-		<br />
-	</ul>
-	</b></font></div>
-	<br />
-	<br />
-	<font face='calibri' color='#880000' size='2'><b> <apex:outputText value="No jobs to display in this tab."
-		rendered="{!NOT(Cancelled_work_without_install_date.renderTab)}" /></b></font>
+    <a href="#" onclick="invokePopUp('EEEE')" class="describe">Suspended
+    or canceled jobs without smart meter install date tab. Click here to
+    read the criteria....</a>
+    <div id="EEEE" class="popupSpan"><font face='calibri'
+        color='#D8F6CE' size='4'><b> All the jobs where : <br />
+    <br />
+    <ul>
+        <li>Smart meter installation is required and Smart meter
+        installation date is blank..</li>
+        <br />
+        <li>Smart meter install status is canceled or suspended...</li>
+        <br />
+        <li>Not yet acknowledged...</li>
+        <br />
+        <li>Once acknowledged these jobs will disappear from this
+        report...</li>
+        <br />
+    </ul>
+    </b></font></div>
+    <br />
+    <br />
+    <font face='calibri' color='#880000' size='2'><b> <apex:outputText value="No jobs to display in this tab."
+        rendered="{!NOT(Cancelled_work_without_install_date.renderTab)}" /></b></font>
 
-	<apex:outputPanel id="Cancelled_work_without_install_date"
-		rendered="{!Cancelled_work_without_install_date.renderTab}">
+    <apex:outputPanel id="Cancelled_work_without_install_date"
+        rendered="{!Cancelled_work_without_install_date.renderTab}">
 
-		<apex:pageblock rendered="{!Cancelled_work_without_install_date.renderUpdateSection}">
-			<apex:pageBlockButtons >
-				<apex:commandButton action="{!saveChangesCancelled_work_without_install_date}"
-					value="Save changes" status="myStatus"
-					rerender="Cancelled_work_without_install_date">
-				</apex:commandButton>
-				<apex:commandButton action="{!saveChangesGoBackCancelled_work_without_install_date}"
-					value="Save changes and return to report"
-					rerender="Cancelled_work_without_install_date" status="myStatus">
-				</apex:commandButton>
-			</apex:pageBlockButtons>
-			<apex:pageBlockSection >
-				<apex:pageblocktable value="{!Cancelled_work_without_install_date.jobsToUpdate}"
-					var="v_job" align="left"
-					style="'border: 1px solid #990066;color: black;"
-					rowClasses="oddRow,evenRow">
-					<apex:column headerValue="Job" style="border: 1px solid #990066;">
-						<apex:outputLink value="{!URLFOR($Action.Job__c.View,v_job.thisJob.Id)}"
-							style="{!v_job.style}" target="_blank">{!v_job.thisJob.Name}</apex:outputLink>
-					</apex:column>
-					<apex:column headerValue="CHI Lead"
-						style="border: 1px solid #990066;">
-						<apex:outputLink value="{!URLFOR($Action.Opportunity.View,v_job.thisJob.CHI_Lead__r.Id)}"
-							style="{!v_job.style}" target="_blank">{!v_job.thisJob.CHI_Lead_Number_Text__c}</apex:outputLink>
-					</apex:column>
-					<apex:column headerValue="Smart meter reference number"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.CHI_Lead__r.Smart_meter_reference_number__c}" />
-					</apex:column>
-					<apex:column headerValue="Customer Name"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Customer_Name__c}" />
-					</apex:column>
-					<apex:column headerValue="Customer Phone"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Best_Phone_Number__c}" />
-					</apex:column>
-					<apex:column headerValue="Installation Postcode"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Install_Postcode__c}" />
-					</apex:column>
-					<apex:column headerValue="Region"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Region__c}" />
-					</apex:column>
-					<apex:column headerValue="CHI Job Status"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Status__c}" />
-					</apex:column>
-					<apex:column headerValue="Smart Meter Install Date"
-						style="border: 1px solid #990066;">
-						<apex:inputField value="{!v_job.thisJob.Smart_meter_installation_date__c}" />
-					</apex:column>
-					<apex:column headerValue="Smart Meter Install Status"
-						style="border: 1px solid #990066;">
-						<apex:inputField value="{!v_job.thisJob.Smart_meter_installation_status__c}" />
-					</apex:column>
-					<apex:column headerValue="Decouple"
-						style="border: 1px solid #990066;">
-						<apex:inputField value="{!v_job.thisJob.Decouple_Smart_Meter_Install_Date__c}" />
-					</apex:column>
-					<apex:column headerValue="Click to add smart meter notes"
-						style="border: 1px solid #990066;">
-						<a href="#" onclick="invokePopUp('{!v_job.thisJob.Name}')">Click
-						here to add smart meter notes</a>
-						<div id="{!v_job.thisJob.Name}" class="popupSpan"><apex:inputtextarea value="{!v_job.smartMeterJobNotes}" cols="100" rows="20">
-						</apex:inputtextarea></div>
-					</apex:column>
-				</apex:pageblocktable>
-			</apex:pageBlockSection>
-		</apex:pageblock>
+        <apex:pageblock rendered="{!Cancelled_work_without_install_date.renderUpdateSection}">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!saveChangesCancelled_work_without_install_date}"
+                    value="Save changes" status="myStatus"
+                    rerender="Cancelled_work_without_install_date">
+                </apex:commandButton>
+                <apex:commandButton action="{!saveChangesGoBackCancelled_work_without_install_date}"
+                    value="Save changes and return to report"
+                    rerender="Cancelled_work_without_install_date" status="myStatus">
+                </apex:commandButton>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection >
+                <apex:pageblocktable value="{!Cancelled_work_without_install_date.jobsToUpdate}"
+                    var="v_job" align="left"
+                    style="'border: 1px solid #990066;color: black;"
+                    rowClasses="oddRow,evenRow">
+                    <apex:column headerValue="Job" style="border: 1px solid #990066;">
+                        <apex:outputLink value="{!URLFOR($Action.Job__c.View,v_job.thisJob.Id)}"
+                            style="{!v_job.style}" target="_blank">{!v_job.thisJob.Name}</apex:outputLink>
+                    </apex:column>
+                    <apex:column headerValue="CHI Lead"
+                        style="border: 1px solid #990066;">
+                        <apex:outputLink value="{!URLFOR($Action.Opportunity.View,v_job.thisJob.CHI_Lead__r.Id)}"
+                            style="{!v_job.style}" target="_blank">{!v_job.thisJob.CHI_Lead_Number_Text__c}</apex:outputLink>
+                    </apex:column>
+                    <apex:column headerValue="Smart meter reference number"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.CHI_Lead__r.Smart_meter_reference_number__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Customer Name"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Customer_Name__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Customer Phone"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Best_Phone_Number__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Installation Postcode"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Install_Postcode__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Region"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Region__c}" />
+                    </apex:column>
+                    <apex:column headerValue="CHI Job Status"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Status__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Smart Meter Install Date"
+                        style="border: 1px solid #990066;">
+                        <apex:inputField value="{!v_job.thisJob.Smart_meter_installation_date__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Smart Meter Install Status"
+                        style="border: 1px solid #990066;">
+                        <apex:inputField value="{!v_job.thisJob.Smart_meter_installation_status__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Decouple"
+                        style="border: 1px solid #990066;">
+                        <apex:inputField value="{!v_job.thisJob.Decouple_Smart_Meter_Install_Date__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Click to add smart meter notes"
+                        style="border: 1px solid #990066;">
+                        <a href="#" onclick="invokePopUp('{!v_job.thisJob.Name}')">Click
+                        here to add smart meter notes</a>
+                        <div id="{!v_job.thisJob.Name}" class="popupSpan"><apex:inputtextarea value="{!v_job.smartMeterJobNotes}" cols="100" rows="20">
+                        </apex:inputtextarea></div>
+                    </apex:column>
+                </apex:pageblocktable>
+            </apex:pageBlockSection>
+        </apex:pageblock>
 
-		<apex:outputPanel rendered="{!IF((Cancelled_work_without_install_date.selectAllUnackAndSort ||Cancelled_work_without_install_date.renderUpdateSection),FALSE,TRUE)}">
-			<apex:inputCheckbox value="{!Cancelled_work_without_install_date.selectAll}"
-				onchange="selectAllCancelled_work_without_install_date()" />
-			<font face='calibri' color='#880000' size='2'><b> Select
-			All Items </b></font>
-		</apex:outputPanel>
+        <apex:outputPanel rendered="{!IF((Cancelled_work_without_install_date.selectAllUnackAndSort ||Cancelled_work_without_install_date.renderUpdateSection),FALSE,TRUE)}">
+            <apex:inputCheckbox value="{!Cancelled_work_without_install_date.selectAll}"
+                onchange="selectAllCancelled_work_without_install_date()" />
+            <font face='calibri' color='#880000' size='2'><b> Select
+            All Items </b></font>
+        </apex:outputPanel>
 
-		<br />
-		<br />
+        <br />
+        <br />
 
-		<apex:outputPanel rendered="{!IF((Cancelled_work_without_install_date.selectAll ||Cancelled_work_without_install_date.renderUpdateSection),FALSE,TRUE)}">
-			<apex:inputCheckbox value="{!Cancelled_work_without_install_date.selectAllUnackAndSort}"
-				onchange="selectAllUnackAndSortCancelled_work_without_install_date()" />
-			<font face='calibri' color='#880000' size='2'><b> Select
-			and Sort All Unacknowledged Items </b></font>
-		</apex:outputPanel>
+        <apex:outputPanel rendered="{!IF((Cancelled_work_without_install_date.selectAll ||Cancelled_work_without_install_date.renderUpdateSection),FALSE,TRUE)}">
+            <apex:inputCheckbox value="{!Cancelled_work_without_install_date.selectAllUnackAndSort}"
+                onchange="selectAllUnackAndSortCancelled_work_without_install_date()" />
+            <font face='calibri' color='#880000' size='2'><b> Select
+            and Sort All Unacknowledged Items </b></font>
+        </apex:outputPanel>
 
-		<apex:actionFunction name="selectAllCancelled_work_without_install_date"
-			action="{!selectAllCancelled_work_without_install_date}"
-			rerender="Cancelled_work_without_install_date" status="myStatus">
-		</apex:actionFunction>
-		<apex:actionFunction name="selectAllUnackAndSortCancelled_work_without_install_date"
-			action="{!selectAllUnackAndSortCancelled_work_without_install_date}"
-			rerender="Cancelled_work_without_install_date" status="myStatus">
-		</apex:actionFunction>
+        <apex:actionFunction name="selectAllCancelled_work_without_install_date"
+            action="{!selectAllCancelled_work_without_install_date}"
+            rerender="Cancelled_work_without_install_date" status="myStatus">
+        </apex:actionFunction>
+        <apex:actionFunction name="selectAllUnackAndSortCancelled_work_without_install_date"
+            action="{!selectAllUnackAndSortCancelled_work_without_install_date}"
+            rerender="Cancelled_work_without_install_date" status="myStatus">
+        </apex:actionFunction>
 
-		<br />
-		<br />
-		<br />
-		<br />
+        <br />
+        <br />
+        <br />
+        <br />
 
-		<apex:pageblock rendered="{!Not(Cancelled_work_without_install_date.renderUpdateSection)}">
-			<apex:pageBlockButtons >
-				<apex:commandButton action="{!extractSelectedCancelled_work_without_install_date}"
-					value="Extract selected" status="myStatus">
-				</apex:commandButton>
-				<apex:commandButton action="{!acknowledgeSelectedCancelled_work_without_install_date}"
-					status="myStatus" value="Acknowledge jobs"
-					rerender="Cancelled_work_without_install_date">
-				</apex:commandButton>
-				<apex:commandButton action="{!selectSmartMeterJobsForUpdateCancelled_work_without_install_date}"
-					status="myStatus" value="Update selected jobs"
-					rerender="Cancelled_work_without_install_date">
-				</apex:commandButton>
-			</apex:pageBlockButtons>
-			<apex:pageBlockSection >
-				<apex:pageblocktable value="{!Cancelled_work_without_install_date.smartMeterJobs}"
-					var="v_job" align="left"
-					style="'border: 1px solid #990066;color: black;"
-					rowClasses="oddRow,evenRow">
-					<apex:column headerValue="Select"
-						style="border: 1px solid #990066;">
-						<apex:inputCheckbox value="{!v_job.isSelected}" />
-					</apex:column>
-					<apex:column headerValue="Job" style="border: 1px solid #990066;">
-						<apex:outputLink value="{!URLFOR($Action.Job__c.View,v_job.thisJob.Id)}"
-							style="{!v_job.style}" target="_blank">{!v_job.thisJob.Name}</apex:outputLink>
-					</apex:column>
-					<apex:column headerValue="CHI Lead"
-						style="border: 1px solid #990066;">
-						<apex:outputLink value="{!URLFOR($Action.Opportunity.View,v_job.thisJob.CHI_Lead__r.Id)}"
-							style="{!v_job.style}" target="_blank">{!v_job.thisJob.CHI_Lead_Number_Text__c}</apex:outputLink>
-					</apex:column>
-					<apex:column headerValue="Smart meter reference number"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.CHI_Lead__r.Smart_meter_reference_number__c}"
-							style="{!v_job.style}" />
-					</apex:column>
-					<apex:column headerValue="Customer Name"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Customer_Name__c}"
-							style="{!v_job.style}" />
-					</apex:column>
-					<apex:column headerValue="Installation Postcode"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Install_Postcode__c}"
-							style="{!v_job.style}" />
-					</apex:column>
-					<apex:column headerValue="Region"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Region__c}"
-							style="{!v_job.style}" />
-					</apex:column>
-					<apex:column headerValue="CHI Job Status"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Status__c}"
-							style="{!v_job.style}" />
-					</apex:column>
-					<apex:column headerValue="Customer Phone"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Best_Phone_Number__c}"
-							style="{!v_job.style}" />
-					</apex:column>
-					<apex:column headerValue="Smart Meter Install Date"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.smartMeterInstallDate}"
-							style="{!v_job.style}" />
-					</apex:column>
-					<apex:column headerValue="Smart Meter Install Status"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Smart_meter_installation_status__c}"
-							style="{!v_job.style}" />
-					</apex:column>
-					<apex:column headerValue="Reason for acknowledgement"
-						style="border: 1px solid #990066;">
-						<apex:outputText value="{!v_job.thisJob.Reason_for_acknowledgement__c}"
-							style="{!v_job.style}" />
-					</apex:column>
-				</apex:pageblocktable>
-			</apex:pageBlockSection>
-		</apex:pageblock>
+        <apex:pageblock rendered="{!Not(Cancelled_work_without_install_date.renderUpdateSection)}">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!extractSelectedCancelled_work_without_install_date}"
+                    value="Extract selected" status="myStatus">
+                </apex:commandButton>
+                <apex:commandButton action="{!acknowledgeSelectedCancelled_work_without_install_date}"
+                    status="myStatus" value="Acknowledge jobs"
+                    rerender="Cancelled_work_without_install_date">
+                </apex:commandButton>
+                <apex:commandButton action="{!selectSmartMeterJobsForUpdateCancelled_work_without_install_date}"
+                    status="myStatus" value="Update selected jobs"
+                    rerender="Cancelled_work_without_install_date">
+                </apex:commandButton>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection >
+                <apex:pageblocktable value="{!Cancelled_work_without_install_date.smartMeterJobs}"
+                    var="v_job" align="left"
+                    style="'border: 1px solid #990066;color: black;"
+                    rowClasses="oddRow,evenRow">
+                    <apex:column headerValue="Select"
+                        style="border: 1px solid #990066;">
+                        <apex:inputCheckbox value="{!v_job.isSelected}" />
+                    </apex:column>
+                    <apex:column headerValue="Job" style="border: 1px solid #990066;">
+                        <apex:outputLink value="{!URLFOR($Action.Job__c.View,v_job.thisJob.Id)}"
+                            style="{!v_job.style}" target="_blank">{!v_job.thisJob.Name}</apex:outputLink>
+                    </apex:column>
+                    <apex:column headerValue="CHI Lead"
+                        style="border: 1px solid #990066;">
+                        <apex:outputLink value="{!URLFOR($Action.Opportunity.View,v_job.thisJob.CHI_Lead__r.Id)}"
+                            style="{!v_job.style}" target="_blank">{!v_job.thisJob.CHI_Lead_Number_Text__c}</apex:outputLink>
+                    </apex:column>
+                    <apex:column headerValue="Smart meter reference number"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.CHI_Lead__r.Smart_meter_reference_number__c}"
+                            style="{!v_job.style}" />
+                    </apex:column>
+                    <apex:column headerValue="Customer Name"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Customer_Name__c}"
+                            style="{!v_job.style}" />
+                    </apex:column>
+                    <apex:column headerValue="Installation Postcode"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Install_Postcode__c}"
+                            style="{!v_job.style}" />
+                    </apex:column>
+                    <apex:column headerValue="Region"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Region__c}"
+                            style="{!v_job.style}" />
+                    </apex:column>
+                    <apex:column headerValue="CHI Job Status"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Status__c}"
+                            style="{!v_job.style}" />
+                    </apex:column>
+                    <apex:column headerValue="Customer Phone"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Best_Phone_Number__c}"
+                            style="{!v_job.style}" />
+                    </apex:column>
+                    <apex:column headerValue="Smart Meter Install Date"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.smartMeterInstallDate}"
+                            style="{!v_job.style}" />
+                    </apex:column>
+                    <apex:column headerValue="Smart Meter Install Status"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Smart_meter_installation_status__c}"
+                            style="{!v_job.style}" />
+                    </apex:column>
+                    <apex:column headerValue="Reason for acknowledgement"
+                        style="border: 1px solid #990066;">
+                        <apex:outputText value="{!v_job.thisJob.Reason_for_acknowledgement__c}"
+                            style="{!v_job.style}" />
+                    </apex:column>
+                </apex:pageblocktable>
+            </apex:pageBlockSection>
+        </apex:pageblock>
 
-	</apex:outputPanel>
-
+    </apex:outputPanel>-->
+<apex:component >
 </apex:component>

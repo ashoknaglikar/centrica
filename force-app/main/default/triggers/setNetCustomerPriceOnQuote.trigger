@@ -98,12 +98,13 @@
         /*
             Change: Specify to Succeed.
             Description: Update Quote with TrialName
-        */
+        
         if(newJob.Quote__c!= null && newJob.Trial_Names__c != oldJob.Trial_Names__c )
         {
             cls_IsRun.setgeneralTriggerSwitch();
             update( new BigMachines_Quote__c(id = newJob.Quote__c, Trial_Name__c= newJob.Trial_Names__c));
         }
+        */
         
         if(AddOpp)
         oppList.add(tempOpp);

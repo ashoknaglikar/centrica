@@ -16,6 +16,7 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
     }
     List<Payment_Collection__c> lst_Payment =new List<Payment_Collection__c>{};
     List<Commissioning_Report__c> lst_CReports1= new List<Commissioning_Report__c>();
+    Commissioning_Report__c gasReport = new Commissioning_Report__c();
     //List<Commissioning_Report__c>  lst_CReports2= new List<Commissioning_Report__c>();
     //List<Commissioning_Report__c> lst_CReports3= new List<Commissioning_Report__c>();
     //List<Commissioning_Report__c> lst_CReports4 = new List<Commissioning_Report__c>();
@@ -178,9 +179,9 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                     system.debug('After status-->'+obj_Payment.Payment_Collection_Status__c);
                     lst_Payment.add(obj_Payment);
                 }
-                lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Asbestos Report','AS' ));
+                /*lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Asbestos Report','AS' ));
                 lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Gas Installation Works','GA' ));
-                lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Minor Electrical Installation','ME' ));
+                lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Minor Electrical Installation','ME' ));*/
                 if(system.label.tunon2019H_S == 'YES')
                 {
                     if(j.Secondary_Job_Type_New__c == 'Remedial' || j.Secondary_Job_Type_New__c == 'Recall')
@@ -188,8 +189,23 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                         lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Remedial No Appliance Report','RN' ));
                         lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'System','SY' )); 
                     }
-                    lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'No Access Report','NA' ));
-                }
+                    //lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'No Access Report','NA' ));
+                }                
+               
+             
+                if(j.electrical_hours__c>0&& j.Total_Hours_Excl_Electrical__c<=0)
+                    {
+                       lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Minor Electrical Installation','ME' )); 
+                    }
+                else
+                    {
+                        lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Asbestos Report','AS' ));
+                        gasReport = JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Gas Installation Works','GA' );
+                        lst_CReports1.add(gasReport);
+                        if(j.electrical_hours__c>0)
+                        lst_CReports1.add(JobCompletionTriggerHelper.JobCompletionDataPopulate(j,'Minor Electrical Installation','ME' ));
+                        
+                    }
                     
                // }
                 /*e
@@ -323,7 +339,7 @@ trigger Create_Job_Completion_n_Commissioning_report on Job__c (after update) {
                         Product_Order__c materialRecord = purchaseOrderMap.get(jobBoilerMap.get(jobId));
                         Appliance_At_Risk__c newApplianceRecord = new Appliance_At_Risk__c(External_Id__c =jobId,   Appliance_Type__c = 'Boiler',
                                                                                          Model__c = materialRecord.COMPONENT_MODEL__c,  Manufacturer__c =materialRecord.COMPONENT_MAKE__c,
-                                                                                          GC_Number__c = materialRecord.BGC_Number__c,  Compliance_Report__c=lst_CReports1[1].Id  );
+                                                                                          GC_Number__c = materialRecord.BGC_Number__c,  Compliance_Report__c=gasReport.Id  );
                         upsert newApplianceRecord External_Id__c;
                     }
                     

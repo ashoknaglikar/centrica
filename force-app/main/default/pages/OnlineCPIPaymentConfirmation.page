@@ -1,4 +1,4 @@
-<apex:page controller="OnlinePaymentCollection" title="Online Payment Portal" tabStyle="Payment_Collection__c">
+<!--<apex:page controller="OnlinePaymentCollection" title="Online Payment Portal" tabStyle="Payment_Collection__c">
     <apex:sectionHeader Title="Payment Collection" subTitle="Confirm Payment" ></apex:sectionHeader>
     <apex:pageblock title="Your Details" >
         <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -34,7 +34,7 @@
             </script>
             </head>
             <body>
-<!--            <form action="https://secure2.mde.epdq.co.uk/cgi-bin/CcxBarclaysEpdq.e" method="post" name="barclaysForm"> -->
+
                 <form action="https://secure2.epdq.co.uk/cgi-bin/CcxBarclaysEpdq.e" method="post" name="barclaysForm">
                     <center>
                         <table width="90%" border=1 BORDERCOLOR="#FFFFFF" cellSpacing=0 cellPadding="5px" >
@@ -92,5 +92,6 @@
                 </form>
             </body> 
         </html>         
-    </apex:pageblock>
+    </apex:pageblock>-->
+    <apex:page >
 </apex:page>

@@ -158,7 +158,7 @@ public class customerPortalHSAPlanHelper {
            }             
            string s='12:00';
            time t = DateTimeHelper.stringToTime(s);
-           if(SearchBlackBox.jobInfo.Job.S_P_Hours__c == 8.00 && cand.primaryStartDT.Time() == t){
+           if((SearchBlackBox.jobInfo.Job.S_P_Hours__c == 8.00 || label.Temporary_Portal_PM_Blcok == 'on' )&& cand.primaryStartDT.Time() >= t){
              continue;
            }
             system.debug('@@candi '+candi);

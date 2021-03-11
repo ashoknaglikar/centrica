@@ -84,8 +84,6 @@ public class webGetAppointmentsByPostcode {
                   result.Error.Code = 5;
                   result.Error.Message = 'ERROR: Postcode sector not found. ' + post_code_sector;
                   system.debug(result.Error.Message);
-                  Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'New');
-                  //insert o;
                   return result;  
               }else if(post_code_info[0].Sub_Patch__r.District__r.NA_Online__c)
               {
@@ -93,8 +91,6 @@ public class webGetAppointmentsByPostcode {
                   result.Error.Message = 'ERROR: No Available Appoinmnent Slots. ' + post_code_sector;
                   system.debug('This District id not availalble for online booking.');
                   system.debug(result.Error.Message);
-                  //Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'New');
-                  //insert o;
                   return result;
                   
               }else
@@ -109,14 +105,14 @@ public class webGetAppointmentsByPostcode {
                 //Guided Sale Changes   
                 if(objGetAppointmentsByPostcode.CHILeadChannel != null  && Remote_Quote_Product__c.getInstance(objGetAppointmentsByPostcode.CHILeadChannel) !=null)
                 {
-                   result = callSalesforce(post_code_info[0],  objGetAppointmentsByPostcode.BoilerOp,  process_start_time,  process_end_time , appsres,  latest , earliest, objGetAppointmentsByPostcode.CHILeadChannel);
+                   result = callSalesforce(post_code_info[0],  objGetAppointmentsByPostcode.BoilerOp,  process_start_time,  process_end_time , appsres,  latest , earliest, objGetAppointmentsByPostcode.CHILeadChannel, customerCategory);
                    return result;
                 }
                 //end
 
                 if(objGetAppointmentsByPostcode.CHILeadChannel != null  && objGetAppointmentsByPostcode.CHILeadChannel == 'Straight Swap')
                 {
-                  result = callSalesforce(post_code_info[0],  objGetAppointmentsByPostcode.BoilerOp,  process_start_time,  process_end_time , appsres,  latest , earliest, objGetAppointmentsByPostcode.CHILeadChannel);
+                  result = callSalesforce(post_code_info[0],  objGetAppointmentsByPostcode.BoilerOp,  process_start_time,  process_end_time , appsres,  latest , earliest, objGetAppointmentsByPostcode.CHILeadChannel,customerCategory);
                   return result;
 
                 }else if(post_code_info[0].Sub_Patch__r.Appointment_Source__c == 'OFS' && OFS_Start_Date != null && latest < OFS_Start_Date  && earliest > OFS_Start_Date)
@@ -126,7 +122,7 @@ public class webGetAppointmentsByPostcode {
                   datetime sfdcStart = latest;
                   datetime sfdcEnd = OFS_Start_Date.adddays(-1);
           
-                  webservice_CHI_Online.GetAppointmentsByPostcodeResponse sfdcResult = callSalesforce( post_code_info[0],  objGetAppointmentsByPostcode.BoilerOp,  process_start_time,  process_end_time , appsres,  sfdcStart , sfdcEnd, null);
+                  webservice_CHI_Online.GetAppointmentsByPostcodeResponse sfdcResult = callSalesforce( post_code_info[0],  objGetAppointmentsByPostcode.BoilerOp,  process_start_time,  process_end_time , appsres,  sfdcStart , sfdcEnd, null,customerCategory);
           
                   datetime ofsStartDate = OFS_Start_Date;
                   datetime ofsEnddate= earliest;
@@ -165,7 +161,7 @@ public class webGetAppointmentsByPostcode {
                 //Change End   
                 else{
                /*****************ONLY IN SALESFORCE********************/
-                  result = callSalesforce(post_code_info[0],  objGetAppointmentsByPostcode.BoilerOp,  process_start_time,  process_end_time , appsres,  latest , earliest, null);
+                  result = callSalesforce(post_code_info[0],  objGetAppointmentsByPostcode.BoilerOp,  process_start_time,  process_end_time , appsres,  latest , earliest, null,customerCategory);
                   return result;
                 }
             }  
@@ -181,8 +177,6 @@ public class webGetAppointmentsByPostcode {
         result.Error.Message = 'ERROR: Something went wrong. '+e.Getmessage();
         system.debug('Exception while querying Appointments'+e.getmessage());
         CreateEmail.CretaeSendTextEmail(new list<string>{system.label.supportOnline},e.getmessage()+' Occured in webGetAppointmentsByPostcode at line NO: '+e.getLineNumber(), 'Exception in Online Booking webGetAppointmentsByPostcode class');
-        Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Journey__c = 'New', Exception__c =e.getmessage() );
-        //insert o;
         return result;
       }
       
@@ -235,7 +229,9 @@ public class webGetAppointmentsByPostcode {
            toaCapacity.capacity_response_element response  = getCapacityRes.getCapacity(location, appointmentWindow, post_code_info.Name,post_code,'Central Heating Boiler');
            system.debug('&&&&&&&&&&&Response'+Response.capacity);
            system.debug('&&&&&&&&&&&window'+appointmentWindow);
+           /*
            system.debug('***********'+response.capacity.size());
+           */
            
            // fix for duplicate slotStartTime start 
            
@@ -245,7 +241,7 @@ public class webGetAppointmentsByPostcode {
 
            map<string, list<webservice_CHI_Online.cAppointment>> bucketHours = new map<string, list<webservice_CHI_Online.cAppointment>>();
            
-           if(response!=null)
+           if(response!=null && response.capacity!=null)
            {
               TOA_Product_Interest__c tp = TOA_Product_Interest__c.getInstance('Central Heating Boiler');
               integer minAvailable = integer.valueof(response.activity_travel_time)+integer.valueof(tp.Duration__c);
@@ -345,8 +341,6 @@ public class webGetAppointmentsByPostcode {
                 result.Error.Code = 6;
                 result.Error.Message = 'ERROR: No Available Appoinmnent Slots. ' + post_code_info.Name;
                 system.debug(result.Error.Message);
-                Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'New');
-                //insert o;
                 return result;
            }else if(result.AppointmentSlots.size()>0)
             {
@@ -367,7 +361,7 @@ public class webGetAppointmentsByPostcode {
         return(s.length() == 1 ? '0'+s:s);
     }
     
-    public  webservice_CHI_Online.GetAppointmentsByPostcodeResponse callSalesforce(Postcode_Sector__c post_code_info, string BoilerOp, datetime process_start_time, datetime process_end_time , integer appsres, datetime latest , datetime earliest, string productInterest)
+    public  webservice_CHI_Online.GetAppointmentsByPostcodeResponse callSalesforce(Postcode_Sector__c post_code_info, string BoilerOp, datetime process_start_time, datetime process_end_time , integer appsres, datetime latest , datetime earliest, string productInterest, integer customerCategory)
     {
          
            webservice_CHI_Online.GetAppointmentsByPostcodeResponse  result  = new webservice_CHI_Online.GetAppointmentsByPostcodeResponse();  
@@ -400,7 +394,6 @@ public class webGetAppointmentsByPostcode {
               result.Error.Code = 6;
               result.Error.Message = 'ERROR: No Available Appoinmnent Slots. ' + post_code_info.Name;
               system.debug(result.Error.Message);
-              Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'New');
               return result;
              }
              else
@@ -439,7 +432,6 @@ public class webGetAppointmentsByPostcode {
               result.Error.Code = 6;
               result.Error.Message = 'ERROR: No Available Appoinmnent Slots. ' + post_code_info.Name;
               system.debug(result.Error.Message);
-              Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'New');
               return result;
           }else
           {
@@ -477,13 +469,21 @@ public class webGetAppointmentsByPostcode {
              }
              //ends
               
-              system.debug('cEmpAvailMap---->'+cEmpAvailMap);
+              
+             system.debug('earliest-->'+earliest+'customerCategory '+customerCategory);
+             if((customerCategory == null || customerCategory>3) && productInterest  == 'Straight Swap')
+             {
+                 earliest = datetime.newInstance(earliest.date(), time.newInstance(0,0,0,0));
+                 earliest=earliest.addDays(integer.valueof(label.SSOperationGapGrow));
+                 latest = datetime.newInstance(latest.date(), time.newInstance(0,0,0,0));
+                 latest =latest.addDays(integer.valueof(label.SSOperationGapGrow));
+             }
+             system.debug('cEmpAvailMap---->'+cEmpAvailMap);
               //Query Appointments
               system.debug('avaiRecordType--->'+avaiRecordType);
               system.debug('Visit Type--->'+visit_type);
               system.debug('earliest-->'+earliest);
               system.debug('latest--->'+latest);
-              
               
              List<Appointment__c> apps = [SELECT Id, Start__c, End__c, Assigned_To__c, Start_Time__c, Type__c,Valid_Slot__c 
                                FROM Appointment__c
@@ -504,8 +504,6 @@ public class webGetAppointmentsByPostcode {
                   result.Error.Code = 6;
                   result.Error.Message = 'ERROR: No Available Appoinmnent Slots. ' + post_code_info.name;
                   system.debug(result.Error.Message);
-                  Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'New');
-                  //insert o;
                   return result;
                   
               }else
@@ -580,8 +578,6 @@ public class webGetAppointmentsByPostcode {
                     result.Error.Code = 6;
                     result.Error.Message = 'ERROR: No Available Appoinmnent Slots. ' + post_code_info.name;
                     system.debug(result.Error.Message);
-                    Online_Timing__c o = new Online_Timing__c(Postcode__c = post_code , Start__c = string.valueof(process_Start_time), End__c = string.valueof(process_end_time), appointments__c = string.valueof(appsres), Journey__c = 'New');
-                    //insert o;
                     return result;
                   }else if(result.AppointmentSlots.size()>0)
                     {

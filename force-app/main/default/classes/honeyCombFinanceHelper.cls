@@ -381,6 +381,7 @@ public class honeyCombFinanceHelper {
     public static Finance_Application__c getSigningLinkHoneyComb(Finance_Application__c fp)
     {
         honeyCombFinanceJSONSigning signingLink = new honeyCombFinanceJSONSigning();
+        if(userinfo.getusername().contains('portal'))
         signingLink.returnURL = fp.Portal_Link__c;        
         
         string endPoint = system.label.HoneyComb_Endpoint+fp.Application_Id__c+system.label.HoneyComb_Signing_Link; 

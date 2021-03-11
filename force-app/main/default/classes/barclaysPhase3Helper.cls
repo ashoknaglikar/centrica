@@ -204,8 +204,10 @@ public class barclaysPhase3Helper {
     
     public static  Finance_Application__c submitFinanceApplication(Finance_Application__c fApplication)
     {
+        try{
         system.debug('I am in new Submit -->'+fApplication.Lender_Text__c.toUpperCase());
         fApplication.Lead_Ext_Ref_No__c = generateNextReferenceNumber(fApplication.CHI_Lead__r.ExternalRef__c, fApplication.CHI_Lead__r.CHI_Lead_Id__c);
+        
         if(fApplication.Lender_Text__c.toUpperCase() == system.label.HoneyComb.toUpperCase())
         {
             fApplication = honeyCombFinanceHelper.submitApplication(fApplication, null);
@@ -215,8 +217,12 @@ public class barclaysPhase3Helper {
             fApplication = barclaysPhase3Helper.submitBarclaysApplication(fApplication);
             
         }
-        updateOpp(fApplication.CHI_Lead__c, fApplication.Lead_Ext_Ref_No__c);
         
+        updateOpp(fApplication.CHI_Lead__c, fApplication.Lead_Ext_Ref_No__c);
+        } catch (exception e)
+        {
+            updateOpp(fApplication.CHI_Lead__c, fApplication.Lead_Ext_Ref_No__c);
+        }
         return fApplication;
     }
     

@@ -85,10 +85,11 @@ public class Create_task_to_call_Quality_Test {
    
     p.Payment_Notes__c = 'test';
     Update p;
-    
+    /*
     Customer_history_card__c chc = new Customer_history_card__c(Job__c=Job[0].Id,Payment_Collection__c=p.Id);
     
     Database.insert(chc);
+    */
     /*
     List<Task> taskList = [Select Id,Status,Any_Issues_with_Installation__c,Date_of_post_call_check_completion__c,Post_installation_call_notes__c from Task where WhatId = :p.Id];
     

@@ -148,12 +148,12 @@ public class GetUnavailabilityController
 		string dateFrom = hsaUnavailability.Work_Time_Start__c.format('yyyy-MM-dd');
 		string dateTo = hsaUnavailability.Work_Time_End__c.format('yyyy-MM-dd');
 		UnavailUpadateInOFS_Rest unavailRest = new  UnavailUpadateInOFS_Rest();
-		string jSonList = unavailRest.searchUnavail(empId, dateFrom, dateTo, url);
+		string jSonList = unavailRest.searchUnavail(null, dateFrom, dateTo, url);
 		UnavailWrapResp uWrapList = (UnavailWrapResp)JSON.deserialize(jSonList, UnavailWrapResp.Class);
 		total_size = 0;
 		
 		startandEndtime = new List<list<datetime>>();
-		map<string, integer> dayMap = new map<string, integer>{'Mon' => 0,'Tue'=>1, 'Wed'=>2, 'Thu'=>3, 'Fri'=>4, 'Sat'=>5, 'Sun'=>7 };
+		map<string, integer> dayMap = new map<string, integer>{'Mon' => 0,'Tue'=>1, 'Wed'=>2, 'Thu'=>3, 'Fri'=>4, 'Sat'=>5, 'Sun'=>6 };
 		
 		if(hsaUnavailability.Type__c == 'Recurring')
 		{

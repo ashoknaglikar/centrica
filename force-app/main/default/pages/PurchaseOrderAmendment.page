@@ -130,8 +130,9 @@ function check2(obj) {
                             <apex:outputText value="{!unOrder.objJobElement.Units__c}"/>
                         </apex:column>
                         <apex:column headerValue="Supplier">
-                            <apex:selectList value="{!unOrder.sSupplierId}" size="1">
-                                <apex:selectOptions value="{!tertiarySupplierLst}"/>
+                            <apex:selectList value="{!unOrder.sSupplierId}" multiselect="false" size="1">
+                                <apex:selectOptions value="{!unOrder.tertiarySuppListDisplay}" />
+                                <!--<apex:selectOptions value="{!tertiarySupplierLst}"/>-->
                             </apex:selectList>
                         </apex:column>
                     </apex:pageblocktable>

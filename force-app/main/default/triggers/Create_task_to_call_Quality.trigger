@@ -291,7 +291,7 @@ if(trigger.isUpdate && Trigger.New[0].Payment_Collection_Status__c == 'Complete'
                     // Added as part of customer history card change request. 
                     Set<Id> set_JobId=new Set<Id>{};
                     Map<Id,Id> map_PaymentCompDocId=new Map<Id,Id>{}; 
-                    List<Customer_history_card__c> custHistCardList = new List<Customer_history_card__c>();
+                    //List<Customer_history_card__c> custHistCardList = new List<Customer_history_card__c>();
                     for(Payment_Collection__c p:trigger.new)
                     {
                         if(p.Payment_Method__c == 'Finance')
@@ -299,6 +299,7 @@ if(trigger.isUpdate && Trigger.New[0].Payment_Collection_Status__c == 'Complete'
                         set_JobId.add(p.Job__c);
                         map_PaymentCompDocId.put(p.Job__c,p.Id);
                     }
+                    /*
                     try{
                      if(trigger.isinsert){  
                       for(Customer_history_card__c c : [Select Job__r.Id,Job_Completion_Document__r.Id from Customer_history_card__c where Job__c in :set_JobId]){
@@ -311,7 +312,7 @@ if(trigger.isUpdate && Trigger.New[0].Payment_Collection_Status__c == 'Complete'
                      }
                     }catch(Exception ex){
                           System.debug('Exception  : '+ex.getMessage());
-                    }
+                    }*/
                     
                                         
                     if(CHILeadLst.size()>0)

@@ -104,7 +104,7 @@
                         </apex:pageBlockSection>
             </apex:pageBlockSection>
                 
-            <apex:pageBlockSection >
+           <!-- <apex:pageBlockSection >
                          <apex:pageBlockSection title="Core Bundle Criteria (Excluded)" columns="1" collapsible="true" >
                             <apex:pageBlockSectionItem >
                                 <apex:outputLabel ><b>Core Bundle : </b></apex:outputLabel>
@@ -128,6 +128,58 @@
                            </apex:pageBlockSectionItem>
                         </apex:pageBlockSection>
             </apex:pageBlockSection>
+            
+             <apex:pageBlockSection >
+                         <apex:pageBlockSection title="Customer Category (Included)" columns="2" collapsible="true" >
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel ><b>Customer Category : </b></apex:outputLabel>
+                                <c:MultiselectPicklist leftLabel="Available values"
+                                    leftOptions="{!CustomerCategoryOptions}"
+                                    rightLabel="Selected Values"
+                                    rightOptions="{!allCustomerCategorySelected}"
+                                    size="5"
+                                    width="200px"/>
+                           </apex:pageBlockSectionItem>
+                         </apex:pageBlockSection>
+            </apex:pageBlockSection>-->
+            
+            
+            <apex:pageBlockSection >
+                         <apex:pageBlockSection title="Core Bundle Criteria (Excluded)" columns="1" collapsible="true" >
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel ><b>Core Bundle : </b></apex:outputLabel>
+                                <c:MultiselectPicklist leftLabel="Available values"
+                                    leftOptions="{!CoreBundleOptions}"
+                                    rightLabel="Selected Values"
+                                    rightOptions="{!allCoreBundleSelected}"
+                                    size="5"
+                                    width="200px"/>
+                           </apex:pageBlockSectionItem>
+                         </apex:pageBlockSection>
+                         <apex:pageBlockSection title="Customer Category (Included)" columns="2" collapsible="true" >
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel ><b>Customer Category : </b></apex:outputLabel>
+                                <c:MultiselectPicklist leftLabel="Available values"
+                                    leftOptions="{!CustomerCategoryOptions}"
+                                    rightLabel="Selected Values"
+                                    rightOptions="{!allCustomerCategorySelected}"
+                                    size="5"
+                                    width="200px"/>
+                           </apex:pageBlockSectionItem>
+                         </apex:pageBlockSection>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="Current Product Holdings & Part Number Criteria (Included)" columns="2" collapsible="true" >
+                            
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="Current Product Holdings "></apex:outputLabel>
+                                <apex:inputText value="{!currentProductHoldings}"/>
+                           </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="Part Number "></apex:outputLabel>
+                                <apex:inputText value="{!partNumber}"/>
+                           </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
             
             <apex:pageBlockButtons >
                 <!--<apex:commandButton value="Back" action="{!backQuotes}" />-->

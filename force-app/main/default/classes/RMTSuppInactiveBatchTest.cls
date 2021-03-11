@@ -148,8 +148,12 @@ private class RMTSuppInactiveBatchTest{
         cont1.License_Expiry_Date__c = Date.today();
         insert cont1;
         
-     ContSuppInActiveBatch M = new ContSuppInActiveBatch();
-     Database.executeBatch(M);
+     /*ContSuppInActiveBatch M = new ContSuppInActiveBatch();
+     Database.executeBatch(M);*/
+     String cronExpr = '0 0 0 15 3 ? *';
+     ContDataScheduler abs= new ContDataScheduler();
+     String jobId = System.schedule('myJobTestJobName', cronExpr, abs);
+     abs.execute(null);
    }
 
 }

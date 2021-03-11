@@ -1385,9 +1385,11 @@ public without sharing class InstallPlanningRTHelper {
         sr.End_Date_Time__c = Availability.End__c;
     }
     
-    
+    String jobPostCode = job.Install_Postcode__c;
+       if(system.label.Bing_Google_API=='Bing'&&job.latitude__latitude__s!=null)
+       JobPostCode = String.valueof(job.latitude__latitude__s)+','+string.valueof(job.latitude__longitude__s);
           
-   indayTravel = Utilities.calcluateIndayJobTime(new list<Search_Result__c>{sr}, job.Install_Postcode__c, Availability.Week__c);      
+   indayTravel = Utilities.calcluateIndayJobTime(new list<Search_Result__c>{sr}, jobPostCode, Availability.Week__c);      
     return indayTravel;
   }
 

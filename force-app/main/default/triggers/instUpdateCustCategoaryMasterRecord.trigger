@@ -12,7 +12,7 @@ trigger instUpdateCustCategoaryMasterRecord on Opportunity (after insert, before
   }
   if(cls_IsRun.isinstUpdCustCatMasRec)
   return;
-  
+  /*
   List<Id> oppIds = new List<Id>();
   List<Customer_category__c> allCustomerCategories = new List<Customer_category__c>();
   Map<Id,Customer_category__c> oppsToCreateMasterCustCategoryMap = new Map<Id,Customer_category__c>();
@@ -21,28 +21,31 @@ trigger instUpdateCustCategoaryMasterRecord on Opportunity (after insert, before
   Map<Id,Customer_category__c> allExistingSGCCustomerCategoriesMap = new Map<Id,Customer_category__c>();
   Map<Id,Customer_category__c> allExistingSalesCustomerCategoriesMap = new Map<Id,Customer_category__c>();
   Map<Id,Customer_category__c> allExistingInstallCustomerCategoriesMap = new Map<Id,Customer_category__c>();
-  
+  */
   // Collect all Account Ids
   Map<Id, Opportunity> accountIdList = new Map<Id, Opportunity>();
   
    
   if(Trigger.isInsert){
-  	  Customer_category__c custCatTemp;
+  	  //Customer_category__c custCatTemp;
   	  for(Opportunity opp : Trigger.new){
-  	  	if(opp.isLocked__c)
+  	  	/*if(opp.isLocked__c)
   	  	{
   	  		return; 
   	  	}
   	 	if(!opp.isLocked__c && opp.CreatedDate.date() >= Date.valueOf(System.Label.Priority_Install_Release_Date) && opp.Last_customer_cat_info_update_source__c != null){
   	 		custCatTemp = new Customer_category__c();
   	 		oppsToCreateMasterCustCategoryMap.put(opp.Id,custCatTemp);
-  	 	}
+  	 	}*/
   	 	
   	 	accountIdList.put(opp.AccountId, opp);
       }
+      /*
       prioHelper.createOrUpdateCustomerCategory(oppsToCreateMasterCustCategoryMap,Trigger.newMap);
       allCustomerCategories.addAll(oppsToCreateMasterCustCategoryMap.values());
-   }else{
+      */
+   }
+   /*else{
 		Opportunity tmpNewOpp;
   	    Opportunity tmpOldOpp;
   	  for(Opportunity opp : Trigger.new){
@@ -195,7 +198,7 @@ trigger instUpdateCustCategoaryMasterRecord on Opportunity (after insert, before
   	 	system.debug('----exception---'+ex.getMessage());
   	 }
   	 
-  }	 
+  }	 */
   	 // Create landlord records
   	 
   	 if(accountIdList.size()>0)

@@ -6,15 +6,15 @@
 * changed...
 */
 trigger createCustCategoryHistory on Customer_category__c (after insert,before update) {
-
+    /*
     List<Customer_category_history__c> custHistoryList = new List<Customer_category_history__c>();
     
     Integer i=0;
     
     for(Customer_category__c newCust : Trigger.new){
-    	
+        
         if(Trigger.isInsert){
-        	
+            
             custHistoryList.add(new PriorityInstallHelper().createVersions(newCust));
              
         }else if(newCust.Is_the_customer_s_boiler_working__c != Trigger.old[i].Is_the_customer_s_boiler_working__c ||
@@ -32,7 +32,7 @@ trigger createCustCategoryHistory on Customer_category__c (after insert,before u
                 newCust.Milestone_End__c != Trigger.old[i].Milestone_End__c ||
                 newCust.Date_and_time_job_planned__c != Trigger.old[i].Date_and_time_job_planned__c || 
                 newCust.BM_Quote_Download_into_SFDC_datetime__c != Trigger.old[i].BM_Quote_Download_into_SFDC_datetime__c){
-                	
+                    
                 newCust.Version__c = newCust.Version__c + 1;
                 custHistoryList.add(new PriorityInstallHelper().createVersions(newCust));
                 
@@ -43,16 +43,17 @@ trigger createCustCategoryHistory on Customer_category__c (after insert,before u
     }
     
     if(custHistoryList.size() > 0){
-    	
+        
         try{
-        	
+            
             insert custHistoryList;
             
         }catch(Exception e){
-        	
+            
             System.debug('-Exception-'+e.getMessage());
             
         }
         
     }
+    */
 }

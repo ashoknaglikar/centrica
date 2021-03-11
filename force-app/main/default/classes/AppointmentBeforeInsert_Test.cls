@@ -21,8 +21,8 @@
  */
 @isTest
 private class AppointmentBeforeInsert_Test {
-	
-	
+    
+    
 
      static Order__c orders;
     static Account account;
@@ -223,8 +223,9 @@ private class AppointmentBeforeInsert_Test {
         insert product;
         insert quoteProduct;
 
-        
-        District__c district = [Select id from District__c limit 1];
+        District__c district = new District__c(Type__c='Installation', Name='Decompile District', Code__c='yyyyyyyy');      
+        insert district;
+        //District__c district = [Select id from District__c limit 1];
                 
        
        
@@ -277,39 +278,39 @@ private class AppointmentBeforeInsert_Test {
            update app;*/
            static testmethod  void StartCondition1()
            {
-           	preparedata();
-           	insert app;
+            preparedata();
+            insert app;
            } 
            static testmethod  void StartCondition2()
            {
-           	preparedata();
-           	startTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 13, 0, 0);
-       	    endTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 21, 0, 0);
-           	app.Start__c=startTime;
-           	//system.debug('app.Start__c--'+app.Start__c);
-           	insert app;
-           	//system.debug('app.Start__c2'+app.Start__c);
+            preparedata();
+            startTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 13, 0, 0);
+            endTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 21, 0, 0);
+            app.Start__c=startTime;
+            //system.debug('app.Start__c--'+app.Start__c);
+            insert app;
+            //system.debug('app.Start__c2'+app.Start__c);
            }
            static testmethod  void StartCondition3()
            {
-           	preparedata();
-           	startTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 17, 0, 0);
-       	    endTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 21, 0, 0);
-           	app.Start__c=startTime;
-           	//system.debug('app.Start__c--'+app.Start__c);
-           	insert app;
-           	//system.debug('app.Start__c2'+app.Start__c);
+            preparedata();
+            startTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 17, 0, 0);
+            endTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 21, 0, 0);
+            app.Start__c=startTime;
+            //system.debug('app.Start__c--'+app.Start__c);
+            insert app;
+            //system.debug('app.Start__c2'+app.Start__c);
            }
            static testmethod  void StartCondition4()
            {
-           	preparedata();
-           	startTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 7, 0, 0);
-       	    endTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 21, 0, 0);
-           	app.Start__c=startTime;
-           	app.End__c=endTime;
-           	//system.debug('app.Start__c--'+app.Start__c);
-           	insert app;
-           	//system.debug('app.Start__c2'+app.Start__c);
+            preparedata();
+            startTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 7, 0, 0);
+            endTime = Datetime.newInstance(now.year()+7, now.month()+7, now.day()+7, 21, 0, 0);
+            app.Start__c=startTime;
+            app.End__c=endTime;
+            //system.debug('app.Start__c--'+app.Start__c);
+            insert app;
+            //system.debug('app.Start__c2'+app.Start__c);
            }
            
            

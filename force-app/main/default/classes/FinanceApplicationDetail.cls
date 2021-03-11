@@ -71,7 +71,7 @@ public class FinanceApplicationDetail{
      ApexPages.Message myMsg;
      string status = '';
      
-     AppStatus = true;
+     AppStatus = false;
      
      try{
      
@@ -81,7 +81,7 @@ public class FinanceApplicationDetail{
          if(fApplication.Valid_New_Application__c)
          {
              // use new apis
-             
+             fApplication.Error_Details__c = '';
              fApplication = barclaysPhase3Helper.submitFinanceApplication(fApplication);
              addErrorMessageToPage();
              
@@ -223,7 +223,7 @@ public class FinanceApplicationDetail{
   public void ApplicationEnquiry(){
       
       
-     fApplication = FinanceApplicationDetail.ApplicationEnquiry1(fApplication, isFreedomFinance);
+     fApplication =ApplicationEnquiry1(fApplication, isFreedomFinance);
      string status = fApplication.Application_Status__c;
      if(!fApplication.Valid_New_Application__c)
      {
@@ -319,7 +319,7 @@ public class FinanceApplicationDetail{
      
   }
   */
-  public static Finance_Application__c ApplicationEnquiry1(Finance_Application__c fApplication, boolean isFreedomFinance){
+  public  Finance_Application__c ApplicationEnquiry1(Finance_Application__c fApplication, boolean isFreedomFinance){
     ApexPages.Message myMsg;
     try{  
         
@@ -404,6 +404,7 @@ public class FinanceApplicationDetail{
     }Catch(Exception e){
          myMsg = new ApexPages.Message(ApexPages.Severity.ERROR,e.getMessage()+' '+e.getlinenumber());
          ApexPages.addMessage(myMsg);
+         AppStatus = false;
      }
      return fApplication;
      
@@ -541,9 +542,12 @@ public class FinanceApplicationDetail{
                   myMsg = new ApexPages.Message(ApexPages.Severity.error,err.ErrorMessage);
               }
               ApexPages.addMessage(myMsg);
-          }
+              AppStatus = false;
+          }else
+          AppStatus = true;
       }catch (exception e){
           system.debug(e.getMessage());
+          AppStatus = false;
       }
   }
   

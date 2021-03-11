@@ -933,7 +933,7 @@ window.validateBoilerPlusControls= function validateBoilerPlusControls(){
 
 
         // PD Updated 12/06/19
-        var arr=["PSLT3","PSLT5","PSLT6","PSLT7","P2290","P2291","P2292","P2293","P2295","P1471","PSLT49","PSLT50","PSLT61","PSLT62","PSLT63"];
+        var arr=["PSLT3","PSLT5","PSLT6","PSLT7","P2290","P2291","P2292","P2293","P2295","P1471","PSLT49","PSLT50","PSLT61","PSLT62","PSLT63","P2271"];
         
         //IC Updated 23/10/2018
         for(var i=0; i<arr.length; i++){
@@ -1051,7 +1051,7 @@ window.validateVoucherNumber = function validateVoucherNumber(){
 
     CS.Service.config['Energy_Account_Ref_0'].attr.cscfga__Is_Required__c=false;
     CS.Service.config['Contact_Email_0'].attr.cscfga__Is_Required__c=false;
-   
+    var anyAllowanceRequiresBillingRef = false;
 
     if(table){//table only exists on calculate prices
         for (var i = 1; i <= 6; i++) {
@@ -1061,15 +1061,17 @@ window.validateVoucherNumber = function validateVoucherNumber(){
             var requiresBillingRef = select.options[select.selectedIndex].getAttribute('requires-billing');
             var requiresEmail = select.options[select.selectedIndex].getAttribute('requires-email');
             
-            if(requiresBillingRef=='true' && reference ==''){
-                console.log(allowanceCode+" requires billing ref");
+            if(requiresBillingRef=='true') {
+                anyAllowanceRequiresBillingRef = true;
+                if (reference =='') {
+                    console.log(allowanceCode+" requires billing ref");
                     CS.Service.config['Energy_Account_Ref_0'].attr.cscfga__Is_Required__c=true;
                     setTimeout(function(){jQuery('[data-cs-label="Energy_Account_Ref_0"]').parent().addClass('attributeError');}, 0);
                     //jQuery('[data-cs-label="Energy_Account_Ref_0"]').parent().addClass('attributeError');
                     return false;
+                }
             }
-            
-            else if(requiresEmail=='true' && email ==''){
+            else if(requiresEmail=='true' && email =='') {
                 console.log(allowanceCode+" requires email");
                 CS.Service.config['Contact_Email_0'].attr.cscfga__Is_Required__c=true;
                 setTimeout(function(){jQuery('[data-cs-label="Contact_Email_0"]').parent().addClass('attributeError');}, 0);
@@ -1077,24 +1079,33 @@ window.validateVoucherNumber = function validateVoucherNumber(){
                 return false;
             }
         }
-    }else{
+    } else {
         //console.log("checking allowance attributes...")
         for (var i = 1; i <= 6; i++) {
             //var allowanceCode = CS.getAttributeFieldValue('Allowance'+i+'_0', 'Code');
             var requiresBillingRef = CS.getAttributeFieldValue('Allowance'+i+'_0', 'requiresBillingRef');
             var requiresEmail = CS.getAttributeFieldValue('Allowance'+i+'_0', 'requiresEmail');
 
-            if(requiresBillingRef=='TRUE' && reference == ''){
-                CS.Service.config['Energy_Account_Ref_0'].attr.cscfga__Is_Required__c=true;
-                return false;
+            if(requiresBillingRef=='true') {
+                anyAllowanceRequiresBillingRef = true;
+                if (reference =='') {
+                    CS.Service.config['Energy_Account_Ref_0'].attr.cscfga__Is_Required__c=true;
+                    return false;
+                }
             }
-            else if(requiresEmail=='TRUE' && email == ''){
+            else if(requiresEmail=='true' && email == '') {
                 //console.log(allowanceCode+" requires email");
                 CS.Service.config['Contact_Email_0'].attr.cscfga__Is_Required__c=true;
                 setDefaultEmail();
                 return false;
             }
         }
+    }
+
+    // if the reference is populated and there is no reason (no allowance requires that)
+    if (!anyAllowanceRequiresBillingRef && reference != '') {
+        CS.markConfigurationInvalid("Energy Account Ref is populated but Energy Credit discount not applied. If Energy Credit not applicable please remove Energy Account Ref in order to completed quote.");
+        return false;
     }
 
     function setDefaultEmail(){
@@ -1133,3 +1144,25 @@ window.addStandOffBracket = function addStandOffBracket(id){
     }
 }
 
+window.setNotesTextFieldWidth = function setNotesTextFieldWidth(){
+    console.log("setNotesTextFieldWidth() fired)");
+    if (navigator.device){
+        //Notes Screen
+        jQuery('[data-cs-binding="Additional_Delivery_Notes_0"]').width('200%');
+        jQuery('[data-cs-binding="Office_Notes_0"]').width('200%');
+        jQuery('[data-cs-binding="Installer_Notes_Boiler_0"]').width('200%');
+        jQuery('[data-cs-binding="Installer_Notes_Flue_0"]').width('200%');
+        jQuery('[data-cs-binding="Installer_Notes_GasWater_0"]').width('200%');
+        jQuery('[data-cs-binding="Installer_Notes_Disruption_0"]').width('200%');
+        jQuery('[data-cs-binding="Installer_Notes_Customer_Agreed_Actions_0"]').width('200%');
+        jQuery('[data-cs-binding="Installer_Notes___Customer_Agreed_Actions_0"]').width('200%');//WWAB notes field.
+        jQuery('[data-cs-binding="Installer_Notes_Special_Customer_Requirements_0"]').width('200%');
+        
+        //Safety and Compliance Screen
+        jQuery('[data-cs-binding="Work_Area_Hazards_Notes_0"]').width('200%');
+        jQuery('[data-cs-binding="Work_Area_Restrictions_Notes_0"]').width('200%');
+        jQuery('[data-cs-binding="Component_Removal_Notes_0"]').width('200%');
+        jQuery('[data-cs-binding="System_Characteristics_Notes_0"]').width('200%');
+
+    }  
+}

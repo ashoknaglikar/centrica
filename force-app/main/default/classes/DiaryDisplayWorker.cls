@@ -351,7 +351,7 @@ public with sharing class DiaryDisplayWorker {
         Week__r.Shift_Pattern__r.Friday_Max_Hours__c, Week__r.Shift_Pattern__r.Friday_End_Time__c,Week__r.Shift_Pattern__r.Monday_End_Time__c,
         Week__r.Locking_User__c,Week__r.Locking_Category__c,Week__r.Release_Date__c,
         d.Job__r.Type__c, d.Job__r.Sub_Status__c, d.Job__r.Status__c, d.Job__r.Customer_Name__c, d.Job__c,d.Job__r.Installation_Address__c,     
-        d.Job__r.Phone_Number__c,d.Job__r.Secondary_Job_Type_New__c, d.Job__r.Install_Postcode__c,Job__r.CHI_Lead__r.Latest_customer_category__c,Job__r.Is_Downtime_Job__c,Job__r.Is_Remedial_Job__c,
+        d.Job__r.Phone_Number__c,d.Job__r.Secondary_Job_Type_New__c, d.Job__r.Install_Postcode__c,Job__r.CHI_Lead__r.Latest_customer_category__c,Job__r.CHI_Lead__r.Product_Interest__c, Job__r.Is_Downtime_Job__c,Job__r.Is_Remedial_Job__c,
         d.Job__r.Green_Deal__c,d.Job__r.Job_Type__c, Job__r.Engineer_Working_NWD__c,d.Job__r.Quote__r.Job_Type__c,d.Job__r.Own_Labour__c,d.Job__r.Contractors__c,d.Job__r.Double_Handed_Job__c
         
             From Diary_Entry__c d
@@ -764,14 +764,17 @@ public with sharing class DiaryDisplayWorker {
                         {
                             bar.prdId = 'NWD';
                         }
+                        /*
                         else if(entry.Job__r.Job_Type__c.contains('A W'))
                         bar.prdId = 'Affordable';
+                        */
                         else if(entry.Job__r.Quote__r.Job_Type__c == '15')
                         bar.prdId = 'Straight Swap';
+                        /*
                         else if(entry.Job__r.Green_Deal__c != 'No')
                         {
                             bar.prdId = 'GreenDeal';
-                        }
+                        }*/
                         else if(entry.Job__r.Is_Remedial_Job__c || entry.Job__r.Is_Downtime_Job__c)
                         {
                             bar.prdId = 'Green';
@@ -780,10 +783,16 @@ public with sharing class DiaryDisplayWorker {
                         {
                             bar.prdId = 'NONOP';
                         }
+                        else
+                        {
+                            bar.prdId = entry.Job__r.CHI_Lead__r.Product_Interest__c;
+                        }
+                        /*
                         else if(entry.Product_Id__c == 'ECH')
                         {
                             bar.prdId = 'ECH';
                         }
+                        */
                         bar.Priority = 99;
                         if(entry.Job__r.CHI_Lead__r.Latest_customer_category__c!=null)
                         bar.Priority = entry.Job__r.CHI_Lead__r.Latest_customer_category__c.intValue();
@@ -1812,14 +1821,14 @@ public with sharing class DiaryDisplayWorker {
             String retColour='White';
             if(bgColour == 'NotWorking.gif')retColour='gray';
             if(bgColour == 'JobBooking.gif')retColour='#00DCFF';
-           
+            if(bgColour == 'JobBooking.gif' && prdId=='Guided Sale')retColour='#53d80a;';
             // CH- 08/11/11 to display all the job bookings in violet color where we have got non_op flag
             if(bgColour == 'JobBooking.gif' && ((prdId!='Green' && Priority < 4)||prdId == 'NONOP'))retColour='Pink;';
             if(bgColour == 'JobBooking.gif' && prdId == 'ECH')retColour='blue;';
             //Green Deal Change
-            if(bgColour == 'JobBooking.gif' && prdId=='GreenDeal')retColour='#53d80a;';
+            //if(bgColour == 'JobBooking.gif' && prdId=='GreenDeal')retColour='#53d80a;';
             //Affordable Warmth change
-            if(bgColour == 'JobBooking.gif' && prdId=='Affordable')retColour='#8D38C9;';
+            //if(bgColour == 'JobBooking.gif' && prdId=='Affordable')retColour='#8D38C9;';
             if(bgColour == 'JobBooking.gif' && prdId=='NWD')retColour='#CD96CD;';
             if(bgColour == 'JobBooking.gif' && subType == 'Travel Time')retColour='yellow;';
             if(bgColour == 'JobBooking.gif' && prdId=='Straight Swap')retColour='brown;';

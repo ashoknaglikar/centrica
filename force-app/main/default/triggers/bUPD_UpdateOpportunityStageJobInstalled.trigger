@@ -43,11 +43,12 @@ trigger bUPD_UpdateOpportunityStageJobInstalled on Job__c (before update) {
     if(opportunityIdSet.size() > 0){
         List<Opportunity> opportunityList =[Select StageName,Id, isLocked__c, CreatedDate, (Select ID, isLocked__c, Record_Status__c , Opportunity__c from Customer_categories__r) from Opportunity where Id In: opportunityIdSet and isClosed=false];
         
+        /*
         // ++ Added for Prority Installations CR start
         Map<Id,List<Customer_category__c>> custMap = new Map<Id,List<Customer_category__c>>();   
         List<Customer_category__c> tmpCustList = new List<Customer_category__c>(); 
         // --  Added for Prority Installations CR end
-        
+        */
         for (Opportunity objOpportunity:opportunityList ){
             objOpportunity.StageName='Closed Won';
             objOpportunity.isSystem__c=true;
@@ -57,6 +58,7 @@ trigger bUPD_UpdateOpportunityStageJobInstalled on Job__c (before update) {
             objOpportunity.Job_Sub_Status__c =CHILead_JobMap.get(objOpportunity.Id).Sub_Status__c;
             }
             // ++ Added for Prority Installations CR start
+            /*
             if(objOpportunity.CreatedDate.date() < Date.valueOf(System.Label.Priority_Install_Release_Date))
             continue;
             objOpportunity.isLocked__c = true;
@@ -75,12 +77,12 @@ trigger bUPD_UpdateOpportunityStageJobInstalled on Job__c (before update) {
                 System.debug('I am here');
             }
             // --  Added for Prority Installations CR end
-            
+            */
         }
         Database.SaveResult[] saveResultArr;
         if (opportunityList !=null) 
             saveResultArr=Database.Update(opportunityList,false );
-        tmpCustList = new List<Customer_category__c>();      
+        //tmpCustList = new List<Customer_category__c>();      
         for (Job__c objJob:Trigger.new){
             for (Database.SaveResult saveResult:saveResultArr) {
                 if (saveResult.getId()==objJob.CHI_Lead__c) {
@@ -90,17 +92,19 @@ trigger bUPD_UpdateOpportunityStageJobInstalled on Job__c (before update) {
                         objJob.addError(strMsg);
                         
                     // ++ Added for Prority Installations CR start
-                    }else if(custMap.containsKey(objJob.CHI_Lead__c) && saveResult.isSuccess()){
+                    }/*else if(custMap.containsKey(objJob.CHI_Lead__c) && saveResult.isSuccess()){
                         tmpCustList.addAll(custMap.get(objJob.CHI_Lead__c));
-                    }
+                    }*/
                     // --  Added for Prority Installations CR end
                 }
             }
         }
+        /*
         // ++ Added for Prority Installations CR start
         if(tmpCustList.size() > 0)
         Database.Update(tmpCustList,false);
         // --  Added for Prority Installations CR end
+        */
         
     }
 }

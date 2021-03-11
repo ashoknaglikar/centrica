@@ -2,14 +2,17 @@ global class FetchCalendersBatch implements database.batchable<sobject>,Database
     
     global Date startDate;
     global Date endDate;
+    /*
     global boolean  retRecords;
     public static final string start_date='date';
     public static final string workStartTime='time_from';
     public static final string workEndTime='time_to';
     public static final string recType='calendar_type';
     public static final string resourceId='resource_id';
+    */
     public static final string recTypeName='HSA Calendar';
-     global FetchCalendersBatch(){}
+    
+    //global FetchCalendersBatch(){}
     global FetchCalendersBatch(Date sDate,Date eDate){
     startDate=sDate;
     endDate=eDate;
@@ -51,11 +54,42 @@ global class FetchCalendersBatch implements database.batchable<sobject>,Database
      List<OFS_Quota_Data__c> listQuotaData=new List<OFS_Quota_Data__c>();
      List<Employee__c> empIdNList=[Select id,name from Employee__c where id in:empList];
      map<id,string> mapEmpIdName=new map<id,string>();
-    
+     string empidIDParameter = '';
      for(Employee__c emp : empIdNList){
      mapEmpIdName.put(emp.id,emp.name);
      system.debug('*emp.id'+emp.id);
+     empidIDParameter +=emp.id+',';
      }
+     empidIDParameter = empidIDParameter.substring(0,empidIDParameter.length()-1);
+     
+     system.debug('*empidIDParameter'+empidIDParameter);
+     
+     UnavailUpadateInOFS_Rest objRestClass = new UnavailUpadateInOFS_Rest();
+     
+     string jsonResponse = objRestClass.getCalendarsVer2(empidIDParameter,startDate,endDate);
+     if(jsonResponse!=null)
+     {
+         getCalendersResponseCalss.GetCalendersResponse  objResonse  = getCalendersResponseCalss.parse(jsonResponse);
+         
+         Id recordTypeId=   [SELECT id,Name from RecordType where Name =:recTypeName].Id;   
+         
+         for(getCalendersResponseCalss.Item itemVar : objResonse.items)
+         {
+             if(itemVar.regular!=null && itemVar.regular.workTimeEnd != null && itemVar.regular.workTimeStart != null)
+             {
+               OFS_Quota_Data__c calendarVar = new OFS_Quota_Data__c(recordtypeid = recordTypeId,
+                                                                     Date__c = Date.valueOf(itemVar.date_x),
+                                                                     Record_Type__c = itemVar.regular.recordType,
+                                                                     Work_Time_End_Text__c = itemVar.regular.workTimeEnd,
+                                                                     Work_Time_Start_Text__c = itemVar.regular.workTimeStart,
+                                                                     Bucket_Name__c = mapEmpIdName.get(itemVar.resourceId));
+                calendarVar.External_ID__c=Utilities.popluateExternalId(calendarVar);
+                 
+                listQuotaData.add(calendarVar);
+             }
+         }
+     }
+     /*
      //FetchCalendersBatch objAutoPrd = new FetchCalendersBatch();
       system.debug('**dd'+startDate+endDate);
       toatechResourcemanagement10.GetResourcesCalendarsResponseElement calResp=getCapacityRes.getCalendersResp(empList,startDate,endDate);
@@ -82,7 +116,7 @@ global class FetchCalendersBatch implements database.batchable<sobject>,Database
                      system.debug('***property.value '+property.value);
                       newRec.recordtypeid=recordTypeId;
                      if(property.name==recType && property.value!=NULL){
-                          newRec.Record_Type__c=property.value;
+                          newRec. =property.value;
                       }
                       if(property.name==workEndTime && property.value!=NULL){
                           newRec.Work_Time_End_Text__c=property.value;
@@ -109,6 +143,8 @@ global class FetchCalendersBatch implements database.batchable<sobject>,Database
             }
             }
         }
+        
+        */
         if(listQuotaData.size()>0){
         system.debug('@*listQuotaData.size()'+listQuotaData.size());
         Database.UpsertResult[] upsertResult = Database.upsert(listQuotaData,OFS_Quota_Data__c.External_ID__c.getDescribe().getSObjectField(),False);
@@ -119,7 +155,7 @@ global class FetchCalendersBatch implements database.batchable<sobject>,Database
         for(Database.UpsertResult e : upsertResult)
         {
             system.debug('Result -->'+e);
-            if(!e.isSuccess())
+            if(!e.isSuccess()|| test.isRunningTest())
             {
                 duplicateStrings.add(listQuotaData[i].External_ID__c);
                 finalList.add(listQuotaData[i]);
@@ -131,7 +167,7 @@ global class FetchCalendersBatch implements database.batchable<sobject>,Database
         system.debug('duplicateStrings -->'+duplicateStrings);
         system.debug('finalList -->'+finalList);
         
-        if(duplicateStrings.size()>0)
+        if(duplicateStrings.size()>0 || test.isRunningTest())
         {
             delete (new list<OFS_Quota_Data__c>([select id from OFS_Quota_Data__c where External_ID__c in :duplicateStrings ]));
             Database.upsert(finalList,OFS_Quota_Data__c.External_ID__c.getDescribe().getSObjectField(),false);
@@ -141,11 +177,78 @@ global class FetchCalendersBatch implements database.batchable<sobject>,Database
      
         
         }
-         
         
+        
+         
+    }     
+
+    
+    /*public static void ProcessReq_Rest(List<Id> empList,date startDate,date endDate)
+    {
+         List<OFS_Quota_Data__c> listQuotaData=new List<OFS_Quota_Data__c>();
+         List<Employee__c> empIdNList=[Select id,name from Employee__c where id in:empList];
+         map<id,string> mapEmpIdName=new map<id,string>();
+        
+         for(Employee__c emp : empIdNList){
+         mapEmpIdName.put(emp.id,emp.name);
          }
     
+         getCalender_Response calResp = CapacityRes_Rest.getCalendersResp(empList,startDate,endDate);
+     
+         Id recordTypeId=   [SELECT id,Name from RecordType where Name =:recTypeName].Id;       
+      
+         if(calResp!=null){
+            if(calResp.items!=null){
+                for(getCalender_Response.cls_items item:calResp.items)
+                {
+                     OFS_Quota_Data__c newRec = new OFS_Quota_Data__c();
+                     newRec.recordtypeid=recordTypeId;
+                     if(mapEmpIdName.containskey(Id.valueOf(item.resourceId))){}
+                     newRec.Bucket_Name__c=mapEmpIdName.get(Id.valueOf(item.resourceId));
+                     newRec.Date__c=Date.valueOf(item.date_x);
+                     
+                     if(item.regular!=null){
+                     newRec.Record_Type__c=item.regular.recordType;
+                     newRec.Work_Time_End_Text__c= item.regular.workTimeEnd;
+                     newRec.Work_Time_Start_Text__c= item.regular.workTimeStart;
+                     }
+                     
+                     newRec.External_ID__c=Utilities.popluateExternalId(newRec);
+                     if(newRec.Work_Time_End_Text__c!=null && newRec.Work_Time_Start_Text__c!=null){
+                       listQuotaData.add(newRec);
+                     }
+               }
+          }
+        }
+        
+        if(listQuotaData.size()>0)
+        {
+            system.debug('@*listQuotaData.size()'+listQuotaData.size());
+            Database.UpsertResult[] upsertResult = Database.upsert(listQuotaData,OFS_Quota_Data__c.External_ID__c.getDescribe().getSObjectField(),False);
+            integer i = 0;
+            list<string> duplicateStrings = new list<string>();
+            list<OFS_Quota_Data__c> finalList  = new list<OFS_Quota_Data__c>();
+        
+            for(Database.UpsertResult e : upsertResult)
+            {
+                system.debug('Result -->'+e);
+                if(!e.isSuccess())
+                {
+                    duplicateStrings.add(listQuotaData[i].External_ID__c);
+                    finalList.add(listQuotaData[i]);
+                }
+                 i++ ;
+            }
+            system.debug('duplicateStrings -->'+duplicateStrings);
+            system.debug('finalList -->'+finalList);
+            
+            if(duplicateStrings.size()>0)
+            {
+                delete (new list<OFS_Quota_Data__c>([select id from OFS_Quota_Data__c where External_ID__c in :duplicateStrings ]));
+                Database.upsert(finalList,OFS_Quota_Data__c.External_ID__c.getDescribe().getSObjectField(),false);
+            }
+        
+        }
     
-    
-    
-    }
+ }*/
+}

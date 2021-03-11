@@ -95,7 +95,18 @@ body {
                         <apex:inputField value="{!obj_Job1.Email_Address__c}"
                             id="emailadd" />
                     </apex:pageblockSectionItem>
-                     
+                   </apex:pageblocksection>
+                   
+                   <br/><br/><br/> 
+                <apex:pageblocksection id="thesectionSearch">
+                    <apex:pageBlockSectionItem id="thesectionSearch2">
+                        <apex:outputLabel value="CHI lead number" for="chiLeadNumber"></apex:outputLabel>
+                        <apex:inputfield value="{!obj_Job1.CHI_lead_number_text__c}" id="chiLeadNumber"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem id="thesectionSearch3">
+                        <apex:outputLabel value="SAP number" for="sapNumber"></apex:outputLabel>
+                        <apex:inputfield value="{!obj_Job1.SAP_Number__c}" id="sapNumber"/>
+                    </apex:pageBlockSectionItem>
                 </apex:pageblocksection>
 
                 <apex:pageBlockButtons location="bottom">
@@ -283,13 +294,20 @@ body {
                                     </apex:pageBlockSectionItem>
 
                                     <!-- Added as part of customer history card change request -->
-
+                                    <!-- Removed as no longer required 09/03/2020
                                     <apex:pageBlockSectionItem rendered="{!v_job.displayCustHistoryCard}">
                                         <apex:outputLabel value="For navigating to customer history card"
                                             for="custHistCardLink"></apex:outputLabel>
                                         <apex:outputLink value="{!URLFOR($Action.Customer_history_card__c.View,v_job.custHistoryCard.Id)}"
                                             target="_blank" id="custHistCardLink">Click here</apex:outputLink>
                                     </apex:pageBlockSectionItem>
+                                    -->
+                                    
+                                    <apex:pageblockSectionItem >
+                                        <apex:outputLabel value="Vulnerable Customer" for="Vulnerable Customer"></apex:outputLabel>
+                                        <apex:outputField value="{!v_job.obj_job5.CHI_Lead__r.Is_the_customer_vulnerable__c}"
+                                            id="vulCust" />
+                                    </apex:pageblockSectionItem>
 
                                     <apex:pageBlockSectionItem >
                                         <apex:outputLabel value="For navigating to combined notes"
@@ -297,11 +315,9 @@ body {
                                         <apex:outputLink value="/apex/AmalgamateNotes?OppId={!v_job.obj_job5.CHI_Lead__c}"
                                             target="_blank" id="amalNotes">Click here</apex:outputLink>
                                     </apex:pageBlockSectionItem>
-                                    <apex:pageblockSectionItem >
-                                        <apex:outputLabel value="Vulnerable Customer" for="Vulnerable Customer"></apex:outputLabel>
-                                        <apex:outputField value="{!v_job.obj_job5.CHI_Lead__r.Is_the_customer_vulnerable__c}"
-                                            id="vulCust" />
-                                    </apex:pageblockSectionItem>
+                                    
+                                    
+                                    
                                     <apex:pageblockSectionItem >
                                         <apex:outputLabel value="Vulnerable reason" for="Vulnerable reason"></apex:outputLabel>
                                         <apex:outputField value="{!v_job.obj_job5.CHI_Lead__r.Vulnerable_reason__c}"
@@ -321,16 +337,25 @@ body {
                                     <apex:outputField value="{!v_job.obj_job5.GDIndicator__c}"
                                             id="custCat" />
                                     
+                                     <apex:pageBlockSectionItem />
+                                     
                                      <apex:pageblockSectionItem >
                                         <apex:outputLabel value="Product Interest" for="PI"></apex:outputLabel>
                                         <apex:outputField value="{!v_job.obj_job5.Product_Interest__c}"
                                             id="PI" />
                                     </apex:pageblockSectionItem>
+                                    
                                     <!-- End of customer history card change request -->
 
                                 </apex:pageblockSection>
 
                                 <apex:pageBlockSection title="Notes" columns="1">
+                                    <apex:pageBlockSectionItem rendered="{!v_job.attachmentId!=null}">
+                                        <apex:outputLabel value="Installation Notes link"
+                                            for="Inst_notes_link"></apex:outputLabel>
+                                        <apex:outputLink value="{!URLFOR($Action.Attachment.Download,v_job.attachmentId)}"
+                                            target="_blank" id="Inst_notes_link">Click here</apex:outputLink>
+                                    </apex:pageBlockSectionItem>
                                     <apex:pageBlockSectionItem >
                                         <!--  rendered="{!IF(OR(contains($Profile.Name, 'CHI Agency Contractor'),contains($Profile.Name, 'CHI Agency Office User'),contains($Profile.Name, 'CHI Contractor')), False,True)}" -->
                                         <apex:outputLabel value="Job Installation Notes"
@@ -500,6 +525,31 @@ body {
                                             value="{!UserJob.User__r.MobilePhone}" />
                                     </apex:pageBlocktable>
                                 </apex:pageBlockSection>
+                                
+                                <apex:pageBlockSection title="Job Completetion Documents" columns="1">
+                                    <apex:pageBlocktable value="{!v_job.obj_job5.Job_Completion_Documents__r}" var="CommisionReport" rendered="{!NOT(ISNULL(v_job.obj_job5.Job_Completion_Documents__r))}">
+                                        <apex:Column >
+                                            <apex:facet name="header">Reference</apex:facet>
+                                        <apex:outputLink value="{!URLFOR($Action.Commissioning_Report__c.View,CommisionReport.id)}"
+                                            target="_blank" id="Inst_notes_link">{!CommisionReport.name}</apex:outputLink>
+                                        </apex:Column>
+                                        <apex:Column HeaderValue="Report Name" value="{!CommisionReport.Report_Name__c}"/>
+                                        <apex:Column HeaderValue="Address" value="{!CommisionReport.Address__c}"/>
+                                        <apex:Column HeaderValue="Customer Name" value="{!CommisionReport.Customer_Name__c}"/>
+                                        <apex:Column HeaderValue="Document Status" value="{!CommisionReport.Status__c}"/>
+                                    </apex:pageBlocktable>
+                                </apex:pageBlockSection>
+                                
+                                 <apex:pageBlockSection title="Pictures list on CHI Lead" columns="1">
+                                    <apex:pageBlocktable value="{!v_job.chiPicList}" var="chiPicList" rendered="{!IF(v_job.chiPicList.size>0,true,false)}">
+                                        <apex:Column >
+                                            <apex:facet name="header">Title</apex:facet>
+                                            <apex:outputLink value="{!URLFOR($Action.Attachment.Download,chiPicList.id)}" target="_blank">{!chiPicList.name}</apex:outputLink>
+                                        </apex:Column>
+                                        
+                                    </apex:pageBlocktable>
+                                </apex:pageBlockSection>
+                                
                             </apex:pageblocksection>
                         </apex:pageBlock>
                     </apex:repeat>

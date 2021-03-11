@@ -7,6 +7,8 @@ private class QuotesPageCont_Test {
     static Employee__c emp;
     static BigMachines_Quote__c bm;
     static offer__c off;
+    static District__c district;
+    static Region__c region;
     
 	static void createData()
 	{
@@ -33,16 +35,26 @@ private class QuotesPageCont_Test {
         
         //Prepare opportunity data
         opp = new Opportunity (Name = 'Test1 Opp', AccountId = account.Id,
-                                                CloseDate = Date.today().addyears(1), 
+                                                CloseDate = Date.today().addyears(1),
                                                 StageName = 'Active',Override_Billing_checks__c=false,
                                                 Product_Interest__c='Central Heating Boiler',
                                                 LeadSource='Engineer', Referral_Employee__c =emp.id,
-                                                Customer_Category_Record_Modified_By__c = UserInfo.getUserId());
+                                                Customer_Category_Record_Modified_By__c = UserInfo.getUserId(),Comms_Email_Field__c='test@abc.com');
         
         insert opp;
         
         bm = TestClassHelper.createBMQuote(opp);
+        bm.stage__c='Quote Finalised - Not Accepted';
+        bm.submittedDate_quote__c=system.today();
+        bm.discountsTotalOnPricing__c=100;
         insert bm;
+        
+        district =TestClassHelper.createDistrict();
+        insert district;
+        
+        region= testclassHelper.createRegion();
+        region.Type__c = 'Installation';
+        insert region;
         
         off = new offer__C(Offer_Code__c='QWERT12345', Value__c=100,Description__c='test',Start_Date__c=system.today()-5,End_Date__c=system.today()+5,Offer_Type__c ='Monetary');
         insert off;
@@ -63,6 +75,8 @@ private class QuotesPageCont_Test {
         controller.allAllowanceKeySelected = new List<SelectOption>{new SelectOption('EC','EC')};
         controller.allProductIntSelected = new List<SelectOption>{new SelectOption('Guided Sale','Guided Sale')};
         controller.allDistrictsSelected = new List<SelectOption>{new SelectOption('IA West Scotland','1A West Scotland')};
+        controller.allRegionsSelected = new List<SelectOption>{new SelectOption('Test Region','Test Region')};
+        controller.allCustomerCategorySelected = new List<SelectOption>{new SelectOption('1','1')};
         controller.getProductInterestOptions();
         controller.getAllowanceKeyOptions();
         controller.getAllowanceKeyOptions();
@@ -90,11 +104,14 @@ private class QuotesPageCont_Test {
         controller.voucherFile = new QFU_Voucher_File__c(offer__c=off.id);
         controller.isPrevious = true;
         controller.opplist = new List<opportunity>{opp};
-        controller.isSalesforce = true;
-         controller.isContactEngine = false;
-         controller.isText = true;
-         controller.isEmail = true;
+        controller.bm= new BigMachines_Quote__c(installationDate__c=system.today(),closeDate__c=system.today()+1);
+        controller.isSalesforce= false;
+           controller.isContactEngine=false;
+            controller.isText = false;
+            controller.isEmail = false;
+         controller.downloadCSV();
          controller.queryLeads();
+         controller.count=1;
          controller.applyVoucher();
          List<opportunity> leadlist = new List<opportunity>{opp};
          controller.extratctXLS(leadlist);
@@ -116,8 +133,11 @@ private class QuotesPageCont_Test {
         controller.getCoreBundleOptions();
         controller.getAreaItems();
         controller.getRegionItems();
+        controller.getCustomerCategoryOptions();
            controller.back();
            controller.queryLeads();
+           controller.isprevious=true;
+           controller.voucherFile = new QFU_Voucher_File__c(offer__c=null);
            controller.applyVoucher();
            controller.queryVoucherFiles();
     }

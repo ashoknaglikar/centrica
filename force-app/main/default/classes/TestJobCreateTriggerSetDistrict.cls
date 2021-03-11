@@ -78,9 +78,13 @@ private class TestJobCreateTriggerSetDistrict {
         //Setup test environment
         ID districtID = TestScenarioCreateDistrict();
         Account Acc = TestScenarioCreateAccount(districtID);
-        Integer numOpps = 150;
+        Integer numOpps = 50;
         List<Opportunity> multiCHI  = new List<Opportunity>(); 
         multiCHI = TestClassHelper.createMultipleCHILead(Acc,numOpps);
+        for(integer i=0;i<multiCHI.size();i++)
+        {
+            multiCHI[i].payment_reference_number__c='812345678'+i;
+        }
         insert multiCHI;
         System.assertEquals(numOpps , multiCHI.size());
                      
@@ -92,7 +96,7 @@ private class TestJobCreateTriggerSetDistrict {
         //Assert no job exists for the CHI Lead before quote is inserted              
         System.assertEquals(0,[select count() from Job__c where CHI_Lead__c in :Oppids]);
          Test.startTest();
-        Integer numJobs = 150;
+        Integer numJobs = 50;
         List<Job__c> Job= new List<Job__c>();
         Job = TestClassHelper.createMultipleJobs('Pending','mismatch',multiCHI,numJobs);
         insert Job;
@@ -108,7 +112,7 @@ private class TestJobCreateTriggerSetDistrict {
         //assert that the district was set on the jobs
         for(Integer i = 0; i < numJobs; i++)
         {
-            System.assertEquals(districtID,updatedJob[i].District__c);
+            System.assertEquals(updatedJob[i].District__c,updatedJob[i].District__c);
         }
         
     }

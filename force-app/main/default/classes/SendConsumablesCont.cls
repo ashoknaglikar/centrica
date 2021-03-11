@@ -7,6 +7,33 @@
     TestClass for this class is present in : sendConsumableRequests_Test
 */
 public with sharing class SendConsumablesCont {
+    
+    public integer consumablesWaiting{get;set;}
+    
+    public void invokeBatch()
+    {
+        if(consumablesWaiting>0)
+        {
+            sendConsumableRequests sCR = new sendConsumableRequests();
+         	sCR.createConReqBatch();
+            ApexPages.Message msg = new ApexPages.Message(Apexpages.Severity.info, 'Request has been taken. An email should arrive shortly to the consumable inbox.');
+            ApexPages.addMessage(msg);
+        }else
+        {
+            ApexPages.Message msg = new ApexPages.Message(Apexpages.Severity.error, 'There are no orders to process.');
+            ApexPages.addMessage(msg);
+            
+        }
+        
+    }
+    
+    public SendConsumablesCont() {
+        
+        date CreatedDate = system.today().addDays(-365);
+        consumablesWaiting = [Select count()  From Consumables_Requests__c where Picked_Up_by_Email__c = false and lastModifiedDate >=:CreatedDate and Status__c = 'Submitted' and (Approval_Required__c= 'No' OR (Approval_Required__c= 'Yes' and Approved__c = true)) and Employee__c != null];
+        
+    }
+    
     /* ++++++++++++ Commented as this has not been used for long time improves the test class +++++++++++++++++
     
     
@@ -24,6 +51,7 @@ public with sharing class SendConsumablesCont {
          Options.add(new SelectOption('Created Date','Created Date'));
          return options;
     }
+    
     
     
     public PageReference selectAll(){

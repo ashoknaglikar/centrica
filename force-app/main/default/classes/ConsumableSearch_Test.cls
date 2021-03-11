@@ -43,7 +43,7 @@ private class ConsumableSearch_Test {
             //c.getconsumables();
             FOR(Consumables__c co: [SELECT c.image_location__c, c.Sub_Product_Description__c,Image_URL__c, c.Sub_Product_Code_Description__c, c.SubProductGroup__c, c.Status__c, c.Short_Name__c, c.ShortDescription__c, c.Product_Group__c, c.Product_Code__c, c.Name, c.Id,ProductGroupDescription__c,CostPrice__c,Size__c ,Unit_Quantity__c From Consumables__c c where  Status__c = 'Active' LIMIT 10])
             {
-               consumableSearch.genericClass genObj = new consumableSearch.genericClass(co);
+               consumableSearch.genericClass genObj = new consumableSearch.genericClass(co, '');
                c.consumables.add(genObj);
             }
             //c.continue_Btn();

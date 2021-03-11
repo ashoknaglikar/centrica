@@ -191,6 +191,7 @@ public class OnlineQuoteHelper {
                 }
             }else
             {
+                 system.debug('Suguna '+qp);
                  noSection+=qp.Gross_Total__c;
             }
                 
@@ -313,71 +314,71 @@ public class OnlineQuoteHelper {
                                          '', 
                                          'section-price'));
             
-            if(bQuote.allowance_desc_1__c != null && bQuote.appliedAmount1__c != null)
+            if(bQuote.CS_Allowance_1__r.Quote_Description__c != null && bQuote.appliedAmount1__c != null)
             {
                 inputQuoteData.innerTopSummaryTable.add(
                                     new CS_QuoteOnlineTemplateController.SummaryTableType('', 
-                                    bQuote.allowance_desc_1__c, 
+                                    bQuote.CS_Allowance_1__r.Quote_Description__c, 
                                     'allowance-label', 
                                     bQuote.appliedAmount1__c, 
                                     'allowance-value right'));
                                     
-               inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.allowance_desc_1__c, bQuote.appliedAmount1__c));
+               inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.CS_Allowance_1__r.Quote_Description__c, bQuote.appliedAmount1__c));
                allowancesAdded.add(bQuote.CS_Allowance_1__c);
             }
-            if(bQuote.allowance_desc_2__c != null && bQuote.appliedAmount2__c != null)
+            if(bQuote.CS_Allowance_2__r.Quote_Description__c != null && bQuote.appliedAmount2__c != null)
             {
                 inputQuoteData.innerTopSummaryTable.add(
                                     new CS_QuoteOnlineTemplateController.SummaryTableType('', 
-                                    bQuote.allowance_desc_2__c, 
+                                    bQuote.CS_Allowance_2__r.Quote_Description__c, 
                                     'allowance-label', 
                                     bQuote.appliedAmount2__c, 
                                     'allowance-value right'));
-                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.allowance_desc_2__c, bQuote.appliedAmount2__c));
+                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.CS_Allowance_2__r.Quote_Description__c, bQuote.appliedAmount2__c));
                 allowancesAdded.add(bQuote.CS_Allowance_2__c);
             }
-            if(bQuote.allowance_desc_3__c != null && bQuote.appliedAmount3__c != null)
+            if(bQuote.CS_Allowance_3__r.Quote_Description__c != null && bQuote.appliedAmount3__c != null)
             {
                 inputQuoteData.innerTopSummaryTable.add(
                                     new CS_QuoteOnlineTemplateController.SummaryTableType('', 
-                                    bQuote.allowance_desc_3__c, 
+                                    bQuote.CS_Allowance_3__r.Quote_Description__c, 
                                     'allowance-label', 
                                     bQuote.appliedAmount3__c, 
                                     'allowance-value right'));
-                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.allowance_desc_3__c, bQuote.appliedAmount3__c));
+                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.CS_Allowance_3__r.Quote_Description__c, bQuote.appliedAmount3__c));
                 allowancesAdded.add(bQuote.CS_Allowance_3__c);
             }
-            if(bQuote.allowance_desc_4__c != null && bQuote.appliedAmount4__c != null)
+            if(bQuote.CS_Allowance_4__r.Quote_Description__c != null && bQuote.appliedAmount4__c != null)
             {
                 inputQuoteData.innerTopSummaryTable.add(
                                     new CS_QuoteOnlineTemplateController.SummaryTableType('', 
-                                    bQuote.allowance_desc_4__c, 
+                                    bQuote.CS_Allowance_4__r.Quote_Description__c, 
                                     'allowance-label', 
                                     bQuote.appliedAmount4__c, 
                                     'allowance-value right'));
-                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.allowance_desc_4__c, bQuote.appliedAmount4__c));
+                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.CS_Allowance_4__r.Quote_Description__c, bQuote.appliedAmount4__c));
                 allowancesAdded.add(bQuote.CS_Allowance_4__c);
             }
-            if(bQuote.allowance_desc_5__c != null && bQuote.appliedAmount5__c != null)
+            if(bQuote.CS_Allowance_5__r.Quote_Description__c != null && bQuote.appliedAmount5__c != null)
             {
                 inputQuoteData.innerTopSummaryTable.add(
                                     new CS_QuoteOnlineTemplateController.SummaryTableType('', 
-                                    bQuote.allowance_desc_5__c, 
+                                    bQuote.CS_Allowance_5__r.Quote_Description__c, 
                                     'allowance-label', 
                                     bQuote.appliedAmount5__c, 
                                     'allowance-value right'));
-                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.allowance_desc_5__c, bQuote.appliedAmount5__c));
+                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.CS_Allowance_5__r.Quote_Description__c, bQuote.appliedAmount5__c));
                 allowancesAdded.add(bQuote.CS_Allowance_5__c);
             }
-            if(bQuote.allowance_desc_6__c != null && bQuote.appliedAmount6__c != null)
+            if(bQuote.CS_Allowance_6__r.Quote_Description__c != null && bQuote.appliedAmount6__c != null)
             {
                 inputQuoteData.innerTopSummaryTable.add(
                                     new CS_QuoteOnlineTemplateController.SummaryTableType('', 
-                                    bQuote.allowance_desc_6__c, 
+                                    bQuote.CS_Allowance_6__r.Quote_Description__c, 
                                     'allowance-label', 
                                     bQuote.appliedAmount6__c, 
                                     'allowance-value right'));
-                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.allowance_desc_6__c, bQuote.appliedAmount6__c));
+                inputQuoteData.allowances.add(new CS_QuoteOnlineTemplateController.allowanceClass(bQuote.CS_Allowance_6__r.Quote_Description__c, bQuote.appliedAmount6__c));
                 allowancesAdded.add(bQuote.CS_Allowance_6__c);
             }
             if(bQuote.allowance_desc_7__c != null && bQuote.appliedAmount7__c != null)

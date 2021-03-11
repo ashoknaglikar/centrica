@@ -7,8 +7,9 @@ public class webManageCustomerBooking {
     public webservice_CHI_Online.ManageCustomerBookingResponse webManageCustomerBookingFunc(webservice_CHI_Online.ManageCustomerBooking objManageCustomerBooking)
     {
         
-        
-        Savepoint sp = Database.setSavepoint();
+        boolean updateFlag = false, existAccountFlag = false;
+        Opportunity opp;
+       
         webservice_CHI_Online.ManageCustomerBookingResponse reply = new webservice_CHI_Online.ManageCustomerBookingResponse();
         string postcode;
         string NameNumber;
@@ -56,7 +57,7 @@ public class webManageCustomerBooking {
         Opportunity chi_lead = new Opportunity();
         
         boolean existAccount = false, existLead = false;
-       
+        
         
         // format postcode correctly
         string trimmed_code;
@@ -76,17 +77,39 @@ public class webManageCustomerBooking {
         
         reformatted_code = first_part + ' ' + second_part;
         system.debug('reformatted_code = ' + reformatted_code);
-     
         
+        
+        //Suguna - populate the latitude and longitude values on the account for leads created online
+        List<string> latlang = new list<string>();
+        String pcode = objManageCustomerBooking.CreateCustomerData.Address.PostCode;
+        string street = objManageCustomerBooking.CreateCustomerData.Address.NameNumber+' '+objManageCustomerBooking.CreateCustomerData.Address.Street;
+        String city = objManageCustomerBooking.CreateCustomerData.Address.TownCity;
+        
+        street = street!=null ? street.normalizeSpace().replaceall(' ','+').trim():'';
+        city = city!=null ? city.normalizeSpace().replaceall(' ','+').trim():'';
+        pcode = pcode!=null?pcode.normalizeSpace().replaceall(' ','+').trim():'';
+        string Address = street + '+'+city+ '+' +pcode;
+        System.debug('address string send to utility-->'+Address);
+                
+        try{
+             Latlang = Utilities.getLatLang(Address,pcode,street,city);
+        }catch (Exception e)
+        {
+        }
+        //ends
+     
+        Savepoint sp = Database.setSavepoint();
+         
         try {
             
             
             string billingStreet = objManageCustomerBooking.CreateCustomerData.Address.NameNumber + ' ' +objManageCustomerBooking.CreateCustomerData.Address.Street;
             
             string test_acc_name = reformatted_code.trim() + ' ' + (billingStreet.length()>29 ? billingStreet.substring(0,29): billingStreet);
+            test_acc_name = test_acc_name.trim();
             system.debug('Searching for Account with Account_Id__c of: ' + test_acc_name);
             
-            List<Account> existing_accs = [SELECT  Id,BillingStreet,BillingCity,BillingPostalCode,BillingState  FROM Account WHERE Account_Id__c = :test_acc_name ]; // use this field as it is indexed
+            List<Account> existing_accs = [SELECT  Id,BillingStreet,BillingCity,BillingPostalCode,BillingState,Latitude__Latitude__s,Latitude__Longitude__s FROM Account WHERE Account_Id__c = :test_acc_name ]; // use this field as it is indexed
             
             if(existing_accs.size()>0)
             {   
@@ -127,7 +150,40 @@ public class webManageCustomerBooking {
                                     return reply;
                                 }
                             }
-                            if((objManageCustomerBooking.CreateCustomerData.ProductInterest == null && o.Product_Interest__c != system.label.CHB) || (objManageCustomerBooking.CreateCustomerData.ProductInterest != null &&  o.Product_Interest__c != objManageCustomerBooking.CreateCustomerData.ProductInterest)|| (objManageCustomerBooking.CreateCustomerData.extraInfo!=null && objManageCustomerBooking.CreateCustomerData.extraInfo.ProductInterest!= null && objManageCustomerBooking.CreateCustomerData.extraInfo.ProductInterest != o.Product_Interest__c))
+                            if(userinfo.getUserName().contains('enginner.leadapp')||Test.isRunningTest())
+                            {
+                                    reply.Error.Code = 8;
+                                    reply.Error.Message = 'ERROR: Account still has active lead, new lead not allowed';
+                                    system.debug(reply.Error.Message);
+                                    return reply;
+                            }
+                            if(userinfo.getUserName().contains('chi_online')||Test.isRunningTest())
+                            {
+                                if(objManageCustomerBooking.CreateCustomerData.ProductInterest != null && (objManageCustomerBooking.CreateCustomerData.ProductInterest=='Telesales Conv'||objManageCustomerBooking.CreateCustomerData.ProductInterest=='Straight Swap'||objManageCustomerBooking.CreateCustomerData.ProductInterest=='Fanned Warm Air'))
+                                {
+                                    reply.Error.Code = 8;
+                                    reply.Error.Message = 'ERROR: Account still has active lead, new lead not allowed';
+                                    system.debug(reply.Error.Message);
+                                    return reply; 
+                                }
+                                
+                                if((objManageCustomerBooking.CreateCustomerData.ProductInterest == null && o.Product_Interest__c != system.label.CHB)|| (objManageCustomerBooking.CreateCustomerData.ProductInterest != null &&  o.Product_Interest__c != objManageCustomerBooking.CreateCustomerData.ProductInterest&&(objManageCustomerBooking.CreateCustomerData.ProductInterest=='Central heating Boiler'||objManageCustomerBooking.CreateCustomerData.ProductInterest=='Guided Sale')))
+                                {
+                                    o.Product_Interest__c = 'Central Heating Boiler';
+                                    if(objManageCustomerBooking.CreateCustomerData.ProductInterest != null )
+                                    o.Product_Interest__c = objManageCustomerBooking.CreateCustomerData.ProductInterest;
+                                   
+                                    
+                                    // Update Sequence Change
+                                    //helper = createUpdateLead(objManageCustomerBooking.CreateCustomerData, chi_account.Id,existAccount, engineerList, true, o);
+                                    updateFlag = true;
+                                    opp = new Opportunity();
+                                    opp = o;
+                                    existAccountFlag = existAccount;
+                                } 
+                                
+                            }
+                            /*if((objManageCustomerBooking.CreateCustomerData.ProductInterest == null && o.Product_Interest__c != system.label.CHB) || (objManageCustomerBooking.CreateCustomerData.ProductInterest != null &&  o.Product_Interest__c != objManageCustomerBooking.CreateCustomerData.ProductInterest)|| (objManageCustomerBooking.CreateCustomerData.extraInfo!=null && objManageCustomerBooking.CreateCustomerData.extraInfo.ProductInterest!= null && objManageCustomerBooking.CreateCustomerData.extraInfo.ProductInterest != o.Product_Interest__c))
                             {
                                 o.Product_Interest__c = 'Central Heating Boiler';
                                 if(objManageCustomerBooking.CreateCustomerData.ProductInterest != null )
@@ -136,11 +192,12 @@ public class webManageCustomerBooking {
                                 o.Product_Interest__c = objManageCustomerBooking.CreateCustomerData.extraInfo.ProductInterest;
                                 
                                 helper = createUpdateLead(objManageCustomerBooking.CreateCustomerData, chi_account.Id,existAccount, engineerList, true, o);
-                            } 
+                            } */
                             chi_lead = o;
                             reply.ChiLeadId = o.Id;
                             reply.ChiLeadCustRef = o.CHI_Lead_Id1__c;
                             existLead = true;
+                            existAccountFlag= existAccount;
 
                         }
                         
@@ -149,7 +206,11 @@ public class webManageCustomerBooking {
                     
                     if(reply.ChiLeadId==null )
                     {
-                        helper = createUpdateLead(objManageCustomerBooking.CreateCustomerData, chi_account.Id,existAccount, engineerList, false, null);
+                        // Update Sequence Change
+                        //helper = createUpdateLead(objManageCustomerBooking.CreateCustomerData, chi_account.Id,existAccount, engineerList, false, null);
+                        updateFlag = false;
+                        opp = null;
+                        existAccountFlag= existAccount;
                         
                         if(helper.Code!=0)
                         {
@@ -170,7 +231,11 @@ public class webManageCustomerBooking {
                 }else
                 {
                    
-                    helper = createUpdateLead(objManageCustomerBooking.CreateCustomerData, chi_account.Id,existAccount, engineerList, false, null);
+                    // Update Sequence Change
+                    //helper = createUpdateLead(objManageCustomerBooking.CreateCustomerData, chi_account.Id,existAccount, engineerList, false, null);
+                    updateFlag = false;
+                    opp = null;
+                    existAccountFlag= existAccount;
                     
                     if(helper.Code!=0)
                     {
@@ -214,13 +279,13 @@ public class webManageCustomerBooking {
                 //DATE:- June 8, 2018
                 //DESCRIPTION:- To populate the latitude and longitude values on the account page for leads created online
                
-                string street = chi_account.BillingStreet!=null?chi_account.BillingStreet.normalizeSpace().replaceall(' ','+').trim():'';
+                /*string street = chi_account.BillingStreet!=null?chi_account.BillingStreet.normalizeSpace().replaceall(' ','+').trim():'';
                 string city = chi_account.BillingCity!=null ? chi_account.BillingCity.normalizeSpace().replaceall(' ','+').trim():'';
                 string pcode = chi_account.BillingPostalCode!=null?chi_account.BillingPostalCode.normalizeSpace().replaceall(' ','+').trim():'';
                 string Address = street + '+'+city+ '+' +pcode;
                 System.debug('address string send to utility-->'+Address);
                 try{
-                    list<string> Latlang = Utilities.getLatLang(Address,pcode);
+                    list<string> Latlang = Utilities.getLatLang(Address,pcode,street,city);
                     if(Latlang.size()==2)
                     {
                         chi_account.Latitude__Latitude__s = double.valueof(Latlang[0]);
@@ -233,7 +298,7 @@ public class webManageCustomerBooking {
                     
                 }
                 System.debug('Latitude--> '+chi_account.Latitude__Latitude__s);
-                System.debug('Longitude-->'+chi_account.Latitude__Longitude__s);
+                System.debug('Longitude-->'+chi_account.Latitude__Longitude__s);*/
                     
                 //Keerthi - Code ends
                 insert chi_account;
@@ -247,10 +312,14 @@ public class webManageCustomerBooking {
                     return reply;
                 }
                 
+                updateFlag = false;
+                opp =null;
+                existAccountFlag= false;
                  // CHI Lead creaion.
                 
-                helper = createUpdateLead(objManageCustomerBooking.CreateCustomerData, chi_account.Id, false, engineerList, false, null);
-                
+                // Update Sequence Change
+                //helper = createUpdateLead(objManageCustomerBooking.CreateCustomerData, chi_account.Id, false, engineerList, false, null);
+                /*
                 if(helper.Code!=0)
                 {
                     reply.Error.Code = helper.Code;
@@ -263,25 +332,12 @@ public class webManageCustomerBooking {
                     chi_lead = helper.Opp;
                     reply.ChiLeadId = chi_lead.Id;
                     reply.ChiLeadCustRef = chi_lead.CHI_Lead_Id1__c;
-                    /*
-                    if(chi_lead.LeadSource == 'Engineer')
-                    {
-                        string engineerjson = JSON.serialize(objManageCustomerBooking);
-                        blob JSONBody = blob.valueof(engineerjson);
-                        Attachment att = new Attachment(Name = chi_lead.CHI_Lead_Id1__c+' JSON.text', Body = JSONBody, ParentId = chi_Lead.Id);
-                        insert att; 
-                    }*/
-                }   
+                    
+                }  
+                */
                 
                 
             }
-            string engineerjson = JSON.serialize(objManageCustomerBooking);
-            blob JSONBody = blob.valueof(engineerjson);
-            Attachment att = new Attachment(Name = chi_lead.CHI_Lead_Id1__c+' JSON.text', Body = JSONBody, ParentId = chi_Lead.Id);
-            attachmentList.add(att);
-            
-            if(attachmentList.size()>0)
-            insert attachmentList;
             
             new_contact.Salutation          = objManageCustomerBooking.CreateCustomerData.Name_x.Salutation;
             new_contact.FirstName           = objManageCustomerBooking.CreateCustomerData.Name_x.FirstName;
@@ -337,7 +393,7 @@ public class webManageCustomerBooking {
             enquiry.Postcode__c             = chi_account.BillingPostalCode;
             enquiry.Residential_Status__c   = objManageCustomerBooking.CreateCustomerData.ResStatus;
             enquiry.Salutation__c           = new_contact.Salutation;
-            enquiry.CHI_Lead__c             = chi_lead.id;
+           
             string temp_str = '';
             temp_str = objManageCustomerBooking.CreateCustomerData.Address.NameNumber + ' ' + objManageCustomerBooking.CreateCustomerData.Address.Street;
             system.debug('chi_account.BillingStreet-- >'+chi_account.BillingStreet + '  '+temp_str);
@@ -369,44 +425,67 @@ public class webManageCustomerBooking {
             
                 enquiry.Town_City__c = temp_str;    
             }
-        
+            
+            
+            //Suguna
+            if(chi_account.Latitude__Latitude__s==null && Latlang!=null && Latlang.size()==2)
+            {
+                 chi_account.Latitude__Latitude__s = double.valueof(Latlang[0]);
+                 chi_account.Latitude__Longitude__s = double.valueof(Latlang[1]);
+            }
             
             try{
                 system.debug('%%%%%%%%%%%%%%%%%%%%%%%%%'+new_contact);
                 insert new_contact;
-                insert enquiry;
+               
+                
+                //update Account with CHI Lead
+                chi_account.Primary_Contact__c = new_contact.Id;
+                update chi_account;
+                
+                
+                /* Update Sequence Change
+                Create opportunity at the end.
+                */
+                helper = createUpdateLead(objManageCustomerBooking.CreateCustomerData,  chi_account.Id, existAccountFlag, engineerList, updateFlag, opp);
+                
+                
+                if(helper.Code!=0)
+                {
+                    reply.Error.Code = helper.Code;
+                    reply.Error.Message = helper.Message;
+                    system.debug(reply.Error.Message);
+                    Database.rollback( sp );
+                    return reply;
+                }else
+                {
+                    chi_lead = helper.Opp;
+                    reply.ChiLeadId = chi_lead.Id;
+                    reply.ChiLeadCustRef = chi_lead.CHI_Lead_Id1__c;
+                    string engineerjson = JSON.serialize(objManageCustomerBooking);
+                    blob JSONBody = blob.valueof(engineerjson);
+                    Attachment att = new Attachment(Name = chi_lead.CHI_Lead_Id1__c+' JSON.text', Body = JSONBody, ParentId = chi_Lead.Id);
+                    attachmentList.add(att);
+                    
+                    if(attachmentList.size()>0)
+                    insert attachmentList;
+                    
+                    enquiry.CHI_Lead__c             = chi_lead.id;
+                    insert enquiry;
+                    
+                }  
+                
                 
                 
                 // CHG00009065: fix to create relationship record to relate Contat and CHI Lead
                 // as is done in the call centre booking system
                 // So, now add opportunity contact role....
                 OpportunityContactRole opp_contact_role = new OpportunityContactRole();
-                    
                 opp_contact_role.ContactId      = new_contact.Id;
                 opp_contact_role.OpportunityId  = chi_lead.Id;
                 opp_contact_role.Role           = 'Decision Maker';
-                
-                try {
+                insert opp_contact_role;
                     
-                    insert opp_contact_role;
-                    
-                    system.debug('opp_contact_role id =' + opp_contact_role.id);
-                }             
-                catch (exception e) {
-                    // OCP insert failed, set warning (no error code)
-                    reply.Error.Code = 0;
-                    reply.Error.Message = 'WARNING: Opportunity contact role insert failed';
-                    system.debug(reply.Error.Message);
-                    Database.rollback( sp );
-                    createEmail(JSON.serialize(objManageCustomerBooking));   
-                }   
-                
-                //update Account with CHI Lead
-                
-                chi_account.Primary_Contact__c = new_contact.Id;
-                
-                update chi_account;
-                
             }catch (exception e)
             {
                 reply.Error.Code = 2;
@@ -722,7 +801,8 @@ public class webManageCustomerBooking {
         Opportunity chi_lead = new Opportunity();
         
         // update the existing lead
-       
+        if(!updateFlag)
+        closedLostExistingLeads(chi_accountId);
         
         LeadCreateHelper reply = new LeadCreateHelper();
         
@@ -868,33 +948,36 @@ public class webManageCustomerBooking {
             //chi_lead.                                                                          
         }
         
-        List<Campaign> campaign_sources = [SELECT Id 
-                                           FROM Campaign 
-                                           WHERE Name = :campignName];
-        
-        system.debug('campaign_sources.size() = ' + campaign_sources.size());
-        
-        if (campaign_sources.size() == 1) {
+        if(!updateFlag)
+        {
+            List<Campaign> campaign_sources = [SELECT Id 
+                                               FROM Campaign 
+                                               WHERE Name = :campignName];
             
-            system.debug('Campaign id =' + campaign_sources[0].id);
-            chi_lead.CampaignId             = campaign_sources[0].id;
-           
-        }
-        else {
+            system.debug('campaign_sources.size() = ' + campaign_sources.size());
             
-            // chi lead insert failed, return blank app query reply and error code;
-            reply.Code = 9;
-            reply.Message = 'ERROR: Cannot assign Campaign to CHI Lead';
-            system.debug(reply.Message);
-            
-            if (null != chi_accountId && !existAccount) // only need to delete account as this triggers a delete of everything else
-                delete new Account(Id =chi_accountId);
-            
-            return reply;      
-        
+            if (campaign_sources.size() == 1) {
                 
-                
+                system.debug('Campaign id =' + campaign_sources[0].id);
+                chi_lead.CampaignId             = campaign_sources[0].id;
+               
             }
+            /*else {
+                
+                // chi lead insert failed, return blank app query reply and error code;
+                reply.Code = 9;
+                reply.Message = 'ERROR: Cannot assign Campaign to CHI Lead';
+                system.debug(reply.Message);
+                
+                if (null != chi_accountId && !existAccount) // only need to delete account as this triggers a delete of everything else
+                    delete new Account(Id =chi_accountId);
+                
+                return reply;      
+            
+                    
+                    
+                }*/
+        }
             
             try{
                     if(!updateFlag)
@@ -1071,6 +1154,44 @@ public class webManageCustomerBooking {
        return reply;                
     }
     
+    public void closedLostExistingLeads(id chi_accountId)
+    {
+       list<string> closedList = new list<string> {'Closed Lost', 'Expired', 'Closed Won', 'Suspended'};
+       
+       List<opportunity> lstOppty = [Select Id,StageName, Account.BillingPostalCode, Account.BillingStreet, Name,CreatedDate, Product_Interest__c From Opportunity where AccountId=:chi_accountId and stageName Not in :closedList and isClosed = false];
+       
+       if(!lstOppty.isempty())
+       {
+           list<Job__c> joblst = new list<Job__c>([Select Id, CHI_Lead__c From Job__c where CHI_Lead__c in: lstOppty]);
+           map<Id, Boolean> OppflagMap = new map<Id, Boolean>();
+            for(Job__c j :joblst)
+            {
+                if(!OppflagMap.containskey(j.CHI_Lead__c))
+                {
+                    OppflagMap.put(j.CHI_Lead__c, true);
+                }
+            }
+            
+            
+        list<Opportunity> updatelist=  new list<Opportunity>();
+    	for(Opportunity opp : lstOppty)
+    	{
+            if(!OppflagMap.containskey(opp.Id))
+            { 
+    	    	if(opp.StageName!= 'Closed Won' && opp.StageName!= 'Closed Lost')
+    	    	{
+    	    	opp.StageName = 'Closed Lost';
+    	    	opp.Stage_Reason_CHICR__c  = 'Auto Close Via Script';
+    	    	opp.By_Pass_User_Validation__c  = true;
+    	    	opp.Firefly_Script_Complete__c = true;
+    	    	updatelist.add(opp);
+    	    	}
+            }
+    	}
+    	if(!updatelist.isempty())
+    	update updatelist;
+     }
+    }
     
     private class LeadCreateHelper {
         integer  Code = 0;
@@ -1251,6 +1372,9 @@ public class webManageCustomerBooking {
                                             WHERE id=:oppId
                                             LIMIT 1];
         string post_code_sector = Opp.Install_Postcode__c.substring(0,Opp.Install_Postcode__c.length()-2);
+        
+        if(Appt_ID.length()>=20)
+        Appt_ID=Appt_ID.substring(0,18);
         
         if(!Appt_ID.startswith(keyPrefix)){
             

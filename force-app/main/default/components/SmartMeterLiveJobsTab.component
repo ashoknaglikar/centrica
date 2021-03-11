@@ -1,4 +1,4 @@
-<apex:component controller="SmartMeterInstallReport" allowDML="true"
+<!--<apex:component controller="SmartMeterInstallReport" allowDML="true"
     access="global">
     <apex:attribute name="Live_jobs"
         description="All smart meter live jobs with install date..."
@@ -214,6 +214,6 @@
             </apex:pageBlockSection>
         </apex:pageblock>
 
-    </apex:outputPanel>
-
+    </apex:outputPanel>-->
+<apex:component >
 </apex:component>

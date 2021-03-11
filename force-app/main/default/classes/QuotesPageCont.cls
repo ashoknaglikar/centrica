@@ -11,11 +11,13 @@ public with sharing class QuotesPageCont {
     public SelectOption[] allAllowanceKeySelected{get;set;}
     public SelectOption[] allProductIntSelected{get;set;}
     public SelectOption[] allCoreBundleSelected{get;set;}
+    public SelectOption[] allCustomerCategorySelected{get;set;}
    
     public List<District__c> Districts {get;set;}
     public List<Region__c> Regions {get;set;}
     
     Public transient list<opportunity> oppList{get;set;}
+    //Public  list<opportunity> oppListtemp{get;set;}
     public Integer count{get;set;}
     public Integer pageNumber{get;set;}
     public Integer setRecords {get;set;}
@@ -65,6 +67,7 @@ public with sharing class QuotesPageCont {
             allAllowanceKeySelected = new List<SelectOption>();
             allProductIntSelected = new List<SelectOption>();
             allCoreBundleSelected = new List<SelectOption>();
+            allCustomerCategorySelected= new List<SelectOption>();
     }
     
     public list<selectoption> getProductInterestOptions(){
@@ -105,6 +108,17 @@ public with sharing class QuotesPageCont {
         for(String coreBundle : coreBundleList)
         {
             Options.add(new SelectOption(coreBundle,coreBundle));
+        }
+        return options;
+    }
+    
+     public list<selectoption> getCustomerCategoryOptions(){
+        List<selectoption> options = new List<selectoption>();
+        List<String> customerCategoryList = new List<string>{'1','2','3','4','99'};
+        Options.add(new SelectOption('All','All'));
+        for(string customerCategory : customerCategoryList)
+        {
+            Options.add(new SelectOption(customerCategory,customerCategory));
         }
         return options;
     }
@@ -175,6 +189,9 @@ public with sharing class QuotesPageCont {
         {
             for(string s : conditions)
             {
+                if(fieldName=='opportunity__r.Latest_customer_category__c')
+                finalcriteria=finalcriteria + fieldName + '='+integer.valueof(s)+' OR ';
+                else
                 finalcriteria=finalcriteria + fieldName + '=\''+s+'\'  OR ';
             }
         }
@@ -212,7 +229,7 @@ public with sharing class QuotesPageCont {
         return values;
     }
    
-    public String prepareFinalQuery(Set<string> productInt , Set<string> district , Set<string> Region , Set<string> AllowanceKey,Set<string> coreBundle, Set<string> currentPHs)
+    public String prepareFinalQuery(Set<string> productInt , Set<string> district , Set<string> Region , Set<string> AllowanceKey,Set<string> coreBundle, Set<string> currentPHs,set<string> cusCategory)
     {
         String finalquery = ' ';
         if(!productInt.contains('All') && productInt.size() > 0 && productInt!= null)
@@ -239,6 +256,10 @@ public with sharing class QuotesPageCont {
         {
             finalquery =finalquery+' AND ('+ createCriteria(currentPHs,'opportunity__r.Product_Holdings__c') +')';
         }
+         if(!cusCategory.contains('All') && cusCategory.size() > 0 && cusCategory!= null)
+        {
+            finalquery =finalquery+' AND ('+ createCriteria(cusCategory,'opportunity__r.Latest_customer_category__c') +')';
+        }
         return finalquery;
     }
    
@@ -259,6 +280,7 @@ public with sharing class QuotesPageCont {
                 pageNumber=1;
                 setRecords=10;
                 oppList = new List<opportunity>();
+                //oppListtemp = new List<opportunity>();
                 oppids= new set<id>();
                 
                 string districtCriteria;
@@ -269,16 +291,19 @@ public with sharing class QuotesPageCont {
                 Set<string> allowanceKey = new Set<string>();
                 Set<string> district = new Set<string>();
                 Set<string> coreBundle = new Set<string>();
-                Set<String> partNum = new Set<String>();
+                //Set<String> partNum = new Set<String>();
                 Set<String> currentPHs = new Set<String>();
+                Set<String> cusCategory = new Set<String>();
                
+                cusCategory = formatSelectOptionsToString(allCustomerCategorySelected);
                 productInt = formatSelectOptionsToString(allProductIntSelected);
                 district = formatSelectOptionsToString(allDistrictsSelected);
                 Region = formatSelectOptionsToString(allRegionsSelected);
                 allowanceKey = formatSelectOptionsToString(allAllowanceKeySelected);
-                allowanceKey.addall(new List<String>{'M2','EM','XD','X5','X9'});
+                //allowanceKey.addall(new List<String>{'M2','EM','XD','X5','X9'});
+                allowanceKey.addall(system.label.QFU_AllowanceKey_Exclude.split(','));
                 coreBundle = formatSelectOptionsToString(allCoreBundleSelected);
-                partNum = formatTextToString(partNumber);
+                set<string> partNum = partNumber!=null?formatTextToString(partNumber):new Set<String>();
                  if(currentProductHoldings!=null && currentProductHoldings!='')
                 currentPHs = formatTextToString(currentProductHoldings);
                 
@@ -298,16 +323,17 @@ public with sharing class QuotesPageCont {
                 query += ' and bmStatusReason__c NOT IN:statusReason ';
                 
                 endCriteria = 'Opportunity__c != null and opportunity__r.closeDate__c=null and opportunity__r.SC_Type__c!=\'Multi-Premise\' and opportunity__r.StageName IN:oppStages and opportunity__r.Finance_Process_Outcome__c=null';
-                endCriteria +=' and opportunity__r.Portal_Deposit__c=null and opportunity__r.Product_Interest__c NOT IN:productInterest and opportunity__r.Payment_Reference_Number__c=null and opportunity__r.Exclude_QFU__c=false ';
+                endCriteria +=' and opportunity__r.Portal_Deposit__c=null and opportunity__r.Product_Interest__c NOT IN:productInterest and opportunity__r.Exclude_QFU__c=false ';
                 endCriteria +=' and opportunity__r.Comms_Email_Field__c!=null and opportunity__r.Customer_Email__c!=null ';
                 endCriteria += subQuery;
                 
                 string submitdate = 'submittedDate_quote__c >=' +getDateToStringValue(bm.installationDate__c) +' AND submittedDate_quote__c <='+getDateToStringValue(bm.closeDate__c);
-                prepareQuery = prepareFinalQuery(productInt , district , Region , allowanceKey,coreBundle,currentPHs);
+                prepareQuery = prepareFinalQuery(productInt , district , Region , allowanceKey,coreBundle,currentPHs,cusCategory);
                 String finalquery = query + prepareQuery + 'AND ('+submitdate+ ') AND '+endCriteria;
                 
-                transient List<BigMachines_Quote__c> bmlist = database.query(finalquery+' limit 10000');
+                system.debug('Query '+finalquery);
                 
+                transient List<BigMachines_Quote__c> bmlist = database.query(finalquery+' limit 10000');
                 
                 if(bmlist.size()>0)
                 {    
@@ -316,6 +342,7 @@ public with sharing class QuotesPageCont {
                          oppIds.add(bm.opportunity__c);
                      }
                      opplist = [select id,name, Customer_Name__c,CHI_Lead_Id__c,account.Address__c from opportunity where id IN:oppids limit 10000];
+                    
                 }
                 if(opplist.isEmpty())
                 {
@@ -504,6 +531,7 @@ public with sharing class QuotesPageCont {
      //Pagination-navigates to first page
     public PageReference firstPage()
     {
+        opplist = [select id,name, Customer_Name__c,CHI_Lead_Id__c,account.Address__c from opportunity where id IN:oppids limit 10000];
         pageNumber = 1;
         return null;
     }
@@ -511,13 +539,15 @@ public with sharing class QuotesPageCont {
     //Pagination-navigates to previous page
     public PageReference previousPage() 
     {
+         opplist = [select id,name, Customer_Name__c,CHI_Lead_Id__c,account.Address__c from opportunity where id IN:oppids limit 10000];
         pageNumber = pageNumber-1;
         return null;
     }
     
     //Pagination-navigates to next page
     public PageReference nextPage() 
-    {
+    {   
+         opplist = [select id,name, Customer_Name__c,CHI_Lead_Id__c,account.Address__c from opportunity where id IN:oppids limit 10000];
         pageNumber = pageNumber+1;
         return null;
     }
@@ -525,6 +555,7 @@ public with sharing class QuotesPageCont {
     //Pagination-navigates to last page
     public PageReference lastPage()
     {
+        opplist = [select id,name, Customer_Name__c,CHI_Lead_Id__c,account.Address__c from opportunity where id IN:oppids limit 10000];
         pageNumber = (count/setRecords);
         if(pageNumber < pageUp)
         {

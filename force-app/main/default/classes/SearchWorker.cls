@@ -311,8 +311,20 @@ public with sharing class SearchWorker {
                     {
                         if((jro.employeesAlwaysWorksWithElec==null||jro.employeesAlwaysWorksWithElec.isempty())&& SearchBlackBox.jobInfo.namedEmployee==null)
                         break;
+                        
+                        boolean isSkipThisJro = false;
+                        for(ResourceOption r:jro.primaryResources)
+                        {
+                           if(r.employeeID!=SearchBlackBox.jobInfo.namedEmployee && r.alwaysWorksWithElectrician!=SearchBlackBox.jobInfo.namedElectritian)
+                           isSkipThisJro=true;
+                        }
+                       if(isSkipThisJro)
+                       break;
                     }
-                    
+                    else{
+                        if((jro.employeesAlwaysWorksWithElec!=null && !jro.employeesAlwaysWorksWithElec.isempty())&& SearchBlackBox.jobInfo.namedEmployee==null)
+                        break;
+                    }
                     
                     //suguna -PH Jones change
                     EmployeeInformation ei2;
@@ -599,12 +611,14 @@ public with sharing class SearchWorker {
                 
                 //Suguna- Always works with Electrician
                 Set<ID> empsWithSkill= jro.employeesAlwaysWorksWithElec;
+                system.debug('empsWithSkill '+empsWithSkill);
                 if(empsWithSkill == null || empsWithSkill.isEmpty()) 
                 {
                     empsWithSkill = employees.employeeIDsBySkill.get(skill);
+                    empsWithSkill.removeAll(employees.alwaysWorksWithInstallerElecIds);
                     empsWithSkill.removeAll(employees.AlwaysWorksWithElecIDs);
                 }
-                     
+                system.debug('empsWithSkill 2 '+empsWithSkill);     
                 // Get Employees with this skill - if there are none, break out of this loop (and continue with the next JRO)
                 //Set<ID> empsWithSkill = employees.employeeIDsBySkill.get(skill);
                 if(empsWithSkill == null || empsWithSkill.isEmpty()) {
@@ -1548,16 +1562,20 @@ public with sharing class SearchWorker {
         }
         
          //Suguna - heavy appliance fix 
-        if(SearchBlackBox.jobInfo.job.Heavy_Appliance__c&&system.label.Heavy_Appliance_Job=='on'&&!SearchBlackBox.jobInfo.job.Override_Heavy_Appliance__c)
+        // heavy appliance fix 
+       if(SearchBlackBox.jobInfo.job.Heavy_Appliance__c&&system.label.Heavy_Appliance_Job=='on'&&!SearchBlackBox.jobInfo.job.Override_Heavy_Appliance__c)
         {
                  if(de2.startDT!=de1.startDT) {
                            if(de2.startDT<de1.startDT)
                            {
+                               de2.numberOfHours=de2.numberOfHours - de2.workingHoursBetween(de2.startDT,de1.startDT);
                                //de2.startDT= Datetime.newInstance(de2.StartDT.date().adddays(1),DateTimeHelper.stringToTime(de2.entryInfoObjects[0].MstartTime));
                                de2.startDT = de1.startDT;
+                               
                            }
                            else if(de1.startDT<de2.startDT)
                            {
+                                de1.numberOfHours=de1.numberOfHours - de1.workingHoursBetween(de1.startDT,de2.startDT);
                                //de1.startDT=Datetime.newInstance(de1.StartDT.date().adddays(1),DateTimeHelper.stringToTime(de1.entryInfoObjects[0].MstartTime));
                                de1.startDT =de2.startDT;
                            }

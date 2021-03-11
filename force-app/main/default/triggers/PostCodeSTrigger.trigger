@@ -37,7 +37,7 @@ trigger PostCodeSTrigger on Postcode_Sector__c (before delete ,after insert,afte
              if(pCSector.name!=null && ((pCSector.Type__c=='Sales' && oldRecord.Type__c != 'Sales') || 
                (pCSector.Name != oldRecord.Name  && pCSector.Type__c=='Sales' )|| 
                (pCSector.Type__c!='Sales' && oldRecord.Type__c == 'Sales') || 
-               (pCSector.Sub_Patch__c != oldRecord.Sub_Patch__c))){
+               (pCSector.Sub_Patch__c != oldRecord.Sub_Patch__c && pCSector.Type__c =='Sales' ))){
                   subpatchid.add(pCSector.Sub_Patch__c);
              }
              

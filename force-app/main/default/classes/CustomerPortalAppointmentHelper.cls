@@ -63,7 +63,7 @@ public class CustomerPortalAppointmentHelper{
       return null;
    }
    
-   
+   /*
    Public static getAppointmentsJSON.ManageAppointmentResponse ManageReservation(string PostCode, getAppointmentsJSON.ManageAppointment reservedAppt){
    
        getAppointmentsJSON.ManageAppointmentResponse returnResponse = new getAppointmentsJSON.ManageAppointmentResponse();
@@ -107,6 +107,7 @@ public class CustomerPortalAppointmentHelper{
    
     return null;
    }
+   */
    
    
    public static getAppointmentsJSON.createAppointmentDataResponse manageAppointmentBooking(string oppId,string Appt_ID){
@@ -122,6 +123,10 @@ public class CustomerPortalAppointmentHelper{
          try{
                  webservice_CHI_Online.cCreateAppointmentData obj = new webservice_CHI_Online.cCreateAppointmentData();
                  obj.Appointment = new webservice_CHI_Online.cAppointment();
+                 /*
+                 if(Appt_ID.length()>=20)
+                 Appt_ID=Appt_ID.substring(0,18);
+                 */
                  obj.Appointment.AppId = Appt_ID;
                  
                  Appointment__c bookedAppointment = new webManageCustomerBooking().bookedAppointment(obj, oppId,false );
@@ -143,7 +148,10 @@ public class CustomerPortalAppointmentHelper{
             catch(exception e)
             {
                 reply.err.ErrorCode = 4;
-                reply.err.ErrorMessage = 'ERROR: Appointmnet booking failed. '+e.getmessage()+' For CHI Lead : '+opp.Id +' Number :'+opp.CHI_Lead_Id1__c;
+                reply.err.ErrorMessage = 'ERROR: Appointmnet booking failed. '+e.getmessage()+' For CHI Lead : '+opp.Id +' Number :'+opp.CHI_Lead_Id1__c + ' & App id:'+Appt_ID;
+                
+                CreateEmail.CretaeSendTextEmail(new list<String>{'ashokkumar.nagaleekar@centrica.com'},  reply.err.ErrorMessage +' At line number'+e.getLineNumber(), 'Error while changing appointment in portal');
+                
                 return reply;
             }
              

@@ -22,8 +22,8 @@ public class financePhase3helper {
        
         map<string, decimal> lenderPropotion = new map<string, decimal>();
         map<string, Finance_Product__c> lenderProductMap = new map<string, Finance_Product__c>();
-        
-        for(Finance_Product__c lender  : [Select Id, Name, Lender__c, ApplicationPer__c, Payment_Options__c, Selling_Type__c from Finance_Product__c where Finance_Options__c = :fApp.Finance_Options__c and New_Product__c = true order by Lender__c])
+        system.debug(fApp.Finance_Options__c);
+        for(Finance_Product__c lender  : [Select Id, Name, Lender__c, ApplicationPer__c, Payment_Options__c, Selling_Type__c from Finance_Product__c where Finance_Options__c = :fApp.Finance_Options__c and New_Product__c = true   order by Lender__c])
         {
             lenderPropotion.put(lender.Lender__c, lender.ApplicationPer__c);
             lenderProductMap.put(lender.Lender__c, lender);
@@ -41,7 +41,12 @@ public class financePhase3helper {
         
             //IFC
             integer totalCount = 0;
-            list<aggregateresult> aggr = [Select Count(Id)c,  Lender_Text__c  from Finance_Application__c where Valid_New_Application__c = true and Finance_Product__r.New_Product__c = true and Lender_Text__c != null Group by Lender_Text__c  ];
+            list<aggregateresult> aggr = [Select Count(Id)c,  Lender_Text__c  from Finance_Application__c where Valid_New_Application__c = true 
+                                                                                                          and Finance_Product__r.New_Product__c = true 
+                                                                                                          and Lender_Text__c != null 
+                                                                                                          and createdDate >= :system.today() 
+                                                                                                          and Finance_Options__c = : fApp.Finance_Options__c
+                                                                                                          Group by Lender_Text__c  ];
             for(aggregateresult a: aggr)
             {
                 totalCount += integer.valueof(a.get('c'));
@@ -51,10 +56,12 @@ public class financePhase3helper {
             {
                 for(aggregateresult a: aggr)
                 {
-                    decimal percentRequired = lenderPropotion.get(string.valueof(a.get('Lender_Text__c')))*100;
+                    decimal percentRequired = lenderPropotion.get(string.valueof(a.get('Lender_Text__c')));
                     if(percentRequired>0)
                     {
-                        decimal percentUptoNow = (integer.valueof(a.get('c'))/percentRequired)*100;
+                        system.debug('I am in '+a.get('Lender_Text__c')+' And count is '+integer.valueof(a.get('c'))+'/'+totalCount);
+                        decimal percentUptoNow = ((decimal.valueof(integer.valueof(a.get('c')))/totalCount)*100).setscale(2);
+                        system.debug('I am in '+a.get('Lender_Text__c')+' And this needs '+percentRequired+' But we have '+percentUptoNow);
                         if(percentUptoNow<=percentRequired)
                         {
                             lenderName =  (string.valueof(a.get('Lender_Text__c')));

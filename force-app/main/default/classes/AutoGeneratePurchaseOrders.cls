@@ -51,6 +51,7 @@ public class AutoGeneratePurchaseOrders {
         
         //rebate Field Added
         double rebate =0.00;
+        public String matCode{get;set;}
         
     } 
     
@@ -155,6 +156,8 @@ public class AutoGeneratePurchaseOrders {
     private selectRateForElements objRateCard;
     public Map<String,Rate_Card_Items__c> m_SecondaryRate=new Map<String,Rate_Card_Items__c>{};
     public Map<String,Rate_Card_Items__c> m_PrimaryRate=new Map<String,Rate_Card_Items__c>{};
+    public Map<String,Rate_Card_Items__c> m_TertiaryRate=new Map<String,Rate_Card_Items__c>{};
+    public Map<String,Rate_Card_Items__c> im_itineryRate=new Map<String,Rate_Card_Items__c>{};
     public Map<String,Map<String,Post_Code_Skill_Rate__c>> postCodeSkillRateMap=new Map<String,Map<String,Post_Code_Skill_Rate__c>>{};
     public Map<String,Map<String,Rate_Card_Items__c>> rateCardItemMap = new Map<String,Map<String,Rate_Card_Items__c>>{};
     
@@ -527,6 +530,27 @@ public class AutoGeneratePurchaseOrders {
                             m_UnOrderedItem.add(objUnOrdered);  
                         }//End for
                         fetchTertiarySupplier();
+                        
+                        //Suguna- Multiple tertiary Suppliers to unOrderedItems
+                        List<underOrderedItem> m_UnOrderedItemTemp=new List<underOrderedItem>{};
+                        for(underOrderedItem unOrderItem:m_UnOrderedItem)
+                        {
+                            for(String suppNum:tertiarySuppNums)
+                            {
+                                m_tertiaryRate=m_RateCard.get(suppNum);
+                                if(m_tertiaryRate!=null){
+                                    if(m_tertiaryRate.containsKey(unOrderItem.objJobElement.code__c))
+                                    {
+                                       unOrderItem.sSupplierId= suppNum; 
+                                       m_UnOrderedItemTemp.add(unOrderItem);
+                                       break;
+                                    }
+                                }
+                                
+                            }
+                        }
+                        m_UnOrderedItem=m_UnOrderedItemTemp;
+                        //ends
                     }//End if
                     
                       
@@ -563,6 +587,27 @@ public class AutoGeneratePurchaseOrders {
                     im_UnOrderedItem.add(objUnOrdered);  
                 }//End for
                 fetchitinerySupplier();
+                
+                //Suguna- Multiple itinary Suppliers to unOrderedItems
+                set<underOrderedItem> im_UnOrderedItemTemp=new set<underOrderedItem>{};
+                        for(underOrderedItem unOrderItem:im_UnOrderedItem)
+                        {
+                            for(String suppNum:itinerySuppNums)
+                            {
+                                im_itineryRate=im_RateCard.get(suppNum);
+                                if(im_itineryRate!=null){
+                                    if(im_itineryRate.containsKey(unOrderItem.objJobElement.code__c))
+                                    {
+                                       unOrderItem.sSupplierId= suppNum; 
+                                       im_UnOrderedItemTemp.add(unOrderItem);
+                                       break;
+                                    }
+                                }
+                                
+                            }
+                        }
+                        im_UnOrderedItem=new List<underOrderedItem>(im_UnOrderedItemTemp);
+                        //ends
             }//End if
         
         // Cognizant - CHI Phase III CR-005 implementation... START
@@ -1027,6 +1072,7 @@ public class AutoGeneratePurchaseOrders {
                 decimal rebate = m_Rate.get(sTemp).Material__r.Rebate__c!= null?m_Rate.get(sTemp).Material__r.Rebate__c: 0.00;
                 objOrderLineItem.Rebate = rebate*objOrderLineItem.dblUnits;
                 isPriceFoundForOne = true;
+                objOrderLineItem.matCode=m_Rate.get(sTemp).Material__r.material_Code__c;
             }
             // Cognizant - CHI Phase III CR-005 implementation... START
             // Added an else if block to set the unit price of orderlineitem with merchant price of user defined job element. 
@@ -1430,7 +1476,9 @@ public class AutoGeneratePurchaseOrders {
             
             Map<String,List<Job_Element__c>> m_SelectedJobElementMap =new Map<String,List<Job_Element__c>>{};
             if (m_UnOrderedItem!=null) {
+                system.debug('Sugu 11 '+m_UnOrderedItem);
                 for (underOrderedItem unAttendedItem:m_UnOrderedItem){
+                    system.debug('Sugu 11 '+unAttendedItem.sSupplierId);
                     if (unAttendedItem.sSupplierId!=null){
                         m_SelectedJobElementMap =new Map<String,List<Job_Element__c>>{};
                         objJEUnattended=new List<Job_Element__c>{};
@@ -1475,11 +1523,17 @@ public class AutoGeneratePurchaseOrders {
                         }
                     }
                 }
+                
+                
+                
             }
             
             Map<String,Map<String,List<Job_Element__c>>> im_SelectedSupplierJobElementMap=new Map<String,Map<String,List<Job_Element__c>>>{};
             List<Job_Element__c> objiJEUnattended;
             Map<String,List<Job_Element__c>> im_SelectedJobElementMap =new Map<String,List<Job_Element__c>>{};
+            
+            
+            //ends
             if (im_UnOrderedItem!=null) {
                 for (underOrderedItem uniAttendedItem:im_UnOrderedItem){
                     if (uniAttendedItem.sSupplierId!=null){
@@ -1642,6 +1696,7 @@ public class AutoGeneratePurchaseOrders {
                             objOrderLineItemActual.Line_Item_Value__c=objOrderLineItem.dblTotalPrice;
                             objOrderLineItemActual.Skill__c=objOrderLineItem.sSkill;
                             objOrderLineItemActual.Rebate__c=objOrderLineItem.Rebate;
+                            objOrderLineItemActual.material_Code__c=objOrderLineItem.matCode;
                             orderLineItemLst.add(objOrderLineItemActual);      
                             for (Job_Element__c objJobElement:objOrderLineItem.getSJobElementLst()){
                                 objJobElement.Order__c=objOrderFinal.Id;
@@ -1699,38 +1754,55 @@ public class AutoGeneratePurchaseOrders {
         }
     }
    public List<SelectOption> tertiarySupplierLst{get;set;}
-
+   public List<String> tertiarySuppNums= new List<String>();
+   
     private void fetchTertiarySupplier(){
         tertiarySupplierLst=new List<SelectOption>();
         tertiarySupplierLst.add(new Selectoption('','-None-'));
         for (SupplierDetails objSupplier:m_SupplierMap.values()){
             if (objSupplier.intSupplierPref==3){
-                tertiarySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));   
+                tertiarySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName)); 
+                tertiarySuppNums.add(objSupplier.sSupplierNum);
             }
         }
         
     }
     public List<SelectOption> itinerySupplierLst{get;set;}
+    public List<String> itinerySuppNums= new List<String>();
     private void fetchitinerySupplier(){
         itinerySupplierLst=new List<SelectOption>();
         itinerySupplierLst.add(new Selectoption('','-None-')); 
         for (SupplierDetails objSupplier:im_SupplierMap.values()){
-            itinerySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));   
+            itinerySupplierLst.add(new Selectoption(objSupplier.sSupplierNum,objSupplier.sSupplierName));
+            itinerySuppNums.add(objSupplier.sSupplierNum);
         }
         
     }
     // PRB00029071 starts
     public PageReference Autoclick(){
-     
-      Pagereference pgRef ;
-      if(ApexPages.currentPage().getParameters().get('Autogen')=='1')
-       {
-       autoGenerateOrders(objcurjob);
-       pgRef = new Pagereference ('/'+objcurjob.id);
-       pgRef.setredirect(true);
-       return pgRef;
-       }
+         try{
+          Pagereference pgRef ;
+          if(ApexPages.currentPage().getParameters().get('Autogen')=='1')
+           {
+               autoGenerateOrders(objcurjob);
+               pgRef = new Pagereference ('/'+objcurjob.id);
+               pgRef.setredirect(true);
+               return pgRef;
+           }
+            
+         }
+         catch(Exception e){
+            String error = 'Exception Message :' +e.getmessage() + '. \n'+
+                         'line Number :'+e.getLineNumber()+ '\n'+
+                         'Cause of issue'+e.getCause()+'\n'+
+                         'Exception Type'+e.getTypeName()+'\n\n';
+            list<string> toaddress = new list<string>{'sree.subha@britishgas.co.uk','devisree.a@britishgas.co.uk','Suguna.Chinnasamy@cognizant.com'};
+            String plaintextbody ='Error in Autogenrating Purchase Orders for.\n';  
+            plaintextbody+='Job  : ' + objcurjob + '\n';          
+            plaintextbody += error;            
+            CreateEmail.CretaeSendTextEmail(toaddress, plaintextbody,  'Error in Autogenerating PO');
+        }
         return null;
-     }
+    }
     // PRB00029071 ends  
 }

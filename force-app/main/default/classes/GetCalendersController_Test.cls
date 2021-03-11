@@ -28,7 +28,16 @@ public class GetCalendersController_Test{
   getCalenders.quotaData.Work_Time_Start__c=workStartTime ;
   getCalenders.quotaData.Work_Time_End__c=workEndTime ;
   getCalenders.validateDates();
-  Test.setMock(WebServiceMock.class, new toaCapacityMockImpl());
+  
+  getCalenders.getInternalAct();
+  
+  getCalenders.quotaData.Work_Time_Start__c=Date.Today()-2 ;
+  getCalenders.quotaData.Work_Time_End__c=workEndTime ;
+  //Test.setMock(WebServiceMock.class, new toaCapacityMockImpl());
+  SingleRequestMock fakeResp = new SingleRequestMock(200,
+                                                 '200',
+                                               '{"items": [{"resourceId": "a0A20000007ZZZjEAO","date": "2017-11-19","activityType": "MR","duration":60,"serviceWindowEnd":"15:00:00","serviceWindowStart":"14:00:00"}]}', null);
+  Test.setMock(HttpCalloutMock.class, fakeResp); 
   getCalenders.getInternalAct();
   Test.stopTest();
   
@@ -63,5 +72,13 @@ public class GetCalendersController_Test{
   Test.stopTest();
   
   }
+  
+  static testmethod void testMethod4(){
+      GetCalendersController getCalenders=new GetCalendersController();
+      getCalenders.quotaData.Work_Time_Start__c = null;
+      getCalenders.quotaData.Work_Time_End__c = null;
+      getCalenders.getShiftPattern();
+  }
+  
 
 }

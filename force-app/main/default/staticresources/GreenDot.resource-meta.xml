@@ -2,5 +2,5 @@
 <StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
     <cacheControl>Public</cacheControl>
     <contentType>image/jpeg</contentType>
-    <description>Used to display status &#39;Complete&#39;</description>
+    <description>Used to display status &apos;Complete&apos;</description>
 </StaticResource>

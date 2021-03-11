@@ -329,8 +329,8 @@ function checkLimit(limitField, limitCount, limitNum)
   <apex:form id="formID" >
       
    <apex:actionFunction name="parafunction" action="{!indicator}" immediate="true" reRender="faaa,faaa1">
-                 <apex:param name="reason" value="" assignTo="{!subreason}"/>
-                 <apex:param name="subreason" value="" assignTo="{!reason}"/>
+                 <apex:param name="reason" value="" assignTo="{!reason}"/>
+                 <apex:param name="subreason" value="" assignTo="{!subreason}"/>
                  <apex:param name="Heat" value=""/>
                  <apex:param name="HW" value=""/>
                  <apex:param name="OH" value=""/>
@@ -338,8 +338,13 @@ function checkLimit(limitField, limitCount, limitNum)
     </apex:actionFunction>
     
   <apex:pageBlock id="pageBlockID" >
-        
+        {!cancelOldApt.size}
   <!--<apex:pageBlockSection title="New Lead Details" columns="1" id="pageblocksectionID"> --> 
+  <apex:pageBlockSection title="Enter the Cancellation Reasons for existing Appointment" columns="2" id="cancelReasonSection" rendered = "{!cancelOldApt.size>0}">  
+    <apex:inputfield value="{!tempApp.Primary_Cancellation_Reason__c}" required="true"/>
+    <apex:inputfield value="{!tempApp.Secondary_Cancellation_Reason__c}" required="true"/>
+  
+  </apex:pageBlockSection>
   <apex:pageBlockSection title="Lead Details" columns="1" id="pageblocksectionID">  
   <apex:pageBlockSectionItem >
       <!--<apex:outputLabel value="Product Interest of Exsiting Lead"/>-->

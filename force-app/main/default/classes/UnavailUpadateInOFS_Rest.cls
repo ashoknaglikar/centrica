@@ -8,11 +8,14 @@ public string urlOFS =System.Label.URL_for_updating_Unavailability;
 
 
 
-public string searchUnavail( String empIdOFS, String dateFrom,String dateTo, string requestURL){
+public string searchUnavail( String offset, String dateFrom,String dateTo, string requestURL){
     
     Http http = new Http();
+    
     HttpRequest request = new HttpRequest();
-    string urlUnavail=urlOFS+'/activities/custom-actions/search?'+requestURL+'&dateFrom='+dateFrom+'&dateTo='+dateTo+'&fields=activityId,resourceId,activityType,status,startTime,endTime&limit=500';
+    string urlUnavail=urlOFS+'/activities/custom-actions/search?'+requestURL+'&dateFrom='+dateFrom+'&dateTo='+dateTo+'&fields=activityId,resourceId,activityType,status,startTime,endTime,duration,XA_duration,timeZone,timeOfAssignment,timeOfBooking,worktype,date,recordType&limit=100';
+    if(offset !=null)
+    urlUnavail+='&offset='+offset;
     request.setEndpoint(urlUnavail);
     Blob headerValue = Blob.valueOf(userOFS + ':' + passwordOFS);
     String authorizationHeader = 'BASIC ' +EncodingUtil.base64Encode(headerValue);
@@ -84,12 +87,13 @@ public string createActivity(GetUnavailabilityController.UnavailWrap unavailNew)
         System.debug('Received the following :');
        
             System.debug('***'+response.getBody());
+            return response.getBody();
        
     }else
     {
     	return null;
     }
-    return response.getBody();
+    
 
 }
  public Integer deleteActivity(String activityId){
@@ -140,5 +144,57 @@ public string createActivity(GetUnavailabilityController.UnavailWrap unavailNew)
 
     return response.getBody();
 }
+
+public string  getCalendarsVer2(string resourceIds,date dateFrom,date dateTo){
+  
+    string startString = datetime.newinstance(dateFrom, time.newinstance(0,0,0,0)).format('yyyy-MM-dd');
+    string endString = datetime.newinstance(dateTo, time.newinstance(0,0,0,0)).format('yyyy-MM-dd');
+    Http http = new Http();
+    HttpRequest request = new HttpRequest();
+    String strURL=urlOFS+'/calendars?resources='+resourceIds+'&dateFrom='+startString+'&dateTo='+endString;
+    request.setEndpoint(strURL);
+     Blob headerValue = Blob.valueOf(userOFS + ':' + passwordOFS);
+    String authorizationHeader = 'BASIC ' +EncodingUtil.base64Encode(headerValue);
+    request.setHeader('Authorization', authorizationHeader);
+    request.setMethod('GET');
+    HttpResponse response = http.send(request);
+    system.debug('**'+response.getStatusCode());
+    if (response.getStatusCode() == 200) {
+    
+            System.debug('Received the following :');
+       
+            System.debug('***'+response.getBody());
+            return response.getBody().replaceall('date','date_x');
+       
+    }
+    return null;
+
+        
+}
+
+/*
+public string  getActvity(long activityId){
+  
+    Http http = new Http();
+    HttpRequest request = new HttpRequest();
+    String strURL=urlOFS+'/activities/'+activityId;//+'/workskills';
+    request.setEndpoint(strURL);
+     Blob headerValue = Blob.valueOf(userOFS + ':' + passwordOFS);
+    String authorizationHeader = 'BASIC ' +EncodingUtil.base64Encode(headerValue);
+    request.setHeader('Authorization', authorizationHeader);
+    request.setMethod('GET');
+    HttpResponse response = http.send(request);
+    system.debug('**'+response.getStatusCode());
+    if (response.getStatusCode() == 200) {
+    
+        System.debug('Received the following :');
+       
+            System.debug('***'+response.getBody());
+       
+    }
+
+        return response.getBody();
+}
+*/
 
 }

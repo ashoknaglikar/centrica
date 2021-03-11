@@ -30,6 +30,11 @@ Global class CustomerPortalFinance {
     public decimal mortgage;
     public decimal houserent;
     public string financeOptions;
+    public string incomeVariation;
+    public decimal incomeVariationValue;
+    public decimal monthlyExpense;
+    public string expenseVariation;
+    public decimal expenseVariationValue;
     Public List <CustomerPortalFinanceAddress> customerAddress =new List <CustomerPortalFinanceAddress> ();
     Public CustomerPortalFinanceAddress employerAddress = new CustomerPortalFinanceAddress() ;
     

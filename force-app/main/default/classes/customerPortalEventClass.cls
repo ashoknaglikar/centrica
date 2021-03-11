@@ -9,6 +9,8 @@ global class customerPortalEventClass {
     public string eventDescription;
     public string employeeName;
     public string employeeContactNumber;
+    // added employee picture id
+    public string employeePictureId;
     public boolean show;
     public string recordId ;
     public list<cutomerPortalEventChildClass> childEvents;

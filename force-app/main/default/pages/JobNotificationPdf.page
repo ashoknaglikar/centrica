@@ -1,4 +1,4 @@
-<apex:page controller="JobNotificationMail" renderAs="pdf" tabStyle="Job_Diary__tab" title="Job Diary">
+<apex:page controller="JobNotificationMail" renderAs="pdf" title="Job Diary">
 <apex:outputPanel rendered="{!if(ISNULL(lst_JobDiaryDetails),false,true)}">       
         <apex:pageblock title="{!str_InstallerName}">
              <apex:pageBlock title="{!str_jobPipelineTimeline}">

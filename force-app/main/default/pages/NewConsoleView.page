@@ -299,14 +299,14 @@ function openAllNotes(oppid)
                 </div>
                 
                 <div>
-                    <apex:dataTable value="{!recentlyViewedList}" var="rV"   ><!-- rowClasses="even-row, odd-row"-->
-                        <!--<apex:column onclick="readCell('{!rV.Id}'+'?isdtp=vw');" >-->
+                    <!--<apex:dataTable value="{!recentlyViewedList}" var="rV"   ><!-- rowClasses="even-row, odd-row"
+                        <!--<apex:column onclick="readCell('{!rV.Id}'+'?isdtp=vw');" >
                         <apex:column style="height:18px;" >
                             <apex:outputLink value="/apex/{!$CurrentPage.Name}?id={!rV.Id}" style="color:black;font:5px;text-decoration:none;" styleclass="recentlyviewed">
                                 <b>{!LEFT(rV.Name,if(LEN(rV.Name)>30, 30,LEN(rV.Name)))}</b>
                             </apex:outputLink>                               
                         </apex:column> 
-                    </apex:dataTable>
+                    </apex:dataTable>-->
                 </div>
             </div>
             </div>

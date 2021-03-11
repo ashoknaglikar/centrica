@@ -243,6 +243,30 @@ global class webservice_CHI_Online {
         GetAppointmentsByPostcodeResponse reply = new GetAppointmentsByPostcodeResponse();
         webGetAppointmentsByPostcode objwebGetAppointmentsByPostcode = new webGetAppointmentsByPostcode();
         reply = objwebGetAppointmentsByPostcode.getAppointmentsByPostcodeFunc(GetAppointmentsByPostcode);
+        
+        String PI='';
+        if(GetAppointmentsByPostcode.Address.PostCode!='' && GetAppointmentsByPostcode.Address.PostCode!= null)
+          {
+             if(GetAppointmentsByPostcode.CHILeadChannel==null) 
+             GetAppointmentsByPostcode.CHILeadChannel = 'Central Heating Boiler';		
+             if(GetAppointmentsByPostcode.ProductInterest!=null)		
+             GetAppointmentsByPostcode.CHILeadChannel = GetAppointmentsByPostcode.productInterest;
+             if(GetAppointmentsByPostcode.CHILeadChannel=='Straight Swap')
+             PI= 'SS';
+             else if(GetAppointmentsByPostcode.CHILeadChannel=='Guided Sale')
+             PI= 'GS';
+             else 
+             PI='FV';
+          }
+             
+        if(reply!=null){
+          if(reply.AppointmentSlots.size()>0){
+            for(webservice_CHI_Online.cAppointment Appslots: reply.AppointmentSlots){
+               AppSlots.AppId=AppSlots.AppId+PI;
+            }
+          }
+        }
+        system.debug('Sugu '+reply);
         return reply;
         
      }
@@ -262,6 +286,7 @@ global class webservice_CHI_Online {
         ManageCustomerBookingResponse reply = new ManageCustomerBookingResponse();
         webManageCustomerBooking objwebManageCustomerBooking = new webManageCustomerBooking();
         reply = objwebManageCustomerBooking.webManageCustomerBookingFunc(ManageCustomerBooking);
+        system.debug('Sugu '+reply);
         return reply;
         
      }

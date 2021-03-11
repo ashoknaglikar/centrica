@@ -33,7 +33,7 @@ global class customerPortalretrunInstallDeliveryAPI {
         objResponse.callBack = false;
         system.debug('safePlaceFlag -'+safePlaceFlag);
         system.debug('restrictionFlag - '+restrictionFlag);
-        if(safePlaceFlag == 'Yes' &&  restrictionFlag == 'Yes')
+        if(label.sameDayDelivery == 'yes' ||(safePlaceFlag == 'Yes' &&  restrictionFlag == 'Yes'))
         {
             sameDayDelivery = true;
             

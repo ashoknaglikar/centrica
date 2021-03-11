@@ -126,11 +126,13 @@ private class Utilities_test {
         j1.Customer_Preferred_Date__c=system.today();
         update j1;
         District__c district = Phase3TestHelper.createTestGeographyDistrict();
-        Supplier__c supp = [Select s.Type__c, s.SystemModstamp, s.Supplier_Num__c, s.Street__c, s.State__c, s.Start_Date__c, 
+        Supplier__c supp = Phase3TestHelper.createSupplier();
+        
+        /*Supplier__c supp = [Select s.Type__c, s.SystemModstamp, s.Supplier_Num__c, s.Street__c, s.State__c, s.Start_Date__c, 
                 s.Resource_Type__c, s.Postcode__c, s.OwnerId, s.Name, s.LastModifiedDate, s.LastModifiedById, 
                 s.IsDeleted, s.Id, s.GasSafe_Business_ID__c, s.End_Date__c, s.Description__c, s.CreatedDate, s.CreatedById, 
                 s.Country__c, s.City__c
-                From Supplier__c s where s.Supplier_Num__c= :'2017' LIMIT 1];
+                From Supplier__c s where s.Supplier_Num__c= :'2017' LIMIT 1];*/
                 
          Employee__c e = new Employee__c(Name = 'testSBB1', First_Name__c = 'SBB1', Last_Name__c = 'Test1', Supplier__c = supp.ID,
                                             Employee_Number__c = '0002991', Resource_Type__c= 'Installer', Inactive__c = false,
@@ -184,7 +186,7 @@ private class Utilities_test {
         insert searchlist;  
         
         
-        
+        Test.setMock(HttpCalloutMock.class, new HttpMockup());
         Utilities.calcluateIndayJobTime(SearchList,j.CHI_Lead__r.Install_Postcode__c,w.id);
         Utilities.calcluateIndayJobTime(SearchList,j1.CHI_Lead__r.Install_Postcode__c,w.id);
         date holidaydate=date.parse('25/12/2010');

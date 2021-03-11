@@ -17,6 +17,7 @@ public with sharing class JobInformation {
   public ID jobArea = null;
   public Map<String, Double> skillsAndHours = new Map<String, Double>(); 
   public list<string> simpleSkills = new list<string>();
+  public list<string> optInSkills = new list<string>();
   public String primarySkill = null;
   public Double primaryHours = null;
   public Boolean isLocked = false;
@@ -80,6 +81,7 @@ public with sharing class JobInformation {
 
         // simple skill change
         simpleSkills = ObjNewSkill.setSimpleSkills(job);
+        optInSkills = ObjNewSkill.setOptInSkills(job);
         // Named skills - CR - Starts
         
            List<Job_Named_Skill_Resource__c> namedEmps = [Select Skill_Name__c,Employee__c,Employee__r.Always_Works_With__c from Job_Named_Skill_Resource__c where Job__c =: job.ID];
@@ -213,6 +215,12 @@ public with sharing class JobInformation {
     
     // Check if the Job has a named employee, and if so, if that employee has an
     // employee they always work with.
+    
+     // Named electritian change - Starts
+     if(job.Named_Electritian__c != null) {
+        namedElectritian = job.Named_Electritian__c;
+      }
+    // Named electritian change - Ends
    
     if(job.Named_Employee__c != null) {
       if(job.Named_Employee__r.Resource_Type__c != SearchBlackBox.EMPLOYEE_RESOURCE_TYPE) {
@@ -235,15 +243,7 @@ public with sharing class JobInformation {
         namedElectritian =job.Named_Employee__r.Always_Works_With_Electrician__c;
     }
     
-    // Named electritian change - Starts
-    
-     if(job.Named_Electritian__c != null) {
-       
-        namedElectritian = job.Named_Electritian__c;
-        
-      }
-    
-    // Named electritian change - Ends
+   
     
     
     // Pick the primary skill - if the default present skill is present, pick that. 

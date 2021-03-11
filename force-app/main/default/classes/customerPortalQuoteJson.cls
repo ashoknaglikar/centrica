@@ -20,6 +20,7 @@ global class customerPortalQuoteJson {
 		public list<offer> leadOfferList;
 
 		public list<quoteProductClass> quoteProductList;
+		public list<dynamicCustomerPortalJSONClass.ContentVersionJSON> quoteCustomerDocs;
 
 	}
 

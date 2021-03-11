@@ -186,6 +186,8 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
         List<Contact> contactsToBeUpdated = new List<Contact>();
         List<Suspect_Material__c>lstSuspectMaterial =new List<Suspect_Material__c>();
         List<cscfga__Product_Configuration__c> suspectedMaterialConfig=new List<cscfga__Product_Configuration__c>();
+        List<cscfga__Product_Configuration__c> motQuestionAnswers= new list<cscfga__Product_Configuration__c>();
+        list<Reportable_Attribute__c> insertReportableAttributeList = new list<Reportable_Attribute__c>();
         // get all the Allowances for populating lookup fields on bm quote
         String allowanceQuery = 'Select ' + CS_SObjectHelper.getFieldListForSOQL('CS_Allowance__c') + ' From CS_Allowance__c';
         List<CS_Allowance__c> allowancesList =  ((List<CS_Allowance__c>)database.query(allowanceQuery));  
@@ -225,6 +227,7 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
             cscfga__Product_Configuration__c smartMeterConfig = getConfigurationByName('Smart Meter', parentToChildConfigsMap.get(pc.Id));
             //2017
             suspectedMaterialConfig = getAllConfigurationByName('Suspected Material', parentToChildConfigsMap.get(pc.Id));
+            motQuestionAnswers      = getAllConfigurationByName('Home Efficiency', parentToChildConfigsMap.get(pc.Id));
             system.debug('suspectedmaterialConfig='+suspectedmaterialConfig);
             if(smartMeterConfig == null){
                 smartMeterConfig = getConfigurationByName('Smart Meter 1', parentToChildConfigsMap.get(pc.Id));
@@ -395,7 +398,7 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
             bmQuote.bmStatusReason__c                       = duplicate ? 'Subsequent Sold Quote' : getAttributeValue('Reason', configAttributeList);
             
             if ((getAttributeValue('Quote Status',configAttributeList) == CS_Constants.QuoteStatus_FinalizedAccepted)){
-                bmQuote.closeDate__c                        = Date.valueOf(pc.CreatedDate); 
+                bmQuote.closeDate__c                        = system.today();//Date.valueOf(pc.CreatedDate); 
             }           
             
             bmQuote.createdDate_quote__c                    = returnDate(getAttributeValue('Quote Creation Date', configAttributeList));
@@ -918,7 +921,11 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
             if(lstSuspectMaterial.size()>0){
                 insert lstSuspectMaterial;
             }
-            system.debug('lstSuspectMaterial='+lstSuspectMaterial); 
+            //system.debug('motQuestionAnswers-->'+motQuestionAnswers);
+            if(motQuestionAnswers.size()>0){
+                insertReportableAttributeList.addall(CSAllAttachementTriggerSecondHelper.createHomeEffeciencyReportableAttributes('Home Efficiency',motQuestionAnswers,configsData , bmQuotes[0].Id));
+            }
+            //system.debug('lstSuspectMaterial='+lstSuspectMaterial); 
             
             
         if (quoteProducts.size() > 0) { insert quoteProducts; }
@@ -931,7 +938,7 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
         
         if (accountsToBeUpdated.size() > 0) { update accountsToBeUpdated; }
         if (contactsToBeUpdated.size() > 0) { update contactsToBeUpdated;  }
-       
+        if (insertReportableAttributeList.size()>0) {insert insertReportableAttributeList; }
         //EP NEW
         createBMQuoteAttachments(bmQuotes, quotePdfToBasketIdMap, quotePdfConfirmationfToBasketIdMap, basketIdToFinanceIllustrationPdf, tempinstallationNotesPDF);
         }catch(Exception e)
@@ -994,7 +1001,7 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
         Map<Id, BigMachines_Quote__c> basketToBmQuoteWithoutInstallNotedsPdfMap = new Map<Id, BigMachines_Quote__c>();
 
         System.debug('****** Quote PDF attachment not found ... ');
-        
+        boolean quotePDFadded = false;
         for (BigMachines_Quote__c bmQuote : bmQuotes) {
             if(bmQuote.Id != null) {
                 if (quotePdfToBasketIdMap.containsKey(bmQuote.CS_Quote__c)) {
@@ -1006,6 +1013,7 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
                     
                     Attachment clonedAttachment = createPdfAttachmentForBmQuote(bmQuote, pdfAttachmentForBasket, 'quote', false);
                     bmQuoteAttachments.add(clonedAttachment);
+                    quotePDFadded = true;
                 }
                 else {
                     System.debug('****** Quote PDF attachment not found ... ');
@@ -1088,6 +1096,7 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
                     if(bmQuote.Id != null) {
                         Attachment clonedAttachment = createPdfAttachmentForBmQuote(bmQuote, existingPdf, 'quote', false);
                         bmQuoteAttachments.add(clonedAttachment);
+                        quotePDFadded = true;
                     }
                 }
             }
@@ -1212,6 +1221,7 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
                         
                         Attachment clonedAttachment = createPdfAttachmentForBmQuote(bmQuote, pdfAttachmentForBasket, 'quote', false);
                         bmQuoteAttachments.add(clonedAttachment);
+                        quotePDFadded = true;
                     }
                     if (quotePdfConfirmationfToBasketIdMap.containsKey(bmQuote.CS_Quote__c)) {
                         Attachment pdfAttachmentForBasket = quotePdfConfirmationfToBasketIdMap.get(bmQuote.CS_Quote__c);
@@ -1220,6 +1230,7 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
                         
                         Attachment clonedAttachment = createPdfAttachmentForBmQuote(bmQuote, pdfAttachmentForBasket, 'customer_confirmation', false);
                         bmQuoteAttachments.add(clonedAttachment);
+                        //quotePDFadded = true;
                     }
 
                     if (tempinstallationNotesPDF.containsKey(bmQuote.CS_Quote__c)) {
@@ -1243,10 +1254,18 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
 
                 }
             }
+            
         }
         
         //Finally insert all the bmQuoteAttachments
+        
+        system.debug('Auto attach quote pdf -->'+quotePDFadded+' '+bmQuotes);
         insert bmQuoteAttachments;
+        if(!quotePDFadded && system.label.Generate_Quote_PDF_Future=='on' && (bmQuotes[0].Job_Type__c == '15' ||bmQuotes[0].Job_Type__c == '17'))
+        {
+            customerPortalAcceptCloneQuote.addAttachment(bmQuotes[0].id,bmQuotes[0].BigMachines_Transaction_Id__c);
+        }
+       
     }
     
     
@@ -1668,7 +1687,7 @@ public static void createBMQuoteAndQuoteProducts(Map<Id, Attachment> triggerMap)
         
         String jobTypeRequiredFull              = 'Full System';
         String jobTypeRequiredReplacement       = 'Boiler Replacement';
-        String jobTypeStraightSwap              = 'Straight Swaps';
+        String jobTypeStraightSwap              = 'Straight Swap';
         String jobTypeOnlineBoiler              = 'Online Boilers';
         system.debug('---->'+productDef);
         if(productDef!=null &&  productDef.contains(jobTypeOnlineBoiler))

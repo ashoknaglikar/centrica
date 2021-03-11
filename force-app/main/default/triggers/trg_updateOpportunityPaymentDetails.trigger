@@ -1,7 +1,7 @@
 trigger trg_updateOpportunityPaymentDetails on BigMachines_Quote__c (after insert,after update) {
 
  // Added for avoiding run of this trigger whenever needed while developing some apex batch to run etc.
- 	system.debug('Error--->cls_IsRun.dontFireTriggers'+cls_IsRun.dontFireTriggers);
+    system.debug('Error--->cls_IsRun.dontFireTriggers'+cls_IsRun.dontFireTriggers);
     system.debug('Error--->cls_IsRun.istrg_updateOpportunityPaymentDetails'+cls_IsRun.istrg_updateOpportunityPaymentDetails);
     system.debug('Error--->cls_IsRun.bigMachineSwitch '+cls_IsRun.bigMachineSwitch );
     system.debug('Error--->cls_IsRun.bigMachineSwitch '+cls_IsRun.isBGRun );
@@ -10,6 +10,16 @@ trigger trg_updateOpportunityPaymentDetails on BigMachines_Quote__c (after inser
     if(cls_IsRun.dontFireTriggers || cls_IsRun.bigMachineSwitch || cls_IsRun.istrg_updateOpportunityPaymentDetails){
         return;
     }
+    /*
+     if(trigger.isinsert && system.label.Generate_Quote_PDF_Future=='on')
+     {
+         for(BigMachines_Quote__c bm: trigger.new)
+         {
+             if(bm.)
+	        customerPortalAcceptCloneQuote.addAttachment(bm.id,bm.BigMachines_Transaction_Id__c);
+         }
+     }
+     */
 
  // Fix - Cognizant support - To reduce number of SOQL's in quote triggers to avoid governor limits.
   private ID oppId = Trigger.new[0].Opportunity__c;
@@ -20,7 +30,7 @@ trigger trg_updateOpportunityPaymentDetails on BigMachines_Quote__c (after inser
   // ++ Added for Priority Installations CR start
     List<Customer_category__c> custCatList = new List<Customer_category__c>();
   // -- Added for Priority Installations CR end
-   
+/*   
   // ++ Added for Smart Meter CR start
   Set<Id> quoteIds = new Set<Id>();
   if(Trigger.isAfter)
@@ -48,8 +58,9 @@ trigger trg_updateOpportunityPaymentDetails on BigMachines_Quote__c (after inser
         SmartMeterHelper.createSmartMeterRecord(quoteIds);
       }
   }
-   
+  */ 
   // -- Added for Smart Meter CR end
+  /*
     if(trigger.isUpdate)
     {
         BigMachines_Quote__c Oldquote = Trigger.old[0];
@@ -61,7 +72,7 @@ trigger trg_updateOpportunityPaymentDetails on BigMachines_Quote__c (after inser
             update(new Contact(id =quote.Contact_Id__c, bm_fFinancialProduct__c = '', bm_fAmountOfCredit__c = 0.0 ));
         }
     }
-  
+  */
     if (Trigger.size == 1 && oppId != null && cls_IsRun.isBGRun==false && quote.App_Assigned_Payroll__c !=null) {
         
         cls_IsRun.setIsBGRun();
@@ -96,82 +107,84 @@ trigger trg_updateOpportunityPaymentDetails on BigMachines_Quote__c (after inser
         // ++ Added for Priority Installations CR start
         Boolean updateExistingSalesCustCatRecord = false;
         //if((opp.BigMachines_Quotes__r.size() == 0) && ((opp.CreatedDate).date() >= Date.valueOf(System.Label.Priority_Install_Release_Date)))
-        if(((opp.CreatedDate).date() >= Date.valueOf(System.Label.Priority_Install_Release_Date)) && (cls_IsRun.isRestrictCustCategory == false))
-        {
-                      //if(Trigger.isInsert)
-                      //opp.BM_Quote_Download_into_SFDC_datetime__c = DateTime.now();
-                      
-                      if(opp.Customer_categories__r.size() == 0)
-                      {
-                            opp.BM_Quote_Download_into_SFDC_datetime__c = DateTime.now();  
-                            system.debug('-------opp.BM_Quote_Download_into_SFDC_datetime__c---'+opp.BM_Quote_Download_into_SFDC_datetime__c);   
-                            opp.Latest_customer_category__c = quote.Latest_customer_category__c;
-                            opp.Customer_have_any_other_form_of_HEAT__c = quote.Customer_have_any_other_form_of_HEAT__c;
-                            opp.Does_the_customer_have_hot_water__c = quote.Does_the_customer_have_hot_water__c;
-                            opp.Is_the_customers_boiler_working__c = quote.Is_the_customer_s_boiler_working__c;
-                            opp.Is_the_customer_vulnerable__c = quote.Is_the_customer_vulnerable__c;
-                            opp.Vulnerable_reason__c = quote.Vulnerable_reason__c;
+        if(Trigger.isInsert){
+            if(((opp.CreatedDate).date() >= Date.valueOf(System.Label.Priority_Install_Release_Date)) && (cls_IsRun.isRestrictCustCategory == false))
+            {
+                  //if(Trigger.isInsert)
+                  //opp.BM_Quote_Download_into_SFDC_datetime__c = DateTime.now();
+                  
+                  if(opp.Customer_categories__r.size() == 0)
+                  {
+                        opp.BM_Quote_Download_into_SFDC_datetime__c = DateTime.now();  
+                        system.debug('-------opp.BM_Quote_Download_into_SFDC_datetime__c---'+opp.BM_Quote_Download_into_SFDC_datetime__c);   
+                        opp.Latest_customer_category__c = quote.Latest_customer_category__c;
+                        opp.Customer_have_any_other_form_of_HEAT__c = quote.Customer_have_any_other_form_of_HEAT__c;
+                        opp.Does_the_customer_have_hot_water__c = quote.Does_the_customer_have_hot_water__c;
+                        opp.Is_the_customers_boiler_working__c = quote.Is_the_customer_s_boiler_working__c;
+                        opp.Is_the_customer_vulnerable__c = quote.Is_the_customer_vulnerable__c;
+                        opp.Vulnerable_reason__c = quote.Vulnerable_reason__c;
+                        opp.Last_customer_cat_info_update_source__c = 'Sales';
+                        opp.Pending_update_to_customer_category__c = true;
+                        opp.Customer_Category_Modified_Datetime__c = DateTime.now();
+                        opp.Customer_Category_Record_Modified_By__c = emp.Salesforce_User__c;
+                        opp.Stage_Object_Type__c = 'Bigmachines quote';
+                        opp.Stage_object_id__c = quote.Id;
+                
+                  }else {
+                    
+                        if(quote.Is_Primary__c && quote.stage__c == 'Quote Finalised - Accepted')
+                        {
+                            opp.BM_Quote_Download_into_SFDC_datetime__c = DateTime.now();
+                            updateExistingSalesCustCatRecord = true;
+                        }
+                        else if(quote.stage__c != 'Quote Finalised - Accepted')
+                        {
+                            opp.isLocked__c = true;
+                        }
+                        else if(opp.Latest_customer_category__c != quote.Latest_customer_category__c){
+                              opp.Latest_customer_category__c = quote.Latest_Customer_category__c;
+                              updateExistingSalesCustCatRecord = true;
+                        }
+                        else if(opp.Customer_have_any_other_form_of_HEAT__c != quote.Customer_have_any_other_form_of_HEAT__c){
+                              opp.Customer_have_any_other_form_of_HEAT__c = quote.Customer_have_any_other_form_of_HEAT__c;
+                              updateExistingSalesCustCatRecord = true;
+                        }
+                        else if(opp.Does_the_customer_have_hot_water__c != quote.Does_the_customer_have_hot_water__c){
+                             opp.Does_the_customer_have_hot_water__c = quote.Does_the_customer_have_hot_water__c;
+                             updateExistingSalesCustCatRecord = true;
+                        }
+                        else if(opp.Is_the_customers_boiler_working__c != quote.Is_the_customer_s_boiler_working__c){
+                             opp.Is_the_customers_boiler_working__c = quote.Is_the_customer_s_boiler_working__c;
+                             updateExistingSalesCustCatRecord = true;
+                        }
+                        else if(opp.Is_the_customer_vulnerable__c != quote.Is_the_customer_vulnerable__c){
+                             opp.Is_the_customer_vulnerable__c = quote.Is_the_customer_vulnerable__c;
+                             updateExistingSalesCustCatRecord = true;
+                        }
+                        else if(opp.Vulnerable_reason__c != quote.Vulnerable_reason__c){
+                             opp.Vulnerable_reason__c = quote.Vulnerable_reason__c;
+                             updateExistingSalesCustCatRecord = true;
+                        }
+
+                        if(updateExistingSalesCustCatRecord){
                             opp.Last_customer_cat_info_update_source__c = 'Sales';
                             opp.Pending_update_to_customer_category__c = true;
                             opp.Customer_Category_Modified_Datetime__c = DateTime.now();
                             opp.Customer_Category_Record_Modified_By__c = emp.Salesforce_User__c;
                             opp.Stage_Object_Type__c = 'Bigmachines quote';
                             opp.Stage_object_id__c = quote.Id;
-                    
-                      }else {
-                        
-                            if(quote.Is_Primary__c && quote.stage__c == 'Quote Finalised - Accepted')
-                            {
-                                opp.BM_Quote_Download_into_SFDC_datetime__c = DateTime.now();
-                                updateExistingSalesCustCatRecord = true;
-                            }
-                            else if(quote.stage__c != 'Quote Finalised - Accepted')
-                            {
-                                opp.isLocked__c = true;
-                            }
-                            else if(opp.Latest_customer_category__c != quote.Latest_customer_category__c){
-                                  opp.Latest_customer_category__c = quote.Latest_Customer_category__c;
-                                  updateExistingSalesCustCatRecord = true;
-                            }
-                            else if(opp.Customer_have_any_other_form_of_HEAT__c != quote.Customer_have_any_other_form_of_HEAT__c){
-                                  opp.Customer_have_any_other_form_of_HEAT__c = quote.Customer_have_any_other_form_of_HEAT__c;
-                                  updateExistingSalesCustCatRecord = true;
-                            }
-                            else if(opp.Does_the_customer_have_hot_water__c != quote.Does_the_customer_have_hot_water__c){
-                                 opp.Does_the_customer_have_hot_water__c = quote.Does_the_customer_have_hot_water__c;
-                                 updateExistingSalesCustCatRecord = true;
-                            }
-                            else if(opp.Is_the_customers_boiler_working__c != quote.Is_the_customer_s_boiler_working__c){
-                                 opp.Is_the_customers_boiler_working__c = quote.Is_the_customer_s_boiler_working__c;
-                                 updateExistingSalesCustCatRecord = true;
-                            }
-                            else if(opp.Is_the_customer_vulnerable__c != quote.Is_the_customer_vulnerable__c){
-                                 opp.Is_the_customer_vulnerable__c = quote.Is_the_customer_vulnerable__c;
-                                 updateExistingSalesCustCatRecord = true;
-                            }
-                            else if(opp.Vulnerable_reason__c != quote.Vulnerable_reason__c){
-                                 opp.Vulnerable_reason__c = quote.Vulnerable_reason__c;
-                                 updateExistingSalesCustCatRecord = true;
-                            }
-
-                            if(updateExistingSalesCustCatRecord){
-                                opp.Last_customer_cat_info_update_source__c = 'Sales';
-                                opp.Pending_update_to_customer_category__c = true;
-                                opp.Customer_Category_Modified_Datetime__c = DateTime.now();
-                                opp.Customer_Category_Record_Modified_By__c = emp.Salesforce_User__c;
-                                opp.Stage_Object_Type__c = 'Bigmachines quote';
-                                opp.Stage_object_id__c = quote.Id;
-                            }
-                             
-                      }
-
+                        }
+                         
+                  }
+    
+            }
         }
         // -- Added for Priority Installations CR end
        
        system.debug('-----obj_opportunity before ----' +opp);
                                                
         if(quote.Is_Primary__c == True){
-        		 
+                 
                     
             if(quote.Quote_Net_Value__c!=null)
                 opp.Amount = quote.Quote_Net_Value__c;

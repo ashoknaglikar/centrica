@@ -76,6 +76,7 @@
         <!-- Section on left for product backlog list -->
         <div class ="first">
         <div class="half">
+        <div class="backlog-container"><span class="large-font bold med-gray">Change Backlog</span></div>
         <div class="wp-container">
         <div class="section-header">
             <span class="left bold large-font med-gray">Priority Backlog</span>

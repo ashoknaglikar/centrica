@@ -31,13 +31,24 @@ global class FinanceApplicationEnqBatch implements database.batchable<sobject>,D
         string applicationQuery  = Utilities.makeQueryWithAllFields('Finance_Application__c', '');
 		applicationQuery = applicationQuery.replace('from Finance_Application__c' , ',Finance_Product__r.X2nd_Lender_Product__c,Finance_Product__r.Product_Code__c,Finance_Product__r.Asset_Type__c ,CHI_Lead__r.Product_Interest__c,CHI_Lead__r.ExternalRef__c,'+ 
 		'Finance_Product__r.Not_Available_For__c, CHI_Lead__r.CHI_Lead_Id__c, Finance_Product__r.Parent_Product__r.Name, Finance_Product__r.Name, Finance_Product__r.Code__c,Finance_Product__r.Asset_Type_Description__c,'+
-		'Finance_Product__r.New_Product__c, Finance_Product__r.Selling_Type__c from Finance_Application__c where ( '+statusCriteria +' OR   X2nd_Lended_Soft_Search__c = \'Referred\') and CreatedDate>=:x90Days');
+		'Finance_Product__r.New_Product__c, Finance_Product__r.Selling_Type__c from Finance_Application__c where Application_Id__c != null and ( '+statusCriteria +' OR   X2nd_Lended_Soft_Search__c = \'Referred\') and CreatedDate>=:x90Days');
         
         return Database.getQueryLocator(applicationQuery);
     }
     
     
     global void execute(Database.BatchableContext BC,  List<sObject> lstRecords)
+    {
+       list<Finance_Application__c> updateList = getFinanceAppStatus(lstRecords); 
+    }
+    
+    global void finish(Database.BatchableContext bc)
+    {
+        
+    }
+    
+    
+    public list<Finance_Application__c> getFinanceAppStatus(List<sObject> lstRecords)
     {
         string Subject = '';
         list<Finance_Application__c> updateList  = new list<Finance_Application__c>();
@@ -122,14 +133,10 @@ global class FinanceApplicationEnqBatch implements database.batchable<sobject>,D
         
         if(updateList.size()>0)
         Database.update(updateList,false);
-        //if(Subject!='')
-        //CreateEmail.CretaeSendTextEmail(new list<string>{'ashokkumar.nagaleekar@centrica.com'}, Subject, 'Error on Finance Batch');
+        if(Subject!='')
+        CreateEmail.CretaeSendTextEmail(new list<string>{'ashokkumar.nagaleekar@centrica.com'}, Subject, 'Error on Finance Batch');
         
-    }
-    
-    global void finish(Database.BatchableContext bc)
-    {
-        
+        return updateList;
     }
     
    

@@ -9,6 +9,8 @@ global class AvailabilityP2Controller {
     //books the widest slot available for that employee. Page then redirects to Firefly or salesforce Opp //                                                  //                                                                      //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     
+    boolean productInterestChanged = false;
+
     // ++ Updated opp variable for Priority Installation CR start
     public Opportunity opp {get; set;}
     // -- Updated opp variable for Priority Installation CR end
@@ -148,7 +150,8 @@ global class AvailabilityP2Controller {
                
         if(productInt!=null&& productInt!=opp.product_interest__c)
         {
-           opp.product_interest__c=productInt; 
+            productInterestChanged = true;
+            opp.product_interest__c=productInt; 
         }
         
         if(opp.Social_Contact_Details__c==null &&opp.product_interest__c=='Guided Sale')
@@ -307,6 +310,7 @@ global class AvailabilityP2Controller {
                     list<Date> appointmentWindow = new list<Date>{qStrtDate};
                         String postCodeSector = Opp.Account.BillingPostalCode.substring(0,Opp.Account.BillingPostalCode.length()-2);   
                     OfsApptNotBooked = true;
+                    
                     toaCapacity.capacity_response_element response  = getCapacityRes.getCapacity(location, appointmentWindow, postcodeSector,opp.Account.BillingPostalCode,opp.Product_Interest__c);
                     if(response!=null)
                     {
@@ -403,7 +407,7 @@ global class AvailabilityP2Controller {
                 pageRef = new PageReference('/apex/new_wrapupscreenpage?chiLeadId='+CHIleadId+'&accId='+opp.AccountId+'&existingLead='+existingLead+'&new='+newInbound); 
         }
         
-        
+        system.debug('Sugu before lat long' );
         updateLattitude();
         try {
             // CR MC011
@@ -474,6 +478,9 @@ global class AvailabilityP2Controller {
                 // updae the opportunity 
                 upsert opp;
                 System.debug('###*** opp after upsert: '+opp);
+
+                if(productInterestChanged)
+                update bookedAppt;
                 
             }catch(Exception e){
                 System.debug('###*** Exception: '+e);
@@ -565,8 +572,9 @@ currentApp2Delete.Secondary_Cancellation_Reason__c= scr; // Ashok CR 12 End
             System.debug('address string send to utility-->'+Address);
             
             try{
-                list<string> Latlang = Utilities.getLatLang(Address,pcode);
-                if(Latlang.size()==2)
+                list<string> Latlang = Utilities.getLatLang(Address,pcode,street,city);
+                //list<string> Latlang = Utilities.getLatLang(Address,pcode);
+                if(Latlang!=null && Latlang.size()==2)
                 {
                     acct.Latitude__Latitude__s = double.valueof(Latlang[0]);
                     acct.Latitude__Longitude__s = double.valueof(Latlang[1]);
@@ -614,6 +622,7 @@ currentApp2Delete.Secondary_Cancellation_Reason__c= scr; // Ashok CR 12 End
     /////////////////////////////////////////////////////////////////////////
     
     global class availDataSet implements Comparable{
+        public appointment__c app {get;set;}
         public String empFirstName;
         public String empLastName;
         public String empStatus;
@@ -783,6 +792,12 @@ currentApp2Delete.Secondary_Cancellation_Reason__c= scr; // Ashok CR 12 End
         // CR For Diary Start & End Time Changes. Added two additional parameters for storing minutes information.
         
         Datetime queryStartTime = Datetime.newInstance(Date.valueOf(selectedDay).year(),Date.valueOf(selectedDay).month(),Date.valueOf(selectedDay).day(),selectedStartTime,selectedAppStartMinute,0);
+       
+        if(opp.Product_Interest__c == 'Guided Sale' && Date.valueOf(selectedDay) == system.today())
+        {
+            queryStartTime = system.now().addminutes(integer.valueof(label.GuidedSaleBuffer));
+        }
+        
         Datetime queryEndTime = Datetime.newInstance(Date.valueOf(selectedDay).year(),Date.valueOf(selectedDay).month(),Date.valueOf(selectedDay).day(),selectedEndTime,selectedAppEndMinute,0);
         date queryDate = Date.newInstance(Date.valueOf(selectedDay).year(),Date.valueOf(selectedDay).month(),Date.valueOf(selectedDay).day());
         
@@ -797,7 +812,7 @@ currentApp2Delete.Secondary_Cancellation_Reason__c= scr; // Ashok CR 12 End
             ofsStartDate  = queryStartTime;
             ofsEndDate = queryEndTime;
             return new list<availDataSet>{temp};
-                }else
+        }else
                 {
                     //Set lists to iterate over later
                     List<Id> Emps = new List<Id>{};        
@@ -969,7 +984,7 @@ currentApp2Delete.Secondary_Cancellation_Reason__c= scr; // Ashok CR 12 End
                     boolean entered = false;
                     list<string> newVisitToBeAdded = new list<string>();  
                     date queryStartDate = queryStartTime.date();
-                    system.debug('---->'+displayController+displayController.containskey(visitType)+visitType);
+                    //system.debug('---->'+displayController+displayController.containskey(visitType)+visitType);
                     if(displayController.containskey(visitType))
                     {
                         newVisitToBeAdded = displayController.get(visitType);
@@ -1044,8 +1059,8 @@ currentApp2Delete.Secondary_Cancellation_Reason__c= scr; // Ashok CR 12 End
                        }
                                                                 
                     }
-                    
-                    sevenDayAppts = [select Id,Visit_Date__c, Assigned_To__c, Assigned_To__r.Diary_Controller__c,Assigned_To__r.First_Name__c, Assigned_To__r.Primary_Role__c, Assigned_To__r.Last_Name__c, Start__c, End__c, Duration_Mins_Calc__c, Start_Time__c,Assigned_To__r.Sales_Technical_Ability__c, Assigned_To__r.HSA_Employment_Type__c , Type__c,End_Time__c  from Appointment__c
+                    //system.debug('-->'+queryStartTime);
+                    sevenDayAppts = [select Id,Visit_Date__c, Assigned_To__c,Assigned_To__r.name,Assigned_To__r.Social_Contact_App__c, Assigned_To__r.Diary_Controller__c,Assigned_To__r.First_Name__c, Assigned_To__r.Primary_Role__c, Assigned_To__r.Last_Name__c, Start__c, End__c, Duration_Mins_Calc__c, Start_Time__c,Assigned_To__r.Sales_Technical_Ability__c, Assigned_To__r.HSA_Employment_Type__c , Type__c,End_Time__c  from Appointment__c
                                      where Start__c >= :queryStartTime
                                      and start__c >=:system.now() 
                                      and End__c <= :queryEndTime
@@ -1053,8 +1068,8 @@ currentApp2Delete.Secondary_Cancellation_Reason__c= scr; // Ashok CR 12 End
                                      and Show_Time_As__c = 'Out of Office'
                                      and Assigned_To__c in :Emps
                                      AND Assigned_To__r.Pool_Type__c = : No_Suitable Order by Start__c ASC limit 1000];                                               
-                    system.debug('@@@fetced app size'+sevenDayAppts.size());                                          
-                    system.debug('@@@AllAppts'+sevenDayAppts);
+                    //system.debug('@@@fetced app size'+sevenDayAppts.size());                                          
+                    //system.debug('@@@AllAppts'+sevenDayAppts);
                     
                     availDataSet [] retList = new availDataSet[]{};
                         
@@ -1219,7 +1234,7 @@ UniqueString = StartEndString;
                                 //If appointment owner is not in the list yet, or they are but this appointment is for a wider slot, then add/overwrite their details
                                 //if(show == null || show.duration < sevenDayAppts[i].Duration_Mins_Calc__c){                                                             
                                 show = new availDataSet();
-                                
+                                show.app = sevenDayAppts[i];
                                 // HSA allocation CR - Starts
                                 
                                 show.isBestResource = false;

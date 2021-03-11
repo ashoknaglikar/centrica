@@ -58,6 +58,14 @@ public class Lock {
     public static boolean cchContactOppRecursiveStopper = false;
     public static boolean cchApiRecursiveStopper= false;
     public static boolean cchRecursiveStopper = false;
+    
+    public static boolean jobAfterInsertSetDistrict = false;
+    
+    public static void setJobAfterInsertSetDistrict()
+    {
+        jobAfterInsertSetDistrict = true;
+    }
+    
     public static boolean hasAlreadyDone(){ 
         return blnAlreadyDone; 
     }

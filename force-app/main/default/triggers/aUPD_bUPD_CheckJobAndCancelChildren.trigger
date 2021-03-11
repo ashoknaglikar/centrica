@@ -3,40 +3,46 @@ trigger aUPD_bUPD_CheckJobAndCancelChildren on Opportunity (after update, after 
     {
         return;
     }
+    list<Deposit_number__c> usedNumbers = new list<Deposit_number__c>();
     if(trigger.isbefore)
     {
-        if(trigger.isInsert)
-        {
-            /*
-        list<Id> accountIdList = new list<Id>();
-        for(Opportunity opp: trigger.new)
-        {
-            accountIdList.add(opp.AccountId);
+          
+          if(trigger.isInsert || trigger.isUpdate)
+          {
+           for(Opportunity opp: trigger.new)
+           {
+              Opportunity oldOpp = new Opportunity();
+              if(trigger.isupdate)
+              oldOpp = trigger.oldmap.get(opp.Id);
+              
+              /*if((opp.Derived_Payment_Reference_Number__c|| system.label.Deposit_Reference_Number=='on')
+                  &&((trigger.isInsert && opp.Payment_Reference_Number__c == null)
+                  ||(trigger.isUpdate && opp.Payment_Reference_Number__c==null && opp.Sales_visit_date_time__c!=null && opp.Sales_visit_date_time__c!=oldopp.Sales_visit_date_time__c)))*/
+        if(system.label.Deposit_Reference_Number=='on'&&opp.Payment_Reference_Number__c == null&&(trigger.isInsert||(trigger.isUpdate&& opp.Sales_visit_date_time__c!=null && opp.Sales_visit_date_time__c!=oldopp.Sales_visit_date_time__c))
+           ||(opp.Derived_Payment_Reference_Number__c&&opp.Payment_Reference_Number__c == null)&&(trigger.isInsert||(trigger.isupdate&&opp.Derived_Payment_Reference_Number__c==true&&oldopp.Derived_Payment_Reference_Number__c==false)))
+              {
+                  Deposit_number__c refNum =utilities.getAvailableRefNumber();
+                  if(refNum!=null)
+                  {
+                      refNum.Status__c = 'Used';
+                      opp.Payment_Reference_Number__c = refNum.name;
+                     
+                      usedNumbers.add(refNum);
+                  }
+                  
+              }
+          }
         }
-        
-        map<id, string> accountSectorMap = new map<id, string>();
-        for(Account a : [select id, Post_Code_Sector__c from Account Where Id in: accountIdList] )
+                  
+                  
+// mark the used numbes as used 
+        if(usedNumbers.size()>0)
         {
-            accountSectorMap.put(a.id, a.Post_Code_Sector__c);
-        }
-    
-        map<string, id> postCodeManagerMap = new map<string, Id>();
-        for(PostCode_Sector__c pc : [select Name, L6_Sales_Manager__c from PostCode_Sector__c where Name in :accountSectorMap.values() and Type__c = 'Sales' ])
-        {
-            postCodeManagerMap.put(pc.name, pc.L6_Sales_Manager__c);
-        }
-        
-        for(Opportunity opp: trigger.new)
-        {
-            if(accountSectorMap.containsKey(opp.AccountId))
-            if(postCodeManagerMap.containsKey(accountSectorMap.get(opp.AccountId)))
-            opp.L6_Sales_Manager__c = postCodeManagerMap.get(accountSectorMap.get(opp.AccountId));
-        }
-        */
+            update usedNumbers;
         }
         
         if(!lock.cchRecursiveStopper && (trigger.isInsert || trigger.isupdate))
-        //if(!lock.cchRecursiveStopper)
+       
         {
             lock.cchRecursiveStopper = true;
             list<Opportunity> oppToBeSentToCCH = new list<Opportunity>();
@@ -67,6 +73,34 @@ trigger aUPD_bUPD_CheckJobAndCancelChildren on Opportunity (after update, after 
     }
     else if(trigger.isAfter && (trigger.isInsert || trigger.isupdate))
     {
+        
+        /*//Suguna
+        if(system.label.Deposit_Reference_Number=='on')
+        {
+        if(trigger.isInsert)
+        {
+            system.debug('Sugu inside after insert');
+           List<Deposit_number__c> depositNumList = new List<Deposit_Number__c>();
+           map<string,id> refNum= new map<string,id>();
+           for(opportunity opp: trigger.new)
+           {
+               system.debug('Sugu new id '+opp.id+' - '+opp);
+              refNum.put(opp.Payment_Reference_Number__c,opp.id);
+           }
+           system.debug('Sugu map '+refNum);
+           for(Deposit_Number__c dn:[select id,status__c,opportunity__c,name from Deposit_Number__c where name=:refNum.keyset() and status__c='Available'])
+           {
+               dn.status__c='Used';
+               dn.opportunity__c=refNum.get(dn.name);
+               depositnumList.add(dn);
+           }
+           
+           if(!depositnumList.isempty())
+           update depositnumList;
+        }
+        }
+        //ends
+        */
         if(!lock.iscchUser() && !lock.cchApiRecursiveStopper )
         {
             lock.cchApiRecursiveStopper= true;

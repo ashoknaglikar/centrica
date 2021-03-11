@@ -455,8 +455,8 @@ public with sharing class UISupport {
 		
         String allowancesQuery = 'Select c.Id, c.Name, c.Description__c, c.Allowance_Code__c, c.Allowance_Type__c, c.Amount__c, c.Amount_Type__c, c.Cash_Equivalent_Amount__c, c.Commissionable__c, ' +
                     'c.Margin_Based__c, C.Non_Cash__c, c.Quote_Description__c, c.Start_Date__c , c.End_Date__c, c.Expiry_Date__c, c.Minimum_Age__c, c.Minimum_Threshold__c, ' +
-                    'c.Requires_Employee_ID__c, c.Requires_Voucher_ID__c, c.Valid_Product_Types__c, c.Media_Codes__c, c.Available_for_Products__c, c.Requires_Billing_Ref__c, ' + 
-					'c.Requires_Email__c, c.Requires_Ref_Number__c, c.Ref_Number_Pattern__c, c.Ref_Number_Message__c, c.Product_Interest__c, ' +
+                    'c.Requires_Employee_ID__c, c.Requires_Voucher_ID__c, c.Valid_Product_Types__c, c.Media_Codes__c, c.Available_for_Products__c, c.Requires_Billing_Ref__c, c.T_C_for_iPad__c, ' + 
+					'c.Requires_Email__c, c.Requires_Ref_Number__c, c.Ref_Number_Pattern__c, c.Ref_Number_Message__c, c.Product_Interest__c, c.Lead_Allowance__c, c.Valid_Lead_Allowance__c, ' +
                     '(Select CS_Part__c, Type__c, Quantity__c From CS_Allowance_Part_Availabilities__r), ' +
                     '(Select CS_Discount_Category__c, CS_Discount_Category_Name__c , CS_Discount_Category__r.Name, Type__c, Quantity__c From CS_Allowance_Category_Availabilities__r), ' +
                     '(Select Name, District__c, District_Name__c, District_Code__c, District__r.Name, District__r.Code__c From CS_Allowance_Availabilities__r), ' +

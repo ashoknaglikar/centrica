@@ -3,7 +3,7 @@
 * This class contains different helper methods for Priority install related CR.
 */
 public class PriorityInstallHelper{
-    
+    /*
     public Customer_category_history__c createVersions(Customer_category__c newCust){
         
         Customer_category_history__c histObj = new Customer_category_history__c();
@@ -30,9 +30,7 @@ public class PriorityInstallHelper{
         histObj.History_Record_Version_Created_By__c = newCust.Master_Record_Version_Created_By__c;
 
         histObj.Date_and_time_job_planned__c = newCust.Date_and_time_job_planned__c;
-        histObj.BM_Quote_Download_into_SFDC_datetime__c = newCust.BM_Quote_Download_into_SFDC_datetime__c;
-		
-		histObj.Milestone_End__c = newCust.Milestone_End__c;
+        histObj.BM_Quote_Download_into_SFDC_datetime__c = newCu\\
 		histObj.Milestone_start__c = newCust.Milestone_start__c;
 		
         return histObj ;
@@ -42,6 +40,7 @@ public class PriorityInstallHelper{
     /*
     Method maps values from CHI Lead to create/update Customer Category record.
     */
+    /*
     public void createOrUpdateCustomerCategory(Map<Id,Customer_category__c> customerCatMap , Map<Id,Opportunity> oppMap)
 	{
 	    Customer_category__c tempCust;
@@ -114,4 +113,5 @@ public class PriorityInstallHelper{
 			
 		}
 	}
+	*/
 }

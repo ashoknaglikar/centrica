@@ -4,9 +4,4 @@
     <availableInTouch>false</availableInTouch>
     <confirmationTokenRequired>false</confirmationTokenRequired>
     <label>ConsoleView</label>
-    <packageVersions>
-        <majorNumber>1</majorNumber>
-        <minorNumber>211</minorNumber>
-        <namespace>cscfga</namespace>
-    </packageVersions>
 </ApexPage>

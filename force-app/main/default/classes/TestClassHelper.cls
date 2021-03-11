@@ -249,8 +249,28 @@ public with sharing class TestClassHelper {
     {
     	return (new Role_Sub_Patch__c(Role__c =RoleId, Sub_Patch__c = SubPatchId, Type__c = 'Availability', Start_Date__c = system.today().adddays(-50).tostartofweek(), End_Date__c= system.today().adddays(100).tostartofweek() )); 
     }
-    	
     
+    
+    public static list<category_Indicator__c> createCustomerLogicRecords()
+    {
+        category_Indicator__c logic1 = new category_Indicator__c(Category__c = 1, Customer_Category_Logic__c ='0', Heating__c = 'No',
+                                                                           Hot_Water__c = 'No', Other_Heat__c = 'No', Vunerable__c = 'Yes', Reason__c = 'Age', Sub_Reason__c= 'Well Being' );
+        category_Indicator__c logic2 = new category_Indicator__c(Category__c = 1, Customer_Category_Logic__c ='1', Heating__c = 'No',
+                                                                           Hot_Water__c = 'No', Other_Heat__c = 'No', Vunerable__c = 'Yes', Reason__c = 'Age', Sub_Reason__c= 'Well Being' );
+        category_Indicator__c ci1= new category_Indicator__c(Reason__c='Age',Sub_Reason__c='75 and over',Heating__c='No',Hot_Water__c='No',Other_Heat__c='No',Vunerable__c='Yes',Category__c=1,customer_category_Logic__c='0'); 
+        category_Indicator__c ci2= new category_Indicator__c(Heating__c='No',Hot_Water__c='No',Other_Heat__c='No',Vunerable__c='Yes',Category__c=1,customer_category_Logic__c='0'); 
+        category_Indicator__c ci3= new category_Indicator__c(Heating__c='No',Hot_Water__c='No',Other_Heat__c='Yes',Vunerable__c='Yes',Category__c=3,customer_category_Logic__c='0');   
+                                                         
+        return new list<category_Indicator__c>    {logic1, logic2, ci1, ci2,ci3};                                                                
+                                                                           
+        
+    }
+    
+    
+    public static cscfga__Product_Basket__c createCSbasket()
+    {
+        return (new cscfga__Product_Basket__c(name='test basket'));
+    }
     
     
 }

@@ -39,20 +39,43 @@ public with sharing class copyConsumableOrder {
             totalString ='0.00';
             
             conReq = [Select c.Status__c, c.Raised_By__c, c.District__c,Request_Total_Value__c,Employee_ID__c,Item_Count__c,Notes__c,
-                      (Select Capital_Item__c, Cost_Each__c, Item_Requested__c, Line_Total__c, Not_Ordered__c,  
+                      (Select Item_Requested__r.Sharepoint_URL__c, Item_Requested__r.ImageName__c,Capital_Item__c, Cost_Each__c, Item_Requested__c, Line_Total__c, Not_Ordered__c,  
                       Other_Desciption__c, Quantity__c, Short_Description__c, Product_Code__c,Notes__c,Item_Requested__r.Image_URL__c,
                       Item_Requested__r.Unit_Quantity__c,Item_Requested__r.Max_Quantity__c, Item_Requested__r.CHI_Lead__c,Job__c,CHILead__c   From Consumable_Items__r),Order_Name__c , 
                       Employee__r.District__r.Authorisation_Value__c,Employee__r.Employee_Number__c From Consumables_Requests__c c where id = :conReqid ];
            SYSTEM.DEBUG('--->'+conReq.Consumable_Items__r+conReq);
            conClassList  = new list<conItemClass>();
+           /*
+           map<string, string> codeImageURLMap = new map<string, string>();
            for(Consumable_Items__c con : conReq.Consumable_Items__r)
            {
-               conClassList.add(new conItemClass(con));
+               codeImageURLMap.put(con.Item_Requested__r.ImageName__c, null);
            }
-           total = conReq.Request_Total_Value__c;   
-           if(total>conReq.Employee__r.District__r.Authorisation_Value__c) 
-           needApp =true;
-           totalString = total.toplainstring(); 
+           
+           try{
+               if(!test.isRunningTest()){
+               for(items_SharepointVia360__x item : [select id, DisplayUrl,DownloadUrl__c, Name__c from items_SharepointVia360__x where name__c in :codeImageURLMap.keyset()])
+               {
+                    codeImageURLMap.put(item.Name__c, item.DownloadUrl__c);   
+               }
+                   
+               }
+           } catch (exception e)
+           {
+               
+           }*/
+           
+           for(Consumable_Items__c con : conReq.Consumable_Items__r)
+           {
+               //string url = codeImageURLMap.containskey(con.Item_Requested__r.ImageName__c)?codeImageURLMap.get(con.Item_Requested__r.ImageName__c):'';
+               conClassList.add(new conItemClass(con, null));
+          
+           
+               total = conReq.Request_Total_Value__c;   
+               if(total>conReq.Employee__r.District__r.Authorisation_Value__c) 
+               needApp =true;
+               totalString = total.toplainstring(); 
+           }       
     	}            
     }
     
@@ -61,8 +84,10 @@ public with sharing class copyConsumableOrder {
         public Consumable_Items__c conItem {get;set;}
         public integer Quantity {get;set;}
         public string colour {get;set;}
-        public conItemClass(Consumable_Items__c con)
+        public string url{get;set;}
+        public conItemClass(Consumable_Items__c con, string url)
         {
+           this.url = url;
             conItem = con;
             conItem.CHILead__c= new opportunity().id;
             Quantity = con.Quantity__c.intvalue();

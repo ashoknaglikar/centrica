@@ -1,78 +1,79 @@
-<apex:page Controller="OnlinePaymentCollection" title="Online Payment Portal" tabStyle="Payment_Collection__c" >
-	<apex:sectionHeader title="Online Card Payment" subTitle="Payment Details" />
-	<apex:form >
-		<apex:pageblock title="Your Details" >
-			<apex:pageMessage summary="Amount Paid cannot be greater than the Balance Outstanding" severity="error" strength="3" rendered="{!blnPymtGreater}"/>
-			<apex:pageMessage summary="Amount Paid should be greater than £0." severity="error" strength="3" rendered="{!blnPymtLessZero}"/>
-			<apex:pageMessage summary="Amount Paid cannot be blank." severity="error" strength="3" rendered="{!blnAmtPymtBlank}"/>			
-			<center>
-				<table width="90%" border=1 BORDERCOLOR="#FFFFFF" cellSpacing=0 cellPadding="5px" >
-					<tr>
-						<td>
-							<table width="96%" border=0 BORDERCOLOR="#FFFFFF" cellSpacing=0 cellPadding="20px" style="visibility:visible" id="initialPayment">
-								<tr bgcolor=#3D8D8D  >
-									<td height="30" style="word-wrap=break-word" ><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Customer Name</font></B></CENTER></td>
-									<td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Payment Reference Number</font></B></CENTER></td>
-									<td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Customer Address</font></B></CENTER></td>
-									<td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Balance Outstanding</font></B></CENTER></td>    				    				    				
-									<td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Amount Paid</font></B></CENTER></td>
-								</tr>
-								<tr >
-									<td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" >{!obj_PymtCol.ContactName__c}</font></CENTER></td>
-									<td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" >{!obj_PymtCol.BGS_Payment_Reference_Num__c}</font></CENTER></td>
-									<td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" >
-									
-									<br>
-									{!obj_PymtCol.Opportunity__r.Account.Primary_Contact__r.MailingStreet}<br>
-									{!obj_PymtCol.Opportunity__r.Account.Primary_Contact__r.MailingCity}<br>
-									{!obj_PymtCol.Opportunity__r.Account.Primary_Contact__r.MailingState}<br>
-									United Kingdom<br>
-									{!obj_PymtCol.Opportunity__r.Account.Primary_Contact__r.MailingPostalCode}</font></CENTER>
-									<center><font face="Verdana" size="1.5" >
-										
-									</font></center>
-									</td>
-									<td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" ><apex:outputField value="{!obj_PymtCol.Balance_Outstanding1__c}"></apex:outputField></font></CENTER></td>
-									<td style="word-wrap=break-word" ><CENTER><font face="Verdana" size="1.5" ><apex:inputField value="{!obj_Payment.Amount_Collected__c}" ></apex:inputField></font></CENTER></td>
-								</tr>
-								<tr >
-									<td colspan="5">
-										<input type="checkbox" name="isBilling" id="isBilling" onclick="enterCustomerAddress();">Check the box; if this address is not the billing address.								
-									</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-			</center>
-			
-			<br/>
-			<apex:outputPanel id="showstate" >
-				<apex:pageblocksection title="Enter Billing Address" rendered="{!blnAddressBlock}">
-					<apex:pageblocksectionItem >
-						<apex:outputLabel value="Billing Street" />
-						<apex:inputText value="{!strAddr1}" />
-					</apex:pageblocksectionItem>
-					<apex:pageblocksectionitem >
-						<apex:outputLabel value="Billing City" />
-						<apex:inputText value="{!strCity}" />					
-					</apex:pageblocksectionitem>
-					<apex:pageblocksectionitem >
-						<apex:outputLabel value="Billing State" />
-						<apex:inputText value="{!strCountyProvince}" />					
-					</apex:pageblocksectionitem>
-					<apex:pageblocksectionitem >
-						<apex:outputLabel value="Billing Postal Code" />
-						<apex:inputText value="{!strPostalCode}" />					
-					</apex:pageblocksectionitem>
-				</apex:pageblocksection>	
-			</apex:outputPanel>
-			<apex:pageBlockButtons location="bottom">
-				<apex:commandButton action="{!BackToPaymentCollection}" value="Cancel Payment" ></apex:commandButton>
-				<apex:commandButton action="{!PayThroughBarclays}" value="Confirm Payment"></apex:commandButton>
-			</apex:pageBlockButtons>
-		</apex:pageblock>
-		<apex:actionfunction action="{!enterCustomerAddress}" name="enterCustomerAddress" rerender="showstate" >
-		</apex:actionFunction>
-	</apex:form>
+<!--<apex:page Controller="OnlinePaymentCollection" title="Online Payment Portal" tabStyle="Payment_Collection__c" >
+    <apex:sectionHeader title="Online Card Payment" subTitle="Payment Details" />
+    <apex:form >
+        <apex:pageblock title="Your Details" >
+            <apex:pageMessage summary="Amount Paid cannot be greater than the Balance Outstanding" severity="error" strength="3" rendered="{!blnPymtGreater}"/>
+            <apex:pageMessage summary="Amount Paid should be greater than £0." severity="error" strength="3" rendered="{!blnPymtLessZero}"/>
+            <apex:pageMessage summary="Amount Paid cannot be blank." severity="error" strength="3" rendered="{!blnAmtPymtBlank}"/>          
+            <center>
+                <table width="90%" border=1 BORDERCOLOR="#FFFFFF" cellSpacing=0 cellPadding="5px" >
+                    <tr>
+                        <td>
+                            <table width="96%" border=0 BORDERCOLOR="#FFFFFF" cellSpacing=0 cellPadding="20px" style="visibility:visible" id="initialPayment">
+                                <tr bgcolor=#3D8D8D  >
+                                    <td height="30" style="word-wrap=break-word" ><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Customer Name</font></B></CENTER></td>
+                                    <td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Payment Reference Number</font></B></CENTER></td>
+                                    <td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Customer Address</font></B></CENTER></td>
+                                    <td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Balance Outstanding</font></B></CENTER></td>                                                            
+                                    <td style="word-wrap=break-word"><CENTER><B><font face="Verdana" size="1.5" color="#FFFFFF">Amount Paid</font></B></CENTER></td>
+                                </tr>
+                                <tr >
+                                    <td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" >{!obj_PymtCol.ContactName__c}</font></CENTER></td>
+                                    <td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" >{!obj_PymtCol.BGS_Payment_Reference_Num__c}</font></CENTER></td>
+                                    <td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" >
+                                    
+                                    <br>
+                                    {!obj_PymtCol.Opportunity__r.Account.Primary_Contact__r.MailingStreet}<br>
+                                    {!obj_PymtCol.Opportunity__r.Account.Primary_Contact__r.MailingCity}<br>
+                                    {!obj_PymtCol.Opportunity__r.Account.Primary_Contact__r.MailingState}<br>
+                                    United Kingdom<br>
+                                    {!obj_PymtCol.Opportunity__r.Account.Primary_Contact__r.MailingPostalCode}</font></CENTER>
+                                    <center><font face="Verdana" size="1.5" >
+                                        
+                                    </font></center>
+                                    </td>
+                                    <td style="word-wrap=break-word"><CENTER><font face="Verdana" size="1.5" ><apex:outputField value="{!obj_PymtCol.Balance_Outstanding1__c}"></apex:outputField></font></CENTER></td>
+                                    <td style="word-wrap=break-word" ><CENTER><font face="Verdana" size="1.5" ><apex:inputField value="{!obj_Payment.Amount_Collected__c}" ></apex:inputField></font></CENTER></td>
+                                </tr>
+                                <tr >
+                                    <td colspan="5">
+                                        <input type="checkbox" name="isBilling" id="isBilling" onclick="enterCustomerAddress();">Check the box; if this address is not the billing address.                             
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </center>
+            
+            <br/>
+            <apex:outputPanel id="showstate" >
+                <apex:pageblocksection title="Enter Billing Address" rendered="{!blnAddressBlock}">
+                    <apex:pageblocksectionItem >
+                        <apex:outputLabel value="Billing Street" />
+                        <apex:inputText value="{!strAddr1}" />
+                    </apex:pageblocksectionItem>
+                    <apex:pageblocksectionitem >
+                        <apex:outputLabel value="Billing City" />
+                        <apex:inputText value="{!strCity}" />                   
+                    </apex:pageblocksectionitem>
+                    <apex:pageblocksectionitem >
+                        <apex:outputLabel value="Billing State" />
+                        <apex:inputText value="{!strCountyProvince}" />                 
+                    </apex:pageblocksectionitem>
+                    <apex:pageblocksectionitem >
+                        <apex:outputLabel value="Billing Postal Code" />
+                        <apex:inputText value="{!strPostalCode}" />                 
+                    </apex:pageblocksectionitem>
+                </apex:pageblocksection>    
+            </apex:outputPanel>
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton action="{!BackToPaymentCollection}" value="Cancel Payment" ></apex:commandButton>
+                <apex:commandButton action="{!PayThroughBarclays}" value="Confirm Payment"></apex:commandButton>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+        <apex:actionfunction action="{!enterCustomerAddress}" name="enterCustomerAddress" rerender="showstate" >
+        </apex:actionFunction>
+    </apex:form>-->
+  <apex:page >
 </apex:page>

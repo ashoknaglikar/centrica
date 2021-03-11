@@ -89,7 +89,7 @@ trigger ensurePrimary on BigMachines_Quote__c (before insert,before update) {
         /*
         	Change: Specify To Succeed
         	Des: Update Trial Name from Job to BM Quote if a Job existis in before in job.
-        */
+        
         if(trigger.isinsert)
         {
         	AddNewSkill addObj = new AddNewSkill();
@@ -99,6 +99,7 @@ trigger ensurePrimary on BigMachines_Quote__c (before insert,before update) {
         		trigger.new[0].Trial_Name__c = primaryJobList[0].Trial_Names__c;
         	}
         }
+        */
     }
     
     }    

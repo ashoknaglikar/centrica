@@ -124,15 +124,14 @@
 </apex:outputPanel>
 </apex:pageblocksectionitem>
 
-<!--
 <apex:pageblocksectionitem >
-<apex:outputLabel value="Business Type" />
-<apex:outputPanel styleClass="requiredInput" layout="block">
-<apex:outputPanel styleClass="requiredBlock" layout="block"/>
-<apex:inputfield value="{!opportunityObject.Business_Type__c}" />  	
-</apex:outputPanel>
+    <apex:outputLabel value="Business Type" />
+        <apex:outputPanel styleClass="requiredInput" layout="block">
+        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+        <apex:inputfield value="{!opportunityObject.Business_Type__c}" />  	
+    </apex:outputPanel>
 </apex:pageblocksectionitem>	
--->
+
 
 </apex:pageblocksection>
 

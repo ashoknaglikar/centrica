@@ -90,14 +90,14 @@ global with sharing class customerPortalQuoteHelper {
         //String productInterestNames = String.valueof(IV_Vectors__c.getInstance('Product Interest').Key__c);
         //List<string> prodInterest=productInterestNames.split(';');
         list<Bigmachines_Quote__c> bmQuotes = [select id, Name,Opportunity__c,Status__c,	 SubmittedDate_quote__c, Is_Primary__c, Stage__c, bmStatusReason__c,
-													  FinalPriceVisibleToCustomer__c, 	DiscountsTotalOnPricing__c, FinalNetQuoteTotal__c, createdDate,Portal_Cut_Off_Time__c
-													  from Bigmachines_Quote__c where Opportunity__c = :oppID];
+													  FinalPriceVisibleToCustomer__c, 	DiscountsTotalOnPricing__c, FinalNetQuoteTotal__c, createdDate,Portal_Cut_Off_Time__c,Portal_Blocker__c
+													  from Bigmachines_Quote__c where Opportunity__c = :oppID and Stage__c !=null ];
 
 		system.debug('bmQuotes-->'+bmQuotes);
 		for(Bigmachines_Quote__c bq : bmQuotes)
 		{
 			// if Primary Quotes exists retrun null.
-			if(bq.Is_Primary__c || bq.Status__c == 'Quote Finalised - Accepted')
+			if(bq.Is_Primary__c || bq.Stage__c    == 'Quote Finalised - Accepted')
 			return null;
 			
 			//if status reson containds anything with Asbestos . Return null
@@ -106,7 +106,6 @@ global with sharing class customerPortalQuoteHelper {
 			return null;
 			*/
 			// check for quote expiry rule
-
 
 			integer quoteExpiryDays = Integer.valueof(IV_Vectors__c.getInstance('Quote_Expiry_Days').Key__c);
 			
@@ -121,13 +120,13 @@ global with sharing class customerPortalQuoteHelper {
             {
                 createdCutOff = bq.CreatedDate.addMinutes(Integer.valueof(IV_Vectors__c.getInstance('Quote_Created_Time').Key__c));
             } 
-           
+			
 			
             system.debug('createdCutOff=='+createdCutOff);
             system.debug('Age of Qupote -->'+expiryDateStart.daysBetween(system.today()));
 			// this will stop expired quotes. 
 			// also adds dealy to quotes 
-			if(expiryDateStart!=null && expiryDateStart.daysBetween(system.today())<= quoteExpiryDays && createdCutOff < system.now())
+			if((expiryDateStart!=null && expiryDateStart.daysBetween(system.today())<= quoteExpiryDays && createdCutOff < system.now() )|| bq.Portal_Blocker__c != 'None')
 			{
 				eligibleQuotes.add(bq.Id);
 			}
@@ -162,7 +161,7 @@ global with sharing class customerPortalQuoteHelper {
 				    
 					Bigmachines_Quote__c bmQuoteVar = bmQuote[0];
 					returnVar.leadOfferList = buildLeadOfferJSON(bmQuoteVar.Opportunity__c);
-                    
+                    returnVar.quoteCustomerDocs = customerPortalRESTHelper.getCustomerDocs(new list<id>{bmQuoteVar.Opportunity__c,bmQuoteVar.Id});
 					returnVar.validQuote = true;
 
 					// check Asbestos

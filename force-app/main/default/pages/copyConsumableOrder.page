@@ -58,7 +58,7 @@
             <apex:column value="{!con.conItem.Product_Code__c}" style="{!con.colour}" id="c1"/>
             <apex:column value="{!con.conItem.Short_Description__c}" style="{!con.colour}" id="c2"/>
             <apex:column headervalue="Image">
-                <apex:image url="{!con.conItem.Item_Requested__r.Image_URL__c}" height="50" width="50" />
+                <apex:image url="{!con.conItem.Item_Requested__r.Sharepoint_URL__c}" height="50" width="50" />
             </apex:column>
             <apex:column value="{!con.conItem.Item_Requested__r.Unit_Quantity__c}" />
             <apex:column value="{!con.conItem.Cost_Each__c}" style="{!con.colour}" id="c4"/>

@@ -25,6 +25,8 @@ var existAddedHive = false;
 var additionalPackEntryRef = 'AutoAdded_AP_',
     additionalPackPartCodesList; 
 
+//to auto add P3559 pack
+var roofPackExists = false;
 
 var ipadDevice = 'iPad';
 var laptopDevice = 'Laptop';
@@ -236,7 +238,13 @@ require(['bower_components/q/q'], function (Q) {
         districtCode = CS.getAttributeValue('District_Code_0');
         pricebookType = CS.getAttributeValue('Pricebook_Type_0');
         boilerGroup = CS.getAttributeValue('Boiler_0:Boiler_Group_0') ? CS.getAttributeValue('Boiler_0:Boiler_Group_0') : '';
-        geographicUpliftFactor = CS.getAttributeValue('Geographic_Uplift_Factor_0');
+        
+        //geographicUpliftFactor__c field on Big Machines Quote object is a decimal field
+        //empty values were written in json as empty strings, which was leading to type mismatch error in sfdc
+        geographicUpliftFactor = parseFloat(CS.getAttributeValue('Geographic_Uplift_Factor_0'));
+        if (isNaN(geographicUpliftFactor)) {
+            geographicUpliftFactor = 0.00;
+        }
         
         selectListPackPartCodesList = []; // a list containing all of the parts codes retreived from select lists to be queried and automatically added
         var selectListCodesExist = false;
@@ -1903,6 +1911,17 @@ require(['bower_components/q/q'], function (Q) {
         additionalPackPartCodesList = [];
         var boilerID= CS.getAttributeValue("Boiler_0:Part_Code_0","String");
 
+        //Add P3559 pack if the packs P3553 or P3554 is picked and if any one of the roofpack exists from list of roofpacks.
+        var scaffoldPack = CS.getAttributeValue("Scaffold_Part_0","String");
+        var scaffoldAtHeight;
+        scaffoldAtHeight = false;
+        if ((scaffoldPack == 'P3553' || scaffoldPack == 'P3554') && roofPackExists) {
+            additionalPackPartCodesList.push("P3559");
+            roofPackExists = false;
+            CS.Log.warn("Scaffold P3559 Added");
+        }
+        
+        
         //PCBH3 AUTO ADD        
         //CS.Log.warn("++++++ExistsPCBH3 =="+existsPCBH3);
         if((existAddedHive==true) && (existsPCBH3 == true)){
@@ -2836,6 +2855,23 @@ require(['bower_components/q/q'], function (Q) {
                         existsPCBH3=true;
                         //CS.Log.warn("====FOUND P2276");
                     }
+                    
+                     //Check whether a roof pack and scaffolding pack have both been added and if so add additional scaffolding labour pack
+                    //Create array of roof pack identified
+                    var roofPackArray = ['P150', 'P153', 'P1577', 'P7967', 'P1574', 'P1575', 'P775', 'P156', 'P1999', 'P9219', 'P1571', 'P1611', 'P7907'];
+                    var additionalPack = CS.getAttributeValue("Boiler_0:Flue_0:Roof_Flashing_0");
+                    var partCode = parentPartWrapper.part.Part_Code__c;
+                    
+                    if (roofPackArray.includes(additionalPack)){
+                        roofPackExists = true;
+                        CS.Log.warn("Roof Pack Exists");
+                    }
+
+                    if (roofPackArray.includes(partCode)){
+                        roofPackExists = true;
+                        CS.Log.warn("Roof Pack Exists");
+                    }
+
                 }
             }
             //Else if parent is Bundle
@@ -3228,7 +3264,10 @@ require(['bower_components/q/q'], function (Q) {
                                                                            ['Thermostatic Radiator Valves','Thermostatic Radiator Valves'],
                                                                            ['Warranties and Homecare','Warranties and Homecare'],
                                                                            ['Water Heater','Water Heater'],
-                                                                           ['Water Softeners','Water Softeners']
+                                                                           ['Water Softeners','Water Softeners'],
+                                                                           ['Safe Access at Height','Safe Access at Height'],
+                                                                           ['Bespoke Plume Kits','Bespoke Plume Kits'],
+                                                                           ['Hybrid Heat Pumps (Trial Area Only)']
                                                                            ]);
 
                 CS.setAttributeValue('Stores_' + i + ':Pack_C_Subcategory_0', subcat);
@@ -3545,25 +3584,28 @@ window.executeVulnerableCustomersRules = function executeVulnerableCustomersRule
         if (quoteStatus == 'Quote Finalised - Not Accepted') {
             
             var havePdfQuote = CS.getAttributeValue('Pdf_Path_0');
-            var haveInstallationNotes = CS.getAttributeValue('Installation_Form_Path_0');
-            
-            
             havePdfQuote = havePdfQuote != undefined ? havePdfQuote.length > 0 : false;
-            haveInstallationNotes = haveInstallationNotes != undefined ? haveInstallationNotes.length > 0 : false;
             
             if (!havePdfQuote) {
                 CS.markConfigurationInvalid('', 'Please tap the "Print Quote" button');
             }
-            
+        }
+
+        // 2019-11-19
+        // apply for both statuses (as installation notes are not signed anymore - which is checked in js actions)
+        if (quoteStatus == 'Quote Finalised - Not Accepted' || quoteStatus == 'Quote Finalised - Accepted') {
+            var haveInstallationNotes = CS.getAttributeValue('Installation_Form_Path_0');
+            haveInstallationNotes = haveInstallationNotes != undefined ? haveInstallationNotes.length > 0 : false;
+
             if (!haveInstallationNotes) {
                 CS.markConfigurationInvalid('', 'Please tap the "Installation Notes" button');
             }
-            var configStatus = CS.getConfigurationProperty('', 'status');
-            console.log('***** configStatus: ' + configStatus)
-            if (configStatus == 'Incomplete' || configStatus == 'Invalid') {
-                jQuery("button:contains('Finish')").hide();
-            }
-          
+        }
+
+        var configStatus = CS.getConfigurationProperty('', 'status');
+        console.log('***** configStatus: ' + configStatus)
+        if (configStatus == 'Incomplete' || configStatus == 'Invalid') {
+            jQuery("button:contains('Finish')").hide();
         }
     }
 
@@ -3727,17 +3769,74 @@ window.enableDepositValidation = function enableDepositValidation(){
 function triggerActualDepositValidation(){
     CS.Log.warn('****    Executing rule for actual deposit greater than minimum deposit validation- !!!');
     var actDep = parseFloat(CS.getAttributeValue('Actual_Deposit_0'));
-    var minDep = parseFloat(CS.getAttributeValue('Minimum_Deposit_0'));
+    
+    var minDep = 0;
+    //var minDep = parseFloat(CS.getAttributeValue('Minimum_Deposit_0')); - removed as part of Coronavirus 18/03/20 by Phil Dennison
     //When {Heating Solution:Quote Status} is not 'Quote Finalised - Not Accepted' AND {Heating Solution:Actual Deposit} is less than '{Minimum Deposit}' AND {Heating Solution:Payment Method} is not 'Finance' -> Mark Configuration Invalid.
     if((CS.getAttributeValue('Quote_Status_0')!='Quote Finalised - Not Accepted') && (actDep < minDep) && (CS.getAttributeValue('Payment_Method_0')!='Finance')){
         CS.markConfigurationInvalid('To sell the quote the preferred deposit cannot be less than the minimum deposit, unless payment option is finance package.');
     }
+    
+    //Added new conditions in case if Zero Deposit Payment Type is selected. Make the deposit value to 0 and in the background
+    //making the payment type as Cash instead of Zero Deposit
+    let minimumDeposit = CS.getAttributeValue('Minimum_Deposit_0');
+    let actualDeposit = CS.getAttributeValue('Actual_Deposit_0');
+    let updateDeposit = CS.setAttributeValue('Actual_Deposit_0');
+    let paymentType = CS.getAttributeValue('Payment_Type_0');
+    let paymentDispType = CS.getAttributeDisplayValue('Payment_Type_0');
+    let paymentChanged = false;
+
+    if(minimumDeposit != actualDeposit && actualDeposit != 0 ){
+        paymentChanged = true;
+        CS.setAttributeValue('Actual_Deposit_0',actualDeposit);
+        CS.setAttributeValue('Payment_Type_0',paymentType);
+        console.log(paymentChanged);
+    }
+
+    if(minimumDeposit == actualDeposit){
+        CS.setAttributeValue('Actual_Deposit_0',actualDeposit);
+    }
+
+    if(minimumDeposit != actualDeposit && actualDeposit == 0 && paymentType == 'Zero Deposit'){
+        paymentChanged = true;
+        if(paymentType == 'Zero Deposit'){
+        	CS.setAttributeValue('Payment_Type_0','Zero Deposit');
+        }
+        CS.setAttributeValue('Actual_Deposit_0',0);
+        console.log(paymentChanged);
+    }
+
+    if(paymentType == 'Zero Deposit' && actualDeposit != 0 ){
+        paymentChanged = true;
+        CS.setAttributeValue('Actual_Deposit_0',0);
+        console.log(paymentChanged);
+    }
+
+    if(paymentType == 'Zero Deposit' && actualDeposit == 0 ){
+        paymentChanged = true;
+        CS.setAttributeValue('Actual_Deposit_0',0);
+        console.log(paymentChanged);
+    }
+
+
+    if(paymentType != 'Zero Deposit' && actualDeposit == 0){
+        if(paymentChanged == false){
+         CS.setAttributeValue('Actual_Deposit_0',minimumDeposit);
+        }
+    }
+
 
 }
 
 window.setWorldpayButtonVisibility = function() {
     console.log("setWorldpayButtonVisibility()");
     //jQuery("#btn-worldpay-payment").hide();
+    
+     jQuery('[data-cs-binding=' +'Worldpay_Payment_0]').hide();
+     jQuery('[data-cs-binding=' +'Worldpay_Payment_0]').parent().parent().hide();  
+     
+    //Hiding WorldPay button for good//
+    /*
     if (navigator.device) {
         jQuery('[data-cs-binding=' +'Worldpay_Payment_0]').hide();
     } else {
@@ -3767,7 +3866,9 @@ window.setWorldpayButtonVisibility = function() {
         }
       }
     }
-
+    //Hiding WorldPay button for good// 
+    */
+    
     /* doesn't work
     var btnElement = jQuery("#btn-worldpay-payment");
     var depositNumberValid = CS.getAttributeField('Deposit_Receipt_Number_0', 'Valid');

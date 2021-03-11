@@ -2,7 +2,7 @@
 
     <apex:attribute name="tradingName" description="Will show British or Scottish gas" type="string"/>
     
-    <p>Thanks</p>
+    <p>We've got you covered.</p><br/>
     <p>Your&nbsp;{!tradingName}&nbsp;team</p>
     
 </apex:component>

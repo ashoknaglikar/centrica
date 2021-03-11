@@ -20,10 +20,10 @@ public class JobNotificationMail {
         public String str_JobTitle{get;set;}
         public String salesPerson{get;set;}
         // Added as part of customer history card change request.
-        public Customer_history_card__c custHistoryCard{get;set;}
+        //public Customer_history_card__c custHistoryCard{get;set;}
         public string attachmentId {get;set;}
         public string attachmentname{get;set;}
-        public boolean displayCustHistoryCard{get;set;}
+        //public boolean displayCustHistoryCard{get;set;}
         // End of customer history card change request.
         private String sBoilerInstallationNotes = '';
         public String getsBoilerInstallationNotes(){
@@ -415,7 +415,7 @@ public class JobNotificationMail {
                       Merchant_Order_Number__c From Job_Elements1__r Order By Skill__c ASC) ,
                       (Select User__c,User__r.MobilePhone,User__r.Name, Is_Ready__c, Type__c,Sub_Type__c,Installer_Status__c
                       From User_Jobs__r where User__c NOT IN : jobUserList AND (Installer_Status__c =: null OR Installer_Status__c =: 'Active')),
-                      (Select Id from Customer_history_cards__r limit 1),Job_Type__c,Quote__r.Quote_Signed__c,Latest_customer_category_indicator__c,GDIndicator__c,
+                      /*(Select Id from Customer_history_cards__r limit 1),*/Job_Type__c,Quote__r.Quote_Signed__c,Latest_customer_category_indicator__c,GDIndicator__c,
                       Quote__r.POC_Payment_Method__c, Quote__r.POC_Payment_Option__c,Start_Data_Time__c,TrialIndicator__c, Landlord__c,Multiple_Re_Plan_Indiacator__c
                       ,Survey_Required__c,Survey_Completed__c,Survey_Completed_By__c
                       From Job__c Where Id In:jobId and Status__c IN: lst_Status and   
@@ -441,7 +441,7 @@ public class JobNotificationMail {
                       Merchant_Order_Number__c From Job_Elements1__r Order By Skill__c ASC) ,
                       (Select User__c,User__r.MobilePhone,User__r.Name, Is_Ready__c, Type__c,Sub_Type__c,Installer_Status__c
                       From User_Jobs__r where User__c NOT IN : jobUserList AND (Installer_Status__c =: null OR Installer_Status__c =: 'Active')),
-                      (Select Id from Customer_history_cards__r limit 1),Job_Type__c,Quote__r.Quote_Signed__c,Latest_customer_category_indicator__c,GDIndicator__c,
+                      /*(Select Id from Customer_history_cards__r limit 1),*/Job_Type__c,Quote__r.Quote_Signed__c,Latest_customer_category_indicator__c,GDIndicator__c,
                       Quote__r.POC_Payment_Method__c, Quote__r.POC_Payment_Option__c,Start_Data_Time__c,TrialIndicator__c, Landlord__c,Multiple_Re_Plan_Indiacator__c
                       ,Survey_Required__c,Survey_Completed__c,Survey_Completed_By__c
                       From Job__c Where Id In:jobId and Status__c IN: lst_Status
@@ -563,7 +563,7 @@ public class JobNotificationMail {
                   Merchant_Order_Number__c From Job_Elements1__r Order By Skill__c ASC) ,
                   (Select User__c,User__r.MobilePhone,User__r.Name, Is_Ready__c, Type__c,Sub_Type__c,Installer_Status__c
                   From User_Jobs__r where User__c<>:id_Installer AND (Installer_Status__c =: null OR Installer_Status__c =: 'Active')),
-                  (Select Id from Customer_history_cards__r limit 1),Job_Type__c,Quote__r.Quote_Signed__c,Latest_customer_category_indicator__c,GDIndicator__c,
+                  /*(Select Id from Customer_history_cards__r limit 1),*/Job_Type__c,Quote__r.Quote_Signed__c,Latest_customer_category_indicator__c,GDIndicator__c,
                       Quote__r.POC_Payment_Method__c, Quote__r.POC_Payment_Option__c,Start_Data_Time__c,TrialIndicator__c, Landlord__c,Multiple_Re_Plan_Indiacator__c
                   ,Survey_Required__c,Survey_Completed__c,Survey_Completed_By__c
                   From Job__c Where Id In:jobId and Status__c IN: lst_Status and   
@@ -589,7 +589,7 @@ public class JobNotificationMail {
                   Merchant_Order_Number__c From Job_Elements1__r Order By Skill__c ASC) ,
                   (Select User__c,User__r.MobilePhone,User__r.Name, Is_Ready__c, Type__c,Sub_Type__c,Installer_Status__c
                   From User_Jobs__r where User__c<>:id_Installer AND (Installer_Status__c =: null OR Installer_Status__c =: 'Active')),
-                  (Select Id from Customer_history_cards__r limit 1),Job_Type__c,Quote__r.Quote_Signed__c,Latest_customer_category_indicator__c,GDIndicator__c,
+                  /*(Select Id from Customer_history_cards__r limit 1),*/Job_Type__c,Quote__r.Quote_Signed__c,Latest_customer_category_indicator__c,GDIndicator__c,
                       Quote__r.POC_Payment_Method__c, Quote__r.POC_Payment_Option__c,Start_Data_Time__c,TrialIndicator__c, Landlord__c,Multiple_Re_Plan_Indiacator__c
                   ,Survey_Required__c,Survey_Completed__c,Survey_Completed_By__c
                   From Job__c Where Id In:jobId and Status__c IN: lst_Status
@@ -696,7 +696,7 @@ public class JobNotificationMail {
                 int_Count++;
                 // Added as part of customer history card change request.
                 obj_JobDiaryDetails.obj_job5=obj_job;
-                obj_JobDiaryDetails.displayCustHistoryCard = FALSE;
+                //obj_JobDiaryDetails.displayCustHistoryCard = FALSE;
                 // End of customer history card change request.
                 //AGENCY CHANGE FOR ORDER VALUE: START: 08-10-2010.
                 for(Order__c order : orderList){
@@ -890,13 +890,14 @@ public class JobNotificationMail {
                 {
                   obj_JobDiaryDetails.sBoilerInstallationNotes = '';
                 }  
-                // Added as part of customer history card change request.
+                /*// Added as part of customer history card change request.
                 if(obj_JobDiaryDetails.obj_job5.Customer_History_Cards__r.size()>0){
                     
                     obj_JobDiaryDetails.displayCustHistoryCard = TRUE;
                     obj_JobDiaryDetails.custHistoryCard = obj_JobDiaryDetails.obj_job5.Customer_History_Cards__r[0];
                     
                 }
+                */
                 obj_JobDiaryDetails.startDatetime = obj_JobDiaryDetails.obj_job5.Start_Data_Time__c;
                 // End of customer history card change request.
                 obj_JobDiaryDetails.attachmentname = 'No Notes';

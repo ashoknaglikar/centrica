@@ -33,7 +33,7 @@ global class customerPortalAcceptCloneQuote {
         for(Opportunity opp : oppList){
             count = opp.BigMachines_Quotes__r.size();           
         
-           if(!test.isRunningTest())
+          /* if(!test.isRunningTest())
            {
                 if(opp.Account.Latitude__Latitude__s!=null && opp.Account.Latitude__Longitude__s!=null)
                 {
@@ -46,9 +46,9 @@ global class customerPortalAcceptCloneQuote {
                     string pcode = opp.Install_Postcode__c!=null?opp.Install_Postcode__c.normalizeSpace().replaceall(' ','+').trim():'';
                   
                     string Address = street + '+'+city+ '+' +pcode;                    
-                    Latlang = Utilities.getLatLang(Address,pcode);
+                    Latlang = Utilities.getLatLang(Address,pcode,street,city);
                 }
-           }
+           }*/
            
         }
         
@@ -193,7 +193,7 @@ global class customerPortalAcceptCloneQuote {
         else
         objResponse.errorList.add('Error in Cloning the Quote');
           
-       try
+       /*try
        {
         if(Latlang.size()==2 && Latlang[0] != 'null'  && Latlang[0] !=null && Latlang[1] != 'null'  && Latlang[1] !=null)
         {
@@ -208,7 +208,7 @@ global class customerPortalAcceptCloneQuote {
         catch(Exception e)
         {
              objResponse.errorList.add(e.getMessage());
-        }
+        }*/
         //update contact
         
         
@@ -294,5 +294,31 @@ global class customerPortalAcceptCloneQuote {
                 insert clonedAttachments;
             }
          
+    }
+    
+    
+     @future(callout=true)
+    public static void addAttachment(id Quoteid, string transId)
+    {
+        List<attachment> attachlist = [select id,name from attachment where parentid=:Quoteid and name like '%quote.pdf%'];
+        
+        List<Attachment> attlist = new List<Attachment>();   
+        if(attachlist.isempty())
+        {
+                PageReference qPage = Page.BMQuotePDF;
+                qPage.getParameters().put('Id', Quoteid);
+                Attachment att1 = new Attachment();
+                att1.name = transId+'_quote.pdf';
+                if(Test.isRunningTest()) { 
+                    att1.body= blob.valueOf('Unit.Test');
+                } else {
+                    att1.body =  qPage.getContent();
+                }
+                att1.parentid = Quoteid;
+    	        attlist.add(att1);
+        }
+        system.debug('attlist '+attlist);
+        if(!attlist.isempty())
+	    insert attlist;
     }
 }

@@ -1,6 +1,18 @@
-<apex:page controller="SendConsumablesCont">
+<apex:page controller="SendConsumablesCont" id="page">
     <apex:pagemessages />
     <apex:form >
+    <apex:pageblock >
+        <apex:pageBlockButtons location="bottom" >
+            <apex:commandButton value="Extract New Consumble File" action="{!invokeBatch}"  />
+        </apex:pageBlockButtons>
+        <apex:pageBlocksection columns="1">
+            <br/>
+            <apex:outputtext value="Total number of consumble orders awaiting to be ordered is : {!consumablesWaiting}" style="font-weight:bold; font-size:14px"/> 
+            
+        </apex:pageBlocksection>
+    </apex:pageblock>
+    </apex:form>
+    <!--<apex:form >
         <apex:pageblock >
             <apex:pageblockbuttons >
             <apex:commandbutton action="{!fetchRequests}" value="Fetch Consumable Requests"/>
@@ -66,5 +78,5 @@
                 </apex:outputPanel>
             </apex:outputPanel>
         </apex:pageblock>
-    </apex:form>
+    </apex:form>-->
 </apex:page>

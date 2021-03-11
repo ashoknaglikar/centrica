@@ -94,7 +94,7 @@ public class customerPortalRESTHelper_test {
         insert app;
         customerPortalRESTHelper.post(string.valueof(opp.id), 'test bowser', 'test ip', 'test resloution');
         
-        
+        test.starttest();
         Bigmachines_Quote__c bmQuote1 = TestClassHelper.createBMQuote(opp);
         bmQuote1.Is_Primary__c = false;
         bmQuote1.Status__c = 'Quote Finalised - Not Accepeted';
@@ -110,7 +110,8 @@ public class customerPortalRESTHelper_test {
         
         j.Status__c = 'Installed';
         update j;
-         customerPortalRESTHelper.post(string.valueof(opp.id), 'test bowser', 'test ip', 'test resloution');
+       
+        customerPortalRESTHelper.post(string.valueof(opp.id), 'test bowser', 'test ip', 'test resloution');
         
         date today=system.today();
         date endDate=system.today()+10;
@@ -118,6 +119,8 @@ public class customerPortalRESTHelper_test {
         customerPortalRESTHelper pHelper=new customerPortalRESTHelper();
         pHelper.createChildEvent(true,today,endDate,'t1','t2','t3','t4','t5','t6','t7');
         
+        //pHelper.testCOdeCoverare();
+        test.stoptest();
     }
 
 
@@ -125,7 +128,7 @@ public class customerPortalRESTHelper_test {
 
     private static testmethod void  secnarioPhase3aAcceptQuoteNegativeScenarios()
     {
-        
+        //new customerPortalRESTHelper().testCOdeCoverare();
         Account acc = TestClassHelper.createAccout();
         insert acc;
         
@@ -177,7 +180,7 @@ public class customerPortalRESTHelper_test {
         bmQuote1.bmStatusReason__c = 'Asbestos';
         update bmQuote1;
         customerPortalQuoteHelper.getQuote(opp.Opp_Id_Encrypted__c);
-
+        
 
     }
  
@@ -307,9 +310,33 @@ public class customerPortalRESTHelper_test {
         vectorList.add(new IV_Vectors__c(Name = 'Finance_Reffered_Statuses', Key__c = ',Referred,') );
         insert vectorList;
 
+       
 
 
+    }
+    
+    private static testmethod void testcustomerPortalDepositPayment()
+    {
+        
+        customerPortalDepositPayment.depositPayment(null,null,200,'81231231238','mac','jlbx','Success','Debit',system.now());
+        
+        Account acc = TestClassHelper.createAccout();
+        insert acc;
+        
+        Contact con = TestClassHelper.createContact(acc);
+        insert con;
+        
+        Opportunity opp  = TestClassHelper.createCHILead(acc);
 
+        insert opp;
+        Bigmachines_Quote__c quote= TestClassHelper.createBMQuote(opp);
+        insert quote;
+      
+        customerPortalDepositPayment.depositPayment(opp.Id,quote.Id,200,'81231231238','mac','jlbx','Success','Debit',system.now());
+        
+        
+        
+        
     }
     
 
