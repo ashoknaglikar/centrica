@@ -167,7 +167,7 @@ global class jobTriggerHelper {
                 j.Balancing_Skill__c = rightOne.Premier_Hour_Equivalent__c-j.Total_Hours__c;
             }
             else{
-                j.Balancing_Skill__c = j.Balancing_Skill__c - J.Total_Hours__c;
+                j.Balancing_Skill__c = revisedTime - J.Total_Hours__c;
             }
                 j.Balancing_Skill__c = j.Balancing_Skill__c.setScale(2).doubleValue(); //PRB00028115
             

@@ -1166,3 +1166,172 @@ window.setNotesTextFieldWidth = function setNotesTextFieldWidth(){
 
     }  
 }
+
+window.HomeEfficiency = function HomeEfficiency(){
+    console.log('HomeEfficiency()');
+
+    let interestedInMOT = CS.getAttributeValue('Home_Efficiency_0:Interested_in_MOT_options_0');
+    let giveConsent = CS.getAttributeValue('Home_Efficiency_0:Consent_over_third_party_0');
+    let CHILead = CS.getAttributeValue('CHI_Lead_Number_0');
+    let customerName = CS.getAttributeValue('Customer_Name_0');
+    let customerPhone = CS.getAttributeValue('Customer_Phone_Number_0');
+    let emailFromContact = CS.getAttributeValue('Email_0');
+    let installationAddress = CS.getAttributeValue('Installation_Address_0');
+    let mainHeatingFuel = CS.getAttributeValue('Boiler_0:Fuel_Type_0');
+    let buildingType = CS.getAttributeValue('Property_Type_0');
+    let roomHeight = CS.getAttributeValue('Property_Heat_Loss_Section_0:Average_Room_Height_0');
+    let roomWidth = CS.getAttributeValue('Property_Heat_Loss_Section_0:Section_Width_0');
+    let roofType = CS.getAttributeValue('Property_Heat_Loss_Section_0:Roof_Type_0');
+    let windowType = CS.getAttributeValue('Property_Heat_Loss_Section_0:Window_Type_0');
+    let heatingOperational = CS.getAttributeValue('Boiler_Working_0');
+    let noStoreys = CS.getAttributeValue('Property_Heat_Loss_Section_0:Number_of_Storeys_0');
+    let secLength = CS.getAttributeValue('Property_Heat_Loss_Section_0:Section_Length_0');
+    let groundFloorType = CS.getAttributeValue('Property_Heat_Loss_Section_0:Ground_Floor_Type_0');
+    let externalWallType = CS.getAttributeValue('Property_Heat_Loss_Section_0:Outside_Walls_Type_0');
+
+    CS.setAttributeValue('Home_Efficiency_0:Customer_Name_0', customerName);
+    CS.setAttributeValue('Home_Efficiency_0:Customer_Phone_Number_0', customerPhone);
+    CS.setAttributeValue('Home_Efficiency_0:Customer_Email_0', emailFromContact);
+    CS.setAttributeValue('Home_Efficiency_0:Installation_Address_0', installationAddress);
+    CS.setAttributeValue('Home_Efficiency_0:Main_Heating_Fuel_0', mainHeatingFuel);
+    CS.setAttributeValue('Home_Efficiency_0:Type_of_Building_0', buildingType);
+    CS.setAttributeValue('Home_Efficiency_0:Room_Height_0', roomHeight);
+    CS.setAttributeValue('Home_Efficiency_0:Section_Width_0', roomWidth);
+    CS.setAttributeValue('Home_Efficiency_0:Roof_Type_0', roofType);
+    CS.setAttributeValue('Home_Efficiency_0:Window_Type_0', windowType);
+    CS.setAttributeValue('Home_Efficiency_0:Heating_Operational_0', heatingOperational);
+    CS.setAttributeValue('Home_Efficiency_0:Number_of_Storeys_0', noStoreys);
+    CS.setAttributeValue('Home_Efficiency_0:Section_Length_0', secLength);
+    CS.setAttributeValue('Home_Efficiency_0:Ground_Floor_Type_0', groundFloorType);
+    CS.setAttributeValue('Home_Efficiency_0:External_Wall_Type_0', externalWallType);
+    CS.setAttributeValue('Home_Efficiency_0:CHI_Lead_0', CHILead);
+
+    if (navigator.device){
+        if(interestedInMOT == true && giveConsent == true){
+
+            jQuery('[data-cs-binding="Home_Efficiency_0:Wall_Insulation_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Floor_Insulation_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Loft_Insulation_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Armed_Forces_Independence_Payment_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Carers_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Child_Tax_Credit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Contribution_Based_Jobseeker_s_Allowance__JSA__0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Housing_Benefit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_related_Employment_and_Support_Allowance__ESA__0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Industrial_Injuries_Disablement_Benefit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Pension_Guarantee_Credit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Severe_Disablement_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Working_Tax_Credit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Attendance_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Constant_Attendance_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Contribution_Based_Employment_and_Support_Allowance__ESA__0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Disability_Living_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_Support_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_based_Jobseekers_Allowance__JSA__0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Mobility_Supplement_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Personal_Independence_Payment_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Universal_Credit_0"]').prop( "disabled", false );
+
+
+        }else{
+            jQuery('[data-cs-binding="Home_Efficiency_0:Wall_Insulation_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Floor_Insulation_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Loft_Insulation_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Armed_Forces_Independence_Payment_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Carers_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Child_Tax_Credit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Contribution_Based_Jobseeker_s_Allowance__JSA__0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Housing_Benefit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_related_Employment_and_Support_Allowance__ESA__0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Industrial_Injuries_Disablement_Benefit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Pension_Guarantee_Credit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Severe_Disablement_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Working_Tax_Credit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Attendance_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Constant_Attendance_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Contribution_Based_Employment_and_Support_Allowance__ESA__0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Disability_Living_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_Support_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_based_Jobseekers_Allowance__JSA__0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Mobility_Supplement_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Personal_Independence_Payment_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Universal_Credit_0"]').prop( "disabled", true );
+
+        }
+    }else if(interestedInMOT == true && giveConsent == true){
+        
+            jQuery('[data-cs-binding="Home_Efficiency_0:Wall_Insulation_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Floor_Insulation_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Loft_Insulation_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Armed_Forces_Independence_Payment_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Carers_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Child_Tax_Credit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Contribution_Based_Jobseeker_s_Allowance__JSA__0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Housing_Benefit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_related_Employment_and_Support_Allowance__ESA__0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Industrial_Injuries_Disablement_Benefit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Pension_Guarantee_Credit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Severe_Disablement_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Working_Tax_Credit_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Attendance_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Constant_Attendance_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Contribution_Based_Employment_and_Support_Allowance__ESA__0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Disability_Living_Allowance_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_Support_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_based_Jobseekers_Allowance__JSA__0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Mobility_Supplement_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Personal_Independence_Payment_0"]').prop( "disabled", false );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Universal_Credit_0"]').prop( "disabled", false );
+
+    }else{
+            jQuery('[data-cs-binding="Home_Efficiency_0:Wall_Insulation_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Floor_Insulation_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Loft_Insulation_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Armed_Forces_Independence_Payment_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Carers_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Child_Tax_Credit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Contribution_Based_Jobseeker_s_Allowance__JSA__0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Housing_Benefit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_related_Employment_and_Support_Allowance__ESA__0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Industrial_Injuries_Disablement_Benefit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Pension_Guarantee_Credit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Severe_Disablement_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Working_Tax_Credit_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Attendance_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Constant_Attendance_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Contribution_Based_Employment_and_Support_Allowance__ESA__0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Disability_Living_Allowance_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_Support_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Income_based_Jobseekers_Allowance__JSA__0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Mobility_Supplement_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Personal_Independence_Payment_0"]').prop( "disabled", true );
+            jQuery('[data-cs-binding="Home_Efficiency_0:Universal_Credit_0"]').prop( "disabled", true );
+
+    }
+
+}
+
+/*window.enableHomeEfficiency = function enableHomeEfficiency(){
+    console.log('enableHomeEfficiency() Called');
+    let MOTCHILead = CS.getAttributeValue('Home_Efficiency_0:CHI_Lead_0');
+     if(MOTCHILead != ''){
+        jQuery('[data-cs-control="Home_Efficiency_0"]').attr('disabled', true);
+     }else
+     {
+        jQuery('[data-cs-control="Home_Efficiency_0"]').attr('disabled', false);
+     }
+}*/
+jQuery(document).ready(function(){
+
+window.enableHomeEfficiency = function enableHomeEfficiency(){
+
+    let MOTCHILead = CS.getAttributeValue('Home_Efficiency_0:CHI_Lead_0');
+    if(MOTCHILead != ''){
+        jQuery('[data-cs-control="Home_Efficiency_0"]').attr('disabled', true);
+    }else
+    {
+        jQuery('[data-cs-control="Home_Efficiency_0"]').attr('disabled', false);
+    }
+}
+
+});
