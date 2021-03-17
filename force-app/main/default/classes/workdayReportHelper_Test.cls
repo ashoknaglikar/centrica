@@ -1,6 +1,6 @@
 @isTest
 private class workdayReportHelper_Test{
- 
+   
    static Employee__c e;
    static void createTestData(){
       e = Phase3TestHelper.createEmployee();
@@ -32,6 +32,7 @@ private class workdayReportHelper_Test{
    
    }
    static testmethod void testMethod1(){
+      Test.setMock(HttpCalloutMock.class, new HttpMockup());
       
       CreateTestData();
       PageReference pageRef = new PageReference('/apex/workdayReport');
@@ -45,7 +46,7 @@ private class workdayReportHelper_Test{
    }
    
    static testmethod void testMethod2(){
-      
+      Test.setMock(HttpCalloutMock.class, new HttpMockup());
       CreateTestData();
       user usr = TestClassHelper.createUser();
       insert usr;
@@ -64,7 +65,7 @@ private class workdayReportHelper_Test{
    }
    
    static testmethod void testMethod3(){
-      
+      Test.setMock(HttpCalloutMock.class, new HttpMockup());
       CreateTestData();
       PageReference pageRef = new PageReference('/apex/workdayReport');
       Test.setCurrentPage(pageRef);
